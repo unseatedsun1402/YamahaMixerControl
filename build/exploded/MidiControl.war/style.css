@@ -1,0 +1,65 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 28 Mar 2024, 10:43:07
+    Author     : eblood@User.JLRCentral.com
+*/
+body 
+{
+    background-color: #666666
+}
+
+#ch-levels
+{
+    width: 100%;
+}
+
+.bank
+{
+    width: 100%;
+    justify-content: space-between;
+    text-align: center;
+    height: window-height;
+    float: left;
+    
+    
+}
+
+label{
+    font-family:sans-serif;
+    color: #cccccc;
+}
+
+
+
+#ch-edit-select
+{
+    padding-left: 5px;
+    padding-right: 5px;
+    color: #cccccc
+}
+
+input[type="range"]
+{
+    -webkit-appearance: slider-vertical;
+    writing-mode: bt-lr;
+}
+
+.chfader
+{
+    -webkit-appearance: slider-vertical;
+    writing-mode: bt-lr;
+    accent-color: #ffff00;
+    appearance: none;
+    min-width: 20px;
+    max-width: 50px;
+    width:auto;
+    height: 100%;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    padding-right: 5px;
+}

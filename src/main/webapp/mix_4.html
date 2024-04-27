@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit this template
+-->
+<html>
+    <head>
+        <title>Select Midi Device</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css"/>
+        <script>
+            var Client = {};
+
+            Client.socket = null;
+
+            Client.connect = (function(host) {
+                if ('WebSocket' in window) {
+                    Client.socket = new WebSocket(host);
+                } else if ('MozWebSocket' in window) {
+                    Client.socket = new MozWebSocket(host);
+                    } else {
+                    console.log('Error: WebSocket is not supported by this browser.');
+                    return;
+            }
+
+            Client.socket.onopen = function () 
+            {
+                console.log('Info: WebSocket connection opened.');
+                elements = document.getElementsByClassName("chfader");
+                for(let element of elements)
+                {
+                element.addEventListener("input",function() 
+                    {
+                        let message = JSON.stringify({id:this.id,param:83,value:this.value});
+                        Client.sendMessage(message);
+                    });
+                }
+            };
+
+            Client.socket.onclose = function () {
+                //document.getElementById('Client').onkeydown = null;
+                console.log('Info: WebSocket closed.');
+            };
+
+            Client.socket.onmessage = function (message) {
+                console.log(message.data);
+            };
+        });
+
+        Client.initialize = function() {
+            if (window.location.protocol == 'http:') {
+                Client.connect('ws://' + window.location.host + '/MidiControl/endpoint');
+            } else {
+                Client.connect('wss://' + window.location.host + '/MidiControl/endpoint');
+            }
+        };
+
+        Client.sendMessage = (function(msg) {
+            //var message = document.getElementById('Client').value;
+            var message = msg;
+            if (message != '') {
+                Client.socket.send(message);
+                //document.getElementById('Client').value = '';
+            }
+        });
+        
+        Client.initialize();
+        </script>
+    </head>
+    <body>
+        <div id="ch-levels" style="float:none;">
+            <div class="bank">
+                <div class="fader-container">
+                <input type="range" class="chfader" id="ch42" min="0" max="127"><label for="ch1">ch1 </label>
+                </div>
+                <div class="fader-container">
+                <input type="range" class="chfader" id="ch43" min="0" max="127"><label for="ch2">ch2 </label>
+                </div>
+                <div class="fader-container">
+                    <input type="range" class="chfader" id="ch44" min="0" max="127"><label for="ch3">ch3 </label>
+                </div>
+                <div class="fader-container">
+                    <input type="range" class="chfader" id="ch45" min="0" max="127"><label for="ch4">ch4 </label>
+                </div>
+            </div>
+
+            <!-- row 1 -->
+            <div class="bank">
+                <div class="fader-container">
+                <input type="range" class="chfader" id="ch46" min="0" max="127"><label for="ch5">ch5 </label>
+                </div>
+                <div class="fader-container">
+                <input type="range" class="chfader" id="ch47" min="0" max="127"><label for="ch6">ch6 </label>
+                </div>
+                <div class="fader-container">
+                <input type="range" class="chfader" id="ch48" min="0" max="127"><label for="ch7">ch7 </label>
+                </div>
+                <div class="fader-container">
+                <input type="range" class="chfader" id="ch49" min="0" max="127"><label for="ch8">ch8 </label>
+                </div>
+            </div>
+
+            <!--row 2 -->
+            <div class="bank">
+                <div class="fader-container"><input type="range" class="chfader" id="ch50" min="0" max="127" style="accent-color: #00FFFF;">
+                    <label for="ch9">ch9 </label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch51" min="0" max="127" style="accent-color: #00FFFF;">
+                    <label for="ch10">ch10</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch52" min="0" max="127" style="accent-color: #00FFFF;">
+                    <label for="ch11">ch11</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch53" min="0" max="127" style="accent-color: #00FFFF;">
+                    <label for="ch12">ch12</label></div>
+            </div>
+
+            <!-- row 3 -->
+            <div class="bank">
+                <div class="fader-container"><input type="range" class="chfader" id="ch54" min="0" max="127" style="accent-color: #00FFFF;">
+                    <label for="ch13">ch13</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch55" min="0" max="127" style="accent-color: #00FFFF;">
+                    <label for="ch14">ch14</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch56" min="0" max="127" style="accent-color: #00FFFF;">
+                    <label for="ch15">ch15</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch57" min="0" max="127" style="accent-color: #00FFFF;">
+                    <label for="ch16">ch16</label></div>
+            </div>
+            
+            <!-- row 4 -->
+            <div class="bank">
+                <div class="fader-container"><input type="range" class="chfader" id="ch58" min="0" max="127" style="accent-color: #FF2222;">
+                    <label for="ch17">kick</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch59" min="0" max="127" style="accent-color: #FF2222;">
+                    <label for="ch18">kick</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch60" min="0" max="127" style="accent-color: #FF2222;">
+                    <label for="ch19">snr </label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch61" min="0" max="127" style="accent-color: #FF2222;">
+                    <label for="ch20">snr </label></div>
+                </div>
+            
+            <!-- row 5 -->
+            <div class="bank">
+                <div class="fader-container"><input type="range" class="chfader" id="ch62" min="0" max="127" style="accent-color: #FF2222;">
+                    <label for="ch21">hats</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch63" min="0" max="127" style="accent-color: #FF2222;">
+                    <label for="ch22">ride</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch64" min="0" max="127" style="accent-color: #FF2222;">
+                    <label for="ch23">tom</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch65" min="0" max="127" style="accent-color: #FF2222;">
+                    <label for="ch24">tom</label></div>
+            </div>
+            
+            <!-- row 6 -->
+            <div class="bank">
+                <div class="fader-container"><input type="range" class="chfader" id="ch66" min="0" max="127"><label for="ch25">crsh</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch67" min="0" max="127"><label for="ch26">crsh</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch68" min="0" max="127"><label for="ch27">oh l</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch69" min="0" max="127"><label for="ch28">oh r</label></div>
+            </div>
+            
+            <!-- row 7 -->
+            <div class="bank">
+                <div class="fader-container"><input type="range" class="chfader" id="ch70" min="0" max="127"><label for="ch29">ch29</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch71" min="0" max="127"><label for="ch30">ch30</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch72" min="0" max="127"><label for="ch31">ch31</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch73" min="0" max="127"><label for="ch32">ch32</label></div>
+            </div>
+            
+            <!-- row 8 -->
+            <div class="bank">
+                <div class="fader-container"><input type="range" class="chfader" id="ch74" min="0" max="127"><label for="ch33">ch33</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch75" min="0" max="127"><label for="ch34">ch34</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch76" min="0" max="127"><label for="ch35">ch35</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch77" min="0" max="127"><label for="ch36">ch36</label></div>
+            </div>
+            
+            <!-- row 9 -->
+            <div class="bank">
+                <div class="fader-container"><input type="range" class="chfader" id="ch78" min="0" max="127"><label for="ch37">ch37</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch79" min="0" max="127"><label for="ch38">ch38</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch80" min="0" max="127"><label for="ch39">ch39</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch81" min="0" max="127"><label for="ch40">ch40</label></div>
+            </div>
+            
+            <!-- row 10 -->
+            <div class="bank">
+                <div class="fader-container"><input type="range" class="chfader" id="ch82" min="0" max="127"><label for="ch41">ch41</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch83" min="0" max="127"><label for="ch42">ch42</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch84" min="0" max="127"><label for="ch43">ch43</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch85" min="0" max="127"><label for="ch44">ch44</label></div>
+            </div>
+            
+            <!-- row 12 -->
+            <div class="bank">
+                <div class="fader-container"><input type="range" class="chfader" id="ch86" min="0" max="127"><label for="ch45">ch45</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch87" min="0" max="127"><label for="ch46">ch46</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch88" min="0" max="127"><label for="ch47">ch47</label></div>
+                <div class="fader-container"><input type="range" class="chfader" id="ch89" min="0" max="127"><label for="ch48">ch48</label></div>
+            </div>
+        </div>
+        
+    </body>
+</html>

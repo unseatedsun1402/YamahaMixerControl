@@ -1,0 +1,84 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 28 Mar 2024, 10:43:07
+    Author     : eblood@User.JLRCentral.com
+*/
+body 
+{
+    background-color: #666666
+}
+
+#ch-levels
+{
+    width: 100%;
+    justify-content: space-between;
+}
+
+.bank
+{
+    justify-content: space-between;
+    float: left;
+    max-width: 75%;
+    max-margin: 25%;
+    
+    
+}
+
+.fader-container
+{
+    justify-content: space-between;
+    float: left;
+    height:max;
+    min-width: 5%;
+    max-width: 22%;
+    max-margin: 25%;
+}
+
+label{
+    font-family:sans-serif;
+    color: #cccccc;
+    float:none;
+    height: inherit;
+}
+
+
+
+#ch-edit-select
+{
+    padding-left: 5%;
+    padding-right: 5%;
+    color: #cccccc;
+    float: none;
+}
+
+
+input[type="range"].chfader
+{
+    -webkit-appearance: slider-vertical;
+    writing-mode: bt-lr;
+    min-width: 20px;
+    max-width: 30px;
+    min-height: 200px;
+    max-height: 500px;
+    //padding: 5%;
+    //margin: 2%;
+}
+.chfader
+{
+    writing-mode: bt-lr;
+    accent-color: #ffff00;
+    appearance: none;
+    min-width: 20px;
+    max-width: 30px;
+    width:auto;
+    height: 250px;
+    float: none;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    max-padding-right: 5%;
+    max-padding-left: 5%;
+}
