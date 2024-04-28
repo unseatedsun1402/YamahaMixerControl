@@ -14,6 +14,7 @@ body
 #ch-levels
 {
     width: 100%;
+    padding-top: 5%;
     justify-content: space-between;
 }
 
@@ -40,8 +41,7 @@ body
 label{
     font-family:sans-serif;
     color: #cccccc;
-    float:none;
-    height: inherit;
+    
 }
 
 
@@ -55,30 +55,54 @@ label{
 }
 
 
-input[type="range"].chfader
+.chfader input[type="range"]
 {
-    -webkit-appearance: slider-vertical;
-    writing-mode: bt-lr;
-    min-width: 20px;
-    max-width: 30px;
-    min-height: 200px;
-    max-height: 500px;
-    //padding: 5%;
-    //margin: 2%;
+    -webkit-appearance: none; /* Override default CSS styles */
+    appearance: none;
+    width: 41vh; /* Specified height */
+    transform: rotate(270deg); /* Rotate the container vertically */
+    margin-left: -12vh;
+    margin-top: 20vh;
+    margin-bottom: -25vh;
+    background: transparent; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+    transition: opacity 0.2s;
 }
+
+
+.chfader input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 5.5vh;
+    height: 4vh;
+    box-shadow: -2px 2px 2px 0 #111;
+    border-radius: 1vh;
+    background: #DDDDDD;
+    cursor: pointer;
+    margin-top: -1.5vh;
+}
+
+.chfader input[type="range"]::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #222222;
+  border-radius: 1vw;
+  opacity: 0.7;
+  height: 1vh;
+}
+
+
+.chfader label
+{
+    
+}
+
 .chfader
 {
-    writing-mode: bt-lr;
-    accent-color: #ffff00;
-    appearance: none;
-    min-width: 20px;
-    max-width: 30px;
-    width:auto;
-    height: 250px;
-    float: none;
-    outline: none;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-    max-padding-right: 5%;
-    max-padding-left: 5%;
+    height: 45vh;
+    max-width: 12vh;
+    float: left;
+    background-color: transparent;
 }

@@ -28,14 +28,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             {
                 console.log('Info: WebSocket connection opened.');
                 elements = document.getElementsByClassName("chfader");
-                for(let element of elements)
-                {
-                element.addEventListener("input",function() 
-                    {
-                        let message = JSON.stringify({id:this.id,param:83,value:this.value});
-                        Client.sendMessage(message);
-                    });
-                }
+                buildpage();
             };
 
             Client.socket.onclose = function () {
@@ -64,8 +57,54 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
                 //document.getElementById('Client').value = '';
             }
         });
-        
         Client.initialize();
+        </script>
+        
+        <script>
+       function sendMessage(element){
+           let message = JSON.stringify({id:element.id,param:element.className,value:element.value});
+           Client.sendMessage(message);
+       }
+       
+       async function buildpage(){
+            const URL='http://'+window.location.host+'/MidiControl/buildpage?coarse=83&fine=106';
+            const Res= fetch(URL);
+            const response= await Res;
+            const json= await response.text();
+            if(!(json==null)){
+                document.getElementById("ch-levels").innerHTML = json;
+                console.log(json);
+                elements = document.getElementsByClassName("channelfader");
+                for(let element of elements){
+                    console.log(element.id);
+                }
+            }
+            
+            
+        }     
+            
+        async function selectDevice(){
+            const URL='http://'+window.location.host+'/MidiControl/devices';
+            const Res= fetch(URL);
+            const response= await Res;
+            const json= await response.text();
+            if(!(json==null)){
+                document.getElementById("midiDevice").innerHTML = json;
+            }
+        }
+        function doSet(){
+            var selector = document.getElementById("midi-select");
+            console.log(selector.value);
+            if(!(selector==null)){
+                fetch("setmididevice?set="+selector.value);
+                //alert("device selected: "+selector.value);
+                document.getElementById("selected").innerHTML ="<h2>"+selector.options[selector.value].innerHTML+" in use</h2>";
+                }
+            }
+           
+        selectDevice();
+        
+        
         </script>
     </head>
     <body>

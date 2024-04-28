@@ -42,8 +42,6 @@ public class Socket {
     @OnOpen
     public void onOpen(Session session) {
         System.out.println("\nconnection initiated");// Handle new connection
-        //System.out.print("\rURI: "+session.getRequestURI()+"\n");
-        //System.out.println(session.getUserPrincipal());
         
         if(!(ms == null)){
             if(!(serverexists())){
@@ -74,7 +72,7 @@ public class Socket {
             System.out.println("Error: In sendMidi");
             System.out.println(e);
         }
-        return("message sent");
+        return(message);
     }
     
     //@OnError

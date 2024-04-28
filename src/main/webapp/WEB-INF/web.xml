@@ -17,6 +17,15 @@
         <url-pattern>/setmididevice</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+        <servlet-name>BuildMixView</servlet-name>
+        <servlet-class>MidiControl.BuildPage</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BuildMixView</servlet-name>
+    <url-pattern>/buildpage</url-pattern>
+    </servlet-mapping>
+    
     <login-config>
         <auth-method>BASIC</auth-method>
     </login-config>

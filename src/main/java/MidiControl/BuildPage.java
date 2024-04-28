@@ -31,9 +31,26 @@ public class BuildPage extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         
         try (PrintWriter out = response.getWriter()) {
-            int corse = Integer.parseInt(request.getParameter("corse"));
-            int finse = Integer.parseInt(request.getParameter("fine"));
-            
+            int coarse = Integer.parseInt(request.getParameter("coarse"));
+            int fine = Integer.parseInt(request.getParameter("fine"));
+            //out.println("<table>");
+            //out.println("<tr>");
+            for(int i = 0; i < 48; i ++){
+                if(i%4==0){
+                        out.println("<div class=\"bank\">");
+                }
+                if(i%4==3){
+                    out.println("</div>");
+                }
+                    
+                out.println("<div class=\"chfader\">");
+                out.println("<input type=\"range\" id=\"c"+(fine+i)+"\" oninput=\"sendMessage(this)\"/>");
+                out.println("<br><label for=\"ch"+fine+"\" id=\"f"+(fine+i)+"\">");
+                
+                out.println("ch"+(i+1));
+                out.println("</label>");
+                out.println("</div>");
+            }
             
         }
         catch (Exception e){
