@@ -1,6 +1,6 @@
 # YamahaMixerControl
 Java based service using midi to control Yamaha Digital mixers from a web-page interface.<br/>
-<br/>---- prerequisites ----
+<br/>---- prerequisites ----<br/>
 Developed and deployed on tomcat server version 10.0.23
 Compiled using jdk 21
 Not all midi drivers are supported. If a device doesn't show up it might not be supported on your particular OS version. Most seem to work fine on Windows and MacOS but I had issues with cheap usb midi cables on Debian.
