@@ -4,21 +4,33 @@
  */
 package MidiControl;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.File;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
+import java.io.Writer;
+import static java.lang.String.format;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
- * Servlet to build mix view pages
+ *
  * @author ethanblood
  */
-public class BuildPage extends HttpServlet {
-    
+public class ChangeJSONNames extends HttpServlet {
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -31,34 +43,35 @@ public class BuildPage extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String path = new File("../").getCanonicalPath() + "/conf/channels.json";
-        ReadChannelTable.setfile(path);
-        List<String> chnames = ReadChannelTable.getChannelnames();
-        
         try (PrintWriter out = response.getWriter()) {
-            int coarse = Integer.parseInt(request.getParameter("coarse"));
-            int fine = Integer.parseInt(request.getParameter("fine"));
-            for(int i = 0; i < 48; i ++){
-                if(i%4==0){
-                        out.println("<div class=\"bank\">");
-                }
-                
-                    
-                out.println("<div class=\"chfader\">");
-                out.println("<input type=\"range\" max=\"127\" id=\"ch"+(fine+i)+"\" oninput=\"sendMessage(this)\"/>");
-                out.println("<br><br><br><label for=\"chfader\" id=\"f"+(fine+i)+"\">");
-                out.println(chnames.get(i));
-                out.println("</label>");
-                out.println("</div>");
-                
-                if(i%4==3){
-                    out.println("</div>");
-                }
-            }
+            int channel = Integer.parseInt(request.getParameter("channel"));
+            String name = request.getParameter("name");
             
+            String path = new File("../").getCanonicalPath() + "/conf/channels.json";
+            var obj = JsonParser.parseReader(new FileReader(path));
+            List<JsonElement> jsonArray = obj.getAsJsonArray().asList();
+            var elmnt = jsonArray.remove(channel-1).getAsJsonObject();
+            elmnt.remove("short");
+            elmnt.addProperty("short", name);
+            jsonArray.add(channel-1, elmnt);
+            
+            Gson gson = new GsonBuilder().create();
+            Writer writer = new FileWriter(path);
+            JsonWriter gsonWriter = gson.newJsonWriter(writer);
+            gsonWriter.beginArray();
+            for(JsonElement each : jsonArray){
+                gson.toJson(each, gsonWriter);
+            }
+            gsonWriter.endArray();
+            gsonWriter.close();
+            writer.close();
+            System.out.println("Success written file");
+            
+        out.println(format("Added %s",request.getParameter("name")));
         }
-        catch (Exception e){
-            System.out.println(e);
+        catch (Exception e)
+        {
+                Logger.getGlobal().warning(e.toString());
         }
     }
 

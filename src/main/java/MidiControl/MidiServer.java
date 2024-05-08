@@ -19,15 +19,10 @@ import javax.sound.midi.*;
 
 class MidiServer implements MidiInterface,Runnable
 {
-    boolean runwhile;
     static Receiver rcvr;
     static MidiDevice midiport;
     static Transmitter tx;
     static ConcurrentLinkedQueue<ShortMessage[]> buffer = new ConcurrentLinkedQueue<>();
-    
-    public void setrunwhile(boolean flag){
-        runwhile = flag;
-    }
     
     public static void addtosendqueue(ShortMessage[] commands){
         buffer.add(commands);
@@ -74,19 +69,11 @@ class MidiServer implements MidiInterface,Runnable
     @Override
     public void run(){
         while(true){
-            //if(!(rcvr == null)){
             SyncSend checkbuffer = new SyncSend(buffer,rcvr);
             Thread send = new Thread(checkbuffer);
             send.start();
             try {
-                //Thread.sleep(50);
-                //System.out.println("sending");
-                //try {
                 send.join();
-                //} catch (InterruptedException ex) {
-                //    Logger.getLogger(MidiServer.class.getName()).log(Level.SEVERE, null, ex);
-                //}
-                //}
             } catch (InterruptedException ex) {
                 Logger.getLogger(MidiServer.class.getName()).log(Level.SEVERE, null, ex);
             }

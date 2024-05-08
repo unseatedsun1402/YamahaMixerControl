@@ -19,7 +19,6 @@ public class Socket {
     
     public void Socket(){
         MidiServer ms = new MidiServer();
-        //Thread listener = new Thread(ms);
     }
     
     
@@ -50,7 +49,6 @@ public class Socket {
         }
         else{
             ms = new MidiServer();
-            ms.setrunwhile(true);
             listener = new Thread(ms);
             listener.start();
         }
@@ -64,9 +62,7 @@ public class Socket {
             return ("Not Okay");
         }
         try{
-        //ms.sendMidi(message);
         MidiServer.bufferMidi(message);
-        //System.out.println(message);
         }
         catch(Exception e){
             System.out.println("Error: In sendMidi");
@@ -75,11 +71,7 @@ public class Socket {
         return(message);
     }
     
-    //@OnError
-    //public String OnError (String message) {
-    //    return ("console.log(\"error!\")");
-    //}
-    
+
     @OnClose
     public void onClose(Session session) throws IOException{
         session.close();
