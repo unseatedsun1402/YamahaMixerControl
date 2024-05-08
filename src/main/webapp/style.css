@@ -15,94 +15,121 @@ body
 {
     width: 100%;
     padding-top: 5%;
-    justify-content: space-between;
+    text-align: centre;
+    margin: auto;
+    float: left;
 }
 
 .bank
 {
-    justify-content: space-between;
-    float: left;
-    max-width: 75%;
-    max-margin: 25%;
-    
+    width: -moz-fit-content;
+    width: fit-content;
     
 }
 
-.fader-container
-{
-    justify-content: space-between;
-    float: left;
-    height:max;
-    min-width: 5%;
-    max-width: 22%;
-    max-margin: 25%;
+h2{
+    font-family:sans-serif;
+    color: #cccccc;
+    
 }
-
-label{
+Input[type="selector"]{
     font-family:sans-serif;
     color: #cccccc;
     
 }
 
 
-
-#ch-edit-select
+#midiDevice
 {
-    padding-left: 5%;
-    padding-right: 5%;
     color: #cccccc;
-    float: none;
+    width: 100%;
 }
 
-
+@media (orientation: portrait) {
 .chfader input[type="range"]
 {
-    -webkit-appearance: none; /* Override default CSS styles */
+    -webkit-appearance: none;
     appearance: none;
-    width: 41vh; /* Specified height */
-    transform: rotate(270deg); /* Rotate the container vertically */
-    margin-left: -12vh;
-    margin-top: 20vh;
-    margin-bottom: -25vh;
-    background: transparent; /* Grey background */
-    outline: none; /* Remove outline */
-    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
-    -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+    width: 50vh;
+    transform: rotate(270deg);
+    margin-left: -15vh;
+    background: transparent;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: 0.2s;
     transition: opacity 0.2s;
 }
+}
 
+@media (orientation: landscape) {
+.chfader input[type="range"]
+{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 55vh;
+    transform: rotate(270deg);
+    margin-left: -15vh;
+    background: transparent;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: 0.2s;
+    transition: opacity 0.2s;
+}
+}
 
 .chfader input[type="range"]::-webkit-slider-thumb{
     -webkit-appearance: none;
     appearance: none;
-    width: 5.5vh;
-    height: 4vh;
-    box-shadow: -2px 2px 2px 0 #111;
+    width: 5.75vh;
+    height: 3.75vh;
+    box-shadow: -3px 3px 2px 0 #111;
     border-radius: 1vh;
-    background: #DDDDDD;
+    border-bottom: 2px solid rgba(17, 50, 17, 0.621);
+    border-left: 4px solid rgba(20, 70, 20,0.75);
+    border-right: 2px solid rgba(17, 50, 17, 0.804);
+    background: linear-gradient(90deg,#ccc,#eee,#ccc);
     cursor: pointer;
-    margin-top: -1.5vh;
+    margin-top: -1.2vh;
 }
+
 
 .chfader input[type="range"]::-webkit-slider-runnable-track {
   -webkit-appearance: none;
   appearance: none;
-  background: #222222;
+  background: #ffea00;
   border-radius: 1vw;
   opacity: 0.7;
-  height: 1vh;
+  height: 1.5vh;
 }
 
-
-.chfader label
-{
-    
+label[for="chfader"]{
+    transform: translate(20vh,4vw);
+    font-family: sans-serif;
+    color: #fff;
+    text-shadow: #111;
+    text-align: right;
 }
 
-.chfader
-{
-    height: 45vh;
-    max-width: 12vh;
-    float: left;
-    background-color: transparent;
+@media (orientation: landscape) {
+    .chfader
+    {
+        height: 65vh;
+        min-width: 6%;
+        max-width: 12%;
+        width: auto;
+        float: left;
+        transform: translate(0vh,20vh)
+    }
+}
+
+@media (orientation: portrait) {
+    .chfader
+    {
+        height: 55vh;
+        min-width: 20%;
+        max-width: 25%;
+        width: auto;
+        float: left;
+        transform: translate(00vh,25vh)
+    }
 }

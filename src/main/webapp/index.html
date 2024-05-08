@@ -34,6 +34,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             Client.socket.onclose = function () {
                 //document.getElementById('Client').onkeydown = null;
                 console.log('Info: WebSocket closed.');
+                try {
+                    if(!Client.connect(host)){
+                        alert("Connection Lost");
+                    }
+                    else{
+                        alert("Reconnected");
+                    }
+                }
+                catch (Exception){
+                    alert("Reconnected");
+                }
             };
 
             Client.socket.onmessage = function (message) {
@@ -62,7 +73,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         
         <script>
        function sendMessage(element){
-           let message = JSON.stringify({id:element.id,param:element.className,value:element.value});
+           let message = JSON.stringify({id:element.id,param:0,value:element.value});
            Client.sendMessage(message);
        }
        
@@ -73,7 +84,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             const json= await response.text();
             if(!(json==null)){
                 document.getElementById("ch-levels").innerHTML = json;
-                console.log(json);
                 elements = document.getElementsByClassName("channelfader");
                 for(let element of elements){
                     console.log(element.id);
@@ -97,7 +107,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             console.log(selector.value);
             if(!(selector==null)){
                 fetch("setmididevice?set="+selector.value);
-                //alert("device selected: "+selector.value);
                 document.getElementById("selected").innerHTML ="<h2>"+selector.options[selector.value].innerHTML+" in use</h2>";
                 }
             }
@@ -110,7 +119,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
     <body>
         <div id="ch-levels" style="float:none;">
         </div>
-        
         <div id="midiDevice">Selection Goes Here</div>
         <div id="selected"></div>
     </body>

@@ -27,16 +27,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             Client.socket.onopen = function () 
             {
                 console.log('Info: WebSocket connection opened.');
-                elements = document.getElementsByClassName("chfader");
                 buildpage();
-                for(let element of elements)
-                {
-                element.addEventListener("input",function() 
-                    {
-                        let message = JSON.stringify({id:this.id,param:0,value:this.value});
-                        Client.sendMessage(message);
-                    });
-                }
             };
 
             Client.socket.onclose = function () {
@@ -58,11 +49,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         };
 
         Client.sendMessage = (function(msg) {
-            //var message = document.getElementById('Client').value;
             var message = msg;
             if (message != '') {
                 Client.socket.send(message);
-                //document.getElementById('Client').value = '';
             }
         });
         Client.initialize();
@@ -70,7 +59,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         
         <script>
        function sendMessage(element){
-           let message = JSON.stringify({id:element.id,param:element.className,value:element.value});
+           let message = JSON.stringify({id:element.id,param:1,value:element.value});
            Client.sendMessage(message);
        }
        

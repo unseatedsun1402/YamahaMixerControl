@@ -32,8 +32,18 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             };
 
             Client.socket.onclose = function () {
-                //document.getElementById('Client').onkeydown = null;
                 console.log('Info: WebSocket closed.');
+                try {
+                    if(!Client.connect(host)){
+                        alert("Connection Lost");
+                    }
+                    else{
+                        alert("Reconnected");
+                    }
+                }
+                catch (Exception){
+                    alert("Connection Lost");
+                }
             };
 
             Client.socket.onmessage = function (message) {
@@ -50,11 +60,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         };
 
         Client.sendMessage = (function(msg) {
-            //var message = document.getElementById('Client').value;
             var message = msg;
             if (message != '') {
                 Client.socket.send(message);
-                //document.getElementById('Client').value = '';
             }
         });
         Client.initialize();
@@ -62,7 +70,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         
         <script>
        function sendMessage(element){
-           let message = JSON.stringify({id:element.id,param:element.className,value:element.value});
+           let message = JSON.stringify({id:element.id,param:83,value:element.value});
            Client.sendMessage(message);
        }
        
