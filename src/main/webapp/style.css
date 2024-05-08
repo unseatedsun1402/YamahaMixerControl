@@ -4,7 +4,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 */
 body 
 {
-    background-color: #666666
+    background-color: #777
 }
 
 #ch-levels
@@ -83,7 +83,7 @@ Input[type="selector"]{
     border-bottom: 2px solid rgba(17, 50, 17, 0.621);
     border-left: 4px solid rgba(20, 70, 20,0.75);
     border-right: 2px solid rgba(17, 50, 17, 0.804);
-    background: linear-gradient(90deg,#ccc,#eee,#ccc);
+    background: linear-gradient(90deg,#bbb,#eee,#bbb);
     cursor: pointer;
     margin-top: -1.2vh;
 }

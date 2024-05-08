@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit this template
+-->
+<html>
+    <head>
+        <title>Change Names</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div>
+            <form id="changenameform" action="changenames" method="get">
+                <label for="textinput">New name</label>
+                <input type="text" maxlength="8" name="name" id="name"/><!-- New Name -->
+                <label for="numbinput">For Channel</label>
+                <input type="number" max="48" min="1" name="channel" id="channel"/>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </body>
+</html>
