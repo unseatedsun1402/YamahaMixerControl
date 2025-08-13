@@ -1,0 +1,6 @@
+#ignore bins
+*.exe
+*.bins
+
+#ignore build
+build
