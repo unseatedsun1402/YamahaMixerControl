@@ -10,6 +10,7 @@ dependencies {
     providedCompile 'jakarta.platform:jakarta.jakartaee-web-api:10.0.0'
     
     testImplementation     'junit:junit:4.13'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson

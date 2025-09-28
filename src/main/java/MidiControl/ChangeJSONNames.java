@@ -18,12 +18,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.io.Writer;
 import static java.lang.String.format;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
 /**
  *

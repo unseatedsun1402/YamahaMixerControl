@@ -18,7 +18,7 @@ import java.util.List;
  * @author ethanblood
  */
 public class BuildPage extends HttpServlet {
-    
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.

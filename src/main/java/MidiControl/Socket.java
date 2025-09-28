@@ -5,7 +5,6 @@
 package MidiControl;
 import jakarta.websocket.*;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 
 /**
@@ -17,10 +16,10 @@ public class Socket {
     static MidiServer ms;
     static Thread listener;
     
-    public void Socket(){
+    public Socket(){
         MidiServer ms = new MidiServer();
+        ms.run();
     }
-    
     
     private boolean serverexists(){
         if(!(listener == null)){

@@ -3,4 +3,4 @@
 *.bins
 
 #ignore build
-build
+build/generated

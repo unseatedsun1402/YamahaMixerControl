@@ -3,11 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package MidiControl;
-import java.math.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.*;
@@ -17,14 +13,17 @@ import javax.sound.midi.*;
  * @author ethanblood
  */
 
-class MidiServer implements MidiInterface,Runnable
-{
+class MidiServer implements MidiInterface, Runnable {
     static Receiver rcvr;
     static MidiDevice midiport;
     static Transmitter tx;
     static ConcurrentLinkedQueue<ShortMessage[]> buffer = new ConcurrentLinkedQueue<>();
-    
-    public static void addtosendqueue(ShortMessage[] commands){
+
+    // Input MIDI buffer and receiver
+    static ConcurrentLinkedQueue<MidiMessage> inputBuffer = new ConcurrentLinkedQueue<>();
+    static MidiInputReceiver inputReceiver;
+
+    public static void addtosendqueue(ShortMessage[] commands) {
         buffer.add(commands);
     }
     
@@ -45,8 +44,15 @@ class MidiServer implements MidiInterface,Runnable
      * @param dev
      * @throws MidiUnavailableException 
      */
-    protected static void setTransmitter(int dev) throws MidiUnavailableException{
+    protected static void setTransmitter(int dev) throws MidiUnavailableException {
         tx = MidiInterface.getTransmitter(dev);
+        // Attach input receiver to transmitter for incoming MIDI
+        if (tx != null) {
+            if (inputReceiver == null) {
+                inputReceiver = new MidiInputReceiver(inputBuffer);
+            }
+            tx.setReceiver(inputReceiver);
+        }
     }
     
     /**
@@ -67,15 +73,32 @@ class MidiServer implements MidiInterface,Runnable
     }
     
     @Override
-    public void run(){
-        while(true){
-            SyncSend checkbuffer = new SyncSend(buffer,rcvr);
+    public void run() {
+        while (true) {
+            // Process outgoing MIDI events
+            SyncSend checkbuffer = new SyncSend(buffer, rcvr);
             Thread send = new Thread(checkbuffer);
             send.start();
+
+            // Process incoming MIDI events
+            processIncomingMidi();
+
             try {
                 send.join();
+                Thread.sleep(2); // avoid busy loop
             } catch (InterruptedException ex) {
                 Logger.getLogger(MidiServer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    // Example: process and print incoming MIDI events
+    private void processIncomingMidi() {
+        while (!inputBuffer.isEmpty()) {
+            MidiMessage msg = inputBuffer.poll();
+            if (msg != null) {
+                // TODO: Replace with your own event handling logic
+                System.out.println("Received MIDI: " + msg);
             }
         }
     }
@@ -113,5 +136,25 @@ class MidiServer implements MidiInterface,Runnable
             }
         }
             
+    }
+    
+    public static void main(String[] args) {
+        try {
+            int deviceIndex = 0; // Default device index, can be changed or parsed from args
+            if (args.length > 0) {
+                try {
+                    deviceIndex = Integer.parseInt(args[0]);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid device index, using default 0.");
+                }
+            }
+            setDevice(deviceIndex);
+            MidiServer server = new MidiServer();
+            Thread serverThread = new Thread(server);
+            serverThread.start();
+            System.out.println("MidiServer started on device index: " + deviceIndex);
+        } catch (MidiUnavailableException e) {
+            System.err.println("Failed to start MidiServer: " + e.getMessage());
+        }
     }
 }
