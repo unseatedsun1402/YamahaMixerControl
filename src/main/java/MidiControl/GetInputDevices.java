@@ -20,7 +20,7 @@ import javax.sound.midi.MidiUnavailableException;
  *
  * @author ethanblood
  */
-public class GetDevices extends HttpServlet {
+public class GetInputDevices extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -48,22 +48,20 @@ public class GetDevices extends HttpServlet {
                 {   
                     //System.out.println(info);
                     int isout = javax.sound.midi.MidiSystem.getMidiDevice(info).getMaxReceivers();
-                    if(!(isout == 0)){
-                        out.println("<option value=\""+count+"\">"+info.getName()+" - MIDI OUT</option>");
+                    if(isout != 0)
+                    {
+                        out.println("<option value=\""+count+"\">"+info.getName()+" - MIDI IN</option>");
                     }
-                    
-                    else{
-                            out.println("<option value=\""+count+"\">"+info.getName()+" - MIDI IN</option>");}
                     count ++;
                 }
                 out.println("</select>");
-                out.println("<button onclick=doSet()>Set Device</button>");
+                out.println("<button onclick=doSet()>Set Input Device</button>");
                 //out.println("</form>");
                 
-                System.out.println("Called and done!");
+                System.out.println("Loaded input devices");
             } catch (MidiUnavailableException ex) 
             {
-                Logger.getLogger(GetDevices.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(GetInputDevices.class.getName()).log(Level.SEVERE, null, ex);
             }
             
             
@@ -106,7 +104,7 @@ public class GetDevices extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "This servlet returns a list of available midi devices";
     }// </editor-fold>
 
 }

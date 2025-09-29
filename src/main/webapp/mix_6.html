@@ -104,7 +104,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             var selector = document.getElementById("midi-select");
             console.log(selector.value);
             if(!(selector==null)){
-                fetch("setmididevice?set="+selector.value);
+                fetch("setmidioutputdevice?set="+selector.value);
                 //alert("device selected: "+selector.value);
                 document.getElementById("selected").innerHTML ="<h2>"+selector.options[selector.value].innerHTML+" in use</h2>";
                 }

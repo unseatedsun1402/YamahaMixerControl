@@ -106,7 +106,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             var selector = document.getElementById("midi-select");
             console.trace("Fader moved %s",selector.value);
             if(!(selector==null)){
-                fetch("setmididevice?set="+selector.value);
+                fetch("setmidioutputdevice?set="+selector.value);
                 document.getElementById("selected").innerHTML ="<h2>"+selector.options[selector.value].innerHTML+" in use</h2>";
                 }
             }
@@ -117,7 +117,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         </script>
     </head>
     <body>
-        <div id="midiDevice" style="text-align: center;font-family: sans-serif">Selection Goes Here</div>
+        <div id="midiDevice" style="text-align: center;font-family: sans-serif">Select and bind the midi input and output devices</div>
         <div id="selected" style="text-align: center"></div>
         <button onClick="location.href= 'http://'+window.location.host+'/MidiControl/changechannelnames.html';">Change a name</button>
         <div id="ch-levels" style="float:none;">
