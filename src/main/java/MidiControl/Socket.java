@@ -18,7 +18,6 @@ public class Socket {
     
     public Socket(){
         MidiServer ms = new MidiServer();
-        ms.run();
     }
     
     private boolean serverexists(){

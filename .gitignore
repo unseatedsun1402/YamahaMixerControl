@@ -3,5 +3,8 @@
 *.bins
 
 #ignore build
+build/
+build/classes/
 build/generated
-build/tmp
+.gradle/
+bin/

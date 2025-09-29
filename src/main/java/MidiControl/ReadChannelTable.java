@@ -7,6 +7,10 @@ import java.io.File;
 import com.google.gson.*;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,41 +20,51 @@ import java.util.List;
  * @author ethanblood
  */
 public class ReadChannelTable {
-    static private File file;
-    
-    /**
-     * Sets the file path to be used for getChannelnames
-     * @param path 
-     */
-    public static void setfile(String path){
-        file = new File(path);
-    }
-    
     /**
      * reads the set file as a json array or channel information
      * @return List<String>
      * @throws FileNotFoundException 
      */
     public static List<String> getChannelnames() throws FileNotFoundException{
-        var obj = JsonParser.parseReader(new FileReader(file));
-        List<JsonElement> jsonArray = obj.getAsJsonArray().asList();
         List<String> names = new ArrayList<>();
-        for(JsonElement item : jsonArray){
-            names.add(item.getAsJsonObject().get("short").getAsString());
+        try {
+            // Use resource stream instead of file path
+            InputStream is = ReadChannelTable.class.getClassLoader().getResourceAsStream("MidiControl/channels.json");
+            if (is == null) {
+                throw new FileNotFoundException("channels.json not found in classpath");
+            }
+            Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
+            var obj = JsonParser.parseReader(reader);
+            List<JsonElement> jsonArray = obj.getAsJsonArray().asList();
+            
+            for(JsonElement item : jsonArray){
+                names.add(item.getAsJsonObject().get("short").getAsString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return(names);
     }
     
     public static List<String> getChannelcolors() throws FileNotFoundException{
-        var obj = JsonParser.parseReader(new FileReader(file));
-        List<JsonElement> jsonArray = obj.getAsJsonArray().asList();
         List<String> colors = new ArrayList<>();
-        for(JsonElement item : jsonArray){
-            if(item.getAsJsonObject().has("color")){
-                colors.add(item.getAsJsonObject().get("color").getAsString());}
-            else{
-                colors.add("#ffea00");
+        try {
+            InputStream is = ReadChannelTable.class.getClassLoader().getResourceAsStream("MidiControl/channels.json");
+            if (is == null) {
+                throw new FileNotFoundException("channels.json not found in classpath");
             }
+            Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
+            var obj = JsonParser.parseReader(reader);
+            List<JsonElement> jsonArray = obj.getAsJsonArray().asList();
+            for(JsonElement item : jsonArray){
+                if(item.getAsJsonObject().has("color")){
+                    colors.add(item.getAsJsonObject().get("color").getAsString());
+                } else {
+                    colors.add("#ffea00");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return(colors);
     }
