@@ -8,3 +8,6 @@ build/classes/
 build/generated
 .gradle/
 bin/
+
+#allow war files
+!build/libs/*.war

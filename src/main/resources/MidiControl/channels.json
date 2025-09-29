@@ -1,0 +1,276 @@
+[{
+    "channel": 1,
+    "short":"ch 1",
+    "long":"ch 1"
+},
+{
+    "channel": 2,
+    "short":"ch 2",
+    "long":"ch 2"
+},
+{
+    "channel": 3,
+    "short":"ch 3",
+    "long":"ch 3"
+    
+},
+{
+    "channel": 4,
+    "short":"bv 1",
+    "long":"ch 4"
+    
+},
+{
+    "channel": 5,
+    "short":"bv 2",
+    "long":"ch 5"
+    
+},
+{
+    "channel": 6,
+    "short":"bv 3",
+    "long":"ch 6"
+    
+},
+{
+    "channel": 7,
+    "short":"lead",
+    "long":"ch 7"
+    
+},
+{
+    "channel": 8,
+    "short":"viln",
+    "long":"ch 8"
+    
+},
+{
+    "channel": 9,
+    "short":"keys",
+    "long":"ch 9"
+    
+},
+{
+    "channel": 10,
+    "short":"keys",
+    "long":"ch 10"
+    
+},
+{
+    "channel": 11,
+    "short":"inst1",
+    "long":"ch 11"
+    
+},
+{
+    "channel": 12,
+    "short":"inst2",
+    "long":"ch 12"
+    
+},
+{
+    "channel": 13,
+    "short":"ac.g",
+    "long":"ch 13"
+    
+},
+{
+    "channel": 14,
+    "short":"el.g",
+    "long":"ch 14"
+    
+},
+{
+    "channel": 15,
+    "short":"ac.g",
+    "long":"ch 15"
+    
+},
+{
+    "channel": 16,
+    "short":"bass",
+    "long":"ch 16"
+    
+},
+{
+    "channel": 17,
+    "short":"subk",
+    "long":"ch 17"
+    
+},
+{
+    "channel": 18,
+    "short":"kick",
+    "long":"ch 18"
+    
+},
+{
+    "channel": 19,
+    "short":"snr1",
+    "long":"ch 19"
+    
+},{
+    "channel": 20,
+    "short":"snr2",
+    "long":"ch 20"
+    
+},
+{
+    "channel": 21,
+    "short":"hiht",
+    "long":"ch 21"
+    
+},
+{
+    "channel": 22,
+    "short":"ride",
+    "long":"ch 22"
+    
+},
+{
+    "channel": 23,
+    "short":"toms",
+    "long":"ch 23"
+    
+},
+{
+    "channel": 24,
+    "short":"toms",
+    "long":"ch 24"
+    
+},
+{
+    "channel": 25,
+    "short":"crsh",
+    "long":"ch 25"
+    
+},
+{
+    "channel": 26,
+    "short":"crsh",
+    "long":"ch 26"
+    
+},
+{
+    "channel": 27,
+    "short":"ovhd",
+    "long":"ch 27"
+    
+},
+{
+    "channel": 28,
+    "short":"ovhd",
+    "long":"ch 28"
+    
+},
+{
+    "channel": 29,
+    "short":"room1",
+    "long":"ch 29"
+    
+},
+{
+    "channel": 30,
+    "short":"room2",
+    "long":"ch 30"
+    
+},
+{
+    "channel": 31,
+    "short":"ch 31",
+    "long":"ch 31"
+    
+},
+{
+    "channel": 32,
+    "short":"comp",
+    "long":"ch 32"
+    
+},
+{
+    "channel": 33,
+    "short":"purp",
+    "long":"ch 33"
+    
+},
+{
+    "channel": 34,
+    "short":"orng",
+    "long":"ch 34"
+    
+},
+{
+    "channel": 35,
+    "short":"grey",
+    "long":"ch 35"
+    
+},
+{
+    "channel": 36,
+    "short":"blue",
+    "long":"ch 36"
+    
+},
+{
+    "channel": 37,
+    "short":"red",
+    "long":"ch 37"
+},
+{
+    "channel": 38,
+    "short":"ylow",
+    "long":"ch 38"
+},
+{
+    "channel": 39,
+    "short":"atmx",
+    "long":"ch 39"
+},
+{
+    "channel": 40,
+    "short":"comp",
+    "long":"ch 40"
+},
+{
+    "channel": 41,
+    "short":"ch 41",
+    "long":"ch 41"
+},
+{
+    "channel": 42,
+    "short":"ch 42",
+    "long":"ch 42"
+},
+{
+    "channel": 43,
+    "short":"ch 43",
+    "long":"ch 43"
+},
+{
+    "channel": 44,
+    "short":"frnt",
+    "long":"ch 44"
+},
+{
+    "channel": 45,
+    "short":"frnt",
+    "long":"ch 45"
+},
+{
+    "channel": 46,
+    "short":"frnt",
+    "long":"ch 46"
+},
+{
+    "channel": 47,
+    "short":"room3",
+    "long":"ch 47"
+},
+{
+    "channel": 48,
+    "short":"v.pno",
+    "long":"ch 48"
+    
+}
+]
+        

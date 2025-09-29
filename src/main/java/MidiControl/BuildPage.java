@@ -31,26 +31,27 @@ public class BuildPage extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String path = new File("../").getCanonicalPath() + "/conf/channels.json";
-        ReadChannelTable.setfile(path);
         List<String> chnames = ReadChannelTable.getChannelnames();
-        
+
+        // Debug: print the size and contents of chnames
+        System.out.println("chnames.size() = " + chnames.size());
+        for (int i = 0; i < chnames.size(); i++) {
+            System.out.println("chnames[" + i + "] = " + chnames.get(i));
+        }
+
         try (PrintWriter out = response.getWriter()) {
             int coarse = Integer.parseInt(request.getParameter("coarse"));
             int fine = Integer.parseInt(request.getParameter("fine"));
             for(int i = 0; i < 48; i ++){
                 if(i%4==0){
                         out.println("<div class=\"bank\">");
-                }
-                
-                    
+                }   
                 out.println("<div class=\"chfader\">");
                 out.println("<input type=\"range\" max=\"127\" id=\"ch"+(fine+i)+"\" oninput=\"sendMessage(this)\"/>");
                 out.println("<br><br><br><label for=\"chfader\" id=\"f"+(fine+i)+"\">");
                 out.println(chnames.get(i));
                 out.println("</label>");
                 out.println("</div>");
-                
                 if(i%4==3){
                     out.println("</div>");
                 }

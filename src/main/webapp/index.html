@@ -42,12 +42,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
                     }
                 }
                 catch (Exception){
-                    alert("Reconnected");
+                    alert("Exception on reconnect");
                 }
             };
 
             Client.socket.onmessage = function (message) {
-                console.log(message.data);
+                console.trace('Verbose: %s',message.data);
             };
         });
 
@@ -63,6 +63,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             var message = msg;
             if (message != '') {
                 Client.socket.send(message);
+            }
+            else {
+                console.warn('%cWarning%c: No message to send.', 'color: orange; font-weight: bold;', 'color: inherit;');
             }
         });
         Client.initialize();
@@ -83,7 +86,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
                 document.getElementById("ch-levels").innerHTML = json;
                 elements = document.getElementsByClassName("channelfader");
                 for(let element of elements){
-                    console.log(element.id);
+                    console.debug("%cID%c: %s",'color: pink; font-weight: bold;', 'color: inherit;',element.id);
                 }
             }
             
@@ -101,7 +104,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         }
         function doSet(){
             var selector = document.getElementById("midi-select");
-            console.log(selector.value);
+            console.trace("Fader moved %s",selector.value);
             if(!(selector==null)){
                 fetch("setmididevice?set="+selector.value);
                 document.getElementById("selected").innerHTML ="<h2>"+selector.options[selector.value].innerHTML+" in use</h2>";

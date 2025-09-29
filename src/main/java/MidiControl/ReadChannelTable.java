@@ -28,16 +28,14 @@ public class ReadChannelTable {
     public static List<String> getChannelnames() throws FileNotFoundException{
         List<String> names = new ArrayList<>();
         try {
-            // Use resource stream instead of file path
             InputStream is = ReadChannelTable.class.getClassLoader().getResourceAsStream("MidiControl/channels.json");
             if (is == null) {
+                System.out.println("channels.json not found in classpath!");
                 throw new FileNotFoundException("channels.json not found in classpath");
             }
             Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
             var obj = JsonParser.parseReader(reader);
-            List<JsonElement> jsonArray = obj.getAsJsonArray().asList();
-            
-            for(JsonElement item : jsonArray){
+            for (JsonElement item : obj.getAsJsonArray()) {
                 names.add(item.getAsJsonObject().get("short").getAsString());
             }
         } catch (Exception e) {
@@ -55,8 +53,7 @@ public class ReadChannelTable {
             }
             Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
             var obj = JsonParser.parseReader(reader);
-            List<JsonElement> jsonArray = obj.getAsJsonArray().asList();
-            for(JsonElement item : jsonArray){
+            for (JsonElement item : obj.getAsJsonArray()) {
                 if(item.getAsJsonObject().has("color")){
                     colors.add(item.getAsJsonObject().get("color").getAsString());
                 } else {

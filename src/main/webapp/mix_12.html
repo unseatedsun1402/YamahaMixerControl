@@ -47,7 +47,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             };
 
             Client.socket.onmessage = function (message) {
-                console.log(message.data);
+                console.trace('Verbose: %s',message.data);
             };
         });
 
