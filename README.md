@@ -2,7 +2,7 @@
 ## ====== PREREQUISITES =====
 You need to setup the tomcat server, and this project was previously compiled using the java jdk version 21 but I decided thats unnecessarily high, so it now compiles to support jdk 18. This can be downloaded either from oracle or open JDK. You want to set this as your JRE_HOME value. It can be higher if you have that installed but nothing lower. Please follow the Tomcat setup carefully including you environment variables. I have teststed using JAVA_HOME for java 1.8 and JRE_HOME version 18
 
-Then you can either try to make changes if you want and build this yourself and deploy a custom version. Use an ide with gradle support like netbeans and import this project and create the war file.
+Then you can either try to make changes if you want and build this yourself and deploy a custom version or use whatever is in the build/libs/ section and deploy what I have built. Use an ide with gradle support like netbeans and import this project and create the war file.
 
 Take this war file, rename this to MidiControl.war (this matters for file path reasons) and frop it into the webapps area of the tomcat program filespace. This should unpack and you'll have a folder in the same directory with the same name. You dont need to remove the .war, in fact please dont remove it unless your are replacing it entirely.
 
