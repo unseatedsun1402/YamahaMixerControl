@@ -10,17 +10,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.sound.midi.MidiDevice;
-import javax.sound.midi.MidiUnavailableException;
-
 
 /**
  *
  * @author ethanblood
  */
-public class GetDevices extends HttpServlet {
+public class SetMidiInputDevice extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -34,29 +29,14 @@ public class GetDevices extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        
         try (PrintWriter out = response.getWriter()) {
-            try {
-                out.println("<select id=\"midi-select\">");
-                out.println("<label for=\"midi-select\">Select Midi Output Device</label>");
-                var devices = MidiInterface.discoverDevices();
-
-                int count = 0;
-                for(MidiDevice.Info info : devices)
-                {   
-                    int isout = javax.sound.midi.MidiSystem.getMidiDevice(info).getMaxReceivers();
-                    if(isout != 0)
-                    {
-                        out.println("<option value=\""+count+"\">"+info.getName()+" - MIDI OUT</option>");
-                    }
-                    count ++;
-                }
-                out.println("</select>");
-                out.println("<button onclick=doSet()>Set Output Device</button>");
-                System.out.println("Loaded output devices");
-            } catch (MidiUnavailableException ex) 
-            {
-                Logger.getLogger(GetDevices.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            int device = Integer.parseInt(request.getParameter("set"));
+            MidiControl.MidiServer.setInputDevice(device);
+            
+        }
+        catch (Exception e){
+            System.out.println(e);
         }
     }
 
@@ -96,7 +76,7 @@ public class GetDevices extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "This servlet returns a list of available midi devices";
+        return "Servlet to set the current midi input device";
     }// </editor-fold>
 
 }

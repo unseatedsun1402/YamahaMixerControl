@@ -36,7 +36,9 @@ class MidiServer implements MidiInterface, Runnable {
         rcvr = MidiInterface.getReceiver(dev);
         if(!(midiport.isOpen())){
             midiport.open();
+            System.out.println("Opened MIDI device for receiver: " + dev);
         }
+        System.out.println("Receiver set for device: " + dev);
     }
     
     /**
@@ -46,31 +48,79 @@ class MidiServer implements MidiInterface, Runnable {
      */
     protected static void setTransmitter(int dev) throws MidiUnavailableException {
         tx = MidiInterface.getTransmitter(dev);
+        if(!(midiport.isOpen())){
+            midiport.open();
+            System.out.println("Opened MIDI device for transmitter: " + dev);
+        }
         // Attach input receiver to transmitter for incoming MIDI
         if (tx != null) {
             if (inputReceiver == null) {
                 inputReceiver = new MidiInputReceiver(inputBuffer);
+                System.out.println("Created new MidiInputReceiver");
             }
             tx.setReceiver(inputReceiver);
+            System.out.println("Transmitter set and inputReceiver attached for device: " + dev);
+        } else {
+            System.out.println("Transmitter is null for device: " + dev);
         }
     }
     
     /**
-     * Sets the class static variable device tx, rx
+     * Sets the MIDI output device (Receiver)
      * @param dev
-     * @throws MidiUnavailableException 
+     * @throws MidiUnavailableException
+     */
+    public static void setOutputDevice(int dev) throws MidiUnavailableException {
+        midiport = MidiInterface.getMidiDevice(dev);
+        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting output device: "+dev, (Object) null);
+        if (midiport.getMaxReceivers() != 0) {
+            setReceiver(dev);
+            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting midi server receiver to device: "+dev, (Object) null);
+            return;
+        }
+        Logger.getLogger(MidiServer.class.getName()).log(Level.WARNING,"Is an input interface: "+dev, (Object) null);
+        return;
+    }
+
+    /**
+     * Sets the MIDI input device (Transmitter)
+     * @param dev
+     * @throws MidiUnavailableException
+     */
+    public static void setInputDevice(int dev) throws MidiUnavailableException {
+        midiport = MidiInterface.getMidiDevice(dev);
+        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting input device: "+dev, (Object) null);
+        if (midiport.getMaxTransmitters() != 0) {
+            setTransmitter(dev);
+            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Set midi server transmitter to device: "+dev, (Object) null);
+            return;
+        }
+        else{
+            setReceiver(dev);
+            Logger.getLogger(MidiServer.class.getName()).log(Level.WARNING,"Is an output interface: "+dev, (Object) null);
+            return;
+        }
+    }
+
+    /**
+     * Sets both input and output device (legacy)
+     * @param dev
+     * @throws MidiUnavailableException
      */
     public static void setDevice(int dev) throws MidiUnavailableException{
         midiport = MidiInterface.getMidiDevice(dev);
-        
-        if(!(midiport.getMaxReceivers() == 0)){
+        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting legacy midi device: "+dev, (Object) null);
+        if (midiport.getMaxReceivers() != 0) {
             setReceiver(dev);
+            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Is an output interface: "+dev, (Object) null);
         }
-        if(!(midiport.getMaxTransmitters() == 0))
-        {
+        if (midiport.getMaxTransmitters() != 0) {
+            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Is an input interface: "+dev, (Object) null);
             setTransmitter(dev);
         }
     }
+
+    
     
     @Override
     public void run() {
@@ -97,8 +147,13 @@ class MidiServer implements MidiInterface, Runnable {
         while (!inputBuffer.isEmpty()) {
             MidiMessage msg = inputBuffer.poll();
             if (msg != null) {
-                // TODO: Replace with your own event handling logic
                 System.out.println("Received MIDI: " + msg);
+                // Optionally print message details
+                if (msg instanceof ShortMessage) {
+                    ShortMessage sm = (ShortMessage) msg;
+                    System.out.println("Command: " + sm.getCommand() + ", Channel: " + sm.getChannel() +
+                                       ", Data1: " + sm.getData1() + ", Data2: " + sm.getData2());
+                }
             }
         }
     }

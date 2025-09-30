@@ -15,7 +15,7 @@ import java.io.PrintWriter;
  *
  * @author ethanblood
  */
-public class SetMidiDevice extends HttpServlet {
+public class SetMidiOutputDevice extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -32,7 +32,7 @@ public class SetMidiDevice extends HttpServlet {
         
         try (PrintWriter out = response.getWriter()) {
             int device = Integer.parseInt(request.getParameter("set"));
-            MidiControl.MidiServer.setDevice(device);
+            MidiControl.MidiServer.setOutputDevice(device);
             
         }
         catch (Exception e){
@@ -76,7 +76,7 @@ public class SetMidiDevice extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Servlet to set the current midi output device";
     }// </editor-fold>
 
 }
