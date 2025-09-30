@@ -4,10 +4,12 @@ You need to setup the tomcat server, and this project was previously compiled us
 
 Then you can either try to make changes if you want and build this yourself and deploy a custom version or use whatever is in the build/libs/ section and deploy what I have built. Use an ide with gradle support like netbeans and import this project and create the war file.
 
-Take this war file, rename this to MidiControl.war (this matters for file path reasons) and frop it into the webapps area of the tomcat program filespace. This should unpack and you'll have a folder in the same directory with the same name. You dont need to remove the .war, in fact please dont remove it unless your are replacing it entirely.
+Take this war file, rename this to MidiControl.war (this matters for file path reasons) and drop it into the webapps area of the tomcat program filespace. This should unpack and you'll have a folder in the same directory with the same name. You dont need to remove the .war, in fact please dont remove it unless your are replacing it entirely.
 
 Run the tomcat server and go to http://127.0.0.1:8080/MidiControl
-
+## ===== Model Support =====
+Currently this has been tested on both the Yamaha 01V96i and the Yamaha M7CL
+for this to work make sure control change tx and rx are enabled and that the desk is set to Chanel table mode for remote control and that fader resolution is low not hi res. I plan to support hi res later but in most contexts, remote mixing from a phone for in ear mixes this should be sufficient.
 ## ===== Usage ======
 
 The index is the normal mix view, foh area, here you select the midi output channel (currently this doesn't mirror the desk back to the webpages) and set it.
