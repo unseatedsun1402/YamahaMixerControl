@@ -29,14 +29,15 @@ public class SyncSend implements Runnable{
     public synchronized void run() {
         
         if(!(this.buffer.isEmpty())){
-            //System.out.println("buffer populated" + buffer.size());
+            Logger.getLogger(SyncSend.class.getName()).log(Level.FINE, ("Buffer populated" + buffer.size()), (Object) null);
             if(!(this.rcvr == null)){
+                Logger.getLogger(SyncSend.class.getName()).log(Level.INFO, ("Processing the buffer and sending to the midi output device"), (Object) null);
                 for(int i = 0; i <this.buffer.size(); i ++){
                     ShortMessage[] commands = this.buffer.poll();
                     for(ShortMessage command : commands){
                         try {
                             this.rcvr.send(command, -1);
-                            //System.out.println("Device "+rcvr.toString()+" "+command.getCommand()+command.getData1()+command.getData2());
+                            Logger.getLogger(SyncSend.class.getName()).log(Level.FINE, ("Server sending midi event: "+rcvr.toString()+" "+command.getCommand()+command.getData1()+command.getData2()), (Object) null);
                             Thread.sleep(0,500000);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(SyncSend.class.getName()).log(Level.SEVERE, null, ex);
@@ -46,9 +47,10 @@ public class SyncSend implements Runnable{
             }
             else{
                 this.buffer.clear();
+                Logger.getLogger(SyncSend.class.getName()).log(Level.FINE, ("Buffer sent" + buffer.size()), (Object) null);
             }
         }
-    //System.out.println("buffer empty");
+    
     }
     
 }

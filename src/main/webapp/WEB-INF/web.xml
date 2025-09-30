@@ -36,6 +36,15 @@
     <url-pattern>/buildpage</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+        <servlet-name>GetInputDevices</servlet-name>
+        <servlet-class>MidiControl.GetInputDevices</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetInputDevices</servlet-name>
+        <url-pattern>/GetInputDevices</url-pattern>
+    </servlet-mapping>
+    
     <login-config>
         <auth-method>BASIC</auth-method>
     </login-config>

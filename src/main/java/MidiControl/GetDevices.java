@@ -35,38 +35,32 @@ public class GetDevices extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            
-            try 
-            {
-                //out.println("<form method=\"put\" action=\"/device>");
+            try {
                 out.println("<select id=\"midi-select\">");
-                out.println("<label for=\"midi-select\">Select Midi Device</label>");
+                out.println("<label for=\"midi-select\">Select Midi Output Device</label>");
                 var devices = MidiInterface.discoverDevices();
-                
+
                 int count = 0;
                 for(MidiDevice.Info info : devices)
                 {   
-                    //System.out.println(info);
-                    int isout = javax.sound.midi.MidiSystem.getMidiDevice(info).getMaxReceivers();
-                    if(!(isout == 0)){
+                    int isout = javax.sound.midi.MidiSystem.getMidiDevice(info).getMaxTransmitters();
+                    if(isout != 0)
+                    {
                         out.println("<option value=\""+count+"\">"+info.getName()+" - MIDI OUT</option>");
                     }
-                    
-                    else{
-                            out.println("<option value=\""+count+"\">"+info.getName()+" - MIDI IN</option>");}
+                    else
+                    {
+                        out.println("<option value=\""+count+"\">"+info.getName()+" - MIDI *check* IN</option>");
+                    }
                     count ++;
                 }
                 out.println("</select>");
-                out.println("<button onclick=doSet()>Set Device</button>");
-                //out.println("</form>");
-                
-                System.out.println("Called and done!");
+                out.println("<button onclick=doSet()>Set Output Device</button>");
+                System.out.println("Loaded output devices");
             } catch (MidiUnavailableException ex) 
             {
                 Logger.getLogger(GetDevices.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            
         }
     }
 
@@ -106,7 +100,7 @@ public class GetDevices extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "This servlet returns a list of available midi devices";
     }// </editor-fold>
 
 }
