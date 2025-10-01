@@ -19,12 +19,12 @@
     </servlet-mapping>
     
     <servlet>
-        <servlet-name>SetMidiDevice</servlet-name>
-        <servlet-class>MidiControl.SetMidiDevice</servlet-class>
+        <servlet-name>SetMidiOutputDevice</servlet-name>
+        <servlet-class>MidiControl.SetMidiOutputDevice</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>SetMidiDevice</servlet-name>
-        <url-pattern>/setmididevice</url-pattern>
+        <servlet-name>SetMidiOutputDevice</servlet-name>
+        <url-pattern>/setmidioutputdevice</url-pattern>
     </servlet-mapping>
     
     <servlet>
@@ -43,6 +43,15 @@
     <servlet-mapping>
         <servlet-name>GetInputDevices</servlet-name>
         <url-pattern>/GetInputDevices</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>SetMidiInputDevice</servlet-name>
+        <servlet-class>MidiControl.SetMidiInputDevice</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SetMidiInputDevice</servlet-name>
+        <url-pattern>/setmidiinputdevice</url-pattern>
     </servlet-mapping>
     
     <login-config>

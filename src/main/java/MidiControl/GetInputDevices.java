@@ -25,7 +25,7 @@ public class GetInputDevices extends HttpServlet {
                 int count = 0;
                 for(MidiDevice.Info info : devices)
                 {   
-                    int isinput = javax.sound.midi.MidiSystem.getMidiDevice(info).getMaxReceivers();
+                    int isinput = javax.sound.midi.MidiSystem.getMidiDevice(info).getMaxTransmitters();
                     if(isinput != 0)
                     {
                         out.println("<option value=\""+count+"\">"+info.getName()+" - MIDI IN</option>");
