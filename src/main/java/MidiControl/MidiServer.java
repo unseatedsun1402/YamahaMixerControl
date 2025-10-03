@@ -1,27 +1,40 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package MidiControl;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.*;
+
+import MidiControl.Utilities.SysExMapping;
+// import MidiControl.Utilities.SysExTableParser;
+import MidiControl.Utilities.SysExParser;
+import MidiControl.Utilities.NRPNDispatchTarget;
+import MidiControl.Utilities.NrpnMapping;
+import MidiControl.Utilities.NrpnParser;
+import MidiControl.Utilities.NrpnRegistry;
 
 /**
  *
  * @author ethanblood
  */
 
-class MidiServer implements MidiInterface, Runnable {
+class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     static Receiver rcvr;
     static MidiDevice midiport;
     static Transmitter tx;
-    static ConcurrentLinkedQueue<ShortMessage[]> buffer = new ConcurrentLinkedQueue<>();
+    static final ConcurrentLinkedQueue<ShortMessage[]> buffer = new ConcurrentLinkedQueue<>();
 
     // Input MIDI buffer and receiver
-    static ConcurrentLinkedQueue<MidiMessage> inputBuffer = new ConcurrentLinkedQueue<>();
+    static final ConcurrentLinkedQueue<MidiMessage> inputBuffer = new ConcurrentLinkedQueue<>();
     static MidiInputReceiver inputReceiver;
+
+    // SysExTableParser tableParser = new SysExTableParser();
+    // List<SysExMapping> sysexMappings = tableParser.parse("ParamChangeList_V350_M7CL.xls", "Parameter Change");
+    // SysExParser sysexDecoder = new SysExParser(sysexMappings);
+    NrpnParser nrpnParser = new NrpnParser();
+    NrpnRegistry nrpnRegistry = new NrpnRegistry();
+
 
     public static void addtosendqueue(ShortMessage[] commands) {
         buffer.add(commands);
@@ -124,17 +137,10 @@ class MidiServer implements MidiInterface, Runnable {
     
     @Override
     public void run() {
+        System.out.println("MidiServer Thread started");
         while (true) {
-            // Process outgoing MIDI events
-            SyncSend checkbuffer = new SyncSend(buffer, rcvr);
-            Thread send = new Thread(checkbuffer);
-            send.start();
-
-            // Process incoming MIDI events
             processIncomingMidi();
-
             try {
-                send.join();
                 Thread.sleep(2); // avoid busy loop
             } catch (InterruptedException ex) {
                 Logger.getLogger(MidiServer.class.getName()).log(Level.SEVERE, null, ex);
@@ -142,24 +148,46 @@ class MidiServer implements MidiInterface, Runnable {
         }
     }
 
+
     // Example: process and print incoming MIDI events
     private void processIncomingMidi() {
-        while (!inputBuffer.isEmpty()) {
-            MidiMessage msg = inputBuffer.poll();
-            if (msg != null) {
-                System.out.println("Received MIDI: " + msg);
-                // Optionally print message details
-                if (msg instanceof ShortMessage) {
-                    ShortMessage sm = (ShortMessage) msg;
-                    System.out.println("Command: " + sm.getCommand() + ", Channel: " + sm.getChannel() +
-                                       ", Data1: " + sm.getData1() + ", Data2: " + sm.getData2());
+    while (!inputBuffer.isEmpty()) {
+        MidiMessage msg = inputBuffer.poll();
+        if (msg != null) {
+            System.out.println("Received MIDI: " + msg);
+
+            if (msg instanceof ShortMessage sm) {
+                System.out.printf("MIDI: cmd=%d, data1=%d, data2=%d%n",sm.getCommand(), sm.getData1(), sm.getData2());
+                nrpnParser.parse(sm); // Add this line
+                //ParseMidi.printResolvedTypes(sm); // Optional
+
+            }
+            else if (msg instanceof SysexMessage sysex) {
+                byte[] data = sysex.getData();
+                Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"SysEx Raw Data: " + Arrays.toString(data));
+
+                // Decode using your SysExParser
+                // sysexDecoder.parse(data);
                 }
             }
         }
     }
+
+    /**
+     * Handles a resolved NRPN by broadcasting it to all connected WebSocket clients.
+     * @param id
+     * @param param
+     * @param value
+     */
+    public static void handleResolvedNRPN(String json) {
+        Socket.broadcast(json);
+    }
+
+
     
     public static void bufferMidi(String message) throws InterruptedException{
         ShortMessage[] commands = WebControlParser.parseJSON(message);
+        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Buffering MIDI: " + Arrays.toString(commands));
         addtosendqueue(commands);
     }
     
@@ -170,36 +198,34 @@ class MidiServer implements MidiInterface, Runnable {
      * @throws InterruptedException 
      */
     public void sendMidi(String message) throws InterruptedException, MidiUnavailableException{
-        if(!(midiport.isOpen())){
+        if (!midiport.isOpen()) {
             midiport.open();
         }
-        else{
-            if(!(rcvr == null)){
-            try
-            {
-               ShortMessage[] commands = WebControlParser.parseJSON(message);
-               for(ShortMessage command : commands){
-                   System.out.println(command.getCommand()+" "+command.getData1()+" "+command.getData2());
-                   rcvr.send(command,-1);
-                   Thread.sleep(1,11);
-               }
-            }
-            catch (Exception e)
-                    {
-                        System.out.println("Error - send midi: "+e);
-                    }
+        System.out.println("Receiver: " + rcvr.getClass().getName());
+        if (rcvr != null) {
+            try {
+                ShortMessage[] commands = WebControlParser.parseJSON(message);
+                for (ShortMessage command : commands) {
+                    System.out.println("Sending: " + command.getCommand() + " " + command.getData1() + " " + command.getData2());
+                    rcvr.send(command, -1);
+                    Thread.sleep(1, 11);
+                }
+            } catch (Exception e) {
+                System.out.println("Error - send midi: " + e);
             }
         }
+
             
     }
     
     public static void main(String[] args) {
         try {
-            int deviceIndex = 0; // Default device index, can be changed or parsed from args
+            int deviceIndex = 0;
             if (args.length > 0) {
                 try {
                     deviceIndex = Integer.parseInt(args[0]);
-                } catch (NumberFormatException e) {
+                }
+                catch (NumberFormatException e) {
                     System.out.println("Invalid device index, using default 0.");
                 }
             }
@@ -207,9 +233,23 @@ class MidiServer implements MidiInterface, Runnable {
             MidiServer server = new MidiServer();
             Thread serverThread = new Thread(server);
             serverThread.start();
-            System.out.println("MidiServer started on device index: " + deviceIndex);
-        } catch (MidiUnavailableException e) {
+
+            SyncSend checkbuffer = new SyncSend(buffer, rcvr);
+            Thread sendThread = new Thread(checkbuffer);
+            sendThread.start();
+            } 
+        catch (MidiUnavailableException e) {
             System.err.println("Failed to start MidiServer: " + e.getMessage());
         }
     }
+
+    @Override
+    public void handleResolvedNRPN(NrpnMapping mapping, int value) {
+        String json = String.format(
+            "{\"type\":\"nrpnUpdate\",\"channelType\":\"%s\",\"channelIndex\":%d,\"controlType\":\"%s\",\"value\":%d}",
+            mapping.channelType(), mapping.channelIndex(), mapping.controlType(), value
+        );
+        Socket.broadcast(json);
+    }
+
 }

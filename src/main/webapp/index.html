@@ -33,22 +33,28 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
 
             Client.socket.onclose = function () {
                 console.log('Info: WebSocket closed.');
-                try {
-                    if(!Client.connect(host)){
-                        alert("Connection Lost");
-                    }
-                    else{
-                        alert("Reconnected");
-                    }
-                }
-                catch (Exception){
-                    alert("Exception on reconnect");
-                }
+                alert("Connection Lost");
+
+                setTimeout(() => {
+                    Client.initialize(); // try reconnecting after a short delay
+                }, 1000);
             };
 
             Client.socket.onmessage = function (message) {
-                console.trace('Verbose: %s',message.data);
-            };
+            console.log("Received:", message.data);
+            try {
+                const json = JSON.parse(message.data);
+                console.log("Parsed:", json);
+            } catch (e) {
+                console.error("Invalid JSON from server:", message.data);
+            }
+        };
+
+
+            Client.socket.onerror = function (error) {
+            console.error("WebSocket error:", error);
+            alert("WebSocket error occurred");
+        };
         });
 
         Client.initialize = function() {
@@ -73,9 +79,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         
         <script>
        function sendMessage(element){
-           let message = JSON.stringify({id:element.id,param:0,value:element.value});
-           Client.sendMessage(message);
-       }
+            clearTimeout(element._debounce);
+            element._debounce = setTimeout(() => {
+                let message = JSON.stringify({id:element.id,param:0,value:element.value});
+                Client.sendMessage(message);
+            }, 12);
+        }
+
        
        async function buildpage(){
             const URL='http://'+window.location.host+'/MidiControl/buildpage?coarse=0&fine=0';
@@ -124,12 +134,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         
         function doSetInput(){
             var selector = document.getElementById("midi-input-select");
-            console.trace("Input device selected %s",selector.value);
-            if(!(selector==null)){
-                fetch("setmidiinputdevice?set="+selector.value);
-                document.getElementById("selectedInput").innerHTML ="<h2>"+selector.options[selector.value].innerHTML+" in use</h2>";
+            if (selector && selector.options[selector.value]) {
+                fetch("setmidiinputdevice?set=" + selector.value);
+                document.getElementById("selectedInput").innerHTML =
+                    "<h2>" + selector.options[selector.value].innerHTML + " in use</h2>";
+                }
             }
-        }
         
         selectDevice();
         selectInputDevice();
