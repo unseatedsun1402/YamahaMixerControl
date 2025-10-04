@@ -1,8 +1,4 @@
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit this template
--->
 <html>
     <head>
         <title>Select Midi Device</title>
@@ -37,14 +33,19 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
 
                 setTimeout(() => {
                     Client.initialize(); // try reconnecting after a short delay
-                }, 1000);
+                }, 300);
             };
 
             Client.socket.onmessage = function (message) {
             console.log("Received:", message.data);
             try {
                 const json = JSON.parse(message.data);
-                console.log("Parsed:", json);
+                if (json.type === "nrpnUpdate") {
+                    console.log("NRPN Update:", json);
+                    handleNrpnUpdate(json);
+                } else {
+                    console.log("Parsed:", json);
+                }
             } catch (e) {
                 console.error("Invalid JSON from server:", message.data);
             }
@@ -94,7 +95,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             const json= await response.text();
             if(!(json==null)){
                 document.getElementById("ch-levels").innerHTML = json;
-                elements = document.getElementsByClassName("channelfader");
+                elements = document.getElementsByClassName("fader");
                 for(let element of elements){
                     console.debug("%cID%c: %s",'color: pink; font-weight: bold;', 'color: inherit;',element.id);
                 }
@@ -125,25 +126,50 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         
         function doSet(){
             var selector = document.getElementById("midi-select");
-            console.trace("Fader moved %s",selector.value);
-            if(!(selector==null)){
-                fetch("setmidioutputdevice?set="+selector.value);
-                document.getElementById("selected").innerHTML ="<h2>"+selector.options[selector.value].innerHTML+" in use</h2>";
-                }
+            console.trace("Output device selected %s", selector.value);
+            if (selector !== null) {
+                fetch("setmidioutputdevice?set=" + selector.value);
+                var index = parseInt(selector.value, 10);
+                document.getElementById("selected").innerHTML =
+                    "<h2>" + selector.options[index].innerHTML + " in use</h2>";
             }
+        }
         
         function doSetInput(){
             var selector = document.getElementById("midi-input-select");
-            if (selector && selector.options[selector.value]) {
+            console.trace("Input device selected %s", selector.value);
+            if (selector !== null) {
                 fetch("setmidiinputdevice?set=" + selector.value);
+                var index = parseInt(selector.value, 10);
                 document.getElementById("selectedInput").innerHTML =
-                    "<h2>" + selector.options[selector.value].innerHTML + " in use</h2>";
-                }
+                    "<h2>" + selector.options[index].innerHTML + " in use</h2>";
             }
+        }
+
         
         selectDevice();
         selectInputDevice();
         
+        function handleNrpnUpdate(update) {
+            const { channelIndex, value } = update;
+
+            const faderId = `ch${channelIndex}`;
+            const labelId = `f${channelIndex}`;
+
+            const fader = document.getElementById(faderId);
+
+                        document.getElementById(`f${channelIndex}-value`).innerText = ((68*Math.log10(value*0.008))-134).toFixed(1)+" dB";
+
+
+
+            if (fader) {
+                fader.value = Math.round((value / 16383) * 127); // assuming 14-bit NRPN
+                fader.classList.add("updated");
+                setTimeout(() => fader.classList.remove("updated"), 300);
+            } else {
+                console.warn(`Fader element not found: ${faderId}`);
+            }
+        }
         
         </script>
     </head>
@@ -153,7 +179,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         <div id="midiInputDevice" style="text-align: center;font-family: sans-serif">Input Selection Goes Here</div>
         <div id="selectedInput" style="text-align: center"></div>
         <button onClick="location.href= 'http://'+window.location.host+'/MidiControl/changechannelnames.html';">Change a name</button>
-        <div id="ch-levels" style="float:none;">
+        <div id="ch-levels">
         </div>
     </body>
 </html>

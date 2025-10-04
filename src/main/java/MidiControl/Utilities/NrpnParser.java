@@ -63,6 +63,10 @@ public class NrpnParser {
                     String.format("Dispatching NRPN: %s, Value=%d", mapping.channelIndex(), value));
                 dispatchTarget.handleResolvedNRPN(mapping, value);
             }
+            else {
+                Logger.getLogger(NrpnParser.class.getName()).log(Level.WARNING,
+                    "Dispatch target not set. Cannot dispatch NRPN.");
+            }
 
             Logger.getLogger(NrpnParser.class.getName()).log(Level.INFO,
                 String.format("Resolved NRPN: %s, Value=%d", mapping.channelIndex(), value));

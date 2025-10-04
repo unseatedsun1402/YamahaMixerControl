@@ -36,8 +36,19 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             };
 
             Client.socket.onmessage = function (message) {
-                console.trace('Verbose: %s',message.data);
-            };
+            console.log("Received:", message.data);
+            try {
+                const json = JSON.parse(message.data);
+                if (json.type === "nrpnUpdate") {
+                    console.log("NRPN Update:", json);
+                    handleNrpnUpdate(json);
+                } else {
+                    console.log("Parsed:", json);
+                }
+            } catch (e) {
+                console.error("Invalid JSON from server:", message.data);
+            }
+        };
         });
 
         Client.initialize = function() {
@@ -74,7 +85,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             if(!(json==null)){
                 document.getElementById("ch-levels").innerHTML = json;
                 console.log(json);
-                elements = document.getElementsByClassName("channelfader");
+                elements = document.getElementsByClassName("fader");
                 for(let element of elements){
                     console.log(element.id);
                 }
@@ -104,6 +115,26 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
            
         selectDevice();
         
+        function handleNrpnUpdate(update) {
+            const { channelIndex, value } = update;
+
+            const faderId = `ch${channelIndex}`;
+            const labelId = `f${channelIndex}`;
+
+            const fader = document.getElementById(faderId);
+
+                        document.getElementById(`f${channelIndex}-value`).innerText = ((68*Math.log10(value*0.008))-134).toFixed(1)+" dB";
+
+
+
+            if (fader) {
+                fader.value = Math.round((value / 16383) * 127); // assuming 14-bit NRPN
+                fader.classList.add("updated");
+                setTimeout(() => fader.classList.remove("updated"), 300);
+            } else {
+                console.warn(`Fader element not found: ${faderId}`);
+            }
+        }
         
         </script>
     </head>
