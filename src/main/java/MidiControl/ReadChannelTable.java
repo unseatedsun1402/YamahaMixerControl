@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package MidiControl;
 import java.io.File;
 import com.google.gson.*;
@@ -17,7 +13,7 @@ import java.util.List;
 
 /**
  *
- * @author ethanblood
+ * @author unseatedsun1402
  */
 public class ReadChannelTable {
     /**

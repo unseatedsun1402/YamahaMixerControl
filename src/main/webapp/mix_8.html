@@ -70,9 +70,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         
         <script>
        function sendMessage(element){
-           let message = JSON.stringify({id:element.id,param:85,value:element.value});
-           Client.sendMessage(message);
-       }
+            clearTimeout(element._debounce);
+            element._debounce = setTimeout(() => {
+                let message = JSON.stringify({id:element.id,param:0,value:element.value});
+                Client.sendMessage(message);
+            }, 12);
+        }
        
        async function buildpage(){
             const URL='http://'+window.location.host+'/MidiControl/buildpage?coarse=85&fine=106';

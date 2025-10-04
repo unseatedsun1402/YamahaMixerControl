@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"MidiControl","l":"GetDevices"},{"p":"MidiControl","l":"MidiInterface"},{"p":"MidiControl","l":"SetMidiDevice"},{"p":"MidiControl","l":"Socket"},{"p":"MidiControl","l":"WebControlParser"}];updateSearchResults();
