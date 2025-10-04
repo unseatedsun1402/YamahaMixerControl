@@ -12,7 +12,11 @@ Currently this has been tested on both the Yamaha 01V96i and the Yamaha M7CL
 for this to work make sure control change tx and rx are enabled and that the desk is set to Chanel table mode for remote control and that fader resolution is low not hi res. I plan to support hi res later but in most contexts, remote mixing from a phone for in ear mixes this should be sufficient.
 ## ===== Usage ======
 
-The index is the normal mix view, foh area, here you select the midi output channel (currently this doesn't mirror the desk back to the webpages) and set it.
+Load the index at https://<ip-address-of-server>:8080/MidiControl and use the selectors to assign the input and output interfaces of the server to the yamaha desk
+
+When the output is set you should be able to move faders and if the desk is receiving correctly faders on the desk should respond.
+
+When the input is set and the server is correctly receiving and interpretting the data then the gui should respond.
 
 Try moving some faders and see if it works
 
@@ -25,3 +29,7 @@ I built this around serving multiple clients at once which is something that isn
 Therefore for live use protected areas are probably wise.
 
 Change the users in the conf area users.xml of the unpacked folder to suit your own needs. The mix pages are username and password protected to stop musicians from changing other peoples mixes, this can be disabled though if you take the page out of the auth group in the conf files.
+
+## ====== SCREENSHOTS ======
+<img width="3802" height="1740" alt="image" src="https://github.com/user-attachments/assets/869e9448-68ba-4251-a0b4-23db9d132d6c" />
+Above: Main view where the foh is mixed, other views can use the url extension https://<ip-address-of-server>:8080/MidiControl/mix_<1-12>.html
