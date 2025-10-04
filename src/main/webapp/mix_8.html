@@ -31,19 +31,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
                 buildpage();
             };
 
-            Client.socket.onclose = function () {
+           Client.socket.onclose = function () {
                 console.log('Info: WebSocket closed.');
-                try {
-                    if(!Client.connect(host)){
-                        alert("Connection Lost");
-                    }
-                    else{
-                        alert("Reconnected");
-                    }
-                }
-                catch (Exception){
-                    alert("Connection Lost");
-                }
+                alert("Connection Lost");
+
+                setTimeout(() => {
+                    Client.initialize(); // try reconnecting after a short delay
+                }, 300);
             };
 
             Client.socket.onmessage = function (message) {
