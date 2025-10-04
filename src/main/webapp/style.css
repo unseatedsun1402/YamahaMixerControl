@@ -1,26 +1,8 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
-*/
-body 
-{
-    background-color: #777
-}
-
-#ch-levels
-{
-    width: 100%;
-    padding-top: 5%;
-    text-align: centre;
-    margin: auto;
-    float: left;
-}
-
-.bank
-{
-    width: -moz-fit-content;
-    width: fit-content;
-    
+body {
+    background-color: #777;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 h2{
@@ -28,10 +10,10 @@ h2{
     color: #cccccc;
     
 }
-Input[type="selector"]{
-    font-family:sans-serif;
+
+select {
+    font-family: sans-serif;
     color: #cccccc;
-    
 }
 
 
@@ -41,91 +23,65 @@ Input[type="selector"]{
     width: 100%;
 }
 
-@media (orientation: portrait) {
-.chfader input[type="range"]
-{
-    -webkit-appearance: none;
-    appearance: none;
-    width: 50vh;
-    transform: rotate(270deg);
-    margin-left: -15vh;
+.fader {
+    writing-mode: bt-lr;
+    -webkit-appearance: slider-vertical;
+    appearance: slider-vertical;
+    height: clamp(120px, 20vh, 300px);
+    width: 30px;
+    margin-right: 0.5rem;
     background: transparent;
     outline: none;
-    opacity: 0.7;
-    -webkit-transition: 0.2s;
+    opacity: 0.8;
     transition: opacity 0.2s;
 }
-}
 
-@media (orientation: landscape) {
-.chfader input[type="range"]
-{
-    -webkit-appearance: none;
-    appearance: none;
-    width: 55vh;
-    transform: rotate(270deg);
-    margin-left: -15vh;
-    background: transparent;
-    outline: none;
-    opacity: 0.7;
-    -webkit-transition: 0.2s;
-    transition: opacity 0.2s;
-}
-}
-
-.chfader input[type="range"]::-webkit-slider-thumb{
-    -webkit-appearance: none;
-    appearance: none;
-    width: 5.75vh;
-    height: 3.75vh;
-    box-shadow: -3px 3px 2px 0 #111;
-    border-radius: 1vh;
-    border-bottom: 2px solid rgba(17, 50, 17, 0.621);
-    border-left: 4px solid rgba(20, 70, 20,0.75);
-    border-right: 2px solid rgba(17, 50, 17, 0.804);
-    background: linear-gradient(90deg,#bbb,#eee,#bbb);
+.fader:hover {
+    opacity: 1;
     cursor: pointer;
-    margin-top: -1.2vh;
 }
 
-
-.chfader input[type="range"]::-webkit-slider-runnable-track {
-  -webkit-appearance: none;
-  appearance: none;
-  background: #ffea00;
-  border-radius: 1vw;
-  opacity: 0.7;
-  height: 1.5vh;
+.fader-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 1rem;
+    flex: 1 1 100px;
+    min-width: 80px;
+    border-radius: 6px;
+    background-color: #555;
+    border: 1px solid #444;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-label[for="chfader"]{
-    transform: translate(20vh,4vw);
-    font-family: sans-serif;
+.fader-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.fader-value {
+    font-size: 0.9rem;
+    min-width: 40px;
+    text-align: left;
+    transition: all 0.2s ease-in-out;
+
+}
+
+.fader-label {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    text-align: center;
+    word-wrap: break-word;
     color: #fff;
-    text-shadow: #111;
-    text-align: right;
 }
 
-@media (orientation: landscape) {
-    .chfader
-    {
-        height: 65vh;
-        min-width: 6%;
-        max-width: 12%;
-        width: auto;
-        float: left;
-        transform: translate(0vh,20vh)
-    }
-}
-
-@media (orientation: portrait) {
-    .chfader
-    {
-        height: 55vh;
-        min-width: 20%;
-        max-width: 25%;
-        width: auto;
-        float: left;
-        transform: translate(00vh,25vh)
-    }
+.fader-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
 }

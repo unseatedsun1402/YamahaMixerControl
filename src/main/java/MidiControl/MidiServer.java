@@ -6,6 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.*;
 
+import org.apache.commons.math3.analysis.function.Log;
+
 import MidiControl.Utilities.SysExMapping;
 // import MidiControl.Utilities.SysExTableParser;
 import MidiControl.Utilities.SysExParser;
@@ -22,7 +24,7 @@ import MidiControl.Utilities.NrpnRegistry;
 class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     static Receiver rcvr;
     static MidiDevice midiport;
-    static Transmitter tx;
+    public static Transmitter tx;
     static final ConcurrentLinkedQueue<ShortMessage[]> buffer = new ConcurrentLinkedQueue<>();
 
     // Input MIDI buffer and receiver
@@ -60,6 +62,10 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
      * @throws MidiUnavailableException 
      */
     protected static void setTransmitter(int dev) throws MidiUnavailableException {
+        if (tx != null) {
+            tx.close();
+            System.out.println("Closed previous transmitter.");
+        }
         tx = MidiInterface.getTransmitter(dev);
         if(!(midiport.isOpen())){
             midiport.open();
@@ -70,6 +76,11 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
             if (inputReceiver == null) {
                 inputReceiver = new MidiInputReceiver(inputBuffer);
                 System.out.println("Created new MidiInputReceiver");
+            }
+            else{
+                inputReceiver.close();
+                inputReceiver = new MidiInputReceiver(inputBuffer);
+                System.out.println("Restarting existing MidiInputReceiver");
             }
             tx.setReceiver(inputReceiver);
             System.out.println("Transmitter set and inputReceiver attached for device: " + dev);
@@ -82,18 +93,30 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
      * Sets the MIDI output device (Receiver)
      * @param dev
      * @throws MidiUnavailableException
-     */
-    public static void setOutputDevice(int dev) throws MidiUnavailableException {
-        midiport = MidiInterface.getMidiDevice(dev);
-        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting output device: "+dev, (Object) null);
-        if (midiport.getMaxReceivers() != 0) {
-            setReceiver(dev);
-            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting midi server receiver to device: "+dev, (Object) null);
-            return;
-        }
-        Logger.getLogger(MidiServer.class.getName()).log(Level.WARNING,"Is an input interface: "+dev, (Object) null);
-        return;
-    }
+    //  */
+    // public static void setOutputDevice(int dev) throws MidiUnavailableException {
+    //     midiport = MidiInterface.getMidiDevice(dev);
+    //     Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting output device: "+dev, (Object) null);
+    //     if (midiport.getMaxReceivers() != 0) {
+    //         setReceiver(dev);
+    //         Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting midi server receiver to device: "+dev, (Object) null);
+    //         return;
+    //     }
+    //     Logger.getLogger(MidiServer.class.getName()).log(Level.WARNING,"Is an input interface: "+dev, (Object) null);
+    //     return;
+    // }
+    public static void setOutputDevice(int index) throws MidiUnavailableException {
+    MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
+    MidiDevice outputDevice = MidiSystem.getMidiDevice(infos[index]);
+    outputDevice.open();
+    rcvr = outputDevice.getReceiver();
+
+    Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Receiver set for device: " + index);
+
+    // Notify Socket to restart SyncSend
+    Socket.restartSyncSend();
+}
+
 
     /**
      * Sets the MIDI input device (Transmitter)
@@ -249,6 +272,7 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
             "{\"type\":\"nrpnUpdate\",\"channelType\":\"%s\",\"channelIndex\":%d,\"controlType\":\"%s\",\"value\":%d}",
             mapping.channelType(), mapping.channelIndex(), mapping.controlType(), value
         );
+        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Broadcasting NRPN JSON: " + json);
         Socket.broadcast(json);
     }
 

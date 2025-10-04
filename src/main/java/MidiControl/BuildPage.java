@@ -42,21 +42,28 @@ public class BuildPage extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             int coarse = Integer.parseInt(request.getParameter("coarse"));
             int fine = Integer.parseInt(request.getParameter("fine"));
-            for(int i = 0; i < 48; i ++){
-                if(i%4==0){
-                        out.println("<div class=\"bank\">");
-                }   
-                out.println("<div class=\"chfader\">");
-                out.println("<input type=\"range\" max=\"127\" id=\"ch"+(fine+i)+"\" oninput=\"sendMessage(this)\"/>");
-                out.println("<br><br><br><label for=\"chfader\" id=\"f"+(fine+i)+"\">");
-                out.println(chnames.get(i));
-                out.println("</label>");
+
+            out.println("<div class=\"fader-grid\">"); // Start grid container
+
+            for (int i = 0; i < 48; i++) {
+                int channelIndex = fine + i;
+                String channelName = chnames.get(i);
+
+                out.println("<div class=\"fader-block\">");
+
+                // Fader + value display
+                out.println("<div class=\"fader-wrapper\">");
+                out.println("<input type=\"range\" max=\"127\" id=\"ch" + channelIndex +"\" oninput=\"sendMessage(this)\" class=\"fader\" title=\"" + channelName + "\" style=\"writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; height: 200px; width: 30px;\"/>");
+                out.println("<span class=\"fader-value\" id=\"f" + channelIndex + "-value\">0</span>");
                 out.println("</div>");
-                if(i%4==3){
-                    out.println("</div>");
-                }
+
+                // Channel label
+                out.println("<label class=\"fader-label\" id=\"f" + channelIndex + "\">" + channelName + "</label>");
+
+                out.println("</div>");
             }
-            
+
+            out.println("</div>"); // End grid container
         }
         catch (Exception e){
             System.out.println(e);

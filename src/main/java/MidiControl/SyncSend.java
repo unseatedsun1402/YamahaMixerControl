@@ -25,7 +25,7 @@ public class SyncSend implements Runnable{
     @Override
     public synchronized void run() {
         Logger.getLogger(SyncSend.class.getName()).log(Level.INFO, "SyncSend thread started.", (Object) null);
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             if(!(this.buffer.isEmpty())){
                 Logger.getLogger(SyncSend.class.getName()).log(Level.FINE, ("Buffer populated" + buffer.size()), (Object) null);
                 if(!(this.rcvr == null)){

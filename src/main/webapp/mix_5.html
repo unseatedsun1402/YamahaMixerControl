@@ -31,24 +31,29 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
                 buildpage();
             };
 
-            Client.socket.onclose = function () {
+           Client.socket.onclose = function () {
                 console.log('Info: WebSocket closed.');
-                try {
-                    if(!Client.connect(host)){
-                        alert("Connection Lost");
-                    }
-                    else{
-                        alert("Reconnected");
-                    }
-                }
-                catch (Exception){
-                    alert("Connection Lost");
-                }
+                alert("Connection Lost");
+
+                setTimeout(() => {
+                    Client.initialize(); // try reconnecting after a short delay
+                }, 300);
             };
 
             Client.socket.onmessage = function (message) {
-                console.trace('Verbose: %s',message.data);
-            };
+            console.log("Received:", message.data);
+            try {
+                const json = JSON.parse(message.data);
+                if (json.type === "nrpnUpdate") {
+                    console.log("NRPN Update:", json);
+                    handleNrpnUpdate(json);
+                } else {
+                    console.log("Parsed:", json);
+                }
+            } catch (e) {
+                console.error("Invalid JSON from server:", message.data);
+            }
+        };
         });
 
         Client.initialize = function() {
@@ -85,7 +90,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
             if(!(json==null)){
                 document.getElementById("ch-levels").innerHTML = json;
                 console.log(json);
-                elements = document.getElementsByClassName("channelfader");
+                elements = document.getElementsByClassName("fader");
                 for(let element of elements){
                     console.log(element.id);
                 }
@@ -115,6 +120,26 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
            
         selectDevice();
         
+        function handleNrpnUpdate(update) {
+            const { channelIndex, value } = update;
+
+            const faderId = `ch${channelIndex}`;
+            const labelId = `f${channelIndex}`;
+
+            const fader = document.getElementById(faderId);
+
+                        document.getElementById(`f${channelIndex}-value`).innerText = ((68*Math.log10(value*0.008))-134).toFixed(1)+" dB";
+
+
+
+            if (fader) {
+                fader.value = Math.round((value / 16383) * 127); // assuming 14-bit NRPN
+                fader.classList.add("updated");
+                setTimeout(() => fader.classList.remove("updated"), 300);
+            } else {
+                console.warn(`Fader element not found: ${faderId}`);
+            }
+        }
         
         </script>
     </head>
