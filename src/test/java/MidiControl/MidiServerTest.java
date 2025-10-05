@@ -25,15 +25,16 @@ public class MidiServerTest {
     @Test
     void testInputReceiverReceivesMessage() {
         ConcurrentLinkedQueue<MidiMessage> inputBuffer = new ConcurrentLinkedQueue<>();
-        MidiInputReceiver receiver = new MidiInputReceiver(inputBuffer);
-        ShortMessage msg = new ShortMessage();
-        try {
-            msg.setMessage(ShortMessage.NOTE_ON, 0, 60, 127);
-        } catch (Exception e) {
-            org.junit.jupiter.api.Assertions.fail("Failed to create ShortMessage");
+        try (MidiInputReceiver receiver = new MidiInputReceiver(inputBuffer)) {
+            ShortMessage msg = new ShortMessage();
+            try {
+                msg.setMessage(ShortMessage.NOTE_ON, 0, 60, 127);
+            } catch (Exception e) {
+                org.junit.jupiter.api.Assertions.fail("Failed to create ShortMessage");
+            }
+            receiver.send(msg, -1);
+            org.junit.jupiter.api.Assertions.assertFalse(inputBuffer.isEmpty(), "Input buffer should not be empty after receiving a message");
+            org.junit.jupiter.api.Assertions.assertEquals(msg, inputBuffer.poll(), "Received message should match sent message");
         }
-        receiver.send(msg, -1);
-        org.junit.jupiter.api.Assertions.assertFalse(inputBuffer.isEmpty(), "Input buffer should not be empty after receiving a message");
-        org.junit.jupiter.api.Assertions.assertEquals(msg, inputBuffer.poll(), "Received message should match sent message");
     }
 }

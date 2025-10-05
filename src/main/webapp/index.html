@@ -5,179 +5,24 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="style.css"/>
-        <script>
-            var Client = {};
-
-            Client.socket = null;
-
-            Client.connect = (function(host) {
-                if ('WebSocket' in window) {
-                    Client.socket = new WebSocket(host);
-                } else if ('MozWebSocket' in window) {
-                    Client.socket = new MozWebSocket(host);
-                    } else {
-                    console.log('Error: WebSocket is not supported by this browser.');
-                    return;
-            }
-
-            Client.socket.onopen = function () 
-            {
-                console.log('Info: WebSocket connection opened.');
-                elements = document.getElementsByClassName("chfader");
-                buildpage();
-            };
-
-            Client.socket.onclose = function () {
-                console.log('Info: WebSocket closed.');
-                alert("Connection Lost");
-
-                setTimeout(() => {
-                    Client.initialize(); // try reconnecting after a short delay
-                }, 300);
-            };
-
-            Client.socket.onmessage = function (message) {
-            console.log("Received:", message.data);
-            try {
-                const json = JSON.parse(message.data);
-                if (json.type === "nrpnUpdate") {
-                    console.log("NRPN Update:", json);
-                    handleNrpnUpdate(json);
-                } else {
-                    console.log("Parsed:", json);
-                }
-            } catch (e) {
-                console.error("Invalid JSON from server:", message.data);
-            }
-        };
-
-
-            Client.socket.onerror = function (error) {
-            console.error("WebSocket error:", error);
-            alert("WebSocket error occurred");
-        };
-        });
-
-        Client.initialize = function() {
-            if (window.location.protocol == 'http:') {
-                Client.connect('ws://' + window.location.host + '/MidiControl/endpoint');
-            } else {
-                Client.connect('wss://' + window.location.host + '/MidiControl/endpoint');
-            }
-        };
-
-        Client.sendMessage = (function(msg) {
-            var message = msg;
-            if (message != '') {
-                Client.socket.send(message);
-            }
-            else {
-                console.warn('%cWarning%c: No message to send.', 'color: orange; font-weight: bold;', 'color: inherit;');
-            }
-        });
-        Client.initialize();
-        </script>
-        
-        <script>
-       function sendMessage(element){
-            clearTimeout(element._debounce);
-            element._debounce = setTimeout(() => {
-                let message = JSON.stringify({id:element.id,param:0,value:element.value});
-                Client.sendMessage(message);
-            }, 12);
-        }
-
-       
-       async function buildpage(){
-            const URL='http://'+window.location.host+'/MidiControl/buildpage?coarse=0&fine=0';
-            const Res= fetch(URL);
-            const response= await Res;
-            const json= await response.text();
-            if(!(json==null)){
-                document.getElementById("ch-levels").innerHTML = json;
-                elements = document.getElementsByClassName("fader");
-                for(let element of elements){
-                    console.debug("%cID%c: %s",'color: pink; font-weight: bold;', 'color: inherit;',element.id);
-                }
-            }
-            
-            
-        }     
-            
-        async function selectDevice(){
-            const URL='http://'+window.location.host+'/MidiControl/devices';
-            const Res= fetch(URL);
-            const response= await Res;
-            const json= await response.text();
-            if(!(json==null)){
-                document.getElementById("midiDevice").innerHTML = json;
-            }
-        }
-        
-        async function selectInputDevice(){
-            const URL='http://'+window.location.host+'/MidiControl/GetInputDevices';
-            const Res= fetch(URL);
-            const response= await Res;
-            const html= await response.text();
-            if(!(html==null)){
-                document.getElementById("midiInputDevice").innerHTML = html;
-            }
-        }
-        
-        function doSet(){
-            var selector = document.getElementById("midi-select");
-            console.trace("Output device selected %s", selector.value);
-            if (selector !== null) {
-                fetch("setmidioutputdevice?set=" + selector.value);
-                var index = parseInt(selector.value, 10);
-                document.getElementById("selected").innerHTML =
-                    "<h2>" + selector.options[index].innerHTML + " in use</h2>";
-            }
-        }
-        
-        function doSetInput(){
-            var selector = document.getElementById("midi-input-select");
-            console.trace("Input device selected %s", selector.value);
-            if (selector !== null) {
-                fetch("setmidiinputdevice?set=" + selector.value);
-                var index = parseInt(selector.value, 10);
-                document.getElementById("selectedInput").innerHTML =
-                    "<h2>" + selector.options[index].innerHTML + " in use</h2>";
-            }
-        }
-
-        
-        selectDevice();
-        selectInputDevice();
-        
-        function handleNrpnUpdate(update) {
-            const { channelIndex, value } = update;
-
-            const faderId = `ch${channelIndex}`;
-            const labelId = `f${channelIndex}`;
-
-            const fader = document.getElementById(faderId);
-
-                        document.getElementById(`f${channelIndex}-value`).innerText = ((68*Math.log10(value*0.008))-134).toFixed(1)+" dB";
-
-
-
-            if (fader) {
-                fader.value = Math.round((value / 16383) * 127); // assuming 14-bit NRPN
-                fader.classList.add("updated");
-                setTimeout(() => fader.classList.remove("updated"), 300);
-            } else {
-                console.warn(`Fader element not found: ${faderId}`);
-            }
-        }
-        
-        </script>
     </head>
-    <body>
+    <script src="js/midi-gui.js"></script>
+    <script src="js/client.js"></script>
+    
+    <body data-fadermsb="0" data-faderlsb="0">
         <div id="midiDevice" style="text-align: center;font-family: sans-serif">Selection Goes Here</div>
         <div id="selected" style="text-align: center"></div>
         <div id="midiInputDevice" style="text-align: center;font-family: sans-serif">Input Selection Goes Here</div>
         <div id="selectedInput" style="text-align: center"></div>
+        <script>
+            if (document.getElementById('midiDevice') != null){
+            selectDevice();
+            selectInputDevice();  
+            }
+            else {
+                console.log("No MIDI device selection needed on this page.");
+            }
+        </script>
         <button onClick="location.href= 'http://'+window.location.host+'/MidiControl/changechannelnames.html';">Change a name</button>
         <div id="ch-levels">
         </div>

@@ -1,16 +1,15 @@
 package MidiControl;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.*;
 
-import org.apache.commons.math3.analysis.function.Log;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
-import MidiControl.Utilities.SysExMapping;
 // import MidiControl.Utilities.SysExTableParser;
-import MidiControl.Utilities.SysExParser;
 import MidiControl.Utilities.NRPNDispatchTarget;
 import MidiControl.Utilities.NrpnMapping;
 import MidiControl.Utilities.NrpnParser;
@@ -182,7 +181,7 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
             if (msg instanceof ShortMessage sm) {
                 System.out.printf("MIDI: cmd=%d, data1=%d, data2=%d%n",sm.getCommand(), sm.getData1(), sm.getData2());
                 nrpnParser.parse(sm); // Add this line
-                //ParseMidi.printResolvedTypes(sm); // Optional
+                ParseMidi.printResolvedTypes(sm); // Optional
 
             }
             else if (msg instanceof SysexMessage sysex) {
@@ -268,10 +267,15 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
 
     @Override
     public void handleResolvedNRPN(NrpnMapping mapping, int value) {
-        String json = String.format(
-            "{\"type\":\"nrpnUpdate\",\"channelType\":\"%s\",\"channelIndex\":%d,\"controlType\":\"%s\",\"value\":%d}",
-            mapping.channelType(), mapping.channelIndex(), mapping.controlType(), value
-        );
+        String json = "{"
+        + "\"type\":\"nrpnUpdate\","
+        + "\"channelType\":\""+mapping.channelType()+"\","
+        + "\"channelIndex\":" + mapping.channelIndex() + ","
+        + "\"controlType\":\"" + mapping.controlType()+"\","
+        + "\"value\":" + value + ","
+        + "\"msb\":" + mapping.msb() + ","
+        + "\"lsb\":" + mapping.lsb()
+        + "}";
         Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Broadcasting NRPN JSON: " + json);
         Socket.broadcast(json);
     }
