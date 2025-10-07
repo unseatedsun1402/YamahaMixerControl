@@ -26,7 +26,7 @@ public class Socket {
     public synchronized MidiServer getServer() {
         if (listener == null || !listener.isAlive()) {
             listener.start();
-            Logger.getLogger(Socket.class.getName()).log(java.util.logging.Level.INFO, "MidiServer thread started.");
+            Logger.getLogger(Socket.class.getName()).log(java.util.logging.Level.INFO, "MidiServer thread started from socket.");
         }
 
         // ✅ Set dispatch target once server is active
@@ -37,9 +37,9 @@ public class Socket {
                 SyncSend sender = new SyncSend(MidiServer.buffer, MidiServer.rcvr);
                 sendThread = new Thread(sender);
                 sendThread.start();
-                Logger.getLogger(Socket.class.getName()).log(java.util.logging.Level.INFO, "SyncSend thread started.");
+                Logger.getLogger(Socket.class.getName()).log(java.util.logging.Level.INFO, "SyncSend thread started from socket.");
             } else {
-                Logger.getLogger(Socket.class.getName()).log(java.util.logging.Level.WARNING, "Receiver is null — SyncSend not started.");
+                Logger.getLogger(Socket.class.getName()).log(java.util.logging.Level.WARNING, "Receiver is null — SyncSend not started from socket.");
             }
         }
 
@@ -55,7 +55,6 @@ public class Socket {
         System.out.println("Client connected: " + session.getId());
 
         getServer(); // This now starts the thread if needed
-
         Logger.getLogger(Socket.class.getName()).log(java.util.logging.Level.INFO, "MidiServer is active.");
     }
 

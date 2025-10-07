@@ -1,6 +1,8 @@
 package MidiControl;
+import java.io.File;
 import com.google.gson.*;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;

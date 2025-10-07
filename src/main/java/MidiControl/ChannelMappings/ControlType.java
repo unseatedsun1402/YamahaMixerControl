@@ -14,7 +14,8 @@ public enum ControlType {
     EQ(0xA0),
     MATRIX_SEND(0xB0),
     SCENE_RECALL(0xC0),
-    SCENE_STORE(0xD0),;
+    SCENE_STORE(0xD0),
+    INPUT_SEND(0xE0);
 
     private final int controlByte;
 

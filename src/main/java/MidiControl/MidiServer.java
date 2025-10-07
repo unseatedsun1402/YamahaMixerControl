@@ -1,4 +1,5 @@
 package MidiControl;
+import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
@@ -159,7 +160,22 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     
     @Override
     public void run() {
-        System.out.println("MidiServer Thread started");
+        System.out.println("MidiServer Thread started from run()");
+
+        String mappingPath = "MidiControl/nrpn_mappings.json";
+        File mappingFile = new File(mappingPath);
+
+        if (mappingFile.exists()) {
+            NrpnRegistry.INSTANCE.loadFromJson(mappingPath);
+            System.out.println("Loaded NRPN mappings from external file.");
+        } else {
+            NrpnRegistry.INSTANCE.loadFromClasspath(mappingPath);
+        }
+        System.out.println("NrpnRegistry has " + NrpnRegistry.INSTANCE.getMappings().size() + " mappings loaded.");
+
+        
+        NrpnMapping m = NrpnRegistry.INSTANCE.lookup(0, 126);
+        System.out.println("Test mapping load 0, 126: " + m);
         while (true) {
             processIncomingMidi();
             try {
@@ -181,7 +197,7 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
             if (msg instanceof ShortMessage sm) {
                 System.out.printf("MIDI: cmd=%d, data1=%d, data2=%d%n",sm.getCommand(), sm.getData1(), sm.getData2());
                 nrpnParser.parse(sm); // Add this line
-                ParseMidi.printResolvedTypes(sm); // Optional
+                //ParseMidi.printResolvedTypes(sm); // Optional
 
             }
             else if (msg instanceof SysexMessage sysex) {
@@ -241,29 +257,38 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     }
     
     public static void main(String[] args) {
-        try {
-            int deviceIndex = 0;
-            if (args.length > 0) {
-                try {
-                    deviceIndex = Integer.parseInt(args[0]);
-                }
-                catch (NumberFormatException e) {
-                    System.out.println("Invalid device index, using default 0.");
-                }
+    try {
+        int deviceIndex = 0;
+        if (args.length > 0) {
+            try {
+                deviceIndex = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid device index, using default 0.");
             }
-            setDevice(deviceIndex);
-            MidiServer server = new MidiServer();
-            Thread serverThread = new Thread(server);
-            serverThread.start();
-
-            SyncSend checkbuffer = new SyncSend(buffer, rcvr);
-            Thread sendThread = new Thread(checkbuffer);
-            sendThread.start();
-            } 
-        catch (MidiUnavailableException e) {
-            System.err.println("Failed to start MidiServer: " + e.getMessage());
         }
+
+        setDevice(deviceIndex);
+
+        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Starting MidiServer on device index: " + deviceIndex);
+
+        // Build and export mappings only in standalone mode
+        NrpnRegistry.INSTANCE.buildProfileMapping();
+        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Built NRPN profile mapping.");
+        NrpnRegistry.INSTANCE.exportToJson("nrpn_mappings.json");
+
+        // Start server and sync threads
+        MidiServer server = new MidiServer();
+        Thread serverThread = new Thread(server);
+        serverThread.start();
+
+        SyncSend checkbuffer = new SyncSend(buffer, rcvr);
+        Thread sendThread = new Thread(checkbuffer);
+        sendThread.start();
+
+    } catch (MidiUnavailableException e) {
+        System.err.println("Failed to start MidiServer: " + e.getMessage());
     }
+}
 
     @Override
     public void handleResolvedNRPN(NrpnMapping mapping, int value) {

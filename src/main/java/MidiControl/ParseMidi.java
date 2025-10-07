@@ -2,6 +2,10 @@ package MidiControl;
 
 import javax.sound.midi.ShortMessage;
 
+import java.util.Map;
+
+import javax.sound.midi.MidiMessage;
+
 import MidiControl.ChannelMappings.ControlType;
 public class ParseMidi {
     /**

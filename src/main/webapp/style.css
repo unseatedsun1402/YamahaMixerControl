@@ -36,6 +36,10 @@ select {
     transition: opacity 0.2s;
 }
 
+.fader.restored {
+  box-shadow: 0 0 6px #00ffcc;
+}
+
 .fader:hover {
     opacity: 1;
     cursor: pointer;

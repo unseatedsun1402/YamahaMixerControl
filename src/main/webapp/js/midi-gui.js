@@ -15,7 +15,10 @@ function sendMessage(element) {
       msb,
       lsb
     });
+
+    saveFaderState(msb, lsb, value);
     Client.sendMessage(message);
+    localStorage.setItem("lastSync", Date.now());
     console.info("Sent message "+message)
     // Update label immediately
     const label = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
@@ -30,6 +33,23 @@ function sendMessage(element) {
         console.warn("Cannot find fader " + msb + " " + lsb)
     }
   }, 12);
+}
+
+function restoreFaderState(){   //inject any preserved values from localstorage
+    document.querySelectorAll(".fader").forEach(fader => {
+    const msb = fader.dataset.msb;
+    const lsb = fader.dataset.lsb;
+    const key = `fader-${msb}-${lsb}`;
+    const savedValue = localStorage.getItem(key);
+
+    if (savedValue !== null) {
+        fader.value = savedValue;
+        sendMessage(fader); // reapply value and update label
+
+        fader.classList.add("restored");
+        setTimeout(() => fader.classList.remove("restored"), 500);
+    }
+    });
 }
 
 // Builds the control elements on a page
@@ -51,6 +71,10 @@ async function buildpage() {
       for (let element of elements) {
         console.log("Fader ID:", element.id);
       }
+      restoreFaderState() // automatic rehydration
+      document.getElementById("restoreState").disabled = false; //enable the restore button now the page has loaded
+      document.getElementById("restoreState").addEventListener("click", restoreFaderState); // start listening to the button
+      console.debug("Restored saved states")
     }
   } catch (err) {
     console.error("Error loading fader layout:", err);
@@ -157,33 +181,39 @@ document.querySelectorAll("input[type=range].fader").forEach(fader => {
 });
     
 function handleNrpnUpdate(update) {
-console.log("handleNrpnUpdate called with:", update);
-const { msb, lsb, value } = update;
-const fader = document.querySelector(`input[data-msb="${msb}"][data-lsb="${lsb}"]`);
-const valueLabel = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
+  console.log("handleNrpnUpdate called with:", update);
+  const { msb, lsb, value } = update;
+  const fader = document.querySelector(`input[data-msb="${msb}"][data-lsb="${lsb}"]`);
+  const valueLabel = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
 
-if (!fader) {
+  if (!fader) {
     console.warn(`No fader found for NRPN msb:${msb} lsb:${lsb}`);
     return;
+  }
+
+  const step = Math.round((value / 16383) * 127);
+  const db = faderDbMap[step];
+
+  fader.value = step;
+
+  if (valueLabel) {
+    valueLabel.innerText = db === "-∞" ? db : `${db} dB`;
+    console.debug("Updating fader " + msb + " " + lsb + " to " + db);
+    valueLabel.classList.add("updated");
+    setTimeout(() => valueLabel.classList.remove("updated"), 150);
+  } else {
+    console.warn(`No value label found for NRPN msb:${msb} lsb:${lsb}`);
+  }
+
+  fader.classList.add("updated");
+  setTimeout(() => fader.classList.remove("updated"), 300);
+
+  saveFaderState(msb, lsb, step); // Save scaled value
+  console.log(`Updated fader ${fader.id} to ${db} dB`);
 }
 
-const step = Math.round((value / 16383) * 127);
-const db = faderDbMap[step];
-
-fader.value = step;
-
-if (valueLabel) {
-valueLabel.innerText = db === "−∞" ? db : `${db} dB`;
-console.debug("Updating fader "+ msb + " " + lsb + " to " +  db)
-label.classList.add("updated");
-setTimeout(() => label.classList.remove("updated"), 150);
-}
-else {
-console.warn(`No value label found for NRPN msb:${msb} lsb:${lsb}`);
+function saveFaderState(msb, lsb, value) {
+  const key = `fader-${msb}-${lsb}`;
+  localStorage.setItem(key, value);
 }
 
-fader.classList.add("updated");
-setTimeout(() => fader.classList.remove("updated"), 300);
-
-console.log(`Updated fader ${fader.id} to ${db} dB`);
-}
