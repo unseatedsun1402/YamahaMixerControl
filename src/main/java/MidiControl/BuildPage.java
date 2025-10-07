@@ -6,7 +6,6 @@ package MidiControl;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.File;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,21 +45,38 @@ public class BuildPage extends HttpServlet {
             out.println("<div class=\"fader-grid\">"); // Start grid container
 
             for (int i = 0; i < 48; i++) {
+                int raw = fine + i;
+                int msb = coarse + (raw / 128); // MIDI MSB is 7-bit, so divide by 128
+                int lsb = raw % 128;            // MIDI LSB is 7-bit, so modulo 128
+
                 int channelIndex = fine + i;
                 String channelName = chnames.get(i);
+                
+                if (i % 8 == 0) {
+                    out.println("<div class=\"fader-bank\" style=\"background-color: #4d4d4dff;\">"); // Start new fader bank: 8 faders
+                }
+                
+                out.println("<div class=\"fader-block\" data-type=\"input\" data-channel=\"" + (i + 1) + "\">"); // fader block wraps the range and labels
+                
+                out.println("<div class=\"channel-index\">Input " + (i + 1) + "</div>"); //channel index is a numeric label to map the ch name to a patched input
+                //todo floating bank location
+                out.println("<div class=\"fader-wrapper\">"); // Fader + value display
 
-                out.println("<div class=\"fader-block\">");
+                out.println("<input type=\"range\" max=\"127\" id=\"ch" + channelIndex + "\" " +
+                            "data-msb=\"" + msb + "\" data-lsb=\"" + lsb + "\" " +
+                            "oninput=\"sendMessage(this)\" class=\"fader\" title=\"" + channelName + "\" value=60/>"); // Fader input
 
-                // Fader + value display
-                out.println("<div class=\"fader-wrapper\">");
-                out.println("<input type=\"range\" max=\"127\" id=\"ch" + channelIndex +"\" oninput=\"sendMessage(this)\" class=\"fader\" title=\"" + channelName + "\" style=\"writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; height: 200px; width: 30px;\"/>");
-                out.println("<span class=\"fader-value\" id=\"f" + channelIndex + "-value\">0</span>");
-                out.println("</div>");
+                out.println("<span class=\"fader-value\" id=\"f" + channelIndex + "-value\" " +
+                "data-msb=\"" + msb + "\" data-lsb=\"" + lsb + "\">-18 dB</span>"); // Fader value display
 
-                // Channel label
-                out.println("<label class=\"fader-label\" id=\"f" + channelIndex + "\">" + channelName + "</label>");
+                out.println("</div>"); // End fader-wrapper
 
-                out.println("</div>");
+                out.println("<label class=\"fader-label\" id=\"f" + channelIndex + "\">" + channelName + "</label>"); // Channel label
+                out.println("</div>"); // End fader-block
+                
+                if (i % 8 == 7) {
+                    out.println("</div>"); // End fader-bank
+                }
             }
 
             out.println("</div>"); // End grid container

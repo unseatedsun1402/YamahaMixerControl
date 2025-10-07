@@ -60,35 +60,17 @@
     
     <security-constraint>
         <web-resource-collection>
-
-            <web-resource-name>mix_2</web-resource-name>
+            <web-resource-name>mix-pages</web-resource-name>
+            <url-pattern>/mix_1.html</url-pattern>
             <url-pattern>/mix_2.html</url-pattern>
-
-            <web-resource-name>mix_3</web-resource-name>
             <url-pattern>/mix_3.html</url-pattern>
-
-            <web-resource-name>mix_5</web-resource-name>
             <url-pattern>/mix_5.html</url-pattern>
-
-            <web-resource-name>mix_6</web-resource-name>
             <url-pattern>/mix_6.html</url-pattern>
-
-            <web-resource-name>mix_7</web-resource-name>
             <url-pattern>/mix_7.html</url-pattern>
-
-            <web-resource-name>mix_8</web-resource-name>
             <url-pattern>/mix_8.html</url-pattern>
-
-            <web-resource-name>mix_9</web-resource-name>
             <url-pattern>/mix_9.html</url-pattern>
-
-            <web-resource-name>mix_10</web-resource-name>
             <url-pattern>/mix_10.html</url-pattern>
-
-            <web-resource-name>mix_11</web-resource-name>
             <url-pattern>/mix_11.html</url-pattern>
-
-            <web-resource-name>mix_12</web-resource-name>
             <url-pattern>/mix_12.html</url-pattern>
 
         </web-resource-collection>

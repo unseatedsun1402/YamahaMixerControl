@@ -3,11 +3,13 @@
 *.bins
 
 #ignore build
-build/
+build/tmp
+build/resources
 build/classes/
 build/generated
-.gradle/
-bin/
+.gradle/*
+.vscode/*
+bin/*
 
 #allow war files
 !build/libs/*.war
