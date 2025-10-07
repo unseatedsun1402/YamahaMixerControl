@@ -16,17 +16,15 @@ public class WebControlParser {
         try {
             JsonObject jsonobject = JsonParser.parseString(message).getAsJsonObject();
 
-            String idStr = jsonobject.get("id").getAsString(); // e.g. "ch4"
-            int param = jsonobject.get("param").getAsInt();    // coarse/fine selector
-            int value = jsonobject.get("value").getAsInt();    // 0–127
+            String idStr = jsonobject.get("id").getAsString(); // e.g. "ch107"
+        int value = jsonobject.get("value").getAsInt();    // 0–127
 
-            int channelIndex = Integer.parseInt(idStr.substring(2)); // "ch4" → 4
-            int nrpn = (128 * param) + channelIndex;
-            int msb = nrpn / 128;
-            int lsb = nrpn % 128;
+        // NEW: Use msb and lsb directly from JSON
+        int msb = jsonobject.has("msb") ? jsonobject.get("msb").getAsInt() : 0;
+        int lsb = jsonobject.has("lsb") ? jsonobject.get("lsb").getAsInt() : 0;
 
-            System.out.printf("Parsed JSON → ID=%s, Param=%d, Value=%d → NRPN=%d (MSB=%d, LSB=%d)%n",
-                idStr, param, value, nrpn, msb, lsb);
+            System.out.printf("Parsed JSON -> ID=%s, Value=%d -> NRPN (MSB=%d, LSB=%d)%n",
+                idStr, value, msb, lsb);
 
             // NRPN LSB (CC 98)
             command[0] = new ShortMessage();
