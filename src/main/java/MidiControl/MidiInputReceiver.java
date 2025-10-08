@@ -16,11 +16,11 @@ public class MidiInputReceiver implements Receiver {
     }
 
     @Override
-    public void send(MidiMessage message, long timeStamp) {
-        if (open) {
-            inputBuffer.add(message);
-        }
+public void send(MidiMessage message, long timeStamp) {
+    if (open && message != null) {
+        inputBuffer.add(message);
     }
+}
 
     @Override
     public void close() {

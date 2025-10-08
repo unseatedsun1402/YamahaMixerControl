@@ -7,6 +7,10 @@ build/tmp
 build/resources
 build/classes/
 build/generated
+build/reports/
+build/test-results
+build/repo/
+build/logs/
 .gradle/*
 .vscode/*
 bin/*

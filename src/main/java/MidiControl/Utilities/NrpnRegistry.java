@@ -65,16 +65,7 @@ public class NrpnRegistry {
     }
 
     public void buildProfileMapping() {
-        // Dynamically generate mappings
-    //    for (int i = 0; i < 56; i++) {
-    //         int nrpn = 0x0000 + i; // INPUT FADER range
-    //         int msb = nrpn / 128;
-    //         int lsb = nrpn % 128;
-    //         mappings.add(new NrpnMapping(msb, lsb, ControlType.FADER, ChannelType.INPUT, i, "Input " + (i + 1) + " Fader"));
-    //         Logger.getLogger(NrpnRegistry.class.getName()).log(Level.FINE, "Registered NRPN Mapping: MSB {0}, LSB {1} for {2}", new Object[]{msb, lsb, "Input " + (i + 1) + " Fader"});
-    //     }
-        // generateMappings for input faders to stereo
-
+        // generateMappings for input faders
         generateMappings(56,ControlType.FADER , ChannelType.INPUT, "Input to stereo ", 0);
         // generateMappings for mix sends
         generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 1 send ", 0x28EA); //mix 1 sends
