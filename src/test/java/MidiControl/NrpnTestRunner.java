@@ -2,7 +2,7 @@ package MidiControl;
 import MidiControl.Utilities.NrpnMapping;
 import MidiControl.Utilities.NrpnParser;
 import MidiControl.Utilities.NrpnRegistry;
-import MidiControl.TestUtilites.NrpnMocker;
+import MidiControl.TestUtilities.NrpnMocker;
 import MidiControl.Utilities.NRPNDispatchTarget;
 
 public class NrpnTestRunner {

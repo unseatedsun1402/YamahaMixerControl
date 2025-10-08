@@ -7,7 +7,7 @@ import MidiControl.MidiInputReceiver;
 import MidiControl.MidiServer;
 import MidiControl.ChannelMappings.ChannelType;
 import MidiControl.ChannelMappings.ControlType;
-import MidiControl.TestUtilites.MidiTestUtils;
+import MidiControl.TestUtilities.MidiTestUtils;
 import MidiControl.Utilities.NrpnMapping;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -12,8 +12,8 @@ import java.util.Optional;
 
 import javax.sound.midi.ShortMessage;
 
-import MidiControl.TestUtilites.MidiTestUtils;
-import MidiControl.TestUtilites.NrpnMocker;
+import MidiControl.TestUtilities.NrpnMocker;
+import MidiControl.TestUtilities.MidiTestUtils;
 import MidiControl.Utilities.NrpnMapping;
 import MidiControl.Utilities.NrpnParser;
 import MidiControl.Utilities.NrpnRegistry;
