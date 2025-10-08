@@ -1,4 +1,4 @@
-package MidiControl.TestUtilites;
+package MidiControl.TestUtilities;
 import MidiControl.Utilities.NrpnParser;
 import javax.sound.midi.ShortMessage;
 

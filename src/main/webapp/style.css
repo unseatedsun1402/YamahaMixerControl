@@ -29,11 +29,42 @@ select {
     appearance: slider-vertical;
     height: clamp(120px, 20vh, 300px);
     width: 30px;
-    margin-right: 0.5rem;
+    margin-right: 0.6rem;
     background: transparent;
     outline: none;
     opacity: 0.8;
     transition: opacity 0.2s;
+}
+
+.output-fader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.5rem;
+  border-radius: 6px;
+  background-color: #444;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  border: 1px solid #333;
+  flex: 0 0 auto;
+}
+
+#output-fader-panel {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  max-height: 100vh;
+  background-color: #222;
+  border-left: 2px solid #444;
+  padding: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  z-index: 1000;
+  box-shadow: -2px 0 6px rgba(0,0,0,0.4);
+  width: auto; /* key change: let content define width */
+  max-width: 50vw; /* prevent overflow on small screens */
 }
 
 .fader.restored {
@@ -133,7 +164,46 @@ select {
   }
 
   .fader-grid {
-    padding: 0.5rem;
-    gap: 0.5rem;
+    margin-right: 0; /* allow full width for input faders */
+    padding-bottom: 6rem; /* reserve space so input faders don't get covered */
   }
+
+  #output-fader-panel {
+    position: fixed; /* stay anchored */
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: auto;
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    padding: 0.5rem;
+    border-left: none;
+    border-top: 2px solid #444;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.4);
+    background-color: #222;
+    z-index: 1000;
+  }
+}
+
+#toggle-output-panel{
+  top: auto;
+  bottom: 0;
+  right: 0;
+  height: auto;
+  flex-direction: row;
+  padding: 0.5rem;
+  border-left: none;
+  border-top: 2px solid #444;
+  margin-top: 2px;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.4);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.peek {
+  opacity: 20%;
+  transition: 1s;
 }

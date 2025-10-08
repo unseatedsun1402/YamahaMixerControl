@@ -9,6 +9,7 @@ import MidiControl.ChannelMappings.ChannelType;
 import MidiControl.ChannelMappings.ControlType;
 import MidiControl.TestUtilities.MidiTestUtils;
 import MidiControl.Utilities.NrpnMapping;
+import MidiControl.Utilities.NrpnRegistry;
 
 import static org.junit.jupiter.api.Assertions.*;
 import javax.sound.midi.ShortMessage;
@@ -123,5 +124,55 @@ public class MidiServerTest {
                 // Expected: device is valid but not usable as input
             }
         }, "Should not crash when setting output-only device as input");
+    }
+
+    @Test
+    void testOutputFaderJsonDispatch() {
+        NrpnRegistry.getInstance().buildProfileMapping(); // Ensure mappings are loaded
+
+        // Simulate incoming NRPN for output fader (MSB=2, LSB=0)
+        ShortMessage msg1 = MidiTestUtils.createControlChange(0, 99, 2); // NRPN MSB
+        ShortMessage msg2 = MidiTestUtils.createControlChange(0, 98, 0); // NRPN LSB
+        ShortMessage msg3 = MidiTestUtils.createControlChange(0, 6, 64); // Value MSB
+
+        MidiServer.addtoinputqueue(msg1);
+        MidiServer.addtoinputqueue(msg2);
+        MidiServer.addtoinputqueue(msg3);
+
+        MidiServer server = new MidiServer();
+        server.processIncomingMidi();
+
+        NrpnMapping mapping = NrpnRegistry.resolve(2, 0).orElseThrow();
+        String json = MidiControl.ControlMappings.buildFaderJson.buildOutputFaderJson(mapping, 8192);
+        assertTrue(MidiControl.TestUtilities.MidiTestUtils.isValidJson(json));
+        assertTrue(json.contains("\"type\":\"outputFaderUpdate\""));
+        assertTrue(json.contains("\"channelIndex\":" + mapping.channelIndex()));
+        assertTrue(json.contains("\"value\":8192"));
+        assertTrue(json.contains("\"label\":\"" + mapping.label() + "\""));
+    }
+
+    @Test
+    void testFaderJsonDispatch() {
+        NrpnRegistry.getInstance().buildProfileMapping(); // Ensure mappings are loaded
+
+        // Simulate incoming NRPN for output fader (MSB=2, LSB=0)
+        ShortMessage msg1 = MidiTestUtils.createControlChange(0, 99, 2); // NRPN MSB
+        ShortMessage msg2 = MidiTestUtils.createControlChange(0, 98, 0); // NRPN LSB
+        ShortMessage msg3 = MidiTestUtils.createControlChange(0, 6, 64); // Value MSB
+
+        MidiServer.addtoinputqueue(msg1);
+        MidiServer.addtoinputqueue(msg2);
+        MidiServer.addtoinputqueue(msg3);
+
+        MidiServer server = new MidiServer();
+        server.processIncomingMidi();
+
+        NrpnMapping mapping = NrpnRegistry.resolve(2, 0).orElseThrow();
+        String json = MidiControl.ControlMappings.buildFaderJson.buildInputFaderJson(mapping, 8192);
+        assertTrue(MidiControl.TestUtilities.MidiTestUtils.isValidJson(json));
+        assertTrue(json.contains("\"type\":\"nrpnUpdate\""));
+        assertTrue(json.contains("\"channelIndex\":" + mapping.channelIndex()));
+        assertTrue(json.contains("\"value\":8192"));
+        assertTrue(json.contains("\"label\":\"" + mapping.label() + "\""));
     }
 }

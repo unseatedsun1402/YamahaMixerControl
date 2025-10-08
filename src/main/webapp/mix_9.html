@@ -10,13 +10,14 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="style.css"/>
     </head>
+    <script src="js/fader-inject.js"></script>
     <script src="js/midi-gui.js"></script>
     <script src="js/client.js"></script>
     <body data-fadermsb="0" data-faderlsb="126">
-        <div id="ch-levels" style="float:none;">
-            
+        <div id="ch-levels"></div>
+        <div id="output-fader-panel">
+        <div class="output-fader" data-fadermsb="0" data-faderlsb="104" data-label="Mix9" data-channeltype="MIX" data-channelindex="1"></div>
         </div>
-        
-        
+        <button id="toggle-output-panel">Toggle Output Faders</button>
     </body>
 </html>

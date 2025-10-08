@@ -36,7 +36,11 @@ try {
     if (json.type === "nrpnUpdate") {
         console.log("NRPN Update:", json);
         handleNrpnUpdate(json);
-    } else {
+    }
+    else if (msg.type === "outputFaderUpdate") {
+    handleOutputFaderUpdate(msg);
+    }
+    else {
         console.log("Parsed:", json);
     }
 } catch (e) {

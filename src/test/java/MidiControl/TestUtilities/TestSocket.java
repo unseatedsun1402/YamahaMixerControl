@@ -1,4 +1,4 @@
-package MidiControl.TestUtilites;
+package MidiControl.TestUtilities;
 
 import MidiControl.Socket;
 

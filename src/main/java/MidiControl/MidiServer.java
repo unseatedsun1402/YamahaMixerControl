@@ -6,7 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.*;
 
-// import MidiControl.Utilities.SysExTableParser;
+import MidiControl.ChannelMappings.ControlType;
+import MidiControl.ControlMappings.buildFaderJson;
 import MidiControl.Utilities.NRPNDispatchTarget;
 import MidiControl.Utilities.NrpnMapping;
 import MidiControl.Utilities.NrpnParser;
@@ -298,17 +299,15 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
 
     @Override
     public void handleResolvedNRPN(NrpnMapping mapping, int value) {
-        String json = "{"
-        + "\"type\":\"nrpnUpdate\","
-        + "\"channelType\":\""+mapping.channelType()+"\","
-        + "\"channelIndex\":" + mapping.channelIndex() + ","
-        + "\"controlType\":\"" + mapping.controlType()+"\","
-        + "\"value\":" + value + ","
-        + "\"msb\":" + mapping.msb() + ","
-        + "\"lsb\":" + mapping.lsb()
-        + "}";
-        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Broadcasting NRPN JSON: " + json);
-        Socket.broadcast(json);
+        if (mapping.controlType() == ControlType.OUTPUT_FADER) {
+            Socket.broadcast(buildFaderJson.buildOutputFaderJson(mapping, value));
+            return;
+        }
+        if (mapping.controlType() == ControlType.FADER){
+            Socket.broadcast(buildFaderJson.buildInputFaderJson(mapping, value));
+            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, String.format("Broadcasting NRPN JSON to MSB:%d LSB:%d Channel:$d Value:",mapping.msb(),mapping.lsb(),mapping.channelIndex()),value);
+            return;
+        }
+        
     }
-
 }
