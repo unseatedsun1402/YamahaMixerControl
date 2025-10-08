@@ -71,6 +71,8 @@ async function buildpage() {
       for (let element of elements) {
         console.log("Fader ID:", element.id);
       }
+      injectOutputFaders()
+
       restoreFaderState() // automatic rehydration
       document.getElementById("restoreState").disabled = false; //enable the restore button now the page has loaded
       document.getElementById("restoreState").addEventListener("click", restoreFaderState); // start listening to the button
@@ -217,3 +219,39 @@ function saveFaderState(msb, lsb, value) {
   localStorage.setItem(key, value);
 }
 
+function handleOutputFaderUpdate(update) {
+  console.log("Output Update called with:", update);
+  const { msb, lsb, value } = update;
+  const fader = document.querySelector(`input[data-msb="${msb}"][data-lsb="${lsb}"]`);
+  const valueLabel = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
+
+  if (!fader) {
+    console.warn(`No fader found for NRPN msb:${msb} lsb:${lsb}`);
+    return;
+  }
+
+  const step = Math.round((value / 16383) * 127);
+  const db = faderDbMap[step];
+
+  fader.value = step;
+
+  if (valueLabel) {
+    valueLabel.innerText = db === "-∞" ? db : `${db} dB`;
+    console.debug("Updating fader " + msb + " " + lsb + " to " + db);
+    valueLabel.classList.add("updated");
+    setTimeout(() => valueLabel.classList.remove("updated"), 150);
+  } else {
+    console.warn(`No value label found for NRPN msb:${msb} lsb:${lsb}`);
+  }
+
+  fader.classList.add("updated");
+  setTimeout(() => fader.classList.remove("updated"), 300);
+
+  saveFaderState(msb, lsb, step); // Save scaled value
+  console.log(`Updated fader ${fader.id} to ${db} dB`);
+}
+
+function saveFaderState(msb, lsb, value) {
+  const key = `fader-${msb}-${lsb}`;
+  localStorage.setItem(key, value);
+}

@@ -1,7 +1,10 @@
-package MidiControl.TestUtilites;
+package MidiControl.TestUtilities;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.ShortMessage;
+
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.JsonParser;
 
 import MidiControl.Utilities.NrpnMapping;
 import MidiControl.Utilities.NrpnParser;
@@ -43,4 +46,12 @@ public class MidiTestUtils {
         + "}";
 }
 
+    public static boolean isValidJson(String jsonString) {
+        try {
+            JsonParser.parseString(jsonString);
+            return true;
+        } catch (JsonSyntaxException e) {
+            return false;
+        }
+    }
 }

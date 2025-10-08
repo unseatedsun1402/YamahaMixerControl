@@ -16,6 +16,6 @@ public enum ChannelType {
     MACHINE_CONFIG,
     MONITOR,
     GPI,
-    UNKNOWN, GLOBAL, OUTPUT
+    UNKNOWN, GLOBAL, OUTPUT, MASTER
 }
 

@@ -28,19 +28,19 @@ public class NrpnRegistry {
             int nrpn = 0x060 + i; // MIX FADER range
             int msb = nrpn / 128;
             int lsb = nrpn % 128;
-            mappings.add(new NrpnMapping(msb, lsb, ControlType.FADER, ChannelType.OUTPUT, i, "Mix " + (i + 1) + " Fader"));
+            mappings.add(new NrpnMapping(msb, lsb, ControlType.OUTPUT_FADER, ChannelType.MIX, i, "Mix " + (i + 1) + " Fader"));
         }
         for (int i = 0; i < 8; i++) {
             int nrpn = 0x070 + i; // MATRIX FADER range
             int msb = nrpn / 128;
             int lsb = nrpn % 128;
-            mappings.add(new NrpnMapping(msb, lsb, ControlType.FADER, ChannelType.OUTPUT, i, "Matrix " + (i + 1) + " Fader"));
+            mappings.add(new NrpnMapping(msb, lsb, ControlType.OUTPUT_FADER, ChannelType.MATRIX, i, "Matrix " + (i + 1) + " Fader"));
         }
         for (int i = 0; i < 5; i++) {
             int nrpn = 0x079 + i; // ST FADER range
             int msb = nrpn / 128;
             int lsb = nrpn % 128;
-            mappings.add(new NrpnMapping(msb, lsb, ControlType.FADER, ChannelType.OUTPUT, i, "ST Bus " + (i + 1) + " Fader"));
+            mappings.add(new NrpnMapping(msb, lsb, ControlType.OUTPUT_FADER, ChannelType.MASTER, i, "ST Bus " + (i + 1) + " Fader"));
         }
     }
 
@@ -68,32 +68,32 @@ public class NrpnRegistry {
         // generateMappings for input faders
         generateMappings(56,ControlType.FADER , ChannelType.INPUT, "Input to stereo ", 0);
         // generateMappings for mix sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 1 send ", 0x28EA); //mix 1 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 2 send ", 0x292A); //mix 2 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 3 send ", 0x296A); //mix 3 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 4 send ", 0x29AA); //mix 4 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 5 send ", 0x29EA); //mix 5 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 6 send ", 0x2A2A); //mix 6 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 7 send ", 0x2A6A); //mix 7 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 8 send ", 0x2AAA); //mix 8 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 9 send ", 0x07e);  // mix 9 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 10 send ", 0x0de); //mix 10 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 11 send ", 0x13e); //mix 11 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 12 send ", 0x19e); //mix 12 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 13 send ", 0x1fe); //mix 13 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 14 send ", 0x25e); //mix 14 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 15 send ", 0x2be); //mix 15 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MIX, "Mix 16 send ", 0x31e); //mix 16 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 1 send ", 0x28EA); //mix 1 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 2 send ", 0x292A); //mix 2 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 3 send ", 0x296A); //mix 3 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 4 send ", 0x29AA); //mix 4 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 5 send ", 0x29EA); //mix 5 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 6 send ", 0x2A2A); //mix 6 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 7 send ", 0x2A6A); //mix 7 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 8 send ", 0x2AAA); //mix 8 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 9 send ", 0x07e);  //mix 9 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 10 send ", 0x0de); //mix 10 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 11 send ", 0x13e); //mix 11 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 12 send ", 0x19e); //mix 12 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 13 send ", 0x1fe); //mix 13 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 14 send ", 0x25e); //mix 14 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 15 send ", 0x2be); //mix 15 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Mix 16 send ", 0x31e); //mix 16 sends
 
         // generateMappings for matrix sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MATRIX, "Matrix 1 send ", 0x037E); //matrix 1 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MATRIX, "Matrix 2 send ", 0x03DE); //matrix 2 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MATRIX, "Matrix 3 send ", 0x043E); //matrix 3 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MATRIX, "Matrix 4 send ", 0x04DE); //matrix 4 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MATRIX, "Matrix 5 send ", 0x2AEA); //matrix 5 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MATRIX, "Matrix 6 send ", 0x2B2A); //matrix 6 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MATRIX, "Matrix 7 send ", 0x2B6A); //matrix 7 sends
-        generateMappings(56, ControlType.INPUT_SEND, ChannelType.MATRIX, "Matrix 8 send ", 0x2BAA); //matrix 8 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Matrix 1 send ", 0x037E); //matrix 1 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Matrix 2 send ", 0x03DE); //matrix 2 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Matrix 3 send ", 0x043E); //matrix 3 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Matrix 4 send ", 0x04DE); //matrix 4 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Matrix 5 send ", 0x2AEA); //matrix 5 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Matrix 6 send ", 0x2B2A); //matrix 6 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Matrix 7 send ", 0x2B6A); //matrix 7 sends
+        generateMappings(56, ControlType.INPUT_SEND, ChannelType.INPUT, "Matrix 8 send ", 0x2BAA); //matrix 8 sends
     }
 
     private void generateMappings(int numberofmappings, ControlType controlType, ChannelType channelType, String labelPrefix, int startNrpn) {
