@@ -1,13 +1,15 @@
 package MidiControl;
-
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
- */
-import javax.sound.midi.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Receiver;
+import javax.sound.midi.Sequencer;
+import javax.sound.midi.Synthesizer;
+import javax.sound.midi.Transmitter;
 
 
 /**
@@ -48,11 +50,7 @@ public interface MidiInterface {
             {
                 if(!(device instanceof Sequencer))
                 {
-                    
-                    if(!(validenum == null))
-                    {
-                    validenum.add(enumeration);
-                    }
+                validenum.add(enumeration);
                 }
                 
             }
