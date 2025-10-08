@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 import MidiControl.Utilities.NrpnParser;
 
-
 /**
  *
  * @author ethanblood

@@ -17,7 +17,7 @@ import MidiControl.Utilities.NrpnRegistry;
  * @author ethanblood
  */
 
-class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
+public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     static Receiver rcvr;
     static MidiDevice midiport;
     public static Transmitter tx;
@@ -33,9 +33,16 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     NrpnParser nrpnParser = new NrpnParser();
     NrpnRegistry nrpnRegistry = new NrpnRegistry();
 
+    public static int getBufferSize() {
+        return buffer.size();
+    }
 
     public static void addtosendqueue(ShortMessage[] commands) {
         buffer.add(commands);
+    }
+
+    public static void addtoinputqueue(ShortMessage msg) {
+        inputBuffer.add(msg);
     }
     
     /**
@@ -84,23 +91,28 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
             System.out.println("Transmitter is null for device: " + dev);
         }
     }
+
+    public static boolean isReceiverOpen() {
+        return rcvr != null;
+    }
+
+    public static boolean isTransmitterOpen() {
+        return tx != null;
+    }
+
+    public static Receiver getReceiver() {
+        return rcvr;
+    }
+
+    public static Transmitter getTransmitter() {
+        return tx;
+    }
     
     /**
      * Sets the MIDI output device (Receiver)
      * @param dev
      * @throws MidiUnavailableException
     //  */
-    // public static void setOutputDevice(int dev) throws MidiUnavailableException {
-    //     midiport = MidiInterface.getMidiDevice(dev);
-    //     Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting output device: "+dev, (Object) null);
-    //     if (midiport.getMaxReceivers() != 0) {
-    //         setReceiver(dev);
-    //         Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting midi server receiver to device: "+dev, (Object) null);
-    //         return;
-    //     }
-    //     Logger.getLogger(MidiServer.class.getName()).log(Level.WARNING,"Is an input interface: "+dev, (Object) null);
-    //     return;
-    // }
     public static void setOutputDevice(int index) throws MidiUnavailableException {
     MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
     MidiDevice outputDevice = MidiSystem.getMidiDevice(infos[index]);
@@ -113,13 +125,16 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     Socket.restartSyncSend();
 }
 
-
     /**
      * Sets the MIDI input device (Transmitter)
      * @param dev
      * @throws MidiUnavailableException
      */
     public static void setInputDevice(int dev) throws MidiUnavailableException {
+        int deviceCount = MidiInterface.discoverDevices().length;
+        if (dev < 0 || dev >= deviceCount) {
+            throw new MidiUnavailableException("Invalid device index: " + dev);
+        }
         midiport = MidiInterface.getMidiDevice(dev);
         Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting input device: "+dev, (Object) null);
         if (midiport.getMaxTransmitters() != 0) {
@@ -151,8 +166,6 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
             setTransmitter(dev);
         }
     }
-
-    
     
     @Override
     public void run() {
@@ -184,7 +197,7 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
 
 
     // Example: process and print incoming MIDI events
-    private void processIncomingMidi() {
+    public void processIncomingMidi() {
     while (!inputBuffer.isEmpty()) {
         MidiMessage msg = inputBuffer.poll();
         if (msg != null) {
@@ -216,15 +229,12 @@ class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     public static void handleResolvedNRPN(String json) {
         Socket.broadcast(json);
     }
-
-
     
     public static void bufferMidi(String message) throws InterruptedException{
         ShortMessage[] commands = WebControlParser.parseJSON(message);
         Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Buffering MIDI: " + Arrays.toString(commands));
         addtosendqueue(commands);
     }
-    
     
     /**
      * Parses and sends a json string object as a midi command array
