@@ -30,24 +30,19 @@ Client.socket.onclose = function () {
 };
 
 Client.socket.onmessage = function (message) {
-console.log("Received:", message.data);
-try {
+  console.log("Received:", message.data);
+  try {
     const json = JSON.parse(message.data);
     if (json.type === "nrpnUpdate") {
-        console.log("NRPN Update:", json);
-        handleNrpnUpdate(json);
+      console.log("NRPN Update:", json);
+      handleNrpnUpdate(json);
+    } else {
+      console.log("Parsed:", json);
     }
-    else if (msg.type === "outputFaderUpdate") {
-    handleOutputFaderUpdate(msg);
-    }
-    else {
-        console.log("Parsed:", json);
-    }
-} catch (e) {
+  } catch (e) {
     console.error("Invalid JSON from server:", message.data);
-}
+  }
 };
-
 
 Client.socket.onerror = function (error) {
 console.error("WebSocket error:", error);

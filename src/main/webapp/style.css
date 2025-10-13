@@ -103,14 +103,47 @@ select {
 
 .fader-wrapper {
     display: flex;
+    padding-right: 2px;
     flex-direction: row;
     align-items: center;
     justify-content: center;
 }
 
+.fader-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.mute-btn,
+.solo-btn {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  background-color: #555;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.mute-btn.mute-active {
+  background-color: #c00;
+  box-shadow: 0 0 6px rgba(255, 0, 0, 0.6);
+  color: #fff;
+}
+
+.solo-btn.solo-active {
+  background-color: #ff9900;
+  box-shadow: 0 0 6px rgba(255, 165, 0, 0.6);
+  color: #000;
+}
+
+
 .fader-value {
     font-size: 0.9rem;
-    width: 50px;
+    width: 52px;
+    height: 45px;
     text-align: left;
     font-family: monospace;
     transition: all 0.2s ease-in-out;

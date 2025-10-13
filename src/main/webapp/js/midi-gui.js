@@ -185,71 +185,48 @@ document.querySelectorAll("input[type=range].fader").forEach(fader => {
 function handleNrpnUpdate(update) {
   console.log("handleNrpnUpdate called with:", update);
   const { msb, lsb, value } = update;
-  const fader = document.querySelector(`input[data-msb="${msb}"][data-lsb="${lsb}"]`);
-  const valueLabel = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
 
-  if (!fader) {
-    console.warn(`No fader found for NRPN msb:${msb} lsb:${lsb}`);
+  const el = document.querySelector(`[data-msb="${msb}"][data-lsb="${lsb}"]`);
+  if (!el) {
+    console.warn(`No element found for NRPN msb:${msb} lsb:${lsb}`);
     return;
   }
 
-  const step = Math.round((value / 16383) * 127);
-  const db = faderDbMap[step];
+  // Handle fader input
+  if (el.tagName === "INPUT" && el.type === "range") {
+    const step = Math.round((value / 16383) * 127);
+    const db = faderDbMap[step];
+    el.value = step;
 
-  fader.value = step;
+    const valueLabel = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
+    if (valueLabel) {
+      valueLabel.innerText = db === "-∞" ? db : `${db} dB`;
+      console.debug("Updating fader " + msb + " " + lsb + " to " + db);
+      valueLabel.classList.add("updated");
+      setTimeout(() => valueLabel.classList.remove("updated"), 150);
+    } else {
+      console.warn(`No value label found for NRPN msb:${msb} lsb:${lsb}`);
+    }
 
-  if (valueLabel) {
-    valueLabel.innerText = db === "-∞" ? db : `${db} dB`;
-    console.debug("Updating fader " + msb + " " + lsb + " to " + db);
-    valueLabel.classList.add("updated");
-    setTimeout(() => valueLabel.classList.remove("updated"), 150);
-  } else {
-    console.warn(`No value label found for NRPN msb:${msb} lsb:${lsb}`);
-  }
+    el.classList.add("updated");
+    setTimeout(() => el.classList.remove("updated"), 300);
 
-  fader.classList.add("updated");
-  setTimeout(() => fader.classList.remove("updated"), 300);
-
-  saveFaderState(msb, lsb, step); // Save scaled value
-  console.log(`Updated fader ${fader.id} to ${db} dB`);
-}
-
-function saveFaderState(msb, lsb, value) {
-  const key = `fader-${msb}-${lsb}`;
-  localStorage.setItem(key, value);
-}
-
-function handleOutputFaderUpdate(update) {
-  console.log("Output Update called with:", update);
-  const { msb, lsb, value } = update;
-  const fader = document.querySelector(`input[data-msb="${msb}"][data-lsb="${lsb}"]`);
-  const valueLabel = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
-
-  if (!fader) {
-    console.warn(`No fader found for NRPN msb:${msb} lsb:${lsb}`);
+    saveFaderState(msb, lsb, step);
+    console.log(`Updated fader ${el.id} to ${db} dB`);
     return;
   }
 
-  const step = Math.round((value / 16383) * 127);
-  const db = faderDbMap[step];
-
-  fader.value = step;
-
-  if (valueLabel) {
-    valueLabel.innerText = db === "-∞" ? db : `${db} dB`;
-    console.debug("Updating fader " + msb + " " + lsb + " to " + db);
-    valueLabel.classList.add("updated");
-    setTimeout(() => valueLabel.classList.remove("updated"), 150);
-  } else {
-    console.warn(`No value label found for NRPN msb:${msb} lsb:${lsb}`);
+  // Handle mute button
+  if (el.tagName === "BUTTON" && el.classList.contains("mute")) {
+    const isMuted = value === 0;
+    el.classList.toggle("mute-active", isMuted);
+    console.log(`Updated mute ${el.id} to ${isMuted ? "Muted" : "Unmuted"}`);
+    return;
   }
 
-  fader.classList.add("updated");
-  setTimeout(() => fader.classList.remove("updated"), 300);
-
-  saveFaderState(msb, lsb, step); // Save scaled value
-  console.log(`Updated fader ${fader.id} to ${db} dB`);
+  console.warn("Unhandled element type for NRPN sync:", el);
 }
+
 
 function saveFaderState(msb, lsb, value) {
   const key = `fader-${msb}-${lsb}`;

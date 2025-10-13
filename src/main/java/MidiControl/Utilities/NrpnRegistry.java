@@ -42,6 +42,13 @@ public class NrpnRegistry {
             int lsb = nrpn % 128;
             mappings.add(new NrpnMapping(msb, lsb, ControlType.OUTPUT_FADER, ChannelType.MASTER, i, "ST Bus " + (i + 1) + " Fader"));
         }
+
+        for (int i = 0; i < 56; i++) {
+            int nrpn = 0x0566 + i; // INPUT ON range
+            int msb = nrpn / 128;
+            int lsb = nrpn % 128;
+            mappings.add(new NrpnMapping(msb, lsb, ControlType.INPUT_ON, ChannelType.INPUT, i, "Input " + (i + 1) + " Mute"));
+        }
     }
 
     public static NrpnRegistry getInstance() {

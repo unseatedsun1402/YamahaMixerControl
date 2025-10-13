@@ -49,6 +49,15 @@ public class BuildPage extends HttpServlet {
                 int msb = coarse + (raw / 128); // MIDI MSB is 7-bit, so divide by 128
                 int lsb = raw % 128;            // MIDI LSB is 7-bit, so modulo 128
 
+                int onAddress = 0x0566 + i;
+                int onMsb = onAddress / 128;
+                int onLsb = onAddress % 128;
+
+                // int soloAddress = 0x9999;
+                int soloMsb = 0x9999;
+                int soloLsb = 0x9999;
+
+
                 int channelIndex = fine + i;
                 String channelName = chnames.get(i);
                 
@@ -59,17 +68,31 @@ public class BuildPage extends HttpServlet {
                 out.println("<div class=\"fader-block\" data-type=\"input\" data-channel=\"" + (i + 1) + "\">"); // fader block wraps the range and labels
                 
                 out.println("<div class=\"channel-index\">Input " + (i + 1) + "</div>"); //channel index is a numeric label to map the ch name to a patched input
-                //todo floating bank location
-                out.println("<div class=\"fader-wrapper\">"); // Fader + value display
+                
+                out.println("<div class=\"fader-wrapper\">"); // Fader + buttons + value display
 
                 out.println("<input type=\"range\" max=\"127\" id=\"ch" + channelIndex + "\" " +
                             "data-msb=\"" + msb + "\" data-lsb=\"" + lsb + "\" " +
                             "oninput=\"sendMessage(this)\" class=\"fader\" title=\"" + channelName + "\" value=60/>"); // Fader input
 
-                out.println("<span class=\"fader-value\" id=\"f" + channelIndex + "-value\" " +
-                "data-msb=\"" + msb + "\" data-lsb=\"" + lsb + "\">-18 dB</span>"); // Fader value display
+                
 
-                out.println("</div>"); // End fader-wrapper
+                out.println("<div class=\"fader-buttons\">");                                 // button wrapper
+
+                out.println("<span class=\"fader-value\" id=\"f" + channelIndex + "-value\" " +
+                            "data-msb=\"" + msb + "\" data-lsb=\"" + lsb + "\">-18 dB</span>"); // Fader value display
+                
+                out.println("<button id=\"mute-"+channelIndex+"\" class=\"mute\" "+             // Mute toggle
+                            "data-msb=\""+onMsb +"\" data-lsb=\"" + onLsb + "\" data-type=\"mute\" data-index=\""+channelIndex+
+                            "\" onclick=\"toggleMute(this)\">Mute</button>");
+
+                out.println("<button id=\"solo-ch"+channelIndex+"\" class=\"solo\" "+           // Solo toggle
+                            "data-msb=\""+ soloMsb +"\" data-lsb=\"" + soloLsb + "\" data-type=\"solo\" data-index=\""+channelIndex+
+                            "\" onclick=\"toggleSolo(this)\">Solo</button>");
+
+                out.println("</div>");                                                        // End button-wrapper
+
+                out.println("</div>");                                                        // End fader-wrapper
 
                 out.println("<label class=\"fader-label\" id=\"f" + channelIndex + "\">" + channelName + "</label>"); // Channel label
                 out.println("</div>"); // End fader-block
