@@ -32,8 +32,8 @@ public class Socket {
         NrpnParser.setDispatchTarget(ms);
 
         if (sendThread == null || !sendThread.isAlive()) {
-            if (MidiServer.rcvr != null) {
-                SyncSend sender = new SyncSend(MidiServer.buffer, MidiServer.rcvr);
+            if (MidiServer.midiOut != null) {
+                SyncSend sender = new SyncSend(MidiServer.buffer, MidiServer.midiOut);
                 sendThread = new Thread(sender);
                 sendThread.start();
                 Logger.getLogger(Socket.class.getName()).log(java.util.logging.Level.INFO, "SyncSend thread started from socket.");
@@ -83,8 +83,8 @@ public class Socket {
             Logger.getLogger(Socket.class.getName()).log(Level.INFO, "SyncSend thread interrupted.");
         }
 
-        if (MidiServer.rcvr != null) {
-            SyncSend sender = new SyncSend(MidiServer.buffer, MidiServer.rcvr);
+        if (MidiServer.midiOut != null) {
+            SyncSend sender = new SyncSend(MidiServer.buffer, MidiServer.midiOut);
             sendThread = new Thread(sender);
             sendThread.start();
             Logger.getLogger(Socket.class.getName()).log(Level.INFO, "SyncSend thread restarted.");

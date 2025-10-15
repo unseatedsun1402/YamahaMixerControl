@@ -8,6 +8,8 @@ import javax.sound.midi.*;
 
 import MidiControl.ChannelMappings.ControlType;
 import MidiControl.ControlMappings.buildFaderJson;
+import MidiControl.MidiDeviceManager.MidiOutput;
+import MidiControl.MidiDeviceManager.ReceiverWrapper;
 import MidiControl.Utilities.NRPNDispatchTarget;
 import MidiControl.Utilities.NrpnMapping;
 import MidiControl.Utilities.NrpnParser;
@@ -19,7 +21,7 @@ import MidiControl.Utilities.NrpnRegistry;
  */
 
 public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
-    static Receiver rcvr;
+    static MidiOutput midiOut;
     static MidiDevice midiport;
     public static Transmitter tx;
     static final ConcurrentLinkedQueue<ShortMessage[]> buffer = new ConcurrentLinkedQueue<>();
@@ -28,9 +30,6 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     static final ConcurrentLinkedQueue<MidiMessage> inputBuffer = new ConcurrentLinkedQueue<>();
     static MidiInputReceiver inputReceiver;
 
-    // SysExTableParser tableParser = new SysExTableParser();
-    // List<SysExMapping> sysexMappings = tableParser.parse("ParamChangeList_V350_M7CL.xls", "Parameter Change");
-    // SysExParser sysexDecoder = new SysExParser(sysexMappings);
     NrpnParser nrpnParser = new NrpnParser();
     NrpnRegistry nrpnRegistry = new NrpnRegistry();
 
@@ -51,12 +50,13 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
      * @param dev
      * @throws MidiUnavailableException 
      */
-    protected static void setReceiver(int dev) throws MidiUnavailableException{
-        rcvr = MidiInterface.getReceiver(dev);
-        if(!(midiport.isOpen())){
-            midiport.open();
+    protected static void setReceiver(int dev) throws MidiUnavailableException {
+        MidiDevice device = MidiInterface.getMidiDevice(dev);
+        if (!device.isOpen()) {
+            device.open();
             System.out.println("Opened MIDI device for receiver: " + dev);
         }
+        midiOut = new ReceiverWrapper(device);
         System.out.println("Receiver set for device: " + dev);
     }
     
@@ -93,38 +93,40 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
         }
     }
 
-    public static boolean isReceiverOpen() {
-        return rcvr != null;
-    }
-
     public static boolean isTransmitterOpen() {
         return tx != null;
-    }
-
-    public static Receiver getReceiver() {
-        return rcvr;
     }
 
     public static Transmitter getTransmitter() {
         return tx;
     }
     
+    public static Receiver getReceiver() {
+        if (midiOut instanceof ReceiverWrapper wrapper) {
+            return wrapper.getRawReceiver();
+        }
+        return null;
+    }
+
+
     /**
      * Sets the MIDI output device (Receiver)
      * @param dev
      * @throws MidiUnavailableException
     //  */
     public static void setOutputDevice(int index) throws MidiUnavailableException {
-    MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
-    MidiDevice outputDevice = MidiSystem.getMidiDevice(infos[index]);
-    outputDevice.open();
-    rcvr = outputDevice.getReceiver();
+        MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
+        MidiDevice outputDevice = MidiSystem.getMidiDevice(infos[index]);
 
-    Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Receiver set for device: " + index);
+        if (!outputDevice.isOpen()) {
+            outputDevice.open();
+            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Opened MIDI device for output: " + index);
+        }
+        midiOut = new ReceiverWrapper(outputDevice);
+        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Receiver set for device: " + index);
+        Socket.restartSyncSend();
+    }
 
-    // Notify Socket to restart SyncSend
-    Socket.restartSyncSend();
-}
 
     /**
      * Sets the MIDI input device (Transmitter)
@@ -243,24 +245,13 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
      * @throws InterruptedException 
      */
     public void sendMidi(String message) throws InterruptedException, MidiUnavailableException{
-        if (!midiport.isOpen()) {
-            midiport.open();
-        }
-        System.out.println("Receiver: " + rcvr.getClass().getName());
-        if (rcvr != null) {
-            try {
-                ShortMessage[] commands = WebControlParser.parseJSON(message);
-                for (ShortMessage command : commands) {
-                    System.out.println("Sending: " + command.getCommand() + " " + command.getData1() + " " + command.getData2());
-                    rcvr.send(command, -1);
-                    Thread.sleep(1, 11);
-                }
-            } catch (Exception e) {
-                System.out.println("Error - send midi: " + e);
+        if (midiOut != null) {
+            ShortMessage[] commands = WebControlParser.parseJSON(message);
+            for (ShortMessage command : commands) {
+                midiOut.sendMessage(command);
+                Thread.sleep(1, 11);
             }
         }
-
-            
     }
     
     public static void main(String[] args) {
@@ -288,7 +279,7 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
         Thread serverThread = new Thread(server);
         serverThread.start();
 
-        SyncSend checkbuffer = new SyncSend(buffer, rcvr);
+        SyncSend checkbuffer = new SyncSend(buffer, midiOut);
         Thread sendThread = new Thread(checkbuffer);
         sendThread.start();
 
