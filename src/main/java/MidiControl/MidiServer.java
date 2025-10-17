@@ -8,106 +8,62 @@ import javax.sound.midi.*;
 
 import MidiControl.ChannelMappings.ControlType;
 import MidiControl.ControlMappings.buildFaderJson;
+import MidiControl.MidiDeviceManager.MidiDeviceUtils;
+import MidiControl.MidiDeviceManager.MidiInput;
 import MidiControl.MidiDeviceManager.MidiOutput;
+import MidiControl.MidiDeviceManager.MidiSettings;
 import MidiControl.MidiDeviceManager.ReceiverWrapper;
+import MidiControl.MidiDeviceManager.Settings;
+import MidiControl.MidiDeviceManager.TransmitterWrapper;
 import MidiControl.Utilities.NRPNDispatchTarget;
 import MidiControl.Utilities.NrpnMapping;
 import MidiControl.Utilities.NrpnParser;
 import MidiControl.Utilities.NrpnRegistry;
 
 /**
- *
- * @author ethanblood
+ * Server for hosting a hardware device for midi communication and relaying this to web sockets to be broadcast to client sessions
  */
-
 public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
-    static MidiOutput midiOut;
-    static MidiDevice midiport;
-    public static Transmitter tx;
-    static final ConcurrentLinkedQueue<ShortMessage[]> buffer = new ConcurrentLinkedQueue<>();
-
-    // Input MIDI buffer and receiver
+    public static MidiOutput midiOut;
+    public static MidiInput midiIn;
+    static final ConcurrentLinkedQueue<ShortMessage[]> outputBuffer = new ConcurrentLinkedQueue<>();
     static final ConcurrentLinkedQueue<MidiMessage> inputBuffer = new ConcurrentLinkedQueue<>();
-    static MidiInputReceiver inputReceiver;
-
     NrpnParser nrpnParser = new NrpnParser();
-    NrpnRegistry nrpnRegistry = new NrpnRegistry();
 
     public static int getBufferSize() {
-        return buffer.size();
+        return outputBuffer.size();
     }
 
     public static void addtosendqueue(ShortMessage[] commands) {
-        buffer.add(commands);
+       outputBuffer.add(commands);
     }
 
-    public static void addtoinputqueue(ShortMessage msg) {
+    public static void addtoinputqueue(ShortMessage msg) { // used for testing
         inputBuffer.add(msg);
     }
-    
-    /**
-     * Sets the receiver
-     * @param dev
-     * @throws MidiUnavailableException 
-     */
-    protected static void setReceiver(int dev) throws MidiUnavailableException {
-        MidiDevice device = MidiInterface.getMidiDevice(dev);
-        if (!device.isOpen()) {
-            device.open();
-            System.out.println("Opened MIDI device for receiver: " + dev);
-        }
-        midiOut = new ReceiverWrapper(device);
-        System.out.println("Receiver set for device: " + dev);
-    }
-    
-    /**
-     * Sets the Transmitter
-     * @param dev
-     * @throws MidiUnavailableException 
-     */
-    protected static void setTransmitter(int dev) throws MidiUnavailableException {
-        if (tx != null) {
-            tx.close();
-            System.out.println("Closed previous transmitter.");
-        }
-        tx = MidiInterface.getTransmitter(dev);
-        if(!(midiport.isOpen())){
-            midiport.open();
-            System.out.println("Opened MIDI device for transmitter: " + dev);
-        }
-        // Attach input receiver to transmitter for incoming MIDI
-        if (tx != null) {
-            if (inputReceiver == null) {
-                inputReceiver = new MidiInputReceiver(inputBuffer);
-                System.out.println("Created new MidiInputReceiver");
-            }
-            else{
-                inputReceiver.close();
-                inputReceiver = new MidiInputReceiver(inputBuffer);
-                System.out.println("Restarting existing MidiInputReceiver");
-            }
-            tx.setReceiver(inputReceiver);
-            System.out.println("Transmitter set and inputReceiver attached for device: " + dev);
-        } else {
-            System.out.println("Transmitter is null for device: " + dev);
-        }
+
+    public static void clearOutputBuffer() {
+        outputBuffer.clear();
     }
 
-    public static boolean isTransmitterOpen() {
-        return tx != null;
+    public static void clearInputBuffer() {
+        inputBuffer.clear();
     }
 
-    public static Transmitter getTransmitter() {
-        return tx;
-    }
     
-    public static Receiver getReceiver() {
+    public static Receiver getReceiver() {  // used for testing
         if (midiOut instanceof ReceiverWrapper wrapper) {
             return wrapper.getRawReceiver();
         }
         return null;
     }
 
+    public static Transmitter getTransmitter() {  //used for testing
+    if (midiIn instanceof TransmitterWrapper wrapper) {
+        return wrapper.getRawTransmitter();
+        }
+        return null;
+    }
 
     /**
      * Sets the MIDI output device (Receiver)
@@ -115,59 +71,38 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
      * @throws MidiUnavailableException
     //  */
     public static void setOutputDevice(int index) throws MidiUnavailableException {
-        MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
-        MidiDevice outputDevice = MidiSystem.getMidiDevice(infos[index]);
-
-        if (!outputDevice.isOpen()) {
-            outputDevice.open();
-            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Opened MIDI device for output: " + index);
-        }
-        midiOut = new ReceiverWrapper(outputDevice);
-        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Receiver set for device: " + index);
-        Socket.restartSyncSend();
+    midiOut = new ReceiverWrapper(MidiDeviceUtils.getDevice(index));
+    MidiDevice.Info info = MidiServer.midiOut.getDeviceInfo();
+    Settings.updateOutputDevice(index, info.getName(), info.getDescription());
+    Socket.restartSyncSend();
     }
-
 
     /**
      * Sets the MIDI input device (Transmitter)
      * @param dev
      * @throws MidiUnavailableException
      */
-    public static void setInputDevice(int dev) throws MidiUnavailableException {
-        int deviceCount = MidiInterface.discoverDevices().length;
-        if (dev < 0 || dev >= deviceCount) {
-            throw new MidiUnavailableException("Invalid device index: " + dev);
-        }
-        midiport = MidiInterface.getMidiDevice(dev);
-        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting input device: "+dev, (Object) null);
-        if (midiport.getMaxTransmitters() != 0) {
-            setTransmitter(dev);
-            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Set midi server transmitter to device: "+dev, (Object) null);
-            return;
-        }
-        else{
-            setReceiver(dev);
-            Logger.getLogger(MidiServer.class.getName()).log(Level.WARNING,"Is an output interface: "+dev, (Object) null);
-            return;
+    public static void setInputDevice(int index) throws MidiUnavailableException {
+        MidiDevice device = MidiDeviceUtils.getDevice(index);
+        device.open(); // Required before querying transmitters
+            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,
+                "After open -> Transmitters: " + device.getMaxTransmitters());
+        if (device.getMaxTransmitters() != 0 || device.getMaxTransmitters() != -1) {
+            midiIn = new TransmitterWrapper(device, inputBuffer);
+            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Transmitter set for device: " + index);
+            MidiDevice.Info info = MidiServer.midiIn.getDeviceInfo();
+            Settings.updateInputDevice(index, info.getName(), info.getDescription());
+        } else {
+            Logger.getLogger(MidiServer.class.getName()).log(Level.WARNING, "Device is output-only: " + index);
+            // Do NOT overwrite midiOut here
         }
     }
 
-    /**
-     * Sets both input and output device (legacy)
-     * @param dev
-     * @throws MidiUnavailableException
-     */
-    public static void setDevice(int dev) throws MidiUnavailableException{
-        midiport = MidiInterface.getMidiDevice(dev);
-        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Setting legacy midi device: "+dev, (Object) null);
-        if (midiport.getMaxReceivers() != 0) {
-            setReceiver(dev);
-            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Is an output interface: "+dev, (Object) null);
-        }
-        if (midiport.getMaxTransmitters() != 0) {
-            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Is an input interface: "+dev, (Object) null);
-            setTransmitter(dev);
-        }
+    //Support for batch IO config
+    public static void configureIO(int inputIndex, int outputIndex) throws MidiUnavailableException {
+        setInputDevice(inputIndex);
+        setOutputDevice(outputIndex);
+        Settings.saveCurrentIO(); // Persist current config
     }
     
     @Override
@@ -188,6 +123,23 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
         
         NrpnMapping m = NrpnRegistry.INSTANCE.lookup(0, 126);
         System.out.println("Test mapping load 0, 126: " + m);
+        
+        try {
+            setInputDevice(Settings.getLastInput());
+            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Restored input device: " + midiOut.getDeviceInfo().getName() + " (" + midiOut.getDeviceInfo().getDescription() + ")");
+        } catch (MidiUnavailableException e) {
+            Logger.getLogger(MidiServer.class.getName()).warning("Last Input Device not available");
+            e.printStackTrace();
+        }
+        try {
+            setOutputDevice(Settings.getLastOutput());
+            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Restored output device: " + midiOut.getDeviceInfo().getName() + " (" + midiOut.getDeviceInfo().getDescription() + ")");
+
+        } catch (MidiUnavailableException e) {
+            Logger.getLogger(MidiServer.class.getName()).warning("Last output Device not available");
+            e.printStackTrace();
+        }
+
         while (true) {
             processIncomingMidi();
             try {
@@ -197,7 +149,6 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
             }
         }
     }
-
 
     // Example: process and print incoming MIDI events
     public void processIncomingMidi() {
@@ -240,34 +191,39 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     }
     
     /**
-     * Parses and sends a json string object as a midi command array
-     * @param message
-     * @throws InterruptedException 
+     * Direct MIDI dispatch from JSON — used for testing or manual control.
+     * Prefer bufferMidi() for production use.
      */
-    public void sendMidi(String message) throws InterruptedException, MidiUnavailableException{
-        if (midiOut != null) {
-            ShortMessage[] commands = WebControlParser.parseJSON(message);
-            for (ShortMessage command : commands) {
-                midiOut.sendMessage(command);
-                Thread.sleep(1, 11);
-            }
+    public void sendMidi(String message) throws InterruptedException, MidiUnavailableException {
+        if (midiOut == null) {
+            Logger.getLogger(MidiServer.class.getName()).log(Level.WARNING, "No MIDI output device set. Cannot send message.");
+            return;
+        }
+
+        ShortMessage[] commands;
+        if (message.trim().startsWith("[")) {
+            // Raw MIDI array
+            commands = ParseMidi.parseRawMidiJson(message);
+        } else {
+            // NRPN-style control
+            commands = WebControlParser.parseJSON(message);
+        }
+
+        for (ShortMessage command : commands) {
+            midiOut.sendMessage(command);
+            Thread.sleep(1, 11);
         }
     }
-    
+
     public static void main(String[] args) {
     try {
-        int deviceIndex = 0;
-        if (args.length > 0) {
-            try {
-                deviceIndex = Integer.parseInt(args[0]);
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid device index, using default 0.");
-            }
-        }
+        MidiSettings settings = Settings.getSettings(); // Load cached settings
+        int inputIndex = settings != null ? Settings.getLastInput() : 0;
+        int outputIndex = settings != null ? Settings.getLastOutput() : 0;
 
-        setDevice(deviceIndex);
-
-        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Starting MidiServer on device index: " + deviceIndex);
+        configureIO(inputIndex, outputIndex);
+        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,
+            "Starting MidiServer with input=" + inputIndex + ", output=" + outputIndex);
 
         // Build and export mappings only in standalone mode
         NrpnRegistry.INSTANCE.buildProfileMapping();
@@ -279,8 +235,8 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
         Thread serverThread = new Thread(server);
         serverThread.start();
 
-        SyncSend checkbuffer = new SyncSend(buffer, midiOut);
-        Thread sendThread = new Thread(checkbuffer);
+        SyncSend sender = new SyncSend(MidiServer.outputBuffer);
+        Thread sendThread = new Thread(sender);
         sendThread.start();
 
     } catch (MidiUnavailableException e) {
@@ -299,6 +255,5 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
             Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, String.format("Broadcasting NRPN JSON to MSB:%d LSB:%d Channel:$d Value:",mapping.msb(),mapping.lsb(),mapping.channelIndex()),value);
             return;
         }
-        
     }
 }

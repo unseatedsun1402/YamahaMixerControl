@@ -2,19 +2,15 @@ package MidiControl;
 
 import javax.sound.midi.ShortMessage;
 
-import MidiControl.MidiDeviceManager.MidiOutput;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SyncSend implements Runnable {
     private final ConcurrentLinkedQueue<ShortMessage[]> buffer;
-    private final MidiOutput midiOut;
 
-    public SyncSend(ConcurrentLinkedQueue<ShortMessage[]> buffer, MidiOutput midiOut) {
+    public SyncSend(ConcurrentLinkedQueue<ShortMessage[]> buffer) {
         this.buffer = buffer;
-        this.midiOut = midiOut;
     }
 
     @Override
@@ -24,15 +20,15 @@ public class SyncSend implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
             ShortMessage[] commands = buffer.poll();
 
-            if (commands != null && midiOut != null) {
+            if (commands != null && MidiServer.midiOut != null) {
                 Logger.getLogger(SyncSend.class.getName()).log(Level.FINE, "Buffer populated", (Object) null);
                 Logger.getLogger(SyncSend.class.getName()).log(Level.INFO, "Processing the buffer and sending to the midi output device", (Object) null);
 
                 for (ShortMessage command : commands) {
                     try {
-                        midiOut.sendMessage(command);
+                        MidiServer.midiOut.sendMessage(command);
                         Logger.getLogger(SyncSend.class.getName()).log(Level.FINE,
-                            "Server sending midi event: " + midiOut.getClass().getSimpleName() + " " +
+                            "Server sending midi event: " + MidiServer.midiOut.getClass().getSimpleName() + " " +
                             command.getCommand() + " " + command.getData1() + " " + command.getData2(),
                             (Object) null);
                         Thread.sleep(0, 500_000); // Optional pacing
