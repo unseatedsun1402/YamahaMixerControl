@@ -2,6 +2,10 @@ package MidiControl;
 
 import javax.sound.midi.ShortMessage;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import MidiControl.ChannelMappings.ControlType;
 public class ParseMidi {
     /**
@@ -27,5 +31,31 @@ public class ParseMidi {
             System.out.println("Unknown Control Type for data1: " + message.getData1());
         }
     }
+
+    public static ShortMessage[] parseRawMidiJson(String json) {
+        try {
+            JsonArray array = JsonParser.parseString(json).getAsJsonArray();
+            ShortMessage[] messages = new ShortMessage[array.size()];
+
+            for (int i = 0; i < array.size(); i++) {
+                JsonObject obj = array.get(i).getAsJsonObject();
+
+                int command = obj.get("command").getAsInt();
+                int data1 = obj.get("data1").getAsInt();
+                int data2 = obj.get("data2").getAsInt();
+                int channel = obj.get("channel").getAsInt();
+
+                ShortMessage msg = new ShortMessage();
+                msg.setMessage(command, channel, data1, data2);
+                messages[i] = msg;
+            }
+
+            return messages;
+        } catch (Exception e) {
+            System.err.println("Error parsing raw MIDI JSON: " + e);
+            return new ShortMessage[0];
+        }
+    }
+
 
 }

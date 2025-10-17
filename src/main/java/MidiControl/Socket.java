@@ -33,14 +33,15 @@ public class Socket {
 
         if (sendThread == null || !sendThread.isAlive()) {
             if (MidiServer.midiOut != null) {
-                SyncSend sender = new SyncSend(MidiServer.buffer, MidiServer.midiOut);
+                SyncSend sender = new SyncSend(MidiServer.outputBuffer);
                 sendThread = new Thread(sender);
                 sendThread.start();
-                Logger.getLogger(Socket.class.getName()).log(java.util.logging.Level.INFO, "SyncSend thread started from socket.");
+                Logger.getLogger(Socket.class.getName()).log(Level.INFO, "SyncSend thread started from socket.");
             } else {
-                Logger.getLogger(Socket.class.getName()).log(java.util.logging.Level.WARNING, "Receiver is null — SyncSend not started from socket.");
+                Logger.getLogger(Socket.class.getName()).log(Level.WARNING, "Receiver is null — SyncSend not started from socket.");
             }
         }
+
 
         return ms;
     }
@@ -84,7 +85,7 @@ public class Socket {
         }
 
         if (MidiServer.midiOut != null) {
-            SyncSend sender = new SyncSend(MidiServer.buffer, MidiServer.midiOut);
+            SyncSend sender = new SyncSend(MidiServer.outputBuffer);
             sendThread = new Thread(sender);
             sendThread.start();
             Logger.getLogger(Socket.class.getName()).log(Level.INFO, "SyncSend thread restarted.");
