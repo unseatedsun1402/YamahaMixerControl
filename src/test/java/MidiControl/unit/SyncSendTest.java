@@ -3,6 +3,7 @@ package MidiControl.unit;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import MidiControl.MidiServer;
 import MidiControl.SyncSend;
 import MidiControl.Mocks.MockMidiOutput;
 
@@ -27,9 +28,9 @@ public class SyncSendTest {
         msg2.setMessage(ShortMessage.NOTE_ON, 0, 60, 127);
 
         buffer.add(new ShortMessage[]{msg1, msg2});
-
-        SyncSend syncSend = new SyncSend(buffer, mockOutput);
-        Thread thread = new Thread(syncSend);
+        MidiServer.midiOut = mockOutput;
+        SyncSend sender = new SyncSend(buffer);
+        Thread thread = new Thread(sender);
 
         // Act
         thread.start();

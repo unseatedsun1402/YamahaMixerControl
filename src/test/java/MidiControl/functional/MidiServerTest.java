@@ -1,5 +1,6 @@
 package MidiControl.functional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -7,6 +8,7 @@ import MidiControl.MidiInputReceiver;
 import MidiControl.MidiServer;
 import MidiControl.ChannelMappings.ChannelType;
 import MidiControl.ChannelMappings.ControlType;
+import MidiControl.Mocks.MockMidiOutput;
 import MidiControl.TestUtilities.MidiTestUtils;
 import MidiControl.Utilities.NrpnMapping;
 import MidiControl.Utilities.NrpnRegistry;
@@ -19,10 +21,19 @@ import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Tag("functional")
 public class MidiServerTest {
+    @BeforeEach
+    void resetMidiServerState() {
+        MidiServer.midiOut = null;
+        MidiServer.midiIn = null;
+        MidiServer.clearInputBuffer();
+        MidiServer.clearOutputBuffer();
+    }
+
     @Test
     void testAddToSendQueue() {
         ShortMessage[] commands = new ShortMessage[1];
@@ -68,19 +79,18 @@ public class MidiServerTest {
         MidiTestUtils.assertJsonContains(json, "lsb", "0");
     }
 
-    // @Test
-    // void testSetOutputDeviceInitializesReceiver() throws Exception {
-    //     MidiServer.setOutputDevice(0); // Assumes device 0 has receivers // internal synth
-    //     assertTrue(MidiServer.isReceiverOpen(), "Receiver should be open");
-    //     assertTrue(MidiServer.getReceiver().getClass().getName().contains("Receiver"), "Receiver should be a valid implementation");
-    // }
-
     @Test
-    void testSetInputDeviceInitializesTransmitter() throws Exception {
-        MidiServer.setInputDevice(1); // Assumes device 1 has transmitters // internal squencer
-        assertTrue(MidiServer.isTransmitterOpen(), "Transmitter should be initialized");
-        assertNotNull(MidiServer.getTransmitter().getReceiver(), "MIDI input device should be open");
+    void testSetOutputDeviceInitializesReceiver() throws Exception {
+        MidiServer.setOutputDevice(0); // Assumes device 0 has a receiver
+
+        assertNotNull(MidiServer.getReceiver(), "Receiver should be initialized");
+        
+        ShortMessage testMessage = new ShortMessage();
+        testMessage.setMessage(ShortMessage.NOTE_ON, 0, 60, 127); // Middle C, full velocity
+
+        assertDoesNotThrow(() -> MidiServer.midiOut.sendMessage(testMessage), "Should send MIDI message without error");
     }
+
 
     @Test
     public void testIncomingMidiParsing() {
@@ -174,5 +184,53 @@ public class MidiServerTest {
         assertTrue(json.contains("\"channelIndex\":" + mapping.channelIndex()));
         assertTrue(json.contains("\"value\":8192"));
         assertTrue(json.contains("\"label\":\"" + mapping.label() + "\""));
+    }
+
+    @Test
+    void testHandleResolvedNRPNBroadcast() {
+        String json = "{\"type\":\"nrpnUpdate\",\"value\":8192}";
+        assertDoesNotThrow(() -> MidiServer.handleResolvedNRPN(json));
+        // Optionally verify broadcast behavior if Socket is mockable
+    }
+
+    @Test
+    void testSendMidiJson() throws Exception {
+        // Arrange
+        MockMidiOutput mockOutput = new MockMidiOutput();
+        MidiServer.midiOut = mockOutput;
+
+        String json = "{\"id\":\"ch107\",\"value\":64,\"msb\":2,\"lsb\":0}";
+
+        // Act
+        assertDoesNotThrow(() -> new MidiServer().sendMidi(json));
+
+        // Assert
+        List<ShortMessage> sent = mockOutput.getSentMessages();
+        assertEquals(4, sent.size(), "Expected 4 MIDI messages for NRPN dispatch");
+
+        ShortMessage cc98 = sent.get(0);
+        ShortMessage cc99 = sent.get(1);
+        ShortMessage cc6  = sent.get(2);
+        ShortMessage cc38 = sent.get(3);
+
+        // Assert LSB (CC 98)
+        assertEquals(ShortMessage.CONTROL_CHANGE, cc98.getCommand());
+        assertEquals(98, cc98.getData1(), "Expected CC 98 for NRPN LSB");
+        assertEquals(0, cc98.getData2(), "Expected LSB value 0");
+
+        // Assert MSB (CC 99)
+        assertEquals(ShortMessage.CONTROL_CHANGE, cc99.getCommand());
+        assertEquals(99, cc99.getData1(), "Expected CC 99 for NRPN MSB");
+        assertEquals(2, cc99.getData2(), "Expected MSB value 2");
+
+        // Assert Value MSB (CC 6)
+        assertEquals(ShortMessage.CONTROL_CHANGE, cc6.getCommand());
+        assertEquals(6, cc6.getData1(), "Expected CC 6 for Data Entry MSB");
+        assertEquals(64, cc6.getData2(), "Expected value 64");
+
+        // Assert Value LSB (CC 38)
+        assertEquals(ShortMessage.CONTROL_CHANGE, cc38.getCommand());
+        assertEquals(38, cc38.getData1(), "Expected CC 38 for Data Entry LSB");
+        assertEquals(0, cc38.getData2(), "Expected LSB value 0");
     }
 }

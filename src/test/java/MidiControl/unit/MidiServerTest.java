@@ -22,9 +22,9 @@ public class MidiServerTest {
     }
 
     @Test
-    void testSetDeviceDoesNotThrow() {
+    void testIOConfigureDoesNotThrow() {
         try {
-            MidiServer.setDevice(0); // Assumes device 0 is valid in test environment
+            MidiServer.configureIO(1,0); // Assumes device 0 is valid in test environment
         } catch (MidiUnavailableException e) {
             fail("Device setup should not throw: " + e.getMessage());
         }
