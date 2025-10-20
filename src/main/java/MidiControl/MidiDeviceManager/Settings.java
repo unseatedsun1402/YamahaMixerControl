@@ -16,29 +16,74 @@ import com.google.gson.GsonBuilder;
 import MidiControl.MidiServer;
 
 public class Settings{
-    private static final String SETTINGS_DIR = System.getProperty("user.home") + File.separator + "MidiControl";
-    private static final String SETTINGS_PATH = SETTINGS_DIR + File.separator + "midi_settings.json";
+    private static final String SETTINGS_DIR;
+    private static final String SETTINGS_PATH;
     private static MidiSettings cachedSettings;
 
-    
-    private static MidiSettings getSettingsOrDefault() {
-        if (cachedSettings == null) {
-            try (Reader reader = new FileReader(SETTINGS_PATH)) {
-                cachedSettings = new Gson().fromJson(reader, MidiSettings.class);
-            } catch (IOException e) {
-                Logger.getLogger(MidiSettings.class.getName()).warning("Reading settings failed, defaulting devices to Unknown -1");
-                cachedSettings = new MidiSettings(-1, "Unknown", "Unknown", -1, "Unknown", "Unknown");
+    static {
+        String dirSource = "MIDI_SETTINGS_DIR (JVM)";
+        String dir = System.getProperty("MIDI_SETTINGS_DIR");
+
+        if (dir == null) {
+            dir = System.getenv("MIDI_SETTINGS_DIR");
+            dirSource = "MIDI_SETTINGS_DIR (env)";
+        }
+
+        if (dir == null) {
+            String candidate = System.getProperty("user.home") + File.separator + "MidiControl";
+            File testDir = new File(candidate);
+            if (testDir.exists() && testDir.canWrite()) {
+                dir = candidate;
+                dirSource = "user.home";
             }
         }
-        return cachedSettings;
+
+        if (dir == null) {
+            dir = System.getProperty("java.io.tmpdir") + File.separator + "MidiControl";
+            dirSource = "java.io.tmpdir";
+        }
+
+        SETTINGS_DIR = dir.trim();
+        SETTINGS_PATH = SETTINGS_DIR + File.separator + "midi_settings.json";
+
+        Logger.getLogger(Settings.class.getName()).log(Level.INFO,
+            "Resolved SETTINGS_DIR from " + dirSource + ": " + SETTINGS_DIR);
+
+        ensureSettingsDirectoryExists();
+    }
+
+    private static MidiSettings getSettingsOrDefault() {
+        if (cachedSettings != null) return cachedSettings;
+        File settingsFile = new File(SETTINGS_PATH);
+        if (!settingsFile.exists()) {
+            Logger.getLogger(Settings.class.getName()).log(Level.WARNING,
+                "Settings file not found at: " + SETTINGS_PATH);
+            cachedSettings = new MidiSettings(-1, "Unknown", "Unknown", -1, "Unknown", "Unknown");
+            return cachedSettings;
+        }
+        try (Reader reader = new FileReader(settingsFile)) {
+            cachedSettings = new Gson().fromJson(reader, MidiSettings.class);
+            return cachedSettings;
+        } catch (IOException e) {
+            Logger.getLogger(Settings.class.getName()).log(Level.WARNING,
+                "Failed to read MIDI settings file", e);
+            cachedSettings = new MidiSettings(-1, "Unknown", "Unknown", -1, "Unknown", "Unknown");
+            return cachedSettings;
+        }
     }
 
     private static void writeSettings(MidiSettings settings) {
         try {
-            File dir = new File(SETTINGS_DIR);
-            if (!dir.exists()) dir.mkdirs();
+            ensureSettingsDirectoryExists();
+            File settingsFile = new File(SETTINGS_PATH);
+            File parentDir = settingsFile.getParentFile();
+            if (!parentDir.exists()) {
+                boolean created = parentDir.mkdirs();
+                Logger.getLogger(Settings.class.getName()).log(Level.INFO,
+                    "Created parent directory: " + parentDir.getAbsolutePath() + " -> " + created);
+            }
 
-            try (Writer writer = new FileWriter(SETTINGS_PATH)) {
+            try (Writer writer = new FileWriter(settingsFile)) {
                 new GsonBuilder().setPrettyPrinting().create().toJson(settings, writer);
                 cachedSettings = settings;
                 Logger.getLogger(Settings.class.getName()).log(Level.INFO,
@@ -48,6 +93,21 @@ public class Settings{
             Logger.getLogger(Settings.class.getName()).log(Level.SEVERE,
                 "Failed to write MIDI settings", e);
         }
+    }
+
+    public static boolean ensureSettingsDirectoryExists() {
+        File dir = new File(SETTINGS_DIR);
+        if (!dir.canWrite()) {
+            Logger.getLogger(Settings.class.getName()).log(Level.SEVERE,
+                "SETTINGS_DIR is not writable: " + SETTINGS_DIR);
+        }
+        if (!dir.exists()) {
+            boolean created = dir.mkdirs();
+            Logger.getLogger(Settings.class.getName()).log(Level.INFO,
+                "Ensured SETTINGS_DIR: " + SETTINGS_DIR + " -> " + created);
+            return created;
+        }
+        return true;
     }
 
     public static MidiSettings getSettings() {
@@ -84,30 +144,32 @@ public class Settings{
     }
 
     public static void setLastIO(String json) {
-        String userHome = System.getProperty("user.home");
-        File settingsDir = new File(userHome + File.separator + "MidiControl");
-
-        if (!settingsDir.exists()) {
-            settingsDir.mkdirs();
+        File settingsFile = new File(SETTINGS_PATH);
+        File parentDir = settingsFile.getParentFile();
+        if (!parentDir.exists()) {
+            boolean created = parentDir.mkdirs();
+            Logger.getLogger(Settings.class.getName()).log(Level.INFO,
+                "Created parent directory: " + parentDir.getAbsolutePath() + " -> " + created);
         }
-
-        File settingsFile = new File(settingsDir, "midi_settings.json");
 
         try (Writer writer = new FileWriter(settingsFile)) {
             writer.write(json);
             Logger.getLogger(Settings.class.getName()).log(Level.INFO,
-                "Saved MIDI settings to: " + settingsFile.getAbsolutePath());
+                "Saved MIDI settings to: " + SETTINGS_PATH);
         } catch (IOException e) {
             Logger.getLogger(Settings.class.getName()).log(Level.SEVERE,
                 "Failed to write MIDI settings file", e);
         }
     }
 
+
     public static void saveCurrentIO() {
         setLastIO(getCurrentIOAsJson());
     }
 
     public static void updateInputDevice(int index, String name, String type) {
+        Logger.getLogger(Settings.class.getName()).log(Level.INFO,
+    "Invoking updateInput()");
         MidiSettings settings = getSettingsOrDefault();
         settings.inputDeviceIndex = index;
         settings.inputDeviceName = name;
@@ -116,6 +178,8 @@ public class Settings{
     }
 
     public static void updateOutputDevice(int index, String name, String type) {
+        Logger.getLogger(Settings.class.getName()).log(Level.INFO,
+    "Invoking updateOutput()");
         MidiSettings settings = getSettingsOrDefault();
         settings.outputDeviceIndex = index;
         settings.outputDeviceName = name;

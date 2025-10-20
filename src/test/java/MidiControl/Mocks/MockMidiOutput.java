@@ -25,4 +25,16 @@ public class MockMidiOutput implements MidiOutput {
     public Info getDeviceInfo() {
         return MidiSystem.getMidiDeviceInfo()[0]; // 0 should be the system internal midi interface
     }
+
+    @Override
+    public boolean isOpen() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isOpen'");
+    }
+
+    @Override
+    public void close() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'close'");
+    }
 }

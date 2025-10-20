@@ -31,7 +31,7 @@ public class ReceiverWrapper implements MidiOutput {
     public void sendMessage(ShortMessage message) {
         if (receiver != null) {
             receiver.send(message, -1); // -1 = immediate
-            logger.log(Level.INFO, "Sent MIDI: cmd={0}, data1={1}, data2={2}",
+            logger.log(Level.FINE, "Sent MIDI: cmd={0}, data1={1}, data2={2}",
                 new Object[]{message.getCommand(), message.getData1(), message.getData2()});
         } else {
             logger.log(Level.WARNING, "Receiver is null. Cannot send MIDI message.");
@@ -50,6 +50,10 @@ public class ReceiverWrapper implements MidiOutput {
             device.close();
         }
         logger.log(Level.INFO, "Closed receiver and MIDI device.");
+    }
+
+    public boolean isOpen(){
+        return device.isOpen();
     }
 
     @Override

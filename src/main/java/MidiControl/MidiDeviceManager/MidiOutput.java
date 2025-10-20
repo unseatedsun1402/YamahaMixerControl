@@ -6,5 +6,7 @@ import javax.sound.midi.ShortMessage;
 public interface MidiOutput {
     void sendMessage(ShortMessage message);
     MidiDevice.Info getDeviceInfo();
+    boolean isOpen();
+    void close();
 }
 

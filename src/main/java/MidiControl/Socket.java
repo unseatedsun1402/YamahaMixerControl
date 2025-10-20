@@ -19,34 +19,36 @@ public class Socket {
     private static final Set<Session> sessions = ConcurrentHashMap.newKeySet();
     private static final Map<Session, String> sceneMap = new ConcurrentHashMap<>();
     private static final MidiServer ms = new MidiServer();
-    static final Thread listener = new Thread(ms);
-   private static Thread sendThread;
+    private static Thread listener = null;
+    private static Thread sendThread = null;
 
     public synchronized MidiServer getServer() {
-        if (listener == null || !listener.isAlive()) {
+        if (listener == null) {
+            listener = new Thread(ms);
             listener.start();
-            Logger.getLogger(Socket.class.getName()).log(java.util.logging.Level.INFO, "MidiServer thread started from socket.");
+            Logger.getLogger(Socket.class.getName()).log(Level.INFO, "MidiServer thread created and started from socket.");
+        } else if (!listener.isAlive()) {
+            Logger.getLogger(Socket.class.getName()).log(Level.WARNING, "MidiServer thread exists but is not alive. Not restarting.");
+        } else {
+            Logger.getLogger(Socket.class.getName()).log(Level.INFO, "MidiServer thread already running.");
         }
 
-        // ✅ Set dispatch target once server is active
         NrpnParser.setDispatchTarget(ms);
 
-        if (sendThread == null || !sendThread.isAlive()) {
-            if (MidiServer.midiOut != null) {
-                SyncSend sender = new SyncSend(MidiServer.outputBuffer);
-                sendThread = new Thread(sender);
-                sendThread.start();
-                Logger.getLogger(Socket.class.getName()).log(Level.INFO, "SyncSend thread started from socket.");
-            } else {
-                Logger.getLogger(Socket.class.getName()).log(Level.WARNING, "Receiver is null — SyncSend not started from socket.");
-            }
+        if (MidiServer.midiOut != null) {
+            SyncSend sender = new SyncSend(MidiServer.outputBuffer);
+            sendThread = new Thread(sender);
+            sendThread.start();
+            Logger.getLogger(Socket.class.getName()).log(Level.INFO, "SyncSend thread started from socket.");
+        } else {
+            Logger.getLogger(Socket.class.getName()).log(Level.WARNING,"Output device (midiOut) is null — SyncSend not started.");
+            Logger.getLogger(Socket.class.getName()).log(Level.INFO,"Input device (midiIn) transmitter attached: " + (MidiServer.midiIn != null));
+
+
         }
-
-
+            Logger.getLogger(Socket.class.getName()).log(Level.INFO, "SyncSend thread already running.");
         return ms;
     }
-
-
     
     @OnOpen
     public void onOpen(Session session) {
