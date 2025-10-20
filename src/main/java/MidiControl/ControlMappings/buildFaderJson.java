@@ -17,7 +17,7 @@ public class buildFaderJson {
         json.addProperty("label", mapping.label());
         json.addProperty("msb", mapping.msb());
         json.addProperty("lsb", mapping.lsb());
-        Logger.getLogger(buildFaderJson.class.getName()).log(Level.INFO, "Built output fader for msb %d lsb %d" + mapping.msb(),mapping.lsb());
+        Logger.getLogger(buildFaderJson.class.getName()).log(Level.FINE, "Built output fader for msb %d lsb %d" + mapping.msb(),mapping.lsb());
         return json.toString();
     }
 
@@ -31,7 +31,7 @@ public class buildFaderJson {
         json.addProperty("label", mapping.label());
         json.addProperty("msb", mapping.msb());
         json.addProperty("lsb", mapping.lsb());
-        Logger.getLogger(buildFaderJson.class.getName()).log(Level.INFO, "Built input fader for msb %d lsb %d" + mapping.msb(),mapping.lsb());
+        Logger.getLogger(buildFaderJson.class.getName()).log(Level.FINE, "Built input fader for msb %d lsb %d" + mapping.msb(),mapping.lsb());
         return json.toString();
     }
 }

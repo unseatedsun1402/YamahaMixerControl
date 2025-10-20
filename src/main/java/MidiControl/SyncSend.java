@@ -22,7 +22,7 @@ public class SyncSend implements Runnable {
 
             if (commands != null && MidiServer.midiOut != null) {
                 Logger.getLogger(SyncSend.class.getName()).log(Level.FINE, "Buffer populated", (Object) null);
-                Logger.getLogger(SyncSend.class.getName()).log(Level.INFO, "Processing the buffer and sending to the midi output device", (Object) null);
+                // Logger.getLogger(SyncSend.class.getName()).log(Level.INFO, "Processing the buffer and sending to the midi output device", (Object) null);
 
                 for (ShortMessage command : commands) {
                     try {

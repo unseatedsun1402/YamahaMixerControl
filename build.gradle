@@ -8,12 +8,7 @@ repositories {
 
 dependencies {
     providedCompile 'jakarta.platform:jakarta.jakartaee-web-api:10.0.0'
-    
-    testImplementation     'junit:junit:4.13'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-
-
-    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    testImplementation     'org.junit.jupiter:junit-jupiter:5.10.2'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
 }
@@ -21,4 +16,9 @@ dependencies {
 java {
     sourceCompatibility = JavaVersion.VERSION_18
     targetCompatibility = JavaVersion.VERSION_18
+}
+
+test {
+    failOnNoDiscoveredTests = false
+    useJUnitPlatform()
 }

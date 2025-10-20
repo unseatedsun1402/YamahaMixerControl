@@ -44,7 +44,7 @@ public class WebControlParser {
 
             // Debug output
             for (int i = 0; i < command.length; i++) {
-                System.out.printf("MIDI[%d] → Cmd=%d, Ch=0, CC=%d, Val=%d%n",
+                System.out.printf("MIDI[%d] -> Cmd=%d, Ch=0, CC=%d, Val=%d%n",
                     i, command[i].getCommand(), command[i].getData1(), command[i].getData2());
             }
 

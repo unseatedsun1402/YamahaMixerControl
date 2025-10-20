@@ -46,6 +46,10 @@ public class TransmitterWrapper implements MidiInput {
         transmitter.setReceiver(receiver);
     }
 
+    public boolean isOpen() {
+        return device.isOpen();
+    }
+
     @Override
     public void close() {
         if (transmitter != null) {
@@ -62,5 +66,10 @@ public class TransmitterWrapper implements MidiInput {
 
     public Transmitter getRawTransmitter() {
         return this.transmitter;
+    }
+
+    @Override
+    public MidiDevice.Info getDeviceInfo() {
+        return this.device.getDeviceInfo();
     }
 }
