@@ -9,7 +9,7 @@ Take this war file, rename this to MidiControl.war (this matters for file path r
 Run the tomcat server and go to http://127.0.0.1:8080/MidiControl
 ## ===== Model Support =====
 Currently this has been tested on both the Yamaha 01V96i and the Yamaha M7CL
-for this to work make sure control change tx and rx are enabled and that the desk is set to NRPN table mode for remote control and that **fader resolution** is hi res, _it used to be low_ but now I normalize these values in the program so there is lett setup for the enginee/end user. I plan to support hi res later but in most contexts, remote mixing from a phone for in ear mixes this should be sufficient.
+for this to work make sure control change tx and rx are enabled and that the desk is set to NRPN mode for remote control and that **fader resolution is hi res**, _it used to be low_ but now I normalize these values in the program as this reduces the setup for the engineer/end user. The gui is using low res and then this is scaled up to be sent back to the mixer. I plan to support hi res later in the gui but in most contexts, remote mixing from a phone for in ear mixes this should be sufficient.
 ## ===== Usage ======
 
 Load the index at https://<ip-address-of-server>:8080/MidiControl and use the selectors to assign the input and output interfaces of the server to the yamaha desk
