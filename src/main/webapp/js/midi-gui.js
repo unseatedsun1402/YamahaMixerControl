@@ -1,4 +1,5 @@
 // const version = "20251007";
+const IS_DEBUG = false;
 
 function sendMessage(element) {
   clearTimeout(element._debounce);
@@ -19,13 +20,13 @@ function sendMessage(element) {
     saveFaderState(msb, lsb, value);
     Client.sendMessage(message);
     localStorage.setItem("lastSync", Date.now());
-    console.info("Sent message "+message)
+      if (IS_DEBUG){console.info("Sent message "+message)}
     // Update label immediately
     const label = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
     if (label) {
         const db = faderDbMap[value] || "-∞";
         label.textContent = `${db} dB`;
-        console.debug("Updating fader "+ msb + " " + lsb + " to " +  db)
+        if (IS_DEBUG){console.debug("Updating fader "+ msb + " " + lsb + " to " +  db)}
         label.classList.add("updated");
         setTimeout(() => label.classList.remove("updated"), 150);
     }
@@ -76,7 +77,7 @@ async function buildpage() {
       restoreFaderState() // automatic rehydration
       document.getElementById("restoreState").disabled = false; //enable the restore button now the page has loaded
       document.getElementById("restoreState").addEventListener("click", restoreFaderState); // start listening to the button
-      console.debug("Restored saved states")
+      console.log("Restored saved states")
     }
   } catch (err) {
     console.error("Error loading fader layout:", err);
@@ -183,7 +184,7 @@ document.querySelectorAll("input[type=range].fader").forEach(fader => {
 });
     
 function handleNrpnUpdate(update) {
-  console.log("handleNrpnUpdate called with:", update);
+  if (IS_DEBUG){console.debug("handleNrpnUpdate called with:", update);}
   const { msb, lsb, value } = update;
   const fader = document.querySelector(`input[data-msb="${msb}"][data-lsb="${lsb}"]`);
   const valueLabel = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
@@ -200,7 +201,7 @@ function handleNrpnUpdate(update) {
 
   if (valueLabel) {
     valueLabel.innerText = db === "-∞" ? db : `${db} dB`;
-    console.debug("Updating fader " + msb + " " + lsb + " to " + db);
+    if (IS_DEBUG){console.debug("Updating fader " + msb + " " + lsb + " to " + db);}
     valueLabel.classList.add("updated");
     setTimeout(() => valueLabel.classList.remove("updated"), 150);
   } else {
@@ -211,7 +212,7 @@ function handleNrpnUpdate(update) {
   setTimeout(() => fader.classList.remove("updated"), 300);
 
   saveFaderState(msb, lsb, step); // Save scaled value
-  console.log(`Updated fader ${fader.id} to ${db} dB`);
+  if (IS_DEBUG){console.debug(`Updated fader ${fader.id} to ${db} dB`);}
 }
 
 function saveFaderState(msb, lsb, value) {
@@ -220,7 +221,7 @@ function saveFaderState(msb, lsb, value) {
 }
 
 function handleOutputFaderUpdate(update) {
-  console.log("Output Update called with:", update);
+  if (IS_DEBUG){console.debug("Output Update called with:", update);}
   const { msb, lsb, value } = update;
   const fader = document.querySelector(`input[data-msb="${msb}"][data-lsb="${lsb}"]`);
   const valueLabel = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
@@ -237,7 +238,7 @@ function handleOutputFaderUpdate(update) {
 
   if (valueLabel) {
     valueLabel.innerText = db === "-∞" ? db : `${db} dB`;
-    console.debug("Updating fader " + msb + " " + lsb + " to " + db);
+    if (IS_DEBUG){console.debug("Updating fader " + msb + " " + lsb + " to " + db);}
     valueLabel.classList.add("updated");
     setTimeout(() => valueLabel.classList.remove("updated"), 150);
   } else {

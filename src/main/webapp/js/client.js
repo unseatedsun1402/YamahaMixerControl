@@ -1,5 +1,4 @@
 // const version = "202510072035";
-
 Client = {};
 Client.socket = null;
 
@@ -9,7 +8,7 @@ Client.connect = (function(host) {
     } else if ('MozWebSocket' in window) {
         Client.socket = new MozWebSocket(host);
         } else {
-        console.log('Error: WebSocket is not supported by this browser.');
+        console.error('Error: WebSocket is not supported by this browser.');
         return;
 }
 
@@ -30,21 +29,21 @@ Client.socket.onclose = function () {
 };
 
 Client.socket.onmessage = function (message) {
-console.log("Received:", message.data);
+if(IS_DEBUG){console.log("Received:", message.data);}
 try {
     const json = JSON.parse(message.data);
     if (json.type === "nrpnUpdate") {
-        console.log("NRPN Update:", json);
+        if(IS_DEBUG){console.log("NRPN Update:", json);}
         handleNrpnUpdate(json);
     }
-    else if (msg.type === "outputFaderUpdate") {
-    handleOutputFaderUpdate(msg);
+    else if (message.type === "outputFaderUpdate") {
+    handleOutputFaderUpdate(message);
     }
-    else {
+    else if(IS_DEBUG){
         console.log("Parsed:", json);
     }
 } catch (e) {
-    console.error("Invalid JSON from server:", message.data);
+    console.error("Invalid JSON from server:", e);
 }
 };
 

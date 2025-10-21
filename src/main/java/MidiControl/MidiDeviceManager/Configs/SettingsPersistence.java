@@ -1,4 +1,4 @@
-package MidiControl.MidiDeviceManager;
+package MidiControl.MidiDeviceManager.Configs;
 
 import java.io.File;
 import java.io.FileReader;
