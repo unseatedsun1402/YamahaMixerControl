@@ -7,8 +7,8 @@ import java.io.File;
 
 import org.junit.jupiter.api.*;
 
-import MidiControl.MidiDeviceManager.DeviceSettings;
-import MidiControl.MidiDeviceManager.SettingsPersistence;
+import MidiControl.MidiDeviceManager.Configs.DeviceSettings;
+import MidiControl.MidiDeviceManager.Configs.SettingsPersistence;
 
 @Tag("unit")
 public class SettingsPersistenceTest {

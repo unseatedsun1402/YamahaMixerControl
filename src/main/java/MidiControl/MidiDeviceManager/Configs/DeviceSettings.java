@@ -1,4 +1,4 @@
-package MidiControl.MidiDeviceManager;
+package MidiControl.MidiDeviceManager.Configs;
 
 public class DeviceSettings {
     public int inputDeviceIndex;

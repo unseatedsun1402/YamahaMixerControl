@@ -1,4 +1,4 @@
-package MidiControl.MidiDeviceManager;
+package MidiControl.MidiDeviceManager.Configs;
 
 import java.io.File;
 import java.io.FileReader;
@@ -14,6 +14,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import MidiControl.MidiServer;
+import MidiControl.MidiDeviceManager.MidiDeviceUtils;
+import MidiControl.MidiDeviceManager.MidiSettings;
 
 public class Settings{
     private static final String SETTINGS_DIR;
