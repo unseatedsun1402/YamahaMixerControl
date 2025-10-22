@@ -20,5 +20,4 @@ java {
 
 test {
     failOnNoDiscoveredTests = false
-    useJUnitPlatform()
 }

@@ -9,9 +9,9 @@ import MidiControl.MidiServer;
 import MidiControl.ChannelMappings.ChannelType;
 import MidiControl.ChannelMappings.ControlType;
 import MidiControl.Mocks.MockMidiOutput;
+import MidiControl.NrpnUtils.NrpnMapping;
+import MidiControl.NrpnUtils.NrpnRegistry;
 import MidiControl.TestUtilities.MidiTestUtils;
-import MidiControl.Utilities.NrpnMapping;
-import MidiControl.Utilities.NrpnRegistry;
 
 import static org.junit.jupiter.api.Assertions.*;
 import javax.sound.midi.ShortMessage;
