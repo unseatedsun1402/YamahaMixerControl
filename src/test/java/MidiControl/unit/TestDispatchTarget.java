@@ -1,6 +1,6 @@
 package MidiControl.unit;
-import MidiControl.Utilities.NrpnMapping;
-import MidiControl.Utilities.NRPNDispatchTarget;
+import MidiControl.NrpnUtils.NRPNDispatchTarget;
+import MidiControl.NrpnUtils.NrpnMapping;
 
 public class TestDispatchTarget implements NRPNDispatchTarget {
     public NrpnMapping lastMapping;

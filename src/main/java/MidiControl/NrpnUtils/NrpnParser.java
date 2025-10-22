@@ -1,4 +1,4 @@
-package MidiControl.Utilities;
+package MidiControl.NrpnUtils;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 

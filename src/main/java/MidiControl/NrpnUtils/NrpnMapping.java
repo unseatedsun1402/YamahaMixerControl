@@ -1,4 +1,4 @@
-package MidiControl.Utilities;
+package MidiControl.NrpnUtils;
 import MidiControl.ChannelMappings.ChannelType;
 import MidiControl.ChannelMappings.ControlType;
 
