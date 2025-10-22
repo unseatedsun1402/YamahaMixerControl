@@ -4,10 +4,12 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.ShortMessage;
 
 import com.google.gson.JsonSyntaxException;
+
+import MidiControl.NrpnUtils.NrpnMapping;
+import MidiControl.NrpnUtils.NrpnParser;
+
 import com.google.gson.JsonParser;
 
-import MidiControl.Utilities.NrpnMapping;
-import MidiControl.Utilities.NrpnParser;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MidiTestUtils {

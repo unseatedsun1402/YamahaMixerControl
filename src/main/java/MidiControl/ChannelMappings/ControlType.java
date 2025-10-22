@@ -4,7 +4,6 @@ public enum ControlType {
     FADER(0x10),
     OUTPUT_FADER(0x11),
     PAN(0x20),
-    MUTE(0x00),
     EFFECT_SEND(0x30),
     DIRECT_OUT(0x40),
     USER_DEFINED(0x50),
@@ -18,7 +17,9 @@ public enum ControlType {
     SCENE_STORE(0xD0),
     INPUT_SEND(0xE0),
     SEND_ON(0xF0),
-    INPUT_ON(0xF1);
+    INPUT_ON(0xF1),
+    CUE_ON(0xF2),
+    OUTPUT_ON(0xF3);
 
     private final int controlByte;
 

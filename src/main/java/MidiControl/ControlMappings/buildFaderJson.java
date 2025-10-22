@@ -4,7 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.google.gson.JsonObject;
 
-import MidiControl.Utilities.NrpnMapping;
+import MidiControl.NrpnUtils.NrpnMapping;
 
 public class buildFaderJson {
     public static String buildOutputFaderJson(NrpnMapping mapping, int value) {

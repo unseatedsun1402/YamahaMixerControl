@@ -15,10 +15,10 @@ import MidiControl.MidiDeviceManager.MidiSettings;
 import MidiControl.MidiDeviceManager.ReceiverWrapper;
 import MidiControl.MidiDeviceManager.TransmitterWrapper;
 import MidiControl.MidiDeviceManager.Configs.Settings;
-import MidiControl.Utilities.NRPNDispatchTarget;
-import MidiControl.Utilities.NrpnMapping;
-import MidiControl.Utilities.NrpnParser;
-import MidiControl.Utilities.NrpnRegistry;
+import MidiControl.NrpnUtils.NRPNDispatchTarget;
+import MidiControl.NrpnUtils.NrpnMapping;
+import MidiControl.NrpnUtils.NrpnParser;
+import MidiControl.NrpnUtils.NrpnRegistry;
 import jakarta.annotation.PreDestroy;
 
 /**
