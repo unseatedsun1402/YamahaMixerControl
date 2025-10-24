@@ -1,6 +1,7 @@
 #ignore bins
 *.exe
 *.bins
+*.jar
 
 #ignore build
 build/tmp

@@ -14,7 +14,7 @@ Client.connect = (function(host) {
 
 Client.socket.onopen = function () 
 {
-    console.log('Info: WebSocket connection opened.');
+    console.log('Info: WebSocket connection opened. ' + Client.socket.id);
     elements = document.getElementsByClassName("chfader");
     buildpage();
 };
@@ -29,7 +29,7 @@ Client.socket.onclose = function () {
 };
 
 Client.socket.onmessage = function (message) {
-if(IS_DEBUG){console.log("Received:", message.data);}
+if(IS_DEBUG){console.log("Received from server:", message.data);}
 try {
     const json = JSON.parse(message.data);
     if (json.type === "nrpnUpdate") {
@@ -66,6 +66,7 @@ Client.sendMessage = (function(msg) {
 var message = msg;
 if (message != '') {
     Client.socket.send(message);
+    console.debug("Sent Message "+message)
 }
 else {
     console.warn('%cWarning%c: No message to send.', 'color: orange; font-weight: bold;', 'color: inherit;');

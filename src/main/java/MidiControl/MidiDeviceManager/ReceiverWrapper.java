@@ -1,9 +1,6 @@
 package MidiControl.MidiDeviceManager;
 
-import javax.sound.midi.MidiDevice;
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Receiver;
-import javax.sound.midi.ShortMessage;
+import javax.sound.midi.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,13 +15,23 @@ public class ReceiverWrapper implements MidiOutput {
     }
 
     private void setup() throws MidiUnavailableException {
+        if (device == null) {
+            logger.log(Level.SEVERE, "MIDI device is null — cannot initialize receiver.");
+            return;
+        }
+
         if (!device.isOpen()) {
             device.open();
             logger.log(Level.INFO, "Opened MIDI device for receiver.");
         }
 
-        receiver = device.getReceiver();
-        logger.log(Level.INFO, "Receiver initialized and ready.");
+        try {
+            receiver = device.getReceiver();
+            logger.log(Level.INFO, "Receiver initialized and ready.");
+        } catch (MidiUnavailableException e) {
+            logger.log(Level.SEVERE, "Failed to get receiver from device", e);
+            receiver = null;
+        }
     }
 
     @Override
@@ -46,18 +53,41 @@ public class ReceiverWrapper implements MidiOutput {
         if (receiver != null) {
             receiver.close();
         }
-        if (device.isOpen()) {
+        if (device != null && device.isOpen()) {
             device.close();
         }
         logger.log(Level.INFO, "Closed receiver and MIDI device.");
     }
 
-    public boolean isOpen(){
-        return device.isOpen();
+    public boolean isOpen() {
+        return device != null && device.isOpen();
+    }
+
+    public boolean isAvailable() {
+        return device != null && receiver != null;
     }
 
     @Override
     public MidiDevice.Info getDeviceInfo() {
-        return this.device.getDeviceInfo();
+        if (device == null) {
+            logger.log(Level.WARNING, "Device is null — cannot get device info.");
+            return null;
+        }
+        return device.getDeviceInfo();
+    }
+
+    public String getDeviceName() {
+        MidiDevice.Info info = getDeviceInfo();
+        return info != null ? info.getName() : "Unknown";
+    }
+
+    public String getDeviceDescription() {
+        MidiDevice.Info info = getDeviceInfo();
+        return info != null ? info.getDescription() : "Unknown";
+    }
+
+    public int getDeviceIndex() {
+        MidiDevice.Info info = getDeviceInfo();
+        return info != null ? MidiDeviceUtils.getDeviceIndex(info) : -1;
     }
 }

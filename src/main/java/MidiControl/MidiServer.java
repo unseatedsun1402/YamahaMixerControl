@@ -15,10 +15,10 @@ import MidiControl.MidiDeviceManager.MidiSettings;
 import MidiControl.MidiDeviceManager.ReceiverWrapper;
 import MidiControl.MidiDeviceManager.TransmitterWrapper;
 import MidiControl.MidiDeviceManager.Configs.Settings;
-import MidiControl.Utilities.NRPNDispatchTarget;
-import MidiControl.Utilities.NrpnMapping;
-import MidiControl.Utilities.NrpnParser;
-import MidiControl.Utilities.NrpnRegistry;
+import MidiControl.NrpnUtils.NRPNDispatchTarget;
+import MidiControl.NrpnUtils.NrpnMapping;
+import MidiControl.NrpnUtils.NrpnParser;
+import MidiControl.NrpnUtils.NrpnRegistry;
 import jakarta.annotation.PreDestroy;
 
 /**
@@ -83,10 +83,10 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
      * @throws MidiUnavailableException
     //  */
     public static void setOutputDevice(int index) throws MidiUnavailableException {
-    midiOut = new ReceiverWrapper(MidiDeviceUtils.getDevice(index));
-    MidiDevice.Info info = MidiServer.midiOut.getDeviceInfo();
-    Settings.updateOutputDevice(index, info.getName(), info.getDescription());
-    Socket.restartSyncSend();
+        midiOut = new ReceiverWrapper(MidiDeviceUtils.getDevice(index));
+        MidiDevice.Info info = MidiServer.midiOut.getDeviceInfo();
+        Settings.updateOutputDevice(index, info.getName(), info.getDescription());
+        Socket.restartSyncSend();
     }
 
     /**
@@ -132,13 +132,13 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     }
 
     
-   @Override
+    @Override
     public void run() {
         try {
             Logger.getLogger(MidiServer.class.getName()).info("MidiServer Thread started.");
             initializeMappings();
             waitForMidiDevices();
-            restoreDevices();
+            tryRestoreDevices();
             logDeviceStatus();
         } catch (Exception e) {
             Logger.getLogger(MidiServer.class.getName()).log(Level.SEVERE, "MidiServer thread crashed", e);
@@ -159,20 +159,29 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
         }
     }
 
-    private void restoreDevices() {
-        try {
-            setInputDevice(Settings.getLastInput());
-            Logger.getLogger(MidiServer.class.getName()).info("Restored input device: " + midiOut.getDeviceInfo().getName());
-        } catch (MidiUnavailableException e) {
-            Logger.getLogger(MidiServer.class.getName()).warning("Last Input Device not available");
+    public void tryRestoreDevices() {
+        int retries = 6; // 6 × 500ms = 3 seconds
+        while (retries-- > 0) {
+            if (midiOut != null && midiOut.getDeviceInfo() != null) {
+                Logger.getLogger(getClass().getName()).log(Level.INFO,
+                    "midiOut is ready — restoring devices.");
+                return;
+            }
+
+            Logger.getLogger(getClass().getName()).log(Level.INFO,
+                "Waiting for midiOut initialization...");
+            try {
+                Settings.restore(Settings.getSettingsOrDefault(),this);
+                Thread.sleep(750);
+            } catch (InterruptedException e) {
+                Logger.getLogger(getClass().getName()).log(Level.WARNING,
+                    "Interrupted while waiting for midiOut", e);
+                break;
+            }
         }
 
-        try {
-            setOutputDevice(Settings.getLastOutput());
-            Logger.getLogger(MidiServer.class.getName()).info("Restored output device: " + midiOut.getDeviceInfo().getName());
-        } catch (MidiUnavailableException e) {
-            Logger.getLogger(MidiServer.class.getName()).warning("Last Output Device not available");
-        }
+        Logger.getLogger(getClass().getName()).log(Level.WARNING,
+            "midiOut not initialized after 3 seconds — skipping restoreDevices.");
     }
 
     private void logDeviceStatus() {

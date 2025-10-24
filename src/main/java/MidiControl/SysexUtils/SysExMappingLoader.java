@@ -1,4 +1,4 @@
-package MidiControl.sysex;
+package MidiControl.SysexUtils;
 
 import java.io.File;
 import java.io.IOException;

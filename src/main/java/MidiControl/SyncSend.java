@@ -18,11 +18,12 @@ public class SyncSend implements Runnable {
         Logger.getLogger(SyncSend.class.getName()).log(Level.INFO, "SyncSend thread started.", (Object) null);
 
         while (!Thread.currentThread().isInterrupted()) {
+            Logger.getLogger(this.getClass().getName()).log(Level.FINE, "SyncSend loop tick...");
             ShortMessage[] commands = buffer.poll();
 
             if (commands != null && MidiServer.midiOut != null) {
                 Logger.getLogger(SyncSend.class.getName()).log(Level.FINE, "Buffer populated", (Object) null);
-                // Logger.getLogger(SyncSend.class.getName()).log(Level.INFO, "Processing the buffer and sending to the midi output device", (Object) null);
+                Logger.getLogger(SyncSend.class.getName()).log(Level.INFO, "Processing the buffer and sending to the midi output device", (Object) null);
 
                 for (ShortMessage command : commands) {
                     try {

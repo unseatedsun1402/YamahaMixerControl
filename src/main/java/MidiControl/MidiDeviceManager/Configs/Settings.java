@@ -9,6 +9,7 @@ import java.io.Writer;
 import java.util.logging.*;
 
 import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiUnavailableException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -54,7 +55,7 @@ public class Settings{
         ensureSettingsDirectoryExists();
     }
 
-    private static MidiSettings getSettingsOrDefault() {
+    public static MidiSettings getSettingsOrDefault() {
         if (cachedSettings != null) return cachedSettings;
         File settingsFile = new File(SETTINGS_PATH);
         if (!settingsFile.exists()) {
@@ -145,29 +146,53 @@ public class Settings{
         return cachedSettings != null ? cachedSettings.outputDeviceIndex : -1;
     }
 
-    public static void setLastIO(String json) {
-        File settingsFile = new File(SETTINGS_PATH);
-        File parentDir = settingsFile.getParentFile();
-        if (!parentDir.exists()) {
-            boolean created = parentDir.mkdirs();
-            Logger.getLogger(Settings.class.getName()).log(Level.INFO,
-                "Created parent directory: " + parentDir.getAbsolutePath() + " -> " + created);
-        }
-
-        try (Writer writer = new FileWriter(settingsFile)) {
-            writer.write(json);
-            Logger.getLogger(Settings.class.getName()).log(Level.INFO,
-                "Saved MIDI settings to: " + SETTINGS_PATH);
-        } catch (IOException e) {
-            Logger.getLogger(Settings.class.getName()).log(Level.SEVERE,
-                "Failed to write MIDI settings file", e);
-        }
-    }
-
-
     public static void saveCurrentIO() {
-        setLastIO(getCurrentIOAsJson());
+        MidiDevice.Info inputInfo = MidiServer.midiIn != null ? MidiServer.midiIn.getDeviceInfo() : null;
+        MidiDevice.Info outputInfo = MidiServer.midiOut != null ? MidiServer.midiOut.getDeviceInfo() : null;
+
+        int inputIndex = inputInfo != null ? MidiDeviceUtils.getDeviceIndex(inputInfo) : -1;
+        int outputIndex = outputInfo != null ? MidiDeviceUtils.getDeviceIndex(outputInfo) : -1;
+
+        MidiSettings current = new MidiSettings(
+            inputIndex,
+            inputInfo != null ? inputInfo.getName() : "Unknown",
+            inputInfo != null ? inputInfo.getDescription() : "Unknown",
+            outputIndex,
+            outputInfo != null ? outputInfo.getName() : "Unknown",
+            outputInfo != null ? outputInfo.getDescription() : "Unknown"
+        );
+
+        writeSettings(current);
     }
+
+    public static void restore(MidiSettings settings,MidiServer instance) {
+        if (settings == null) {
+            Logger.getLogger(Settings.class.getName()).log(Level.WARNING,
+                "Cannot restore devices — settings object is null.");
+            return;
+        }
+
+        if (instance == null) {
+            Logger.getLogger(Settings.class.getName()).log(Level.WARNING,
+                "Cannot restore devices — MidiServer instance is null.");
+            return;
+        }
+
+        try {
+            MidiServer.setInputDevice(settings.inputDeviceIndex);
+            Logger.getLogger(Settings.class.getName()).info("Restored input device: " + settings.inputDeviceName);
+        } catch (MidiUnavailableException e) {
+            Logger.getLogger(Settings.class.getName()).warning("Failed to restore input device: " + e.getMessage());
+        }
+
+        try {
+            MidiServer.setOutputDevice(settings.outputDeviceIndex);
+            Logger.getLogger(Settings.class.getName()).info("Restored output device: " + settings.outputDeviceName);
+        } catch (MidiUnavailableException e) {
+            Logger.getLogger(Settings.class.getName()).warning("Failed to restore output device: " + e.getMessage());
+        }
+    }
+
 
     public static void updateInputDevice(int index, String name, String type) {
         Logger.getLogger(Settings.class.getName()).log(Level.INFO,
@@ -205,5 +230,10 @@ public class Settings{
             outputInfo != null ? outputInfo.getDescription() : "Unknown"
         );
         return new GsonBuilder().setPrettyPrinting().create().toJson(current);
+    }
+
+    public static Object getLastIO() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getLastIO'");
     }
 }

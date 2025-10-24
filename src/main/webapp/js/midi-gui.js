@@ -1,5 +1,5 @@
 // const version = "20251007";
-const IS_DEBUG = false;
+const IS_DEBUG = true;
 
 function sendMessage(element) {
   clearTimeout(element._debounce);
