@@ -183,45 +183,80 @@ document.querySelectorAll("input[type=range].fader").forEach(fader => {
     });
 });
     
-function handleNrpnUpdate(update) {
-  if (IS_DEBUG){console.debug("handleNrpnUpdate called with:", update);}
-  const { msb, lsb, value } = update;
-  const fader = document.querySelector(`input[data-msb="${msb}"][data-lsb="${lsb}"]`);
-  const valueLabel = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
+// function handleNrpnUpdate(update) {
+//   if (IS_DEBUG){console.debug("handleNrpnUpdate called with:", update);}
+//   const { msb, lsb, value } = update;
+//   const fader = document.querySelector(`input[data-msb="${msb}"][data-lsb="${lsb}"]`);
+//   const valueLabel = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
 
-  if (!fader) {
-    console.warn(`No fader found for NRPN msb:${msb} lsb:${lsb}`);
-    return;
-  }
+//   if (!fader) {
+//     console.warn(`No fader found for NRPN msb:${msb} lsb:${lsb}`);
+//     return;
+//   }
 
-  const step = Math.round((value / 16383) * 127);
-  const db = faderDbMap[step];
+//   const step = Math.round((value / 16383) * 127);
+//   const db = faderDbMap[step];
 
-  fader.value = step;
+//   fader.value = step;
 
-  if (valueLabel) {
-    valueLabel.innerText = db === "-∞" ? db : `${db} dB`;
-    if (IS_DEBUG){console.debug("Updating fader " + msb + " " + lsb + " to " + db);}
-    valueLabel.classList.add("updated");
-    setTimeout(() => valueLabel.classList.remove("updated"), 150);
-  } else {
-    console.warn(`No value label found for NRPN msb:${msb} lsb:${lsb}`);
-  }
+//   if (valueLabel) {
+//     valueLabel.innerText = db === "-∞" ? db : `${db} dB`;
+//     if (IS_DEBUG){console.debug("Updating fader " + msb + " " + lsb + " to " + db);}
+//     valueLabel.classList.add("updated");
+//     setTimeout(() => valueLabel.classList.remove("updated"), 150);
+//   } else {
+//     console.warn(`No value label found for NRPN msb:${msb} lsb:${lsb}`);
+//   }
 
-  fader.classList.add("updated");
-  setTimeout(() => fader.classList.remove("updated"), 300);
+//   fader.classList.add("updated");
+//   setTimeout(() => fader.classList.remove("updated"), 300);
 
-  saveFaderState(msb, lsb, step); // Save scaled value
-  if (IS_DEBUG){console.debug(`Updated fader ${fader.id} to ${db} dB`);}
-}
+//   saveFaderState(msb, lsb, step); // Save scaled value
+//   if (IS_DEBUG){console.debug(`Updated fader ${fader.id} to ${db} dB`);}
+// }
 
 function saveFaderState(msb, lsb, value) {
   const key = `fader-${msb}-${lsb}`;
   localStorage.setItem(key, value);
 }
 
-function handleOutputFaderUpdate(update) {
-  if (IS_DEBUG){console.debug("Output Update called with:", update);}
+// function handleOutputFaderUpdate(update) {
+//   if (IS_DEBUG){console.debug("Output Update called with:", update);}
+//   const { msb, lsb, value } = update;
+//   const fader = document.querySelector(`input[data-msb="${msb}"][data-lsb="${lsb}"]`);
+//   const valueLabel = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
+
+//   if (!fader) {
+//     console.warn(`No fader found for NRPN msb:${msb} lsb:${lsb}`);
+//     return;
+//   }
+
+//   const step = Math.round((value / 16383) * 127);
+//   const db = faderDbMap[step];
+
+//   fader.value = step;
+
+//   if (valueLabel) {
+//     valueLabel.innerText = db === "-∞" ? db : `${db} dB`;
+//     if (IS_DEBUG){console.debug("Updating fader " + msb + " " + lsb + " to " + db);}
+//     valueLabel.classList.add("updated");
+//     setTimeout(() => valueLabel.classList.remove("updated"), 150);
+//   } else {
+//     console.warn(`No value label found for NRPN msb:${msb} lsb:${lsb}`);
+//   }
+
+//   fader.classList.add("updated");
+//   setTimeout(() => fader.classList.remove("updated"), 300);
+
+//   saveFaderState(msb, lsb, step); // Save scaled value
+//   console.log(`Updated fader ${fader.id} to ${db} dB`);
+// }
+
+function handleFaderUpdate(update) {
+  if (IS_DEBUG) {
+    console.debug("Fader update received:", update);
+  }
+
   const { msb, lsb, value } = update;
   const fader = document.querySelector(`input[data-msb="${msb}"][data-lsb="${lsb}"]`);
   const valueLabel = document.querySelector(`.fader-value[data-msb="${msb}"][data-lsb="${lsb}"]`);
@@ -235,21 +270,21 @@ function handleOutputFaderUpdate(update) {
   const db = faderDbMap[step];
 
   fader.value = step;
-
-  if (valueLabel) {
-    valueLabel.innerText = db === "-∞" ? db : `${db} dB`;
-    if (IS_DEBUG){console.debug("Updating fader " + msb + " " + lsb + " to " + db);}
-    valueLabel.classList.add("updated");
-    setTimeout(() => valueLabel.classList.remove("updated"), 150);
-  } else {
-    console.warn(`No value label found for NRPN msb:${msb} lsb:${lsb}`);
-  }
-
   fader.classList.add("updated");
   setTimeout(() => fader.classList.remove("updated"), 300);
 
-  saveFaderState(msb, lsb, step); // Save scaled value
-  console.log(`Updated fader ${fader.id} to ${db} dB`);
+  if (valueLabel) {
+    valueLabel.innerText = db === "-∞" ? db : `${db} dB`;
+    valueLabel.classList.add("updated");
+    setTimeout(() => valueLabel.classList.remove("updated"), 150);
+    if (IS_DEBUG) {
+      console.debug(`Updated fader ${msb} ${lsb} to ${db}`);
+    }
+  } else if (IS_DEBUG) {
+    console.debug(`No value label found for NRPN msb:${msb} lsb:${lsb}`);
+  }
+
+  saveFaderState(msb, lsb, step);
 }
 
 function saveFaderState(msb, lsb, value) {

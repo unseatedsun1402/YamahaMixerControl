@@ -2,6 +2,7 @@ package MidiControl;
 import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.*;
@@ -95,14 +96,23 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
      * @throws MidiUnavailableException
      */
     public static void setInputDevice(int index) throws MidiUnavailableException {
+        // Close previous input device if open
+        if (midiIn != null) {
+            midiIn.close();
+            Logger.getLogger(MidiServer.class.getName()).info("Closed previous input device and transmitter.");
+        }
+
         MidiDevice device = MidiDeviceUtils.getDevice(index);
-        device.open(); // Required BeforeEach querying transmitters
-            Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,
-                "After open -> Transmitters: " + device.getMaxTransmitters());
+        device.open(); // Required before querying transmitters
+
+        Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,
+            "After open -> Transmitters: " + device.getMaxTransmitters());
+
         if (device.getMaxTransmitters() > 0 || device.getMaxTransmitters() == -1) {
             midiIn = new TransmitterWrapper(device, inputBuffer);
             Logger.getLogger(MidiServer.class.getName()).log(Level.INFO, "Transmitter set for device: " + index);
-            MidiDevice.Info info = MidiServer.midiIn.getDeviceInfo();
+
+            MidiDevice.Info info = midiIn.getDeviceInfo();
             Settings.updateInputDevice(index, info.getName(), info.getDescription());
         } else {
             Logger.getLogger(MidiServer.class.getName()).log(Level.WARNING, "Device is output-only: " + index);
@@ -132,20 +142,31 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     }
 
     
-   @Override
+    @Override
     public void run() {
-        try {
-            Logger.getLogger(MidiServer.class.getName()).info("MidiServer Thread started.");
+        Logger logger = Logger.getLogger("MidiControl");
+            logger.setLevel(Level.FINE);
+            for (Handler h : Logger.getLogger("").getHandlers()) {
+                h.setLevel(Level.FINE);
+            }try {
+            Logger.getLogger(MidiServer.class.getName()).info("MidiServer Thread started.");   
             initializeMappings();
             waitForMidiDevices();
             restoreDevicesWithRetry();
             logDeviceStatus();
+
+            Thread processingThread = new Thread(this::startProcessingLoop);
+            processingThread.setName("MidiProcessingThread");
+            processingThread.setPriority(Thread.NORM_PRIORITY + 1); // Slight boost
+            processingThread.setUncaughtExceptionHandler((t, e) -> {
+                Logger.getLogger(MidiServer.class.getName()).log(Level.SEVERE, "Processing thread crashed: " + t.getName(), e);
+            });
+            processingThread.start();
         } catch (Exception e) {
             Logger.getLogger(MidiServer.class.getName()).log(Level.SEVERE, "MidiServer thread crashed", e);
         }
-
-        startProcessingLoop();
     }
+
 
     private void waitForMidiDevices() {
         int retries = 10;
@@ -189,32 +210,40 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
 
 
     private void startProcessingLoop() {
+        long lastHeartbeat = System.currentTimeMillis();
         while (true) {
             processIncomingMidi();
+            if (System.currentTimeMillis() - lastHeartbeat > 5000) {
+                Logger.getLogger(getClass().getName()).info("Processing loop heartbeat: still alive");
+                lastHeartbeat = System.currentTimeMillis();
+            }
             try {
                 Thread.sleep(2);
             } catch (InterruptedException ex) {
-                Logger.getLogger(MidiServer.class.getName()).log(Level.SEVERE, "Processing loop interrupted", ex);
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Processing loop interrupted", ex);
+                break;
             }
         }
     }
 
-    // Example: process and print incoming MIDI events
     public void processIncomingMidi() {
-    while (!inputBuffer.isEmpty()) {
-        MidiMessage msg = inputBuffer.poll();
-        if (msg != null) {
-            Logger.getLogger(MidiServer.class.getName()).info("Received MIDI: " + msg);
-            if (msg instanceof ShortMessage sm) {
-                System.out.printf("MIDI: cmd=%d, data1=%d, data2=%d%n",sm.getCommand(), sm.getData1(), sm.getData2());
-                nrpnParser.parse(sm); // Add this line
-                // ParseMidi.printResolvedTypes(sm); // Optional
-            }
-            else if (msg instanceof SysexMessage sysex) {
-                byte[] data = sysex.getData();
-                Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"SysEx Raw Data: " + Arrays.toString(data));
-                // Decode using your SysExParser
-                // sysexDecoder.parse(data);
+        while (!inputBuffer.isEmpty()) {
+            MidiMessage msg = inputBuffer.poll();
+            Logger.getLogger(getClass().getName()).fine("Polling inputBuffer...");
+            if (msg != null) {
+                Logger.getLogger(MidiServer.class.getName()).info("Received MIDI: " + msg);
+                if (msg instanceof ShortMessage sm) {
+                    if (Logger.getLogger(getClass().getName()).isLoggable(Level.FINE)) {
+                            Logger.getLogger(getClass().getName()).fine(String.format("MIDI: cmd=%d, data1=%d, data2=%d", sm.getCommand(), sm.getData1(), sm.getData2()));
+                        }
+                    nrpnParser.parse(sm); // Add this line
+                    // ParseMidi.printResolvedTypes(sm); // Optional
+                }
+                else if (msg instanceof SysexMessage sysex) {
+                    byte[] data = sysex.getData();
+                    Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"SysEx Raw Data: " + Arrays.toString(data));
+                    // Decode using your SysExParser
+                    // sysexDecoder.parse(data);
                 }
             }
         }
@@ -232,7 +261,7 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     
     public static void bufferMidi(String message) throws InterruptedException{
         ShortMessage[] commands = WebControlParser.parseJSON(message);
-        Logger.getLogger(MidiServer.class.getName()).log(Level.FINE,"Buffering MIDI: " + Arrays.toString(commands));
+        // Logger.getLogger(MidiServer.class.getName()).log(Level.FINE,"Buffering MIDI: " + Arrays.toString(commands));
         addtosendqueue(commands);
     }
     
