@@ -1,6 +1,7 @@
 package MidiControl.TestUtilities;
-import MidiControl.Utilities.NrpnParser;
 import javax.sound.midi.ShortMessage;
+
+import MidiControl.NrpnUtils.NrpnParser;
 
 public class NrpnMocker {
     private final NrpnParser parser;
