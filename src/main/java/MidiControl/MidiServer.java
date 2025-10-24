@@ -138,7 +138,7 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
             Logger.getLogger(MidiServer.class.getName()).info("MidiServer Thread started.");
             initializeMappings();
             waitForMidiDevices();
-            restoreDevices();
+            restoreDevicesWithRetry();
             logDeviceStatus();
         } catch (Exception e) {
             Logger.getLogger(MidiServer.class.getName()).log(Level.SEVERE, "MidiServer thread crashed", e);
@@ -159,21 +159,28 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
         }
     }
 
-    private void restoreDevices() {
-        try {
-            setInputDevice(Settings.getLastInput());
-            Logger.getLogger(MidiServer.class.getName()).info("Restored input device: " + midiOut.getDeviceInfo().getName());
-        } catch (MidiUnavailableException e) {
-            Logger.getLogger(MidiServer.class.getName()).warning("Last Input Device not available");
+    public void restoreDevicesWithRetry() {
+        int retries = 6;
+        while (retries-- > 0) {
+            if (MidiServer.midiOut != null && MidiServer.midiOut.getDeviceInfo() != null) {
+                Logger.getLogger(getClass().getName()).log(Level.INFO, "midiOut is ready — restored devices.");
+                Settings.restore(Settings.getSettingsOrDefault());
+                return;
+            }
+
+            Logger.getLogger(getClass().getName()).log(Level.INFO, "Waiting for midiOut initialization...");
+            try {
+                Thread.sleep(750);
+                Settings.restore(Settings.getSettingsOrDefault());
+            } catch (InterruptedException e) {
+                Logger.getLogger(getClass().getName()).log(Level.WARNING, "Interrupted during restore wait", e);
+                break;
+            }
         }
 
-        try {
-            setOutputDevice(Settings.getLastOutput());
-            Logger.getLogger(MidiServer.class.getName()).info("Restored output device: " + midiOut.getDeviceInfo().getName());
-        } catch (MidiUnavailableException e) {
-            Logger.getLogger(MidiServer.class.getName()).warning("Last Output Device not available");
-        }
+        Logger.getLogger(getClass().getName()).log(Level.WARNING, "midiOut not initialized — skipping restore.");
     }
+
 
     private void logDeviceStatus() {
         Logger.getLogger(MidiServer.class.getName()).info("Receiver attached: " + (midiIn != null));
