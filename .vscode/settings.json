@@ -1,4 +1,17 @@
 {
     "java.configuration.updateBuildConfiguration": "disabled",
-    "java.debug.settings.onBuildFailureProceed": true
+    "java.debug.settings.onBuildFailureProceed": true,
+    "log-tail.channel": "document",       //Configuring the log printout channel
+    // make sure to update remote object with your server ssh details
+    "log-tail.remote": {
+        "host": "localhost",
+        "port": 22,
+        "username": "root",
+        "password": ""
+    },
+    //Configure a list of log file paths, followed by selective monitoring.
+    "log-tail.logsPath": [
+        "/home/dev/main/log/12-02-2024.log",
+        "/home/qa/main/log/12-02-2024.log",
+    ]
 }

@@ -13,9 +13,30 @@ h2{
 
 select {
     font-family: sans-serif;
-    color: #cccccc;
+    color: #2b322e;
 }
 
+.selector_wrapper {
+  margin-bottom: 16px;
+}
+
+.device-row {
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center;
+  gap: 16px;
+}
+
+.device-label {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #444;
+  min-width: 200px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  transform: translateY(4px);
+}
 
 #midiDevice
 {
@@ -47,24 +68,6 @@ select {
   box-shadow: 0 2px 4px rgba(0,0,0,0.3);
   border: 1px solid #333;
   flex: 0 0 auto;
-}
-
-#output-fader-panel {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  max-height: 100vh;
-  background-color: #222;
-  border-left: 2px solid #444;
-  padding: 1rem 0.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  z-index: 1000;
-  box-shadow: -2px 0 6px rgba(0,0,0,0.4);
-  width: auto; /* key change: let content define width */
-  max-width: 50vw; /* prevent overflow on small screens */
 }
 
 .fader.restored {
@@ -137,7 +140,7 @@ select {
     padding: 1rem;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .fader {
     width: 24px;
     height: clamp(180px, 35vh, 320px); /* taller for touch precision */
@@ -169,20 +172,20 @@ select {
   }
 
   #output-fader-panel {
-    position: fixed; /* stay anchored */
-    bottom: 0;
-    right: 0;
-    left: 0;
-    height: auto;
-    width: 100%;
-    flex-direction: row;
-    justify-content: center;
-    padding: 0.5rem;
-    border-left: none;
-    border-top: 2px solid #444;
-    box-shadow: 0 -2px 6px rgba(0,0,0,0.4);
-    background-color: #222;
-    z-index: 1000;
+     background-color: #222;
+    border-left: 2px solid #444;
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: -2px 0 6px rgba(0,0,0,0.4);
+    width: auto;
+    max-width: 50vw;
+    transition: max-height 0.4s ease, opacity 0.4s ease;
+    overflow: hidden;
+    max-height: 500px;
+    opacity: 1;
   }
 }
 
@@ -206,4 +209,46 @@ select {
 .peek {
   opacity: 20%;
   transition: 1s;
+}
+
+#output-fader-panel {
+  position: fixed;
+  bottom: 3rem; /* sits above the button */
+  right: 0;
+  background-color: #222;
+  border-left: 2px solid #444;
+  padding: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  z-index: 1000;
+  box-shadow: -2px 0 6px rgba(0,0,0,0.4);
+  width: auto;
+  max-width: 50vw;
+  transition: max-height 0.4s ease, opacity 0.4s ease;
+  overflow: hidden;
+  max-height: 500px;
+  opacity: 1;
+}
+
+#output-fader-panel.hidden {
+  max-height: 0;
+  opacity: 0;
+}
+
+#toggle-output-panel {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-family: sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-top: 2px solid #444;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.4);
+  z-index: 1001; /* ensure it sits above the panel */
 }
