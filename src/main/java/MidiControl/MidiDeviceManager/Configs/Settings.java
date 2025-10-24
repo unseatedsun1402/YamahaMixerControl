@@ -9,6 +9,7 @@ import java.io.Writer;
 import java.util.logging.*;
 
 import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiUnavailableException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -54,7 +55,7 @@ public class Settings{
         ensureSettingsDirectoryExists();
     }
 
-    private static MidiSettings getSettingsOrDefault() {
+    public static MidiSettings getSettingsOrDefault() {
         if (cachedSettings != null) return cachedSettings;
         File settingsFile = new File(SETTINGS_PATH);
         if (!settingsFile.exists()) {
@@ -71,6 +72,28 @@ public class Settings{
                 "Failed to read MIDI settings file", e);
             cachedSettings = new MidiSettings(-1, "Unknown", "Unknown", -1, "Unknown", "Unknown");
             return cachedSettings;
+        }
+    }
+
+    public static void restore(MidiSettings settings) {
+        if (settings == null) {
+            Logger.getLogger(Settings.class.getName()).log(Level.WARNING,
+                "Cannot restore devices — settings object is null.");
+            return;
+        }
+
+        try {
+            MidiServer.setInputDevice(settings.inputDeviceIndex);
+            Logger.getLogger(Settings.class.getName()).info("Restored input device: " + settings.inputDeviceName);
+        } catch (MidiUnavailableException e) {
+            Logger.getLogger(Settings.class.getName()).warning("Failed to restore input device: " + e.getMessage());
+        }
+
+        try {
+            MidiServer.setOutputDevice(settings.outputDeviceIndex);
+            Logger.getLogger(Settings.class.getName()).info("Restored output device: " + settings.outputDeviceName);
+        } catch (MidiUnavailableException e) {
+            Logger.getLogger(Settings.class.getName()).warning("Failed to restore output device: " + e.getMessage());
         }
     }
 
