@@ -40,19 +40,19 @@
 },
 {
     "channel": 8,
-    "short":"viln",
+    "short":"violin",
     "long":"ch 8"
     
 },
 {
     "channel": 9,
-    "short":"keys",
+    "short":"keys L",
     "long":"ch 9"
     
 },
 {
     "channel": 10,
-    "short":"keys",
+    "short":"keys R",
     "long":"ch 10"
     
 },
@@ -129,13 +129,13 @@
 },
 {
     "channel": 23,
-    "short":"toms",
+    "short":"tomL",
     "long":"ch 23"
     
 },
 {
     "channel": 24,
-    "short":"toms",
+    "short":"tomR",
     "long":"ch 24"
     
 },
@@ -218,17 +218,17 @@
 },
 {
     "channel": 38,
-    "short":"ylow",
+    "short":"yellow",
     "long":"ch 38"
 },
 {
     "channel": 39,
-    "short":"atmx",
+    "short":"automix",
     "long":"ch 39"
 },
 {
     "channel": 40,
-    "short":"comp",
+    "short":"vision",
     "long":"ch 40"
 },
 {
@@ -268,7 +268,7 @@
 },
 {
     "channel": 48,
-    "short":"v.pno",
+    "short":"Piano vx",
     "long":"ch 48"
     
 }

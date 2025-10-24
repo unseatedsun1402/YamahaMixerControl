@@ -29,22 +29,25 @@ Client.socket.onclose = function () {
 };
 
 Client.socket.onmessage = function (message) {
-if(IS_DEBUG){console.log("Received:", message.data);}
-try {
+  if (IS_DEBUG) {
+    console.log("Received:", message.data);
+  }
+
+  try {
     const json = JSON.parse(message.data);
-    if (json.type === "nrpnUpdate") {
-        if(IS_DEBUG){console.log("NRPN Update:", json);}
-        handleNrpnUpdate(json);
+
+    if (json.type === "nrpnUpdate" || json.type === "outputFaderUpdate") {
+      if (IS_DEBUG) {
+        console.log("Fader Update:", json);
+      }
+      handleFaderUpdate(json); // unified handler
+    } else if (IS_DEBUG) {
+      console.log("Parsed (unhandled type):", json);
     }
-    else if (message.type === "outputFaderUpdate") {
-    handleOutputFaderUpdate(message);
-    }
-    else if(IS_DEBUG){
-        console.log("Parsed:", json);
-    }
-} catch (e) {
+
+  } catch (e) {
     console.error("Invalid JSON from server:", e);
-}
+  }
 };
 
 

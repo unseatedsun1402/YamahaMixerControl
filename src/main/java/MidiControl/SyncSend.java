@@ -31,7 +31,7 @@ public class SyncSend implements Runnable {
                             "Server sending midi event: " + MidiServer.midiOut.getClass().getSimpleName() + " " +
                             command.getCommand() + " " + command.getData1() + " " + command.getData2(),
                             (Object) null);
-                        Thread.sleep(0, 500_000); // Optional pacing
+                        Thread.sleep(2);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(SyncSend.class.getName()).log(Level.FINE, "SyncSend interrupted during send", ex);
                         Thread.currentThread().interrupt(); // Preserve interrupt status
@@ -39,7 +39,7 @@ public class SyncSend implements Runnable {
                 }
             } else {
                 try {
-                    Thread.sleep(1); // Yield to avoid busy loop
+                    Thread.sleep(5); // Yield to avoid busy loop
                 } catch (InterruptedException ex) {
                     Logger.getLogger(SyncSend.class.getName()).log(Level.FINE, "SyncSend interrupted during idle", ex);
                     Thread.currentThread().interrupt();
