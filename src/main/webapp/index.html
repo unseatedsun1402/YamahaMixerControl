@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<<<<<<< HEAD
 <head>
   <title>Scan to Access</title>
   <style>
@@ -44,4 +45,44 @@
     </div>
   </div>
 </body>
+=======
+    <head>
+        <title>Select Midi Device</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css"/>
+    </head>
+    <script src="js/fader-inject.js"></script>
+    <script src="js/midi-gui.js"></script>
+    <script src="js/client.js"></script>
+    <body data-fadermsb="0" data-faderlsb="0">
+        <div class="selector-wrapper">
+            <div class="device-row">
+                <div id="midiDevice" style="text-align: center">Selection Goes Here</div>
+                <div id="selected"></div>
+            </div>
+            <div class="device-row">
+                <div id="midiInputDevice" style="text-align: center">Input Selection Goes Here</div>
+                <div id="selectedInput"></div>
+            </div>
+        </div>
+        <script>
+            if (document.getElementById('midiDevice') != null){
+            selectDevice();
+            selectInputDevice();  
+            }
+            else {
+                console.log("No MIDI device selection needed on this page.");
+            }
+        </script>
+        <button onClick="location.href= 'http://'+window.location.host+'/MidiControl/changechannelnames.html';">Change a name</button>
+        <div id="ch-levels"></div>
+        <div class="output-fader-wrapper">
+        <div id="output-fader-panel">
+        <div class="output-fader" data-fadermsb="0" data-faderlsb="125" data-label="Master" data-channelindex="1">
+        </div>
+        </div>
+        <button id="toggle-output-panel">Toggle Output Faders</button></div>
+    </body>
+>>>>>>> 960a764d948c518c94f759ebd9641d4a3e3d4f92
 </html>
