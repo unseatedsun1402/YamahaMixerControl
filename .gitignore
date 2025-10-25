@@ -15,3 +15,4 @@ build/logs/
 .vscode/*
 bin/*
 build/libs/YamahaMixerControl.war
+src/main/webapp/qrcodes
