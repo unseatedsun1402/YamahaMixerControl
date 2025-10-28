@@ -1,0 +1,48 @@
+@media (max-width: 768px) {
+  .fader {
+    width: 24px;
+    height: clamp(180px, 35vh, 320px); /* taller for touch precision */
+    margin-right: 0.25rem;
+  }
+
+  .fader-block {
+    margin: 0.5rem;
+    min-width: 60px;
+    flex: 1 1 60px;
+  }
+
+  .fader-value,
+  .fader-label {
+    font-size: 0.75rem;
+    width: auto;
+    text-align: center;
+  }
+
+  .fader-bank {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .fader-grid {
+    margin-right: 0; /* allow full width for input faders */
+    padding-bottom: 6rem; /* reserve space so input faders don't get covered */
+  }
+
+  #output-fader-panel {
+     background-color: #222;
+    border-left: 2px solid #444;
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: -2px 0 6px rgba(0,0,0,0.4);
+    width: auto;
+    max-width: 50vw;
+    transition: max-height 0.4s ease, opacity 0.4s ease;
+    overflow: hidden;
+    max-height: 500px;
+    opacity: 1;
+  }
+}

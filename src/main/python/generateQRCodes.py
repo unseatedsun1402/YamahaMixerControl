@@ -25,7 +25,7 @@ output_dir.mkdir(parents=True, exist_ok=True)
 
 # Build base URL
 lan_ip = get_lan_ip()
-base_url = f"http://{lan_ip}/MidiControl/"
+base_url = f"http://{lan_ip}:8080/MidiControl/"
 
 # Find all .html files in webapp
 html_files = glob.glob(str(webapp_dir / "*.html"))
