@@ -42,3 +42,25 @@ function injectOutputFaderToggle(){
     panel.classList.toggle("hidden");
     });
 }
+
+function setFaderMarker(faderElement, color) {
+  const markerClasses = ['marker-red', 'marker-blue', 'marker-green'];
+  faderElement.classList.remove(...markerClasses);
+  faderElement.classList.add(`marker-${color}`);
+}
+
+// Usage
+function colorFaderMarkers() {
+  document.querySelectorAll('.fader').forEach(fader => {
+    const msb = parseInt(fader.dataset.msb, 10);
+    if (msb >= 0x30 && msb <= 0x3F) {
+      setFaderMarker(fader, 'red');
+    } else if (msb >= 0x40 && msb <= 0x4F) {
+      setFaderMarker(fader, 'blue');
+    } else if (msb >= 0x50 && msb <= 0x5F) {
+      setFaderMarker(fader, 'green');
+    }
+  });
+}
+
+colorFaderMarkers();
