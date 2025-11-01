@@ -1,32 +1,60 @@
 /* Fader thumb components */
+/* Fader thumb components */
 .fader::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 28px;
-  height: 20px;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 30px;
   background: linear-gradient(to bottom, #aaa, #666, #aaa);
-  border: 1px solid #333;
-  border-radius: 4px;
-  box-shadow: inset 0 0 4px #000, 0 2px 4px rgba(0,0,0,0.5);
+  border: 1px solid #4f4f4f;
+  border-radius: 0%;
+  box-shadow: inset 0 0 3px #000, 0 2px 4px rgba(0,0,0,0.5);
   cursor: pointer;
-  margin-top: -8px;
 }
 
 .fader::-moz-range-thumb {
-  width: 28px;
-  height: 20px;
+  width: 24px;
+  height: 30px;
   background: linear-gradient(to bottom, #aaa, #666, #aaa);
-  border: 1px solid #333;
-  border-radius: 4px;
+  border: 1px solid #4f4f4f;
+  border-radius: 2px;
   box-shadow: inset 0 0 4px #000, 0 2px 4px rgba(0,0,0,0.5);
   cursor: pointer;
+}
+
+/* Marker color variants */
+.marker-red::-webkit-slider-runnable-track {
+  background: linear-gradient(to bottom, #400, #a00);
+}
+
+.marker-blue::-webkit-slider-runnable-track {
+  background: linear-gradient(to bottom, #004, #00a);
+}
+
+.marker-green::-webkit-slider-runnable-track {
+  background: linear-gradient(to bottom, #040, #0a0);
+}
+
+/* Firefox support */
+.marker-red::-moz-range-track {
+  background: linear-gradient(to bottom, #400, #a00);
+}
+
+.marker-blue::-moz-range-track {
+  background: linear-gradient(to bottom, #004, #00a);
+}
+
+.marker-green::-moz-range-track {
+  background: linear-gradient(to bottom, #040, #0a0);
 }
 
 /* fader track appearance */
 .fader {
-    writing-mode: bt-lr;
-    -webkit-appearance: slider-vertical;
-    appearance: slider-vertical;
+    writing-mode: vertical-lr;
+    direction: rtl;
     height: clamp(120px, 20vh, 300px);
     width: 30px;
     margin-right: 0.6rem;
@@ -34,6 +62,21 @@
     outline: none;
     opacity: 0.8;
     transition: opacity 0.2s;
+}
+
+.fader::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #222;
+  border: 1px solid #555;
+  border-radius: 4px;
+  width: 33%;
+  height: 100%;
+}
+.fader::-moz-range-track {
+  background: #222;
+  border: 1px solid #555;
+  border-radius: 4px;
 }
 
 .output-fader {
