@@ -11,7 +11,7 @@ import MidiControl.MidiServer;
 
 @Tag("unit")
 public class MidiServerTest {
-        @Test
+        @org.junit.jupiter.api.Test
     
     void testSetOutputDeviceDoesNotThrow() {
         try {
@@ -21,7 +21,7 @@ public class MidiServerTest {
         }
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testIOConfigureDoesNotThrow() {
         try {
             MidiServer.configureIO(1,0); // Assumes device 0 is valid in test environment
@@ -30,7 +30,7 @@ public class MidiServerTest {
         }
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testSetInputDeviceDoesNotThrow() {
         try {
             MidiServer.setInputDevice(0); // Assumes device 0 is valid in test environment

@@ -2,7 +2,6 @@ package MidiControl.functional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
 
 import MidiControl.MidiInputReceiver;
 import MidiControl.MidiServer;
@@ -34,7 +33,7 @@ public class MidiServerTest {
         MidiServer.clearOutputBuffer();
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testAddToSendQueue() {
         ShortMessage[] commands = new ShortMessage[1];
         try {
@@ -49,7 +48,7 @@ public class MidiServerTest {
         org.junit.jupiter.api.Assertions.assertEquals(before + 1, after, "Buffer should have one more element after adding");
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testInputReceiverReceivesMessage() {
         ConcurrentLinkedQueue<MidiMessage> inputBuffer = new ConcurrentLinkedQueue<>();
         try (MidiInputReceiver receiver = new MidiInputReceiver(inputBuffer)) {
@@ -65,7 +64,7 @@ public class MidiServerTest {
         }
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testNrpnJsonStructureWithHelpers() {
         NrpnMapping mapping = new NrpnMapping(1, 0, ControlType.FADER, ChannelType.MIX, 3, "Mix 9 send 3 control");
         String json = MidiTestUtils.buildNrpnJson(mapping, 8192);
@@ -79,7 +78,7 @@ public class MidiServerTest {
         MidiTestUtils.assertJsonContains(json, "lsb", "0");
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testSetOutputDeviceInitializesReceiver() throws Exception {
         MidiServer.setOutputDevice(0); // Assumes device 0 has a receiver
 
@@ -92,7 +91,7 @@ public class MidiServerTest {
     }
 
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testIncomingMidiParsing() {
         ShortMessage msg = null;
         try {
@@ -105,17 +104,17 @@ public class MidiServerTest {
         // Assert parser state or logs
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testSetInputDeviceWithInvalidIndexThrows() {
         assertThrows(MidiUnavailableException.class, () -> MidiServer.setInputDevice(999), "Should throw for invalid device index");
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testSetOutputDeviceWithInvalidIndexThrows() {
         assertThrows(MidiUnavailableException.class, () -> MidiServer.setInputDevice(999), "Should throw for invalid device index");
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testSetInputDeviceWithOutputIndexFailsGracefully() {
         MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
         MidiDevice device = null;
@@ -136,7 +135,7 @@ public class MidiServerTest {
         }, "Should not crash when setting output-only device as input");
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testOutputFaderJsonDispatch() {
         NrpnRegistry.getInstance().buildProfileMapping(); // Ensure mappings are loaded
 
@@ -161,7 +160,7 @@ public class MidiServerTest {
         assertTrue(json.contains("\"label\":\"" + mapping.label() + "\""));
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testFaderJsonDispatch() {
         NrpnRegistry.getInstance().buildProfileMapping(); // Ensure mappings are loaded
 
@@ -186,14 +185,14 @@ public class MidiServerTest {
         assertTrue(json.contains("\"label\":\"" + mapping.label() + "\""));
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testHandleResolvedNRPNBroadcast() {
         String json = "{\"type\":\"nrpnUpdate\",\"value\":8192}";
         assertDoesNotThrow(() -> MidiServer.handleResolvedNRPN(json));
         // Optionally verify broadcast behavior if Socket is mockable
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testSendMidiJson() throws Exception {
         // Arrange
         MockMidiOutput mockOutput = new MockMidiOutput();

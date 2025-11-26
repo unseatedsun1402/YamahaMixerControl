@@ -13,7 +13,7 @@ import MidiControl.MidiInputReceiver;
 @Tag("unit")
 public class MidiInputReceiverTest {
     
-    @Test
+    @org.junit.jupiter.api.Test
     void testReceiverHandlesNullMessageGracefully() {
         ConcurrentLinkedQueue<MidiMessage> buffer = new ConcurrentLinkedQueue<>();
         MidiInputReceiver receiver = new MidiInputReceiver(buffer);

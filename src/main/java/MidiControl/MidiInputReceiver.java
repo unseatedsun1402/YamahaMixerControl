@@ -3,9 +3,7 @@ package MidiControl;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
 
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Logger;
 
 /**
  * Receives incoming MIDI messages and puts them into a buffer for processing.

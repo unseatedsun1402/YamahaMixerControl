@@ -1,6 +1,4 @@
 package MidiControl;
-import jakarta.websocket.*;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +8,10 @@ import java.util.logging.Logger;
 
 import MidiControl.NrpnUtils.NrpnParser;
 
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
 /**
  *
  * @author ethanblood

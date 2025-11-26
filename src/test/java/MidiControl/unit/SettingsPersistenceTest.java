@@ -38,7 +38,7 @@ public class SettingsPersistenceTest {
         if (file.exists()) file.delete();
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testDeviceSettingsSerialization() {
         DeviceSettings loaded = SettingsPersistence.load();
         assertEquals(1, loaded.inputDeviceIndex);
