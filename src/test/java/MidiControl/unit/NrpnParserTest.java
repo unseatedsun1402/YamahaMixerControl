@@ -20,7 +20,7 @@ import MidiControl.TestUtilities.MidiTestUtils;
 
 @Tag("unit")
 public class NrpnParserTest {
-    @Test
+    @org.junit.jupiter.api.Test
     public void testMix9Send3Resolution() throws Exception {
     NrpnParser parser = new NrpnParser();
     NrpnMocker mocker = new NrpnMocker(parser);
@@ -30,7 +30,7 @@ public class NrpnParserTest {
     assertTrue(NrpnRegistry.resolve(0x01, 0x00).isPresent());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testValidNrpnWithOnlyValueMsb() throws Exception {
     NrpnRegistry.getInstance().buildProfileMapping();
     NrpnParser parser = new NrpnParser();
@@ -45,7 +45,7 @@ public class NrpnParserTest {
     }
 
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testValidNrpnWithFull14BitValue() throws Exception {
     NrpnParser parser = new NrpnParser();
     // Value = 12345 = 0x3039 → MSB = 96, LSB = 57
@@ -60,7 +60,7 @@ public class NrpnParserTest {
     }
 
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testParserIgnoresIncompleteSequence() throws Exception {
         NrpnParser parser = new NrpnParser();
         ShortMessage msg = MidiTestUtils.createControlChange(0, 99, 1); // Only MSB
@@ -71,7 +71,7 @@ public class NrpnParserTest {
         assertTrue(resolved.isPresent(), "Registry should still contain mapping");
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void testParserRejectsInvalidControlChange() throws Exception {
     NrpnParser parser = new NrpnParser();
     ShortMessage msg = new ShortMessage(ShortMessage.NOTE_ON, 0, 60, 127); // Not a control change

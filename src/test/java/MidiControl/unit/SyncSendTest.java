@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tag("Unit")
 public class SyncSendTest {
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testSyncSendDispatchesMidiMessages() throws Exception {
         // Arrange
         ConcurrentLinkedQueue<ShortMessage[]> buffer = new ConcurrentLinkedQueue<>();

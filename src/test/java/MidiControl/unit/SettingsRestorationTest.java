@@ -37,7 +37,7 @@ public class SettingsRestorationTest {
         if (file.exists()) file.delete();
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testLoadValidSettingsJson() {
         DeviceSettings settings = SettingsPersistence.load();
         assertNotNull(settings);
