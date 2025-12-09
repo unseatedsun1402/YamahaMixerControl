@@ -1,13 +1,24 @@
 package MidiControl.SysexUtils;
 
+import java.util.*;
 import java.util.logging.Logger;
-import java.util.List;
 
 public class SysexRegistry {
     private final List<SysexMapping> mappings;
+    private final Map<Integer, List<SysexMapping>> byControlId = new HashMap<>();
     private final Logger log = Logger.getLogger(this.getClass().getName());
+    private final int MATCH_LENGTH = 11;
+
     public SysexRegistry(List<SysexMapping> mappings) {
         this.mappings = mappings;
+
+        // Build index by controlId (byte 8 of the format)
+        for (SysexMapping m : mappings) {
+            int controlId = m.getParameter_change_format().get(7) instanceof Number
+                    ? ((Number) m.getParameter_change_format().get(7)).intValue()
+                    : -1;
+            byControlId.computeIfAbsent(controlId, k -> new ArrayList<>()).add(m);
+        }
     }
 
     public SysexMapping resolve(byte[] message) {
@@ -24,17 +35,21 @@ public class SysexRegistry {
             log.info("Message length " + message.length + " longer than expected 18, skipping");
             return null;
         }
-        for (SysexMapping mapping : mappings) {
-            if (matchesFormat(message, mapping.getParameter_change_format()) ||
-                matchesFormat(message, mapping.getParameter_request_format())) {
+
+        // Extract controlId from incoming message (byte 8)
+        int controlId = message[7] & 0xFF;
+        List<SysexMapping> candidates = byControlId.getOrDefault(controlId, Collections.emptyList());
+
+        // Only check candidates for this controlId
+        for (SysexMapping mapping : candidates) {
+            if (matchesFormat(message, mapping.getParameter_change_format())) {
                 return mapping;
             }
         }
-        Logger.getLogger(SysexRegistry.class.getName())
-            .info("No mapping matched for message: " + bytesToHex(message));
+
+        log.info("No mapping matched for message: " + bytesToHex(message));
         return null;
     }
-
 
     private String bytesToHex(byte[] message) {
         StringBuilder sb = new StringBuilder();
@@ -48,20 +63,18 @@ public class SysexRegistry {
         int len = format.size();
         if (message.length < len) return false;
 
-        // Build expected array with substitutions
         int[] expected_bytes = new int[len];
         boolean[] wildcard = new boolean[len];
-        boolean[] nibble1n = new boolean[len];
-        boolean[] nibble3n = new boolean[len];
+        boolean[] nibble = new boolean[len];
 
         for (int i = 0; i < len; i++) {
             Object f = format.get(i);
             if (f instanceof Number) {
                 expected_bytes[i] = ((Number) f).intValue();
             } else if ("1n".equals(f)) {
-                nibble1n[i] = true;
+                nibble[i] = true;
             } else if ("3n".equals(f)) {
-                nibble3n[i] = true;
+                nibble[i] = true;
             } else if ("dd".equals(f) || "cc".equals(f)) {
                 wildcard[i] = true;
             } else {
@@ -69,21 +82,24 @@ public class SysexRegistry {
             }
         }
 
-        // Now compare arrays in one pass
         int[] actual_bytes = new int[len];
         for (int i = 0; i < len; i++) {
             actual_bytes[i] = message[i] & 0xFF;
         }
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < MATCH_LENGTH; i++) {
             if (wildcard[i]) continue;
-            if (nibble1n[i] && (actual_bytes[i] & 0xF0) != 0x10) return false;
-            else if (nibble3n[i] && (actual_bytes[i] & 0xF0) != 0x30) return false;
-            else if (!nibble1n[i] && !nibble3n[i] && !wildcard[i]) {
-                if (actual_bytes[i] != expected_bytes[i]) return false;
+
+            int actual = actual_bytes[i];
+            int masked = actual & 0xF0;
+
+            if (nibble[i]) {
+                if (masked != 0x10 && masked != 0x30) return false;
+                // if it matches, keep going
+            } else {
+                if (actual != expected_bytes[i]) return false;
             }
         }
 
-        // Require F7 terminator
         return (message[len - 1] & 0xFF) == 0xF7;
     }
 }
