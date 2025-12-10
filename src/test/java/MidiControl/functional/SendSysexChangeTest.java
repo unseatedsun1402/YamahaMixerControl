@@ -25,7 +25,7 @@ public class SendSysexChangeTest {
         // // Load registry
         // // SysexRegistry.getInstance().loadFromJson("sysex_mappings.json");
 
-        // // Send a known SysEx message
-        // mocker.sendSysex(new byte[] {(byte)0xF0, 0x43, 0x12, 0x00, 0x7F, 0xF7}); // Example SysEx message
+        // // Send a known Sysex message
+        // mocker.sendSysex(new byte[] {(byte)0xF0, 0x43, 0x12, 0x00, 0x7F, 0xF7}); // Example Sysex message
     }
 }

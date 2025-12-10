@@ -21,7 +21,7 @@ public class SysexParserTest {
 
     @org.junit.jupiter.api.Test
     public void testProcessIncomingMidiMessage_PhantomPowerOn() {
-        // Expanded SysEx message based on mapping
+        // Expanded Sysex message based on mapping
         byte[] phantomOn = new byte[] {
         (byte)0xF0, (byte)0x43, (byte)0x10, (byte)0x3E,
         (byte)0x11, (byte)0x01, (byte)0x00, (byte)0x29,
