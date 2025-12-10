@@ -16,8 +16,8 @@ public class SysexParser {
                    interpretValue(mapping, value);
         }
         Logger.getLogger(SysexParser.class.getName())
-              .warning("Unrecognized SysEx message: " + bytesToHex(message));
-        return "Unknown SysEx message " + bytesToHex(message);
+              .warning("Unrecognized Sysex message: " + bytesToHex(message));
+        return "Unknown Sysex message " + bytesToHex(message);
     }
 
 
@@ -36,7 +36,7 @@ public class SysexParser {
     }
 
     private static boolean isSysexMessage(byte[] message) {
-        // Check if the message is a SysEx message
+        // Check if the message is a Sysex message
         return message != null && message.length >= 2 && message[0] == (byte) 0xF0 && message[message.length - 1] == (byte) 0xF7;
     }
 

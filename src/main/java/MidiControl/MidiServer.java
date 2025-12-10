@@ -241,8 +241,8 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
                 }
                 else if (msg instanceof SysexMessage sysex) {
                     byte[] data = sysex.getData();
-                    Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"SysEx Raw Data: " + Arrays.toString(data));
-                    // Decode using your SysExParser
+                    Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Sysex Raw Data: " + Arrays.toString(data));
+                    // Decode using your SysexParser
                     // sysexDecoder.parse(data);
                 }
             }
