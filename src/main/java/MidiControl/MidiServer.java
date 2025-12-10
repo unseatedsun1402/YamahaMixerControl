@@ -1,6 +1,7 @@
 package MidiControl;
+
 import java.io.File;
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -9,6 +10,8 @@ import javax.sound.midi.*;
 
 import MidiControl.ChannelMappings.ControlType;
 import MidiControl.ControlMappings.buildFaderJson;
+import MidiControl.ControlServer.InputHandler;
+import MidiControl.Controls.ControlRegistry;
 import MidiControl.MidiDeviceManager.MidiDeviceUtils;
 import MidiControl.MidiDeviceManager.MidiInput;
 import MidiControl.MidiDeviceManager.MidiOutput;
@@ -16,10 +19,8 @@ import MidiControl.MidiDeviceManager.MidiSettings;
 import MidiControl.MidiDeviceManager.ReceiverWrapper;
 import MidiControl.MidiDeviceManager.TransmitterWrapper;
 import MidiControl.MidiDeviceManager.Configs.Settings;
-import MidiControl.NrpnUtils.NRPNDispatchTarget;
-import MidiControl.NrpnUtils.NrpnMapping;
-import MidiControl.NrpnUtils.NrpnParser;
-import MidiControl.NrpnUtils.NrpnRegistry;
+import MidiControl.NrpnUtils.*;
+import MidiControl.SysexUtils.*;
 import jakarta.annotation.PreDestroy;
 
 /**
@@ -28,9 +29,13 @@ import jakarta.annotation.PreDestroy;
 public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     public static MidiOutput midiOut;
     public static MidiInput midiIn;
-    static final ConcurrentLinkedQueue<ShortMessage[]> outputBuffer = new ConcurrentLinkedQueue<>();
+    static final ConcurrentLinkedQueue<MidiMessage[]> outputBuffer = new ConcurrentLinkedQueue<>();
     static final ConcurrentLinkedQueue<MidiMessage> inputBuffer = new ConcurrentLinkedQueue<>();
-    NrpnParser nrpnParser = new NrpnParser();
+    static final NrpnParser nrpnParser = new NrpnParser();
+    static final InputHandler inputHandler = new InputHandler(nrpnParser);
+    static final List<SysexMapping> mappings = SysexMappingLoader.loadMappings();
+    static final SysexRegistry registry = new SysexRegistry(mappings);
+    static final ControlRegistry controlRegistry = new ControlRegistry(mappings);
 
     @PreDestroy
     public void shutdown() {
@@ -51,7 +56,7 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
        outputBuffer.add(commands);
     }
 
-    public static void addtoinputqueue(ShortMessage msg) { // used for testing
+    public static void addtoinputqueue(MidiMessage msg) { // used for testing
         inputBuffer.add(msg);
     }
 
@@ -86,6 +91,7 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     public static void setOutputDevice(int index) throws MidiUnavailableException {
     midiOut = new ReceiverWrapper(MidiDeviceUtils.getDevice(index));
     MidiDevice.Info info = MidiServer.midiOut.getDeviceInfo();
+    System.out.println("Opening device: " + info.getName());
     Settings.updateOutputDevice(index, info.getName(), info.getDescription());
     Socket.restartSyncSend();
     }
@@ -103,6 +109,7 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
         }
 
         MidiDevice device = MidiDeviceUtils.getDevice(index);
+        System.out.println("Opening device: " + device.getDeviceInfo().getName());
         device.open(); // Required before querying transmitters
 
         Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,
@@ -137,7 +144,6 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
             NrpnRegistry.INSTANCE.loadFromClasspath(mappingPath);
             Logger.getLogger(MidiServer.class.getName()).info("Loaded NRPN mappings from classpath.");
         }
-
         Logger.getLogger(MidiServer.class.getName()).info("NrpnRegistry has " + NrpnRegistry.INSTANCE.getMappings().size() + " mappings loaded.");
     }
 
@@ -152,7 +158,7 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
             Logger.getLogger(MidiServer.class.getName()).info("MidiServer Thread started.");   
             initializeMappings();
             waitForMidiDevices();
-            restoreDevicesWithRetry();
+            // restoreDevicesWithRetry();
             logDeviceStatus();
 
             Thread processingThread = new Thread(this::startProcessingLoop);
@@ -229,25 +235,31 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
     public void processIncomingMidi() {
         while (!inputBuffer.isEmpty()) {
             MidiMessage msg = inputBuffer.poll();
-            Logger.getLogger(getClass().getName()).fine("Polling inputBuffer...");
-            if (msg != null) {
-                Logger.getLogger(MidiServer.class.getName()).info("Received MIDI: " + msg);
-                if (msg instanceof ShortMessage sm) {
-                    if (Logger.getLogger(getClass().getName()).isLoggable(Level.FINE)) {
-                            Logger.getLogger(getClass().getName()).fine(String.format("MIDI: cmd=%d, data1=%d, data2=%d", sm.getCommand(), sm.getData1(), sm.getData2()));
-                        }
-                    nrpnParser.parse(sm); // Add this line
-                    // ParseMidi.printResolvedTypes(sm); // Optional
+            if (msg == null) continue;
+
+            Logger.getLogger(MidiServer.class.getName()).info("Received MIDI: " + SysexParser.bytesToHex(msg.getMessage()));
+
+            Object event = inputHandler.handle(msg);
+            if (event == null) continue;
+
+            if (event instanceof byte[]) {
+                byte[] sysex = (byte[]) event;
+                Logger.getLogger(MidiServer.class.getName()).info("Raw Sysex: " + SysexParser.bytesToHex(sysex));
+                MidiControl.Controls.Control control = controlRegistry.resolveSysex(sysex);
+                if (control != null) {
+                    Logger.getLogger(MidiServer.class.getName()).info("Resolved Control: " + control.getControlGroup());
+                } else {
+                    Logger.getLogger(MidiServer.class.getName()).info("No Control mapping found for Sysex message.");
                 }
-                else if (msg instanceof SysexMessage sysex) {
-                    byte[] data = sysex.getData();
-                    Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,"Sysex Raw Data: " + Arrays.toString(data));
-                    // Decode using your SysexParser
-                    // sysexDecoder.parse(data);
-                }
+            } else if (event instanceof ShortMessage) {
+                nrpnParser.parse((ShortMessage) event);
+            } else {
+                Logger.getLogger(MidiServer.class.getName()).info("Unhandled MIDI event type: " + event.getClass().getName());
             }
         }
     }
+
+
 
     /**
      * Handles a resolved NRPN by broadcasting it to all connected WebSocket clients.
@@ -305,9 +317,13 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
             }
         }
 
-        int inputIndex = settings != null ? Settings.getLastInput() : 0;
-        int outputIndex = settings != null ? Settings.getLastOutput() : 0;
+        // int inputIndex = settings != null ? Settings.getLastInput() : 0;
+        // int outputIndex = settings != null ? Settings.getLastOutput() : 0;
+        MidiControl.ListDevices.listDevices(); // List available devices
 
+        int inputIndex = 13;
+        int outputIndex = 4;
+        
         configureIO(inputIndex, outputIndex);
         Logger.getLogger(MidiServer.class.getName()).log(Level.INFO,
             "Starting MidiServer with input=" + inputIndex + ", output=" + outputIndex);

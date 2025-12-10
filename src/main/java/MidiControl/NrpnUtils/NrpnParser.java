@@ -50,6 +50,39 @@ public class NrpnParser {
         }
     }
 
+     public void parse(byte[] msg) {
+        int data1 = msg[1];
+        int data2 = msg[2];
+
+        switch (data1) {
+            case 99 -> {
+                currentMsb = data2;
+                hasMsb = true;
+            }
+            case 98 -> {
+                currentLsb = data2;
+                hasLsb = true;
+            }
+            case 6 -> {
+                currentValueMsb = data2;
+                hasValueMsb = true;
+            }
+            case 38 -> {
+                currentValueLsb = data2;
+                hasValueLsb = true;
+            }
+        }
+
+        if (hasMsb && hasLsb && hasValueMsb) {
+            int value = (currentValueMsb << 7) | (hasValueLsb ? currentValueLsb : 0);
+            handleValue(value);
+
+            // Reset
+            hasMsb = hasLsb = hasValueMsb = hasValueLsb = false;
+            currentMsb = currentLsb = currentValueMsb = currentValueLsb = -1;
+        }
+    }
+
 
     private void handleValue(int value) {
         if (currentMsb < 0 || currentLsb < 0) return;
