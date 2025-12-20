@@ -60,6 +60,7 @@ async function buildpage() {
   const faderlsb = body.dataset.faderlsb || "0";
 
   const URL = `http://${window.location.host}/MidiControl/buildpage?coarse=${fadermsb}&fine=${faderlsb}`;
+
   try {
     const response = await fetch(URL);
     const html = await response.text();
@@ -68,23 +69,34 @@ async function buildpage() {
       document.getElementById("ch-levels").innerHTML = html;
       console.log("Fader HTML injected:", html);
 
-      const elements = document.getElementsByClassName("fader");
-      for (let element of elements) {
-        console.log("Fader ID:", element.id);
-      }
-      injectOutputFaders()
+      injectOutputFaders();     // <-- output faders now exist
+      restoreFaderState();      // <-- safe now
+      colorFaderMarkers();      // <-- safe now
 
-      restoreFaderState() // automatic rehydration
-      document.getElementById("restoreState").disabled = false; //enable the restore button now the page has loaded
-      document.getElementById("restoreState").addEventListener("click", restoreFaderState); // start listening to the button
-      console.log("Restored saved states")
+      // Attach fader listeners AFTER injection
+      document.querySelectorAll("input[type=range].fader").forEach(fader => {
+        fader.addEventListener("input", e => {
+          const channelIndex = parseInt(e.target.dataset.channelIndex, 10);
+          const step = parseInt(e.target.value, 10);
+          updateFader(channelIndex, step);
+
+          const normValue = Math.round((step / 127) * 16383);
+          socket.send(JSON.stringify({
+            type: "nrpnUpdate",
+            channelIndex,
+            value: normValue
+          }));
+        });
+      });
+
+      document.getElementById("restoreState").disabled = false;
+      document.getElementById("restoreState").addEventListener("click", restoreFaderState);
     }
   } catch (err) {
     console.error("Error loading fader layout:", err);
   }
 }
-     
-    
+
 async function selectDevice(){
     const URL='http://'+window.location.host+'/MidiControl/devices';
     const Res= fetch(URL);
@@ -182,7 +194,7 @@ document.querySelectorAll("input[type=range].fader").forEach(fader => {
         }));
     });
 });
-    
+
 // function handleNrpnUpdate(update) {
 //   if (IS_DEBUG){console.debug("handleNrpnUpdate called with:", update);}
 //   const { msb, lsb, value } = update;
@@ -285,9 +297,4 @@ function handleFaderUpdate(update) {
   }
 
   saveFaderState(msb, lsb, step);
-}
-
-function saveFaderState(msb, lsb, value) {
-  const key = `fader-${msb}-${lsb}`;
-  localStorage.setItem(key, value);
 }

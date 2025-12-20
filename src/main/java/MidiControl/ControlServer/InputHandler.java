@@ -1,5 +1,7 @@
 package MidiControl.ControlServer;
 import java.util.Arrays;
+
+import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.SysexMessage;
@@ -15,7 +17,7 @@ public class InputHandler {
         InputHandler.nrpnParser = nrpnParser;
     }
     
-    public Object handle(MidiMessage msg) {
+    public Object handle(MidiMessage msg){
         if (nrpnParser == null) {
             throw new IllegalStateException("NrpnParser not initialized");
         }
@@ -26,6 +28,22 @@ public class InputHandler {
                 sm.getCommand(), sm.getData1(), sm.getData2()
             ));
             return sm;
+        }
+
+        if (msg.getMessage()[0] == ShortMessage.CONTROL_CHANGE){
+            ShortMessage controlChange = new ShortMessage();
+            if (msg.getMessage().length < 3) {
+                logger.warning("Control Change message too short: " + Arrays.toString(msg.getMessage()));
+                return null;
+            }
+            try {
+                controlChange.setMessage(msg.getMessage()[0], msg.getMessage()[1], msg.getMessage()[2]);
+            } catch (InvalidMidiDataException e) {
+                logger.log(Level.SEVERE, "Invalid MIDI data in Control Change message: " + Arrays.toString(msg.getMessage()), e);
+                return null;
+            }
+            logger.info("Valid Control Message "+controlChange.getData1() + " " + controlChange.getData2());
+            return controlChange;
         }
 
         if (msg instanceof SysexMessage sysex) {

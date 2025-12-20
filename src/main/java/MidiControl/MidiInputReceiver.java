@@ -3,6 +3,9 @@ package MidiControl;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
 
+import MidiControl.ControlServer.InputHandler;
+import MidiControl.SysexUtils.SysexParser;
+
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
@@ -31,6 +34,6 @@ public class MidiInputReceiver implements Receiver {
             return;
         }
         if (open) inputBuffer.add(message);
-        logger.info("Added to inputBuffer: " + Arrays.toString(message.getMessage()));
+        logger.info("Added to inputBuffer: " + SysexParser.bytesToHex(message.getMessage()));
     }
 }

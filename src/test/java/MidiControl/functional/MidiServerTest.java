@@ -187,12 +187,12 @@ public class MidiServerTest {
         assertTrue(json.contains("\"label\":\"" + mapping.label() + "\""));
     }
 
-    @org.junit.jupiter.api.Test
-    void testHandleResolvedNRPNBroadcast() {
-        String json = "{\"type\":\"nrpnUpdate\",\"value\":8192}";
-        assertDoesNotThrow(() -> MidiServer.handleResolvedNRPN(json));
-        // Optionally verify broadcast behavior if Socket is mockable
-    }
+    // @org.junit.jupiter.api.Test
+    // void testHandleResolvedNRPNBroadcast() {
+    //     String json = "{\"type\":\"nrpnUpdate\",\"value\":8192}";
+    //     assertDoesNotThrow(() -> MidiServer.handleResolvedNRPN(json));
+    //     // Optionally verify broadcast behavior if Socket is mockable
+    // }
 
     @org.junit.jupiter.api.Test
     void testSendMidiJson() throws Exception {

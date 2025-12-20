@@ -44,7 +44,7 @@ public class SysexMappingLoader {
     public static List<SysexMapping> loadAllMappings() {
         List<String> mappingFiles = Arrays.asList(
             "MidiControl/01V96i_sysex_mappings.json",
-            "MidiControl/M7CL_sysex_mappings.json"
+            "MidiControl/m7cl_sysex_mappings.json"
             // add more consoles here later
         );
 
@@ -53,18 +53,5 @@ public class SysexMappingLoader {
             all.addAll(loadMappingsFromResource(file));
         }
         return all;
-    }
-
-    public static List<SysexMapping> loadDebugSubset() {
-        List<SysexMapping> all = loadMappingsFromResource("MidiControl/01V96i_sysex_mappings.json");
-
-        return all.stream()
-            .filter(m -> {
-                List<Object> fmt = m.getParameter_change_format();
-                int group = ((Number) fmt.get(5)).intValue();
-                int param = ((Number) fmt.get(6)).intValue();
-                return group == 0x01 && param == 0x1C; // Input Fader
-            })
-            .toList();
     }
 }

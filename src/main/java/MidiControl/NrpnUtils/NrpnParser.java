@@ -6,6 +6,7 @@ import javax.sound.midi.ShortMessage;
 
 public class NrpnParser {
     private final NrpnRegistry registry = NrpnRegistry.getInstance();
+    private final Logger logger = Logger.getLogger(NrpnParser.class.getName());
     
     private int currentMsb = -1;
     private int currentLsb = -1;
@@ -74,6 +75,7 @@ public class NrpnParser {
         }
 
         if (hasMsb && hasLsb && hasValueMsb) {
+            logger.fine("Valid Nrpn received " + currentMsb + " " + currentLsb);
             int value = (currentValueMsb << 7) | (hasValueLsb ? currentValueLsb : 0);
             handleValue(value);
 
@@ -92,23 +94,19 @@ public class NrpnParser {
             var mapping = resolved.get();
 
             if (dispatchTarget != null) {
-                Logger.getLogger(NrpnParser.class.getName()).log(Level.INFO,
-                    String.format("Dispatching NRPN: %s, Value=%d", mapping.channelIndex(), value));
+                logger.info(String.format("Dispatching NRPN: %s, Value=%d", mapping.channelIndex(), value));
                 dispatchTarget.handleResolvedNRPN(mapping, value);
             }
             else {
-                Logger.getLogger(NrpnParser.class.getName()).log(Level.WARNING,
-                    "Dispatch target not set. Cannot dispatch NRPN.");
+                logger.warning("Dispatch target not set. Cannot dispatch NRPN.");
             }
 
-            Logger.getLogger(NrpnParser.class.getName()).log(Level.INFO,
-                String.format("Resolved NRPN: %s, Value=%d", mapping.channelIndex(), value));
+            logger.info(String.format("Resolved NRPN:Channel %s, Value=%d", mapping.channelIndex(), value));
         }
     
             
         else {
-            Logger.getLogger(NrpnParser.class.getName()).log(Level.WARNING,
-                String.format("Unknown NRPN: MSB=0x%02X, LSB=0x%02X, Value=%d", currentMsb, currentLsb, value));
+            logger.warning(String.format("Unknown NRPN: MSB=0x%02X, LSB=0x%02X, Value=%d", currentMsb, currentLsb, value));
         }
 
         // Reset after handling
