@@ -34,6 +34,7 @@ function injectOutputFaders() {
     div.appendChild(valueEl);
   });
   injectOutputFaderToggle();
+  colorFaderMarkers();
 }
 
 function injectOutputFaderToggle(){
@@ -52,6 +53,7 @@ function setFaderMarker(faderElement, color) {
 // Usage
 function colorFaderMarkers() {
   document.querySelectorAll('.fader').forEach(fader => {
+    if (!fader.dataset.msb) return;  // <-- guard
     const msb = parseInt(fader.dataset.msb, 10);
     if (msb >= 0x30 && msb <= 0x3F) {
       setFaderMarker(fader, 'red');
@@ -62,5 +64,3 @@ function colorFaderMarkers() {
     }
   });
 }
-
-colorFaderMarkers();

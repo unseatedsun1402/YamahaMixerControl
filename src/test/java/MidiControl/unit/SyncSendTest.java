@@ -7,6 +7,7 @@ import MidiControl.MidiServer;
 import MidiControl.SyncSend;
 import MidiControl.Mocks.MockMidiOutput;
 
+import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
 
 import java.util.logging.*;
@@ -19,7 +20,7 @@ public class SyncSendTest {
     @org.junit.jupiter.api.Test
     public void testSyncSendDispatchesMidiMessages() throws Exception {
         // Arrange
-        ConcurrentLinkedQueue<ShortMessage[]> buffer = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<MidiMessage[]> buffer = new ConcurrentLinkedQueue<>();
         MockMidiOutput mockOutput = new MockMidiOutput();
 
         ShortMessage msg1 = new ShortMessage();
@@ -52,8 +53,8 @@ public class SyncSendTest {
 
         // Assert
         assertEquals(2, mockOutput.getSentMessages().size(), "Expected 2 MIDI messages to be sent");
-        assertEquals(ShortMessage.CONTROL_CHANGE, mockOutput.getSentMessages().get(0).getCommand());
-        assertEquals(ShortMessage.NOTE_ON, mockOutput.getSentMessages().get(1).getCommand());
+        assertEquals(ShortMessage.CONTROL_CHANGE, (mockOutput.getSentMessages().get(0).getMessage()[0] & 0xFF));
+        assertEquals(ShortMessage.NOTE_ON, (mockOutput.getSentMessages().get(1).getMessage()[0] & 0xFF));
     }
 }
 

@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,10 +13,7 @@ import jakarta.websocket.OnClose;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
-/**
- *
- * @author ethanblood
- */
+
 @jakarta.websocket.server.ServerEndpoint("/endpoint")
 public class Socket {
     private static final Set<Session> sessions = ConcurrentHashMap.newKeySet();
@@ -23,32 +21,35 @@ public class Socket {
     private static final MidiServer ms = new MidiServer();
     private static Thread listener = null;
     private static Thread sendThread = null;
+    private static Logger logger = Logger.getLogger(Socket.class.getName());
+    public static Consumer<String> testBroadcastHook = null;
 
     public synchronized MidiServer getServer() {
         if (listener == null) {
             listener = new Thread(ms);
             listener.start();
-            Logger.getLogger(Socket.class.getName()).log(Level.INFO, "MidiServer thread created and started from socket.");
+            logger.info( "MidiServer thread created and started from socket.");
         } else if (!listener.isAlive()) {
-            Logger.getLogger(Socket.class.getName()).log(Level.WARNING, "MidiServer thread exists but is not alive. Not restarting.");
+            logger.warning("MidiServer thread exists but is not alive. Not restarting.");
         } else {
-            Logger.getLogger(Socket.class.getName()).log(Level.INFO, "MidiServer thread already running.");
+            logger.info("MidiServer thread already running.");
         }
 
         NrpnParser.setDispatchTarget(ms);
+        logger.info("NrpnParser dispatch target set.");
 
         if (MidiServer.midiOut != null) {
             SyncSend sender = new SyncSend(MidiServer.outputBuffer);
             sendThread = new Thread(sender);
             sendThread.start();
-            Logger.getLogger(Socket.class.getName()).log(Level.INFO, "SyncSend thread started from socket.");
+            logger.info("SyncSend thread started from socket.");
         } else {
-            Logger.getLogger(Socket.class.getName()).log(Level.WARNING,"Output device (midiOut) is null — SyncSend not started.");
-            Logger.getLogger(Socket.class.getName()).log(Level.INFO,"Input device (midiIn) transmitter attached: " + (MidiServer.midiIn != null));
+            logger.warning("Output device (midiOut) is null — SyncSend not started.");
+            logger.info("Input device (midiIn) transmitter attached: " + (MidiServer.midiIn != null));
 
 
         }
-            Logger.getLogger(Socket.class.getName()).log(Level.INFO, "SyncSend thread already running.");
+            logger.info("SyncSend thread already running.");
         return ms;
     }
     
@@ -56,17 +57,17 @@ public class Socket {
     public void onOpen(Session session) {
         sessions.add(session);
         sceneMap.put(session, "default");
-        System.out.println("Client connected: " + session.getId());
+        logger.info("Client connected: " + session.getId());
 
         getServer(); // This now starts the thread if needed
-        Logger.getLogger(Socket.class.getName()).log(java.util.logging.Level.INFO, "MidiServer is active.");
+        logger.info("MidiServer is active.");
     }
 
     @OnClose
     public void onClose(Session session) {
         sessions.remove(session);
         sceneMap.remove(session);
-        System.out.println("Client disconnected: " + session.getId());
+        logger.info("Client "+ session.getId() + " disconnected");
     }
     
     
@@ -76,8 +77,7 @@ public class Socket {
         try {
             MidiServer.bufferMidi(message);
         } catch (Exception e) {
-            System.out.println("Error in bufferMidi:");
-            e.printStackTrace();
+            logger.severe("Error: buffer midi failed to process message from GUI: " + e.getMessage());
         }
         return message;
     }
@@ -99,16 +99,26 @@ public class Socket {
     }
 
     public static void broadcast(String message) {
-    for (Session session : sessions) {
-        if (session.isOpen()) {
-            try {
-                Logger.getLogger(Socket.class.getName()).log(Level.FINE, "Broadcasting message to session " + session.getId() + ": " + message);
-                session.getBasicRemote().sendText(message);
-            } catch (IOException e) {
-                Logger.getLogger(Socket.class.getName()).log(Level.SEVERE, new String("Error broadcasting to session " + session.getId() + " "+ e.getClass().getName() + ": " + e.getMessage()));
-                e.printStackTrace();
+        logger.info("Broadcasting message: "+ message);
+        // Test hook: if set, bypass WebSocket and capture the message
+        if (testBroadcastHook != null) {
+            logger.fine("Test broadcast hook is set. Bypassing WebSocket broadcast.");
+            testBroadcastHook.accept(message);
+            return;
+        }
+
+        // Production WebSocket broadcast
+        for (Session session : sessions) {
+            if (session.isOpen()) {
+                try {
+                    logger.fine("Broadcasting to session " + session.getId() + ": " + message);
+                    session.getBasicRemote().sendText(message);
+                } catch (IOException e) {
+                    logger.severe("Error broadcasting to session " + session.getId() + " "
+                            + e.getClass().getName() + ": " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }
     }
-}
 }

@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.sound.midi.MidiDevice.Info;
+import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiSystem;
-import javax.sound.midi.ShortMessage;
 
 import MidiControl.MidiDeviceManager.MidiOutput;
 
 public class MockMidiOutput implements MidiOutput {
-    private final List<ShortMessage> sentMessages = new ArrayList<>();
+    private final List<MidiMessage> sentMessages = new ArrayList<>();
 
     @Override
-    public void sendMessage(ShortMessage message) {
-        sentMessages.add(message);
+    public void sendMessage(MidiMessage message) {
+        sentMessages.add((MidiMessage) message);
     }
 
-    public List<ShortMessage> getSentMessages() {
+    public List<MidiMessage> getSentMessages() {
         return sentMessages;
     }
 

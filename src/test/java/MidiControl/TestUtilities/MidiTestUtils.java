@@ -1,6 +1,7 @@
 package MidiControl.TestUtilities;
 
 import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
 
 import com.google.gson.JsonSyntaxException;
@@ -55,5 +56,10 @@ public class MidiTestUtils {
         } catch (JsonSyntaxException e) {
             return false;
         }
+    }
+
+    public static MidiMessage createSysexMessage(byte[] message) throws InvalidMidiDataException {
+        MidiMessage sysex = new javax.sound.midi.SysexMessage(message, message.length);
+        return sysex;
     }
 }

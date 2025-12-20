@@ -1,105 +1,67 @@
 package MidiControl.SysexUtils;
 
-import java.util.*;
 import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SysexRegistry {
-    private final List<SysexMapping> mappings;
-    private final Map<Integer, List<SysexMapping>> byControlId = new HashMap<>();
     private final Logger log = Logger.getLogger(this.getClass().getName());
-    private final int MATCH_LENGTH = 11;
+    private final List<SysexMapping> mappings;
+
+    // model → key → list of mappings
+    private final Map<Integer, Map<Long, List<SysexMapping>>> modelTables = new HashMap<>();
 
     public SysexRegistry(List<SysexMapping> mappings) {
         this.mappings = mappings;
+        buildModelTables(mappings);
+    }
 
-        // Build index by controlId (byte 8 of the format)
+    private void buildModelTables(List<SysexMapping> mappings) {
         for (SysexMapping m : mappings) {
-            int controlId = m.getParameter_change_format().get(7) instanceof Number
-                    ? ((Number) m.getParameter_change_format().get(7)).intValue()
-                    : -1;
-            byControlId.computeIfAbsent(controlId, k -> new ArrayList<>()).add(m);
+            Long key = m.getKey(); // consume precomputed key directly
+            if (key == null) continue;
+
+            int model = (int) (key >>> 32); // top 8 bits = model_id
+
+            modelTables
+                .computeIfAbsent(model, k -> new HashMap<>())
+                .computeIfAbsent(key, k -> new ArrayList<>())
+                .add(m);
         }
     }
 
-    public SysexMapping resolve(byte[] message) {
-        // Length checks
-        if (message.length < 7) {
-            log.warning("Message too short: length=" + message.length);
-            return null;
-        }
-        if (message.length < 18) {
-            log.info("Message length " + message.length + " shorter than expected 18, skipping");
-            return null;
-        }
-        if (message.length > 18) {
-            log.info("Message length " + message.length + " longer than expected 18, skipping");
-            return null;
-        }
-
-        // Extract controlId from incoming message (byte 8)
-        int controlId = message[7] & 0xFF;
-        List<SysexMapping> candidates = byControlId.getOrDefault(controlId, Collections.emptyList());
-
-        // Only check candidates for this controlId
-        for (SysexMapping mapping : candidates) {
-            if (matchesFormat(message, mapping.getParameter_change_format())) {
-                return mapping;
-            }
-        }
-
-        log.info("No mapping matched for message: " + bytesToHex(message));
-        return null;
+    public List<SysexMapping> getMappings() {
+        return mappings;
     }
 
-    private String bytesToHex(byte[] message) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : message) {
-            sb.append(String.format("%02X", b));
-        }
-        return sb.toString();
-    }
+    public SysexMapping resolve(byte[] msg) {
+        if (msg.length < 10) return null;
+        if (msg[0] != (byte)0xF0) return null;
+        if (msg[1] != (byte)0x43) return null;
+        if (msg[msg.length - 1] != (byte)0xF7) return null;
 
-    private boolean matchesFormat(byte[] message, List<Object> format) {
-        int len = format.size();
-        if (message.length < len) return false;
+        // Build key from incoming message bytes 3–7
+        int model        = msg[3] & 0xFF;
+        int scope        = msg[4] & 0xFF;
+        int controlGroup = msg[5] & 0xFF;
+        int subControl   = msg[6] & 0xFF;
+        int param        = msg[7] & 0xFF;
 
-        int[] expected_bytes = new int[len];
-        boolean[] wildcard = new boolean[len];
-        boolean[] nibble = new boolean[len];
+        long key = ((long) model << 32)
+                 | ((long) scope << 24)
+                 | ((long) controlGroup << 16)
+                 | ((long) subControl << 8)
+                 | (long) param;
 
-        for (int i = 0; i < len; i++) {
-            Object f = format.get(i);
-            if (f instanceof Number) {
-                expected_bytes[i] = ((Number) f).intValue();
-            } else if ("1n".equals(f)) {
-                nibble[i] = true;
-            } else if ("3n".equals(f)) {
-                nibble[i] = true;
-            } else if ("dd".equals(f) || "cc".equals(f)) {
-                wildcard[i] = true;
-            } else {
-                return false; // unknown token
-            }
-        }
+        Map<Long, List<SysexMapping>> table = modelTables.get(model);
+        if (table == null) return null;
 
-        int[] actual_bytes = new int[len];
-        for (int i = 0; i < len; i++) {
-            actual_bytes[i] = message[i] & 0xFF;
-        }
-        for (int i = 0; i < MATCH_LENGTH; i++) {
-            if (wildcard[i]) continue;
+        List<SysexMapping> candidates = table.get(key);
+        if (candidates == null || candidates.isEmpty()) return null;
 
-            int actual = actual_bytes[i];
-            int masked = actual & 0xF0;
-
-            if (nibble[i]) {
-                if (masked != 0x10 && masked != 0x30) return false;
-                // if it matches, keep going
-            } else {
-                if (actual != expected_bytes[i]) return false;
-            }
-        }
-
-        return (message[len - 1] & 0xFF) == 0xF7;
+        // Return the first mapping for this control type
+        return candidates.get(0);
     }
 }

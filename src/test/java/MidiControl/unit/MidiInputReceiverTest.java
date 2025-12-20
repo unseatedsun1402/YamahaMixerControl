@@ -17,7 +17,8 @@ public class MidiInputReceiverTest {
     void testReceiverHandlesNullMessageGracefully() {
         ConcurrentLinkedQueue<MidiMessage> buffer = new ConcurrentLinkedQueue<>();
         MidiInputReceiver receiver = new MidiInputReceiver(buffer);
-        assertDoesNotThrow(() -> receiver.send(null, -1), "Receiver should not throw on null message");
+        receiver.send(null, -1);
+        // assertDoesNotThrow(() -> receiver.send(null, -1), "Receiver should not throw on null message");
         assertTrue(buffer.isEmpty(), "Buffer should remain empty on null input");
         receiver.close();
     }

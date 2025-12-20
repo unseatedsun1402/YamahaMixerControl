@@ -4,7 +4,7 @@ import java.util.logging.Logger;
 
 public class SysexParser {
     private static final SysexRegistry registry =
-        new SysexRegistry(SysexMappingLoader.loadMappings());
+        new SysexRegistry(SysexMappingLoader.loadAllMappings());
 
     public static String processIncomingMidiMessage(byte[] message) {
         SysexMapping mapping = registry.resolve(message);
@@ -21,7 +21,7 @@ public class SysexParser {
     }
 
 
-    private static int extractValue(byte[] message) {
+    public static int extractValue(byte[] message) {
         return message[message.length - 2] & 0xFF;
     }
 
@@ -40,7 +40,7 @@ public class SysexParser {
         return message != null && message.length >= 2 && message[0] == (byte) 0xF0 && message[message.length - 1] == (byte) 0xF7;
     }
 
-    private static String bytesToHex(byte[] message) {
+    public static String bytesToHex(byte[] message) {
         StringBuilder sb = new StringBuilder();
         for (byte b : message) {
             sb.append(String.format("%02X", b));

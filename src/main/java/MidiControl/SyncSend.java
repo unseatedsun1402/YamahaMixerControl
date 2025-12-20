@@ -1,15 +1,14 @@
 package MidiControl;
 
-import javax.sound.midi.ShortMessage;
-
+import javax.sound.midi.MidiMessage;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SyncSend implements Runnable {
-    private final ConcurrentLinkedQueue<ShortMessage[]> buffer;
+    private final ConcurrentLinkedQueue<MidiMessage[]> buffer;
 
-    public SyncSend(ConcurrentLinkedQueue<ShortMessage[]> buffer) {
+    public SyncSend(ConcurrentLinkedQueue<MidiMessage[]> buffer) {
         this.buffer = buffer;
     }
 
@@ -18,18 +17,18 @@ public class SyncSend implements Runnable {
         Logger.getLogger(SyncSend.class.getName()).log(Level.INFO, "SyncSend thread started.", (Object) null);
 
         while (!Thread.currentThread().isInterrupted()) {
-            ShortMessage[] commands = buffer.poll();
+            MidiMessage[] commands = buffer.poll();
 
             if (commands != null && MidiServer.midiOut != null) {
                 Logger.getLogger(SyncSend.class.getName()).log(Level.FINE, "Buffer populated", (Object) null);
                 // Logger.getLogger(SyncSend.class.getName()).log(Level.INFO, "Processing the buffer and sending to the midi output device", (Object) null);
 
-                for (ShortMessage command : commands) {
+                for (MidiMessage databyte : commands) {
                     try {
-                        MidiServer.midiOut.sendMessage(command);
+                        MidiServer.midiOut.sendMessage(databyte);
                         Logger.getLogger(SyncSend.class.getName()).log(Level.FINE,
                             "Server sending midi event: " + MidiServer.midiOut.getClass().getSimpleName() + " " +
-                            command.getCommand() + " " + command.getData1() + " " + command.getData2(),
+                            databyte.getMessage()[0] + " " + databyte.getMessage()[1] + " " + databyte.getMessage()[2],
                             (Object) null);
                         Thread.sleep(2);
                     } catch (InterruptedException ex) {

@@ -1,12 +1,7 @@
 package MidiControl.unit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -36,21 +31,50 @@ public class SysexParserTest {
         // Assert that the parser resolves correctly
         assertEquals("kInputHA (kHAPhantom) = On", result);
     }
+
+    @org.junit.jupiter.api.Test
+    public void testProcessIncomingMidiMessage_InputFader() {
+        // Real failing SysEx message from hardware (channel 26 fader value 0x0314)
+        byte[] faderMsg = new byte[] {
+            (byte)0xF0, (byte)0x43, (byte)0x10, (byte)0x3E,
+            (byte)0x7F, (byte)0x01, (byte)0x1C, (byte)0x00,
+            (byte)0x1A, (byte)0x00, (byte)0x00, (byte)0x03,
+            (byte)0x14, (byte)0xF7
+        };
+
+        String result = SysexParser.processIncomingMidiMessage(faderMsg);
+        Logger.getLogger(SysexParserTest.class.getName()).info("Result: " + result);
+
+        // Assert that the parser resolves correctly
+        // Expected mapping name comes from your JSON ("kInputFader (kFader)")
+        // Value 0x0314 = 788 decimal
+        assertEquals("kInputFader (kFader) = 20", result);
+    }
+
     @Test
-    void testResolveValidMessageByStringJson() {
+    void testResolveValidMessageByStringJsonM7CL() {
         // Minimal JSON with one mapping
         String json = "[{"
         + "\"control_group\": \"kInputHA\","
         + "\"control_id\": 41,"
         + "\"sub_control\": \"kHAPhantom\","
-        + "\"channel_index\": 1,"
         + "\"value\": 0,"
         + "\"min_value\": 0,"
         + "\"max_value\": 1,"
         + "\"default_value\": 0,"
         + "\"comment\": \"Off, On\","
-        + "\"parameter_change_format\": [240,67,\"1n\",62,17,1,0,41,0,0,0,14,\"dd\",\"dd\",\"dd\",\"dd\",\"dd\",247],"
-        + "\"parameter_request_format\": [240,67,\"3n\",62,17,1,0,41,0,0,0,14,247]"
+        + "\"key\": 266573250601,"
+        + "\"parameter_change_format\": ["
+        + "240, 67, \"1n\", 62, 17, 1, 0, 41, 0, 0, "
+        + "\"cc\", \"cc\", "
+        + "\"dd\", \"dd\", \"dd\", \"dd\", \"dd\", "
+        + "247"
+        + "],"
+        + "\"parameter_request_format\": ["
+        + "240, 67, \"3n\", 62, 17, 1, 0, 41, 0, 0, "
+        + "\"cc\", \"cc\", "
+        + "247"
+        + "]"
         + "}]";
 
         // Load mapping from JSON
@@ -70,7 +94,7 @@ public class SysexParserTest {
 
         assertNotNull(result, "Expected mapping to be found");
         assertEquals("kInputHA", result.getControlGroup());
-    }
+    }    
 
     @Test
     void testResolveNoMatch() {
