@@ -42,9 +42,9 @@ public class MidiServerTest {
         } catch (Exception e) {
             org.junit.jupiter.api.Assertions.fail("Failed to create ShortMessage");
         }
-        int before = MidiServer.getBufferSize();
+        int before = MidiServer.getOutputBufferSize();
         MidiServer.addtosendqueue(commands);
-        int after = MidiServer.getBufferSize();
+        int after = MidiServer.getOutputBufferSize();
         org.junit.jupiter.api.Assertions.assertEquals(before + 1, after, "Buffer should have one more element after adding");
     }
 
@@ -60,6 +60,7 @@ public class MidiServerTest {
             }
             receiver.send(msg, -1);
             org.junit.jupiter.api.Assertions.assertFalse(inputBuffer.isEmpty(), "Input buffer should not be empty after receiving a message");
+            org.junit.jupiter.api.Assertions.assertEquals(1, inputBuffer.size(), "Input buffer should contain exactly one message");
             org.junit.jupiter.api.Assertions.assertEquals(msg, inputBuffer.poll(), "Received message should match sent message");
         }
     }
