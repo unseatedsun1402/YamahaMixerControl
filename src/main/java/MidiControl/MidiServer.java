@@ -49,7 +49,11 @@ public class MidiServer implements MidiInterface, NRPNDispatchTarget, Runnable {
         }
     }
 
-    public static int getBufferSize() {
+    public static int getInputBufferSize() {
+        return inputBuffer.size();
+    }
+
+    public static int getOutputBufferSize() {
         return outputBuffer.size();
     }
 
