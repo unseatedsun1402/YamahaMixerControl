@@ -1,61 +1,59 @@
 package MidiControl.unit;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import MidiControl.MidiServer;
-import MidiControl.SyncSend;
 import MidiControl.Mocks.MockMidiOutput;
-
+import MidiControl.SyncSend;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.*;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
-
-import java.util.logging.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Tag;
 
 @Tag("Unit")
 public class SyncSendTest {
 
-    @org.junit.jupiter.api.Test
-    public void testSyncSendDispatchesMidiMessages() throws Exception {
-        // Arrange
-        ConcurrentLinkedQueue<MidiMessage[]> buffer = new ConcurrentLinkedQueue<>();
-        MockMidiOutput mockOutput = new MockMidiOutput();
+  @org.junit.jupiter.api.Test
+  public void testSyncSendDispatchesMidiMessages() throws Exception {
+    // Arrange
+    ConcurrentLinkedQueue<MidiMessage[]> buffer = new ConcurrentLinkedQueue<>();
+    MockMidiOutput mockOutput = new MockMidiOutput();
 
-        ShortMessage msg1 = new ShortMessage();
-        msg1.setMessage(ShortMessage.CONTROL_CHANGE, 0, 7, 100);
-        ShortMessage msg2 = new ShortMessage();
-        msg2.setMessage(ShortMessage.NOTE_ON, 0, 60, 127);
+    ShortMessage msg1 = new ShortMessage();
+    msg1.setMessage(ShortMessage.CONTROL_CHANGE, 0, 7, 100);
+    ShortMessage msg2 = new ShortMessage();
+    msg2.setMessage(ShortMessage.NOTE_ON, 0, 60, 127);
 
-        buffer.add(new ShortMessage[]{msg1, msg2});
-        MidiServer.midiOut = mockOutput;
-        SyncSend sender = new SyncSend(buffer);
-        Thread thread = new Thread(sender);
+    buffer.add(new ShortMessage[] {msg1, msg2});
+    MidiServer.midiOut = mockOutput;
+    SyncSend sender = new SyncSend(buffer);
+    Thread thread = new Thread(sender);
 
-        // Act
-        thread.start();
+    // Act
+    thread.start();
 
-        // Wait for processing
-        int attempts = 0;
-        while (mockOutput.getSentMessages().size() < 2 && attempts < 10) {
-            Thread.sleep(10);
-            attempts++;
-        }
-
-        thread.interrupt();
-        try {
-            thread.join();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(SyncSend.class.getName()).log(Level.FINE, "SyncSend interrupted during join", ex);
-            Thread.currentThread().interrupt();
-        }
-
-        // Assert
-        assertEquals(2, mockOutput.getSentMessages().size(), "Expected 2 MIDI messages to be sent");
-        assertEquals(ShortMessage.CONTROL_CHANGE, (mockOutput.getSentMessages().get(0).getMessage()[0] & 0xFF));
-        assertEquals(ShortMessage.NOTE_ON, (mockOutput.getSentMessages().get(1).getMessage()[0] & 0xFF));
+    // Wait for processing
+    int attempts = 0;
+    while (mockOutput.getSentMessages().size() < 2 && attempts < 10) {
+      Thread.sleep(10);
+      attempts++;
     }
+
+    thread.interrupt();
+    try {
+      thread.join();
+    } catch (InterruptedException ex) {
+      Logger.getLogger(SyncSend.class.getName())
+          .log(Level.FINE, "SyncSend interrupted during join", ex);
+      Thread.currentThread().interrupt();
+    }
+
+    // Assert
+    assertEquals(2, mockOutput.getSentMessages().size(), "Expected 2 MIDI messages to be sent");
+    assertEquals(
+        ShortMessage.CONTROL_CHANGE, (mockOutput.getSentMessages().get(0).getMessage()[0] & 0xFF));
+    assertEquals(
+        ShortMessage.NOTE_ON, (mockOutput.getSentMessages().get(1).getMessage()[0] & 0xFF));
+  }
 }
-
-
