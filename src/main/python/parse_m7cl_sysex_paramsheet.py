@@ -1,7 +1,5 @@
-import json
-
 import xlrd
-
+import json
 
 def parse_sysex_table(xls_path, output_json):
     workbook = xlrd.open_workbook(xls_path)
@@ -41,7 +39,7 @@ def parse_sysex_table(xls_path, output_json):
 
         # Replace trailing zeros in change format with "dd" tokens
         if len(change_fmt) > 6 and change_fmt[-6] == 0:
-            change_fmt[-6:] = ["66", "dd", "dd", "dd", "dd", 247]
+            change_fmt[-6:] = ["66","dd", "dd", "dd", "dd", 247]
 
         # Ensure request format ends with F7
         if request_fmt and request_fmt[-1] != 247:
@@ -52,19 +50,17 @@ def parse_sysex_table(xls_path, output_json):
         if not fmt or len(fmt) < 8:
             continue
 
-        model = safe_int(fmt[3])
-        system_scope = safe_int(fmt[4])
+        model         = safe_int(fmt[3])
+        system_scope  = safe_int(fmt[4])
         control_group_val = safe_int(fmt[5])
-        sub_control_val = safe_int(fmt[6])
-        param = safe_int(fmt[7])
+        sub_control_val   = safe_int(fmt[6])
+        param         = safe_int(fmt[7])
 
-        key = (
-            (model << 32)
-            | (system_scope << 24)
-            | (control_group_val << 16)
-            | (sub_control_val << 8)
-            | param
-        )
+        key = ((model << 32) |
+               (system_scope << 24) |
+               (control_group_val << 16) |
+               (sub_control_val << 8) |
+               param)
 
         mapping = {
             "control_group": control_group or "UnknownElement",
@@ -77,7 +73,7 @@ def parse_sysex_table(xls_path, output_json):
             "comment": comment,
             "key": key,  # precomputed long key
             "parameter_change_format": change_fmt,
-            "parameter_request_format": request_fmt,
+            "parameter_request_format": request_fmt
         }
         mappings.append(mapping)
 
@@ -107,13 +103,11 @@ def parse_bytes(cells):
                     result.append(c_str)
     return result
 
-
 def safe_int(val):
     try:
         return int(val)
     except:
         return None
-
 
 # Example usage
 parse_sysex_table("ParamChangeList_V350_M7CL.xls", "m7cl_sysex_mappings.json")
