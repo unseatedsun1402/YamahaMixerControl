@@ -141,3 +141,175 @@ Fix the syntax error first, then re‑run.
 4. Commit  
 
 This keeps the codebase clean and consistent.
+
+# Python Code Formatting Guide
+
+This project uses **Black**, **isort**, and **Flake8** to ensure that all Python code is consistently formatted, import‑clean, and lint‑checked across all platforms (Windows, macOS, Linux).
+
+Formatting is **mandatory** for all contributions.
+
+---
+
+## Why we use these tools
+
+### **Black**
+- Deterministic, opinionated formatter  
+- Removes all style debates  
+- Makes diffs clean and predictable  
+
+### **isort**
+- Automatically sorts imports  
+- Groups standard library, third‑party, and local imports  
+- Prevents messy or inconsistent import blocks  
+
+### **Flake8**
+- Linting for unused variables, undefined names, spacing issues  
+- Helps catch real bugs early  
+- Enforces basic style consistency  
+
+Together, these tools give us a clean, readable, and maintainable Python codebase.
+
+---
+
+# 1. Installing the Tools
+
+Install all three tools with pip:
+
+```
+pip install black isort flake8
+```
+
+Or, if using a virtual environment:
+
+```
+python -m pip install black isort flake8
+```
+
+---
+
+# 2. Formatting a Single File
+
+### Black:
+```
+black path/to/file.py
+```
+
+### isort:
+```
+isort path/to/file.py
+```
+
+---
+
+# 3. Formatting the Entire Project
+
+### Black:
+```
+black .
+```
+
+### isort:
+```
+isort .
+```
+
+These commands recursively format all Python files in the project.
+
+---
+
+# 4. Linting the Project
+
+Run Flake8:
+
+```
+flake8 .
+```
+
+This will report:
+
+- unused imports  
+- undefined variables  
+- spacing issues  
+- overly long lines  
+- syntax errors  
+
+---
+
+# 5. Recommended Workflow
+
+1. Write code  
+2. Run `isort .`  
+3. Run `black .`  
+4. Run `flake8 .`  
+5. Commit  
+
+This ensures your code is clean, consistent, and passes linting before it enters the repository.
+
+---
+
+# 6. Editor Integration (Optional)
+
+### VS Code
+Install extensions:
+- **Black Formatter**
+- **isort**
+- **Flake8**
+
+Enable format‑on‑save.
+
+### PyCharm
+Black and isort can be configured as external tools or via plugins.
+
+### Vim / Neovim
+Use:
+
+```
+:%!black -
+```
+
+or integrate via ALE or null‑ls.
+
+---
+
+# 7. Pre‑Commit Hook (Optional)
+
+To enforce formatting automatically before every commit:
+
+Create `.git/hooks/pre-commit`:
+
+```bash
+#!/bin/sh
+isort .
+black .
+flake8 .
+```
+
+Make it executable:
+
+```
+chmod +x .git/hooks/pre-commit
+```
+
+---
+
+# 8. Common Issues
+
+### “Black reformatted X files”
+This is normal — Black rewrites files to match its style.
+
+### “Flake8: E501 line too long”
+Black does not enforce line length on comments or strings.  
+You can adjust Flake8’s max line length in `setup.cfg` if needed.
+
+### “Import order errors”
+Run `isort .` again.
+
+---
+
+# 9. Summary
+
+- **Black** → formats code  
+- **isort** → sorts imports  
+- **Flake8** → linting and error detection  
+
+Run all three before committing to keep the codebase clean and consistent.
