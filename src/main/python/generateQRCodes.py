@@ -1,9 +1,11 @@
 # requires Pillow, qrcode
 
-import qrcode
-import socket
 import glob
+import socket
 from pathlib import Path
+
+import qrcode
+
 
 # Detect current LAN IP
 def get_lan_ip():
@@ -14,6 +16,7 @@ def get_lan_ip():
     finally:
         s.close()
     return ip
+
 
 # Base project root (two levels up from this script)
 project_root = Path(__file__).resolve().parents[1]

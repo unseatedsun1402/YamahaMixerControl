@@ -1,6 +1,7 @@
 import json
 from collections import defaultdict
 
+
 def summarize_sysex(json_path):
     with open(json_path, "r") as f:
         data = json.load(f)
@@ -48,7 +49,9 @@ def summarize_sysex(json_path):
         print(f"  {group}: {count} controls")
 
     print("\nTop 5 largest sub-controls:")
-    for (group, sub), count in sorted(subcontrol_counts.items(), key=lambda x: -x[1])[:5]:
+    for (group, sub), count in sorted(subcontrol_counts.items(), key=lambda x: -x[1])[
+        :5
+    ]:
         print(f"  {group}/{sub}: {count} channels")
 
     print("\nMissing values:")
@@ -73,6 +76,7 @@ def summarize_sysex(json_path):
             top_group_names.remove(entry["name"])
             if not top_group_names:
                 break
+
 
 # Example usage
 summarize_sysex("sysex_mappings.json")

@@ -1,8 +1,17 @@
 import json
 
-def build_mapping(name, control_id, channel_index, comment,
-                  model_id=62, addr_bytes=[17, 1, 0, 41],
-                  min_value=0, max_value=1, default_value=0):
+
+def build_mapping(
+    name,
+    control_id,
+    channel_index,
+    comment,
+    model_id=62,
+    addr_bytes=[17, 1, 0, 41],
+    min_value=0,
+    max_value=1,
+    default_value=0,
+):
     """
     Build a JSON mapping entry for a given control and channel.
     - name: parameter group (e.g. "kInputHA")
@@ -33,14 +42,21 @@ def build_mapping(name, control_id, channel_index, comment,
         "default_value": default_value,
         "comment": comment,
         "parameter_change_format": parameter_change_format,
-        "parameter_request_format": parameter_request_format
+        "parameter_request_format": parameter_request_format,
     }
 
 
-def generate_all_channels(name, control_id, comment,
-                          model_id=62, addr_bytes=[17, 1, 0, 41],
-                          min_value=0, max_value=1, default_value=0,
-                          max_channel=56):
+def generate_all_channels(
+    name,
+    control_id,
+    comment,
+    model_id=62,
+    addr_bytes=[17, 1, 0, 41],
+    min_value=0,
+    max_value=1,
+    default_value=0,
+    max_channel=56,
+):
     """
     Generate mappings for all channels from 1 to max_channel.
     """
@@ -55,7 +71,7 @@ def generate_all_channels(name, control_id, comment,
             addr_bytes=addr_bytes,
             min_value=min_value,
             max_value=max_value,
-            default_value=default_value
+            default_value=default_value,
         )
         entries.append(entry)
     return entries
@@ -63,10 +79,7 @@ def generate_all_channels(name, control_id, comment,
 
 # Example: generate Phantom Power mappings for channels 1–64
 phantom_entries = generate_all_channels(
-    name="kInputHA",
-    control_id="kHAPhantom",
-    comment="Off, On",
-    max_channel=64
+    name="kInputHA", control_id="kHAPhantom", comment="Off, On", max_channel=64
 )
 
 # Save to JSON file
