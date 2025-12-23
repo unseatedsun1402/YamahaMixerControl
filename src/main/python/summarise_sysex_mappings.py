@@ -20,7 +20,7 @@ def summarize_sysex(json_path):
     for entry in data:
         total_controls += 1
 
-        group_name = entry.get("name", "Unknown")
+        group_name = entry.get("control_group", "Unknown")
         sub_control = entry.get("sub_control", "Unknown")
 
         group_counts[group_name] += 1
@@ -70,13 +70,13 @@ def summarize_sysex(json_path):
     top_group_names = {g for g, _ in top_groups}
 
     for entry in data:
-        if entry["name"] in top_group_names:
-            print(f"\nSample entry for group {entry['name']}:")
+        if entry["control_group"] in top_group_names:
+            print(f"\nSample entry for group {entry['control_group']}:")
             print(json.dumps(entry, indent=2))
-            top_group_names.remove(entry["name"])
+            top_group_names.remove(entry["control_group"])
             if not top_group_names:
                 break
 
 
 # Example usage
-summarize_sysex("sysex_mappings.json")
+summarize_sysex("m7cl_sysex_mappings.json")
