@@ -1,100 +1,91 @@
 package MidiControl;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.sound.midi.MidiDevice;
-import javax.sound.midi.MidiUnavailableException;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiUnavailableException;
 
-
-/**
- *
- * @author ethanblood
- */
+/** @author ethanblood */
 public class GetDevices extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            try {
-                out.println("<select id=\"midi-select\">");
-                out.println("<label for=\"midi-select\">Select Midi Output Device</label>");
-                var devices = MidiInterface.discoverDevices();
+  /**
+   * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+   *
+   * @param request servlet request
+   * @param response servlet response
+   * @throws ServletException if a servlet-specific error occurs
+   * @throws IOException if an I/O error occurs
+   */
+  protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+      throws ServletException, IOException {
+    response.setContentType("text/html;charset=UTF-8");
+    try (PrintWriter out = response.getWriter()) {
+      try {
+        out.println("<select id=\"midi-select\">");
+        out.println("<label for=\"midi-select\">Select Midi Output Device</label>");
+        var devices = MidiInterface.discoverDevices();
 
-                int count = 0;
-                for(MidiDevice.Info info : devices)
-                {   
-                    int isout = javax.sound.midi.MidiSystem.getMidiDevice(info).getMaxReceivers();
-                    if(isout != 0)
-                    {
-                        out.println("<option value=\""+count+"\">"+info.getName()+" - MIDI OUT</option>");
-                    }
-                    count ++;
-                }
-                out.println("</select>");
-                out.println("<button onclick=doSet()>Set Output Device</button>");
-                System.out.println("Loaded output devices");
-            } catch (MidiUnavailableException ex) 
-            {
-                Logger.getLogger(GetDevices.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        int count = 0;
+        for (MidiDevice.Info info : devices) {
+          int isout = javax.sound.midi.MidiSystem.getMidiDevice(info).getMaxReceivers();
+          if (isout != 0) {
+            out.println(
+                "<option value=\"" + count + "\">" + info.getName() + " - MIDI OUT</option>");
+          }
+          count++;
         }
+        out.println("</select>");
+        out.println("<button onclick=doSet()>Set Output Device</button>");
+        System.out.println("Loaded output devices");
+      } catch (MidiUnavailableException ex) {
+        Logger.getLogger(GetDevices.class.getName()).log(Level.SEVERE, null, ex);
+      }
     }
+  }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+  // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the
+  // left to edit the code.">
+  /**
+   * Handles the HTTP <code>GET</code> method.
+   *
+   * @param request servlet request
+   * @param response servlet response
+   * @throws ServletException if a servlet-specific error occurs
+   * @throws IOException if an I/O error occurs
+   */
+  @Override
+  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+      throws ServletException, IOException {
+    processRequest(request, response);
+  }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+  /**
+   * Handles the HTTP <code>POST</code> method.
+   *
+   * @param request servlet request
+   * @param response servlet response
+   * @throws ServletException if a servlet-specific error occurs
+   * @throws IOException if an I/O error occurs
+   */
+  @Override
+  protected void doPost(HttpServletRequest request, HttpServletResponse response)
+      throws ServletException, IOException {
+    processRequest(request, response);
+  }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "This servlet returns a list of available midi devices";
-    }// </editor-fold>
-
+  /**
+   * Returns a short description of the servlet.
+   *
+   * @return a String containing servlet description
+   */
+  @Override
+  public String getServletInfo() {
+    return "This servlet returns a list of available midi devices";
+  } // </editor-fold>
 }
