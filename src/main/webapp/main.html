@@ -1,43 +1,67 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Select Midi Device</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="css/style.css"/>
-        <link rel="stylesheet" href="css/fader-style.css"/>
-        <link rel="stylesheet" href="css/responsive-style.css"/>
-    </head>
-    <script src="js/fader-inject.js"></script>
-    <script src="js/midi-gui.js"></script>
-    <script src="js/client.js"></script>
-    <body data-fadermsb="0" data-faderlsb="0">
-        <div class="selector-wrapper">
-            <div class="device-row">
-                <div id="midiDevice" style="text-align: center">Selection Goes Here</div>
-                <div id="selected"></div>
-            </div>
-            <div class="device-row">
-                <div id="midiInputDevice" style="text-align: center">Input Selection Goes Here</div>
-                <div id="selectedInput"></div>
-            </div>
-        </div>
-        <script>
-            if (document.getElementById('midiDevice') != null){
-            selectDevice();
-            selectInputDevice();  
-            }
-            else {
-                console.log("No MIDI device selection needed on this page.");
-            }
-        </script>
-        <button onClick="location.href= 'http://'+window.location.host+'/MidiControl/changechannelnames.html';">Change a name</button>
-        <div id="ch-levels"></div>
-        <div class="output-fader-wrapper">
-        <div id="output-fader-panel">
-        <div class="output-fader" data-fadermsb="0" data-faderlsb="125" data-label="Master" data-channelindex="1">
-        </div>
-        </div>
-        <button id="toggle-output-panel">Toggle Output Faders</button></div>
-    </body>
+<head>
+    <title>MidiControl UI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Existing styles -->
+    <!--link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/fader-style.css"/>
+    <link rel="stylesheet" href="css/responsive-style.css"/-->
+
+    <!-- New Styles -->
+    <!--link rel="stylesheet" href="css/channel-strip.css"/>
+    <link rel="stylesheet" href="css/responsive-layer.css"/>
+    <link rel="stylesheet" href="css/section-headers.css"/>
+    <link rel="stylesheet" href="css/button.css"/>
+    <link rel="stylesheet" href="css/fader-styling.css"/>
+    <link rel="stylesheet" href="css/number-control.css"/>
+    <link rel="stylesheet" href="css/label-styling.css"/-->
+    <link rel="stylesheet" href="css/basic-view-style.css"/>
+
+    <script type="module" src="js/websocketClient.js"></script>
+
+    <script type="module" src="js/uiRenderer.js"></script>
+
+    <script type="module">
+    import { WebSocketClient } from './js/websocketClient.js';
+    import { renderUiModel } from './js/uiRenderer.js';
+
+    console.log(">>> bootstrap script running <<<");
+
+    // Create the client
+    const contextPath = window.location.pathname.split('/')[1];
+    const wsUrl = `ws://${location.host}/${contextPath}/endpoint`;
+
+    const ws = new WebSocketClient(wsUrl);
+
+    // Register handlers
+    ws.on("connected", () => {
+        console.log("[Bootstrap] Connected — requesting UI model");
+        ws.requestUiModel("channel.1");
+        ws.subscribe("channel.1");
+    });
+
+    ws.on("ui-model", (msg) => {
+        console.log("[Bootstrap] UI model received:", msg);
+        const model = msg.payload.model;
+        renderUiModel(model);
+    });
+
+    ws.on("error", (err) => {
+        console.error("[Bootstrap] Error from server:", err);
+    });
+
+    // Start the connection
+    ws.connect();
+
+    // Expose for debugging
+    window.wsClient = ws;
+</script>
+</head>
+
+<body>
+    <div id="ui-root">Loading UI…</div>
+</body>
 </html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Server Settings</title>
+    <link rel="stylesheet" href="css/setting-style.css">
+    <script type="module" src="js/settings.js"></script>
+</head>
+
+<body>
+
+    <header class="page-header">
+        <h1>MIDI Settings</h1>
+        <nav>
+            <a href="/">Back to Console</a>
+        </nav>
+    </header>
+
+    <main class="settings-container">
+
+        <!-- LEFT COLUMN -->
+        <section class="settings-column">
+
+            <!-- DEVICE SELECTION -->
+            <section class="settings-card">
+                <h2>Devices</h2>
+
+                <label>
+                    MIDI Input Device
+                    <select id="midi-input-device"></select>
+                </label>
+
+                <label>
+                    MIDI Output Device
+                    <select id="midi-output-device"></select>
+                </label>
+
+                <button id="rescan-devices">Rescan Devices</button>
+            </section>
+
+            <!-- ROUTING -->
+            <section class="settings-card">
+                <h2>Routing</h2>
+
+                <label>
+                    Input Channel
+                    <select id="input-channel">
+                        <option value="omni">Omni</option>
+                        <option value="0">Channel 01</option>
+                        <option value="1">Channel 02</option>
+                        <option value="2">Channel 03</option>
+                        <option value="3">Channel 04</option>
+                        <option value="4">Channel 05</option>
+                        <option value="5">Channel 06</option>
+                        <option value="6">Channel 07</option>
+                        <option value="7">Channel 08</option>
+                        <option value="8">Channel 09</option>
+                        <option value="9">Channel 10</option>
+                        <option value="10">Channel 11</option>
+                        <option value="11">Channel 12</option>
+                        <option value="12">Channel 13</option>
+                        <option value="13">Channel 14</option>
+                        <option value="14">Channel 15</option>
+                        <option value="15">Channel 16</option>
+                    </select>
+                </label>
+
+                <label>
+                    Output Channel
+                    <select id="output-channel">
+                        <option value="0">Channel 01</option>
+                        <option value="1">Channel 02</option>
+                        <option value="2">Channel 03</option>
+                        <option value="3">Channel 04</option>
+                        <option value="4">Channel 05</option>
+                        <option value="5">Channel 06</option>
+                        <option value="6">Channel 07</option>
+                        <option value="7">Channel 08</option>
+                        <option value="8">Channel 09</option>
+                        <option value="9">Channel 10</option>
+                        <option value="10">Channel 11</option>
+                        <option value="11">Channel 12</option>
+                        <option value="12">Channel 13</option>
+                        <option value="13">Channel 14</option>
+                        <option value="14">Channel 15</option>
+                        <option value="15">Channel 16</option>
+                    </select>
+                </label>
+
+                <div class="toggle-row">
+                    <label><input type="checkbox" id="enable-nrpn"> Enable NRPN</label>
+                    <label><input type="checkbox" id="enable-sysex"> Enable SYSEX</label>
+                    <label><input type="checkbox" id="enable-cc"> Enable CC</label>
+                </div>
+            </section>
+
+            <!-- ADVANCED -->
+            <section class="settings-card">
+                <h2>Advanced</h2>
+
+                <label><input type="checkbox" id="debug-logging"> Debug Logging</label>
+                <label><input type="checkbox" id="show-raw"> Show Raw MIDI</label>
+                <label><input type="checkbox" id="show-canonical"> Show Canonical Events</label>
+
+                <button id="reset-midi">Reset MIDI Engine</button>
+            </section>
+
+            <section class="settings-card">
+                <button id="apply-settings" class="apply-button">Apply Settings</button>
+            </section>
+
+        </section>
+
+        <!-- RIGHT COLUMN -->
+        <section class="settings-column">
+
+            <!-- LIVE MONITOR -->
+            <section class="settings-card monitor-card">
+                <h2>Live MIDI Monitor</h2>
+                <div id="midi-log" class="monitor-log"></div>
+            </section>
+
+            <!-- CONTROL MAPPING TABLE -->
+            <section class="settings-card">
+                <h2>Control Mappings</h2>
+
+                <table class="mapping-table">
+                    <thead>
+                        <tr>
+                            <th>Canonical ID</th>
+                            <th>Transport</th>
+                            <th>Resolution</th>
+                            <th>Param</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mapping-table-body">
+                        <!-- Filled dynamically -->
+                    </tbody>
+                </table>
+            </section>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

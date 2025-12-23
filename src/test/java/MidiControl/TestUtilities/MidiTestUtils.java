@@ -2,13 +2,11 @@ package MidiControl.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import MidiControl.NrpnUtils.NrpnMapping;
-import MidiControl.NrpnUtils.NrpnParser;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
+import javax.sound.midi.SysexMessage;
 
 public class MidiTestUtils {
   public static ShortMessage createControlChange(int channel, int data1, int data2) {
@@ -19,44 +17,11 @@ public class MidiTestUtils {
     }
   }
 
-  public static void sendMockNrpn(NrpnParser parser, int msb, int lsb, int value) {
-    int valueMsb = (value >> 7) & 0x7F;
-    int valueLsb = value & 0x7F;
-
-    parser.parse(createControlChange(0, 99, msb));
-    parser.parse(createControlChange(0, 98, lsb));
-    parser.parse(createControlChange(0, 6, valueMsb));
-    parser.parse(createControlChange(0, 38, valueLsb));
-  }
-
   public static void assertJsonContains(String json, String key, String expectedValue) {
     assertTrue(
         json.contains("\"" + key + "\":" + expectedValue)
             || json.contains("\"" + key + "\":\"" + expectedValue + "\""),
         "JSON should contain " + key + " with value " + expectedValue);
-  }
-
-  public static String buildNrpnJson(NrpnMapping mapping, int value) {
-    return "{"
-        + "\"type\":\"nrpnUpdate\","
-        + "\"channelType\":\""
-        + mapping.channelType()
-        + "\","
-        + "\"channelIndex\":"
-        + mapping.channelIndex()
-        + ","
-        + "\"controlType\":\""
-        + mapping.controlType()
-        + "\","
-        + "\"value\":"
-        + value
-        + ","
-        + "\"msb\":"
-        + mapping.msb()
-        + ","
-        + "\"lsb\":"
-        + mapping.lsb()
-        + "}";
   }
 
   public static boolean isValidJson(String jsonString) {
@@ -68,8 +33,15 @@ public class MidiTestUtils {
     }
   }
 
-  public static MidiMessage createSysexMessage(byte[] message) throws InvalidMidiDataException {
-    MidiMessage sysex = new javax.sound.midi.SysexMessage(message, message.length);
-    return sysex;
+  public static SysexMessage createSysexMessage(byte[] data) throws Exception {
+    try {
+      SysexMessage msg = new SysexMessage();
+      msg.setMessage(data, data.length);
+      return msg;
+    }
+    catch (Exception e) {
+      System.err.println(e);
+    }
+    return null;
   }
 }

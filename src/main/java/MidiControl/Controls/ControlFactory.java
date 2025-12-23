@@ -1,21 +1,40 @@
 package MidiControl.Controls;
 
 import MidiControl.SysexUtils.SysexMapping;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 
 public class ControlFactory {
-  public static List<Control> fromSysexMappings(List<SysexMapping> mappings) {
-    List<Control> controls = new ArrayList<>();
-    for (SysexMapping mapping : mappings) {
-      int controlId =
-          mapping.getParameter_change_format().get(7) instanceof Number
-              ? ((Number) mapping.getParameter_change_format().get(7)).intValue()
-              : -1;
-      if (controlId != -1) {
-        controls.add(new Control(controlId, mapping.getControlGroup(), mapping.getSubControl()));
-      }
+
+    public static Map<String, ControlGroup> fromSysexMappings(List<SysexMapping> mappings) {
+
+        Map<String, ControlGroup> groups = new HashMap<>();
+
+        for (SysexMapping mapping : mappings) {
+
+            String groupName = mapping.getControlGroup();   // e.g. "kMixFader"
+            String subName   = mapping.getSubControl();     // e.g. "kFader"
+
+            // 1. Get or create ControlGroup
+            ControlGroup group = groups.computeIfAbsent(groupName, ControlGroup::new);
+
+            // 2. Get or create Subcontrol
+            SubControl sub = group.getSubcontrol(subName);
+            if (sub == null) {
+                sub = new SubControl(group, subName);
+                group.addSubcontrol(sub);
+            }
+
+            for (int instance=0; instance < mapping.getMax_Channels(); instance ++) {
+              ControlInstance control = new ControlInstance(
+                sub, instance,
+                mapping,   // store the entire SysexMapping object
+                null // NRPN mapping added later
+              );
+              // 4. Add instance to subcontrol
+              sub.addInstance(control);
+            }
+        }
+        return groups;
     }
-    return controls;
-  }
 }

@@ -1,0 +1,18 @@
+No stop, this isn't hard to understand. I have successfully explained this to you before and you forget everytime I bring up sysex.
+
+byte 0 F0 - start sysex
+byte 1 43 - Yamaha
+byte 2 1n - High nibble (1/3 request/change flag) Low nibble (0-F) midi channel
+byte 3 3n - Model Number
+byte 4 nn - Control Address
+byte 5 nn - control address
+byte 6 nn - control address
+byte 7 cc - instance index
+byte 8-11 dd - data MSB first
+byte 12 F7 - end sysex
+
+This is the basic Yamaha sysex patter, the M7 as a larger consol has an extra cc byte and an extra dd byte
+
+
+
+#### this is for telling any AI tool that forgets how to assemble sysex bytes

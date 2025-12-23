@@ -23,4 +23,11 @@ public class MidiSettings {
     this.outputDeviceName = outputName;
     this.outputDeviceType = outputType;
   }
+
+  public static MidiSettings defaultSettings() {
+      return new MidiSettings(
+          -1, "Unknown", "Unknown",
+          -1, "Unknown", "Unknown"
+      );
+  }
 }

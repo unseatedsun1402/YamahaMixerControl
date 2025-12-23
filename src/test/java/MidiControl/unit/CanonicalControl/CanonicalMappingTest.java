@@ -1,127 +1,135 @@
 package MidiControl.unit.CanonicalControl;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import MidiControl.ControlMappings.CanonicalMapping;
+import MidiControl.Controls.CanonicalRegistry;
+import MidiControl.Controls.ControlGroup;
+import MidiControl.Controls.SubControl;
+import MidiControl.Controls.ControlInstance;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
-import MidiControl.SysexUtils.SysexRegistry;
-import java.util.HashMap;
+import MidiControl.SysexUtils.SysexParser;
+import MidiControl.TestUtilities.TestListener;
+
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 public class CanonicalMappingTest {
-  @Test
-  public void testCanonicalMappingExpansion() {
-    // Minimal JSON with one mapping
-    String json =
-        "[{"
-            + "\"control_group\": \"kInputHA\","
-            + "\"control_id\": 41,"
-            + "\"sub_control\": \"kHAPhantom\","
-            + "\"value\": 0,"
-            + "\"min_value\": 0,"
-            + "\"max_value\": 1,"
-            + "\"default_value\": 0,"
-            + "\"comment\": \"Off, On\","
-            + "\"key\": 266573250601,"
-            + "\"parameter_change_format\": ["
-            + "240, 67, \"1n\", 62, 17, 1, 0, 41, 0, 0, "
-            + "\"cc\", \"cc\", "
-            + "\"dd\", \"dd\", \"dd\", \"dd\", \"dd\", "
-            + "247"
-            + "],"
-            + "\"parameter_request_format\": ["
-            + "240, 67, \"3n\", 62, 17, 1, 0, 41, 0, 0, "
-            + "\"cc\", \"cc\", "
-            + "247"
-            + "]"
+
+    @Test
+    public void testCanonicalIdExpansion() {
+        String json =
+            "[{"
+                + "\"control_group\": \"kInputHA\","
+                + "\"control_id\": 41,"
+                + "\"sub_control\": \"kHAPhantom\","
+                + "\"max_channels\": 3,"
+                + "\"value\": 0,"
+                + "\"min_value\": 0,"
+                + "\"max_value\": 1,"
+                + "\"default_value\": 0,"
+                + "\"comment\": \"Off, On\","
+                + "\"key\": 266573250601,"
+                + "\"parameter_change_format\": ["
+                + "240, 67, \"1n\", 62, 17, 1, 0, 41, 0, 0,"
+                + "\"cc\", \"cc\","
+                + "\"dd\", \"dd\", \"dd\", \"dd\", \"dd\","
+                + "247"
+                + "],"
+                + "\"parameter_request_format\": ["
+                + "240, 67, \"3n\", 62, 17, 1, 0, 41, 0, 0,"
+                + "\"cc\", \"cc\","
+                + "247"
+                + "]"
             + "}]";
 
-    // Load mapping from JSON
-    List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromString(json);
-    SysexRegistry registry = new SysexRegistry(mappings);
+        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromString(json);
 
-    int channelCount = 3; // small test set
+        // CanonicalRegistry builds the entire hierarchy automatically
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
 
-    HashMap<String, CanonicalMapping> map = new HashMap<>();
+        ControlGroup group = registry.getGroup("kInputHA");
+        assertNotNull(group, "Expected control group kInputHA");
 
-    for (int ch = 1; ch <= channelCount; ch++) {
-      String canonicalId =
-          mappings.get(0).getControlGroup() + "." + mappings.get(0).getSubControl() + ".ch" + ch;
-      CanonicalMapping cm = new CanonicalMapping(canonicalId, mappings.get(0));
-      map.put(canonicalId, cm);
+        SubControl sub = group.getSubcontrol("kHAPhantom");
+        assertNotNull(sub, "Expected subcontrol kHAPhantom");
+
+        List<ControlInstance> instances = sub.getInstances();
+        assertEquals(3, instances.size(), "Expected 3 instances from max_ch = 3");
+
+        // Validate canonical IDs (0-based indexing)
+        assertEquals("kInputHA.kHAPhantom.0", instances.get(0).getCanonicalId());
+        assertEquals("kInputHA.kHAPhantom.1", instances.get(1).getCanonicalId());
+        assertEquals("kInputHA.kHAPhantom.2", instances.get(2).getCanonicalId());
+
+        // Validate parent relationships
+        ControlInstance ci0 = instances.get(0);
+        assertEquals("kHAPhantom", ci0.getParent().getName());
+        assertEquals("kInputHA", ci0.getParent().getParentGroup().getName());
     }
 
-    // Assertions
-    assertEquals(3, map.size(), "Expected 3 canonical mappings");
+    @Test
+    public void updateControlTest() {
+        String json =
+          "[{"
+              + "\"control_group\": \"kInputHA\","
+              + "\"control_id\": 41,"
+              + "\"sub_control\": \"kHAPhantom\","
+              + "\"max_channels\": 1,"
+              + "\"value\": 0,"
+              + "\"min_value\": 0,"
+              + "\"max_value\": 1,"
+              + "\"default_value\": 0,"
+              + "\"comment\": \"Off, On\","
+              + "\"key\": 266573250601,"
+              + "\"parameter_change_format\": ["
+              + "240, 67, \"1n\", 62, 17, 1, 0, 41, 0, 0,"
+              + "\"cc\", \"cc\","
+              + "\"dd\", \"dd\", \"dd\", \"dd\", \"dd\","
+              + "247"
+              + "],"
+              + "\"parameter_request_format\": ["
+              + "240, 67, \"3n\", 62, 17, 1, 0, 41, 0, 0,"
+              + "\"cc\", \"cc\","
+              + "247"
+              + "]"
+          + "}]";
 
-    assertTrue(map.containsKey("kInputHA.kHAPhantom.ch1"));
-    assertTrue(map.containsKey("kInputHA.kHAPhantom.ch2"));
-    assertTrue(map.containsKey("kInputHA.kHAPhantom.ch3"));
+        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromString(json);
 
-    assertDoesNotThrow(() -> map.get("kInputHA.kHAPhantom.ch1"));
-    CanonicalMapping cm1 = map.get("kInputHA.kHAPhantom.ch1");
-    System.out.println("Canonical Mapping ID: " + cm1.getCanonicalId());
-    assertEquals("kInputHA.kHAPhantom.ch1", cm1.getCanonicalId());
-    assertEquals(mappings.get(0), cm1.getSysexMapping());
-  }
+        // Build canonical registry from mapping
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
 
-  @Test
-  public void updateControlTest() {
-    // Minimal JSON with one mapping
-    String json =
-        "[{"
-            + "\"control_group\": \"kInputHA\","
-            + "\"control_id\": 41,"
-            + "\"sub_control\": \"kHAPhantom\","
-            + "\"value\": 0,"
-            + "\"min_value\": 0,"
-            + "\"max_value\": 1,"
-            + "\"default_value\": 0,"
-            + "\"comment\": \"Off, On\","
-            + "\"key\": 266573250601,"
-            + "\"parameter_change_format\": ["
-            + "240, 67, \"1n\", 62, 17, 1, 0, 41, 0, 0, "
-            + "\"cc\", \"cc\", "
-            + "\"dd\", \"dd\", \"dd\", \"dd\", \"dd\", "
-            + "247"
-            + "],"
-            + "\"parameter_request_format\": ["
-            + "240, 67, \"3n\", 62, 17, 1, 0, 41, 0, 0, "
-            + "\"cc\", \"cc\", "
-            + "247"
-            + "]"
-            + "}]";
+        // Retrieve the real generated instance
+        ControlInstance ci = registry
+            .getGroup("kInputHA")
+            .getSubcontrol("kHAPhantom")
+            .getInstances()
+            .get(0);
 
-    // Load mapping from JSON
-    List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromString(json);
-    SysexRegistry registry = new SysexRegistry(mappings);
+        TestListener listener = new TestListener();
+        ci.addListener(listener);
 
-    int channelCount = 1; // small test set
+        assertDoesNotThrow(() -> ci.updateValue(127));
 
-    HashMap<String, CanonicalMapping> map = new HashMap<>();
-
-    for (int ch = 1; ch <= channelCount; ch++) {
-      String canonicalId =
-          mappings.get(0).getControlGroup() + "." + mappings.get(0).getSubControl() + ".ch" + ch;
-      CanonicalMapping cm = new CanonicalMapping(canonicalId, mappings.get(0));
-      map.put(canonicalId, cm);
+        assertEquals(127, listener.lastValue);
+        assertEquals(ci, listener.lastInstance);
     }
 
-    // Assertions
-    assertEquals(1, map.size(), "Expected 1 canonical mappings");
+    @Test
+    public void getAllInstancesForContextTest() {
 
-    assertTrue(map.containsKey("kInputHA.kHAPhantom.ch1"));
-    assertDoesNotThrow(() -> map.get("kInputHA.kHAPhantom.ch1"));
-    CanonicalMapping cm1 = map.get("kInputHA.kHAPhantom.ch1");
-    assertDoesNotThrow(() -> cm1.updateValue(127, CanonicalMapping.SOURCE.SYSEX));
+        List<SysexMapping> mappings =
+            SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
 
-    System.out.println("Canonical Mapping ID: " + cm1.getCanonicalId());
-    System.out.println("Value: " + cm1.getValue());
-    assertEquals(127, cm1.getValue());
-    assertEquals(CanonicalMapping.SOURCE.SYSEX, cm1.getLastUpdateSource());
-  }
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
+
+        int totalInstances = registry.getGroups().values().stream()
+            .flatMap(group -> group.getSubcontrols().values().stream())
+            .mapToInt(subgroup -> subgroup.getInstances().size())
+            .sum();
+
+        System.out.println("[TEST] Total instances for in registry" + ": " + totalInstances);
+    }
 }

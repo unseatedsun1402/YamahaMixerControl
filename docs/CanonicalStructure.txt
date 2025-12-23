@@ -1,0 +1,23 @@
+[MIDI IN]
+    ↓
+InputHandler
+    - classify message
+    - filter noise
+    - parse NRPN sequences
+    - return CanonicalInputEvent
+    ↓
+CanonicalRegistry
+    - resolve event to ControlInstance
+    ↓
+ControlInstance
+    - update value
+    - notify listeners / server / UI
+
+Desk protocol
+→ CanonicalRegistry (ControlGroup/SubControl/Instance)
+→ ViewBuilder:
+     - picks which controls to show
+     - maps (group, sub, idx) → UI id/group/type/label
+→ CanonicalUiModel (ViewControls with both identities)
+→ uiRenderer.js
+

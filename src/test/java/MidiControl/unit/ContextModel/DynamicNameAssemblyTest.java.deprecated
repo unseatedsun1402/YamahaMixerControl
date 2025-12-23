@@ -1,0 +1,209 @@
+package MidiControl.unit.ContextModel;
+
+import MidiControl.ContextModel.*;
+import MidiControl.Controls.*;
+import MidiControl.SysexUtils.SysexMapping;
+import MidiControl.SysexUtils.SysexMappingLoader;
+import MidiControl.SysexUtils.SysexParser;
+
+import org.junit.jupiter.api.Test;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class DynamicNameAssemblyTest {
+
+    @Test
+    public void testDynamicNameAssembly() {
+
+        // ------------------------------------------------------------
+        // 1. Load real mappings (M7CL, 01V96i, etc.)
+        // ------------------------------------------------------------
+        List<SysexMapping> mappings =
+                SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
+
+        SysexParser parser = new SysexParser(mappings);
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
+        ControlSchema schema = new ControlSchema(registry);
+
+        // ------------------------------------------------------------
+        // 2. Detect ALL name prefixes dynamically
+        // ------------------------------------------------------------
+        Set<String> namePrefixes = detectNamePrefixes(schema);
+
+        assertFalse(namePrefixes.isEmpty(),
+                "No name prefixes detected in registry");
+
+        // Separate short and long prefixes
+        List<String> shortPrefixes = namePrefixes.stream()
+                .filter(p -> p.toLowerCase().contains("short"))
+                .collect(Collectors.toList());
+
+        List<String> longPrefixes = namePrefixes.stream()
+                .filter(p -> p.toLowerCase().contains("long"))
+                .collect(Collectors.toList());
+
+        assertFalse(shortPrefixes.isEmpty(),
+                "No short-name prefixes detected");
+
+        // ------------------------------------------------------------
+        // 3. Detect the group(s) that contain name subcontrols
+        // ------------------------------------------------------------
+        Set<String> nameGroups = new HashSet<>();
+        for (String prefix : namePrefixes) {
+            nameGroups.addAll(schema.getGroupsForPrefix(prefix));
+        }
+
+        assertFalse(nameGroups.isEmpty(),
+                "No name groups detected");
+
+        // Pick the first group (input channel names, DCA names, etc.)
+        String nameGroup = nameGroups.iterator().next();
+
+        // ------------------------------------------------------------
+        // 4. Inject ASCII values into ALL detected short-name blocks
+        // ------------------------------------------------------------
+        // Example: M7CL has 2 blocks of 4 chars each → 8 chars total
+        //          01V96i has 1 block of 4 chars
+        // We inject "ABCD", "EFGH", "IJKL", ... depending on block count
+
+        Map<String, String> expectedShortNames = new LinkedHashMap<>();
+
+        int blockIndex = 0;
+        for (String prefix : shortPrefixes) {
+
+            int maxIndex = schema.detectIndexedRange(nameGroup, prefix);
+            assertTrue(maxIndex > 0,
+                    "Prefix " + prefix + " has no indexed subcontrols");
+
+            String text = generateBlockText(blockIndex, maxIndex);
+            expectedShortNames.put(prefix, text);
+
+            injectAsciiBlock(registry, prefix, 1, text);
+            blockIndex++;
+        }
+
+        // ------------------------------------------------------------
+        // 5. Inject long name if supported
+        // ------------------------------------------------------------
+        String expectedLongName = null;
+
+        if (!longPrefixes.isEmpty()) {
+            String longPrefix = longPrefixes.get(0);
+            int maxIndex = schema.detectIndexedRange(nameGroup, longPrefix);
+
+            expectedLongName = "LONG NAME TEST";
+            injectAsciiBlock(registry, longPrefix, 1, expectedLongName);
+        }
+
+        // ------------------------------------------------------------
+        // 6. Build context dynamically
+        // ------------------------------------------------------------
+        List<ContextFilter> filters = new ArrayList<>();
+
+        for (String prefix : shortPrefixes)
+            filters.add(new ContextFilter(nameGroup, prefix, null));
+
+        for (String prefix : longPrefixes)
+            filters.add(new ContextFilter(nameGroup, prefix, null));
+
+        Context ctx = new Context(
+                "channel.1",
+                "Channel 1",
+                ContextType.CHANNEL,
+                List.of("admin"),
+                filters
+        );
+
+        ViewBuilder builder = new BasicViewBuilder();
+        List<ViewControl> controls = builder.build(ctx, registry);
+
+        // ------------------------------------------------------------
+        // 7. Validate short-name blocks
+        // ------------------------------------------------------------
+        for (String prefix : shortPrefixes) {
+
+            ViewControl vc = controls.stream()
+                    .filter(c -> c.label.equals("Short Name"))
+                    .findFirst()
+                    .orElseThrow(() -> new AssertionError("Short Name control missing"));
+
+            String assembled = assemble(vc);
+            String expected = expectedShortNames.get(prefix);
+
+            assertEquals(expected, assembled,
+                    "Short name block mismatch for prefix " + prefix);
+        }
+
+        // ------------------------------------------------------------
+        // 8. Validate long name (if supported)
+        // ------------------------------------------------------------
+        if (expectedLongName != null) {
+
+            ViewControl longVc = controls.stream()
+                    .filter(c -> c.label.equals("Long Name"))
+                    .findFirst()
+                    .orElseThrow(() -> new AssertionError("Long Name control missing"));
+
+            String assembled = assemble(longVc);
+
+            assertEquals(expectedLongName, assembled,
+                    "Long name assembly mismatch");
+        }
+    }
+
+    // ------------------------------------------------------------
+    // Helper: detect all name prefixes
+    // ------------------------------------------------------------
+    private Set<String> detectNamePrefixes(ControlSchema schema) {
+        Set<String> prefixes = new HashSet<>();
+
+        for (String prefix : schema.getAllPrefixes()) {
+            String lower = prefix.toLowerCase();
+            if (lower.contains("name") && (lower.contains("short") || lower.contains("long"))) {
+                prefixes.add(prefix);
+            }
+        }
+        return prefixes;
+    }
+
+    // ------------------------------------------------------------
+    // Helper: inject ASCII into a block
+    // ------------------------------------------------------------
+    private void injectAsciiBlock(CanonicalRegistry registry, String prefix, int channelIndex, String text) {
+        for (int i = 0; i < text.length(); i++) {
+            String subName = prefix + (i + 1);
+            char c = text.charAt(i);
+
+            registry.getGroups().values().forEach(group -> {
+                SubControl sub = group.getSubcontrols().get(subName);
+                if (sub != null && channelIndex < sub.getInstances().size()) {
+                    sub.getInstances().get(channelIndex).setValue((int) c);
+                }
+            });
+        }
+    }
+
+    // ------------------------------------------------------------
+    // Helper: generate text for a block
+    // ------------------------------------------------------------
+    private String generateBlockText(int blockIndex, int length) {
+        // Example: block 0 → "ABCD", block 1 → "EFGH"
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        int start = (blockIndex * length) % alphabet.length();
+        return alphabet.substring(start, start + length);
+    }
+
+    // ------------------------------------------------------------
+    // Helper: assemble composite control
+    // ------------------------------------------------------------
+    private String assemble(ViewControl vc) {
+        StringBuilder sb = new StringBuilder();
+        for (ControlInstance inst : vc.multi) {
+            sb.append((char) inst.getValue());
+        }
+        return sb.toString().trim();
+    }
+}

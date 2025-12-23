@@ -1,0 +1,168 @@
+/* ====== GLOBAL ====== */
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #1b1b1d;
+    color: #e6e6e6;
+    font-family: "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+h1, h2 {
+    margin: 0 0 12px 0;
+    font-weight: 500;
+}
+
+a {
+    color: #4da3ff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ====== HEADER ====== */
+
+.page-header {
+    background: #111113;
+    padding: 16px 24px;
+    border-bottom: 1px solid #2a2a2d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-header h1 {
+    font-size: 22px;
+}
+
+.page-header nav a {
+    font-size: 14px;
+}
+
+/* ====== MAIN LAYOUT ====== */
+
+.settings-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.settings-column {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* ====== CARDS ====== */
+
+.settings-card {
+    background: #242427;
+    border: 1px solid #2f2f33;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.settings-card h2 {
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+/* ====== FORM ELEMENTS ====== */
+
+label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+select, input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 6px 8px;
+    margin-top: 4px;
+    background: #1a1a1c;
+    border: 1px solid #3a3a3d;
+    border-radius: 4px;
+    color: #e6e6e6;
+}
+
+select:focus, input:focus {
+    outline: none;
+    border-color: #4da3ff;
+}
+
+button {
+    background: #4da3ff;
+    color: #000;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 8px;
+}
+
+button:hover {
+    background: #6bb4ff;
+}
+
+.toggle-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.toggle-row label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ====== MONITOR ====== */
+
+.monitor-card {
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.monitor-log {
+    flex: 1;
+    background: #111113;
+    border: 1px solid #2a2a2d;
+    border-radius: 4px;
+    padding: 10px;
+    overflow-y: auto;
+    font-family: "Consolas", monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+}
+
+/* ====== TABLE ====== */
+
+.mapping-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.mapping-table th {
+    background: #2f2f33;
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #3a3a3d;
+}
+
+.mapping-table td {
+    padding: 8px;
+    border-bottom: 1px solid #2a2a2d;
+}
+
+.mapping-table tr:hover {
+    background: #2a2a2d;
+}

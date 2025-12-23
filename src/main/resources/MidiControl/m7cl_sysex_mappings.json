@@ -2,6 +2,7 @@
   {
     "control_group": "kSceneComment",
     "control_id": 1,
+    "max_channels": 1,
     "sub_control": "kComment1",
     "value": 0,
     "min_value": 0,
@@ -48,6 +49,7 @@
   {
     "control_group": "kSceneComment",
     "control_id": 1,
+    "max_channels": 1,
     "sub_control": "kComment2",
     "value": 1,
     "min_value": 0,
@@ -94,6 +96,7 @@
   {
     "control_group": "kSceneComment",
     "control_id": 1,
+    "max_channels": 1,
     "sub_control": "kComment3",
     "value": 2,
     "min_value": 0,
@@ -140,6 +143,7 @@
   {
     "control_group": "kSceneComment",
     "control_id": 1,
+    "max_channels": 1,
     "sub_control": "kComment4",
     "value": 3,
     "min_value": 0,
@@ -186,6 +190,7 @@
   {
     "control_group": "kSceneComment",
     "control_id": 1,
+    "max_channels": 1,
     "sub_control": "kComment5",
     "value": 4,
     "min_value": 0,
@@ -232,6 +237,7 @@
   {
     "control_group": "kSceneComment",
     "control_id": 1,
+    "max_channels": 1,
     "sub_control": "kComment6",
     "value": 5,
     "min_value": 0,
@@ -278,6 +284,7 @@
   {
     "control_group": "kSceneComment",
     "control_id": 1,
+    "max_channels": 1,
     "sub_control": "kComment7",
     "value": 6,
     "min_value": 0,
@@ -324,6 +331,7 @@
   {
     "control_group": "kSceneComment",
     "control_id": 1,
+    "max_channels": 1,
     "sub_control": "kComment8",
     "value": 7,
     "min_value": 0,
@@ -370,6 +378,7 @@
   {
     "control_group": "kSceneDateTime",
     "control_id": 2,
+    "max_channels": 6,
     "sub_control": "kDateTime",
     "value": 0,
     "min_value": 0,
@@ -416,6 +425,7 @@
   {
     "control_group": "kSceneFadeTimeEnable",
     "control_id": 3,
+    "max_channels": 1,
     "sub_control": "kFadeLevelOn",
     "value": 0,
     "min_value": 0,
@@ -462,6 +472,7 @@
   {
     "control_group": "kSceneFadeTimeEnable",
     "control_id": 3,
+    "max_channels": 1,
     "sub_control": "kFadePanOn",
     "value": 1,
     "min_value": 0,
@@ -508,6 +519,7 @@
   {
     "control_group": "kSceneFadeTimeEnable",
     "control_id": 3,
+    "max_channels": 1,
     "sub_control": "kFadePanMode",
     "value": 2,
     "min_value": 0,
@@ -554,6 +566,7 @@
   {
     "control_group": "kSceneFadeTimeEnable",
     "control_id": 3,
+    "max_channels": 1,
     "sub_control": "kFadeTimeMaster",
     "value": 3,
     "min_value": 0,
@@ -600,6 +613,7 @@
   {
     "control_group": "kSceneFocusRecallMaster",
     "control_id": 4,
+    "max_channels": 1,
     "sub_control": "kFocusRecallOn",
     "value": 0,
     "min_value": 0,
@@ -646,6 +660,7 @@
   {
     "control_group": "kSceneFocusRecallMaster",
     "control_id": 4,
+    "max_channels": 1,
     "sub_control": "kFocusRecallMode",
     "value": 1,
     "min_value": 0,
@@ -692,6 +707,7 @@
   {
     "control_group": "kGroupSelectorMask",
     "control_id": 18,
+    "max_channels": 30,
     "sub_control": "kSelectorMask",
     "value": 0,
     "min_value": 0,
@@ -738,6 +754,7 @@
   {
     "control_group": "kGroupSelectorMask",
     "control_id": 18,
+    "max_channels": 30,
     "sub_control": "kMixMatrixSelectorMask",
     "value": 1,
     "min_value": 0,
@@ -784,6 +801,7 @@
   {
     "control_group": "kGroupIsRelative",
     "control_id": 19,
+    "max_channels": 30,
     "sub_control": "kIsRelative",
     "value": 0,
     "min_value": 1,
@@ -830,6 +848,7 @@
   {
     "control_group": "kSceneCenterBusControl",
     "control_id": 29,
+    "max_channels": 1,
     "sub_control": "kCenterBusControl",
     "value": 0,
     "min_value": 0,
@@ -876,6 +895,7 @@
   {
     "control_group": "kSceneInputLink",
     "control_id": 30,
+    "max_channels": 1,
     "sub_control": "kLinkEnableDyna",
     "value": 0,
     "min_value": 0,
@@ -922,6 +942,7 @@
   {
     "control_group": "kSceneInputLink",
     "control_id": 30,
+    "max_channels": 1,
     "sub_control": "kLinkEnableEQ",
     "value": 1,
     "min_value": 0,
@@ -968,6 +989,7 @@
   {
     "control_group": "kSceneOutputLink",
     "control_id": 31,
+    "max_channels": 1,
     "sub_control": "kLinkEnableDyna",
     "value": 0,
     "min_value": 0,
@@ -1014,6 +1036,7 @@
   {
     "control_group": "kSceneOutputLink",
     "control_id": 31,
+    "max_channels": 1,
     "sub_control": "kLinkEnableEQ",
     "value": 1,
     "min_value": 0,
@@ -1060,6 +1083,7 @@
   {
     "control_group": "kSceneOutputLink",
     "control_id": 31,
+    "max_channels": 1,
     "sub_control": "kLinkEnableGEQ",
     "value": 2,
     "min_value": 0,
@@ -1106,6 +1130,7 @@
   {
     "control_group": "kSceneOutputLink",
     "control_id": 31,
+    "max_channels": 1,
     "sub_control": "kLinkEnableFader",
     "value": 3,
     "min_value": 0,
@@ -1152,6 +1177,7 @@
   {
     "control_group": "kSceneMuteMaster",
     "control_id": 32,
+    "max_channels": 8,
     "sub_control": "kMuteMaster",
     "value": 0,
     "min_value": 0,
@@ -1198,6 +1224,7 @@
   {
     "control_group": "kMixPair",
     "control_id": 33,
+    "max_channels": 16,
     "sub_control": "kPair",
     "value": 0,
     "min_value": 0,
@@ -1244,6 +1271,7 @@
   {
     "control_group": "kMixPair",
     "control_id": 33,
+    "max_channels": 16,
     "sub_control": "kPairFS",
     "value": 1,
     "min_value": 0,
@@ -1290,6 +1318,7 @@
   {
     "control_group": "kMixBusType",
     "control_id": 34,
+    "max_channels": 16,
     "sub_control": "kBusType",
     "value": 0,
     "min_value": 0,
@@ -1336,6 +1365,7 @@
   {
     "control_group": "kMixFromInPanLink",
     "control_id": 35,
+    "max_channels": 16,
     "sub_control": "kVariPanLink",
     "value": 0,
     "min_value": 0,
@@ -1382,6 +1412,7 @@
   {
     "control_group": "kMatrixPair",
     "control_id": 36,
+    "max_channels": 8,
     "sub_control": "kPair",
     "value": 0,
     "min_value": 0,
@@ -1428,6 +1459,7 @@
   {
     "control_group": "kMatrixBusType",
     "control_id": 37,
+    "max_channels": 8,
     "sub_control": "kBusType",
     "value": 0,
     "min_value": 0,
@@ -1474,6 +1506,7 @@
   {
     "control_group": "kMatrixFromInPanLink",
     "control_id": 38,
+    "max_channels": 8,
     "sub_control": "kVariPanLink",
     "value": 0,
     "min_value": 0,
@@ -1520,6 +1553,7 @@
   {
     "control_group": "kInputPair",
     "control_id": 39,
+    "max_channels": 56,
     "sub_control": "kPair",
     "value": 0,
     "min_value": 0,
@@ -1566,6 +1600,7 @@
   {
     "control_group": "kInputHA",
     "control_id": 41,
+    "max_channels": 56,
     "sub_control": "kHAPhantom",
     "value": 0,
     "min_value": 0,
@@ -1612,6 +1647,7 @@
   {
     "control_group": "kInputHA",
     "control_id": 41,
+    "max_channels": 56,
     "sub_control": "kHAGain",
     "value": 1,
     "min_value": 0,
@@ -1658,6 +1694,7 @@
   {
     "control_group": "kInputHA",
     "control_id": 41,
+    "max_channels": 56,
     "sub_control": "kESHPFFreq",
     "value": 2,
     "min_value": 4,
@@ -1704,6 +1741,7 @@
   {
     "control_group": "kInputHA",
     "control_id": 41,
+    "max_channels": 56,
     "sub_control": "kESHPF",
     "value": 3,
     "min_value": 0,
@@ -1750,6 +1788,7 @@
   {
     "control_group": "kInputStMonoLCR",
     "control_id": 42,
+    "max_channels": 56,
     "sub_control": "kStMonoLCR",
     "value": 0,
     "min_value": 0,
@@ -1796,6 +1835,7 @@
   {
     "control_group": "kInputLCR",
     "control_id": 43,
+    "max_channels": 56,
     "sub_control": "kLCROn",
     "value": 0,
     "min_value": 0,
@@ -1842,6 +1882,7 @@
   {
     "control_group": "kInputLCR",
     "control_id": 43,
+    "max_channels": 56,
     "sub_control": "kLCRControl",
     "value": 1,
     "min_value": 0,
@@ -1888,6 +1929,7 @@
   {
     "control_group": "kInputFadeTime",
     "control_id": 44,
+    "max_channels": 56,
     "sub_control": "kFadeLevelOn",
     "value": 0,
     "min_value": 0,
@@ -1934,6 +1976,7 @@
   {
     "control_group": "kInputFadeTime",
     "control_id": 44,
+    "max_channels": 56,
     "sub_control": "kFadeStartOffset",
     "value": 1,
     "min_value": 0,
@@ -1980,6 +2023,7 @@
   {
     "control_group": "kInputFadeTime",
     "control_id": 44,
+    "max_channels": 56,
     "sub_control": "kFadeTime",
     "value": 2,
     "min_value": 0,
@@ -2026,6 +2070,7 @@
   {
     "control_group": "kInputInsert",
     "control_id": 45,
+    "max_channels": 56,
     "sub_control": "kInsertOn",
     "value": 0,
     "min_value": 0,
@@ -2072,6 +2117,7 @@
   {
     "control_group": "kInputInsert",
     "control_id": 45,
+    "max_channels": 56,
     "sub_control": "kInsertLocation",
     "value": 1,
     "min_value": 0,
@@ -2118,6 +2164,7 @@
   {
     "control_group": "kInputDirectOut",
     "control_id": 46,
+    "max_channels": 56,
     "sub_control": "kDirectOutOn",
     "value": 0,
     "min_value": 0,
@@ -2164,6 +2211,7 @@
   {
     "control_group": "kInputDirectOut",
     "control_id": 46,
+    "max_channels": 56,
     "sub_control": "kDirectOutLocation",
     "value": 1,
     "min_value": 0,
@@ -2210,6 +2258,7 @@
   {
     "control_group": "kInputDirectOut",
     "control_id": 46,
+    "max_channels": 56,
     "sub_control": "kDirectOutLevel",
     "value": 2,
     "min_value": 0,
@@ -2256,6 +2305,7 @@
   {
     "control_group": "kInputPhase",
     "control_id": 47,
+    "max_channels": 56,
     "sub_control": "kPhase",
     "value": 0,
     "min_value": 0,
@@ -2302,6 +2352,7 @@
   {
     "control_group": "kInputOn",
     "control_id": 48,
+    "max_channels": 56,
     "sub_control": "kChannelOn",
     "value": 0,
     "min_value": 0,
@@ -2348,6 +2399,7 @@
   {
     "control_group": "kInputPan",
     "control_id": 49,
+    "max_channels": 56,
     "sub_control": "kPanMode",
     "value": 0,
     "min_value": 0,
@@ -2394,6 +2446,7 @@
   {
     "control_group": "kInputPan",
     "control_id": 49,
+    "max_channels": 56,
     "sub_control": "kChannelPan",
     "value": 1,
     "min_value": -63,
@@ -2440,6 +2493,7 @@
   {
     "control_group": "kInputFader",
     "control_id": 50,
+    "max_channels": 56,
     "sub_control": "kFader",
     "value": 0,
     "min_value": 0,
@@ -2486,6 +2540,7 @@
   {
     "control_group": "kInputAttenuator",
     "control_id": 51,
+    "max_channels": 56,
     "sub_control": "kAttGang",
     "value": 0,
     "min_value": 0,
@@ -2532,6 +2587,7 @@
   {
     "control_group": "kInputAttenuator",
     "control_id": 51,
+    "max_channels": 56,
     "sub_control": "kAtt",
     "value": 1,
     "min_value": -960,
@@ -2578,6 +2634,7 @@
   {
     "control_group": "kInputDyna1Pair",
     "control_id": 52,
+    "max_channels": 56,
     "sub_control": "kPair",
     "value": 0,
     "min_value": 0,
@@ -2624,6 +2681,7 @@
   {
     "control_group": "kInputDyna1Link",
     "control_id": 53,
+    "max_channels": 56,
     "sub_control": "kLink",
     "value": 0,
     "min_value": 0,
@@ -2670,6 +2728,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaOn",
     "value": 0,
     "min_value": 0,
@@ -2716,6 +2775,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaType",
     "value": 1,
     "min_value": 0,
@@ -2762,6 +2822,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kAutoOn",
     "value": 2,
     "min_value": 0,
@@ -2808,6 +2869,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kLeftSideChain",
     "value": 3,
     "min_value": 0,
@@ -2854,6 +2916,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaKeyIn",
     "value": 4,
     "min_value": 0,
@@ -2900,6 +2963,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaFilterOn",
     "value": 5,
     "min_value": 0,
@@ -2946,6 +3010,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaFilterType",
     "value": 6,
     "min_value": 0,
@@ -2992,6 +3057,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaFilterFreq",
     "value": 7,
     "min_value": 4,
@@ -3038,6 +3104,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaFilterQ",
     "value": 8,
     "min_value": 0,
@@ -3084,6 +3151,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaAttack",
     "value": 9,
     "min_value": 0,
@@ -3130,6 +3198,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaRange",
     "value": 10,
     "min_value": -70,
@@ -3176,6 +3245,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaHold",
     "value": 11,
     "min_value": 0,
@@ -3222,6 +3292,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaDecay",
     "value": 12,
     "min_value": 0,
@@ -3268,6 +3339,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaRatio",
     "value": 13,
     "min_value": 0,
@@ -3314,6 +3386,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaGain",
     "value": 14,
     "min_value": 0,
@@ -3360,6 +3433,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaKnee",
     "value": 15,
     "min_value": 0,
@@ -3406,6 +3480,7 @@
   {
     "control_group": "kInputDynamics1",
     "control_id": 54,
+    "max_channels": 56,
     "sub_control": "kDynaThreshold",
     "value": 16,
     "min_value": -720,
@@ -3452,6 +3527,7 @@
   {
     "control_group": "kInputDyna2Pair",
     "control_id": 55,
+    "max_channels": 56,
     "sub_control": "kPair",
     "value": 0,
     "min_value": 0,
@@ -3498,6 +3574,7 @@
   {
     "control_group": "kInputDyna2Link",
     "control_id": 56,
+    "max_channels": 56,
     "sub_control": "kLink",
     "value": 0,
     "min_value": 0,
@@ -3544,6 +3621,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaOn",
     "value": 0,
     "min_value": 0,
@@ -3590,6 +3668,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaType",
     "value": 1,
     "min_value": 2,
@@ -3636,6 +3715,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kAutoOn",
     "value": 2,
     "min_value": 0,
@@ -3682,6 +3762,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kLeftSideChain",
     "value": 3,
     "min_value": 0,
@@ -3728,6 +3809,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaKeyIn",
     "value": 4,
     "min_value": 0,
@@ -3774,6 +3856,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaFilterOn",
     "value": 5,
     "min_value": 0,
@@ -3820,6 +3903,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaFilterType",
     "value": 6,
     "min_value": 0,
@@ -3866,6 +3950,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaFilterFreq",
     "value": 7,
     "min_value": 72,
@@ -3912,6 +3997,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaFilterQ",
     "value": 8,
     "min_value": 0,
@@ -3958,6 +4044,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaAttack",
     "value": 9,
     "min_value": 0,
@@ -4004,6 +4091,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaRange",
     "value": 10,
     "min_value": 0,
@@ -4050,6 +4138,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaHold",
     "value": 11,
     "min_value": 0,
@@ -4096,6 +4185,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaRelease",
     "value": 12,
     "min_value": 0,
@@ -4142,6 +4232,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaRatio",
     "value": 13,
     "min_value": 0,
@@ -4188,6 +4279,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaGain",
     "value": 14,
     "min_value": 0,
@@ -4234,6 +4326,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaKnee",
     "value": 15,
     "min_value": 0,
@@ -4280,6 +4373,7 @@
   {
     "control_group": "kInputDynamics2",
     "control_id": 57,
+    "max_channels": 56,
     "sub_control": "kDynaThreshold",
     "value": 16,
     "min_value": -540,
@@ -4326,6 +4420,7 @@
   {
     "control_group": "kInputEQLink",
     "control_id": 58,
+    "max_channels": 56,
     "sub_control": "kLink",
     "value": 0,
     "min_value": 0,
@@ -4372,6 +4467,7 @@
   {
     "control_group": "kInputHPF",
     "control_id": 59,
+    "max_channels": 56,
     "sub_control": "kEQHPFOn",
     "value": 0,
     "min_value": 0,
@@ -4418,6 +4514,7 @@
   {
     "control_group": "kInputHPF",
     "control_id": 59,
+    "max_channels": 56,
     "sub_control": "kEQHPFFreq",
     "value": 1,
     "min_value": 4,
@@ -4464,6 +4561,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQFlat",
     "value": 0,
     "min_value": 0,
@@ -4510,6 +4608,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQType",
     "value": 1,
     "min_value": 0,
@@ -4556,6 +4655,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQOn",
     "value": 2,
     "min_value": 0,
@@ -4602,6 +4702,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ1Type",
     "value": 3,
     "min_value": 0,
@@ -4648,6 +4749,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ4Type",
     "value": 4,
     "min_value": 0,
@@ -4694,6 +4796,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ1HPFOn",
     "value": 5,
     "min_value": 0,
@@ -4740,6 +4843,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ4LPFOn",
     "value": 6,
     "min_value": 0,
@@ -4786,6 +4890,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ1Bypass",
     "value": 7,
     "min_value": 0,
@@ -4832,6 +4937,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ1Q",
     "value": 8,
     "min_value": -4,
@@ -4878,6 +4984,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ1F",
     "value": 9,
     "min_value": 4,
@@ -4924,6 +5031,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ1G",
     "value": 10,
     "min_value": -180,
@@ -4970,6 +5078,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ2Bypass",
     "value": 11,
     "min_value": 0,
@@ -5016,6 +5125,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ2Q",
     "value": 12,
     "min_value": -4,
@@ -5062,6 +5172,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ2F",
     "value": 13,
     "min_value": 4,
@@ -5108,6 +5219,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ2G",
     "value": 14,
     "min_value": -180,
@@ -5154,6 +5266,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ3Bypass",
     "value": 15,
     "min_value": 0,
@@ -5200,6 +5313,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ3Q",
     "value": 16,
     "min_value": -4,
@@ -5246,6 +5360,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ3F",
     "value": 17,
     "min_value": 4,
@@ -5292,6 +5407,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ3G",
     "value": 18,
     "min_value": -180,
@@ -5338,6 +5454,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ4Bypass",
     "value": 19,
     "min_value": 0,
@@ -5384,6 +5501,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ4Q",
     "value": 20,
     "min_value": -4,
@@ -5430,6 +5548,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ4F",
     "value": 21,
     "min_value": 4,
@@ -5476,6 +5595,7 @@
   {
     "control_group": "kInputEQ",
     "control_id": 60,
+    "max_channels": 56,
     "sub_control": "kEQ4G",
     "value": 22,
     "min_value": -180,
@@ -5522,6 +5642,7 @@
   {
     "control_group": "kInputMute",
     "control_id": 62,
+    "max_channels": 56,
     "sub_control": "kMuteAssign1",
     "value": 0,
     "min_value": 0,
@@ -5568,6 +5689,7 @@
   {
     "control_group": "kInputMute",
     "control_id": 62,
+    "max_channels": 56,
     "sub_control": "kMuteAssign2",
     "value": 1,
     "min_value": 0,
@@ -5614,6 +5736,7 @@
   {
     "control_group": "kInputMute",
     "control_id": 62,
+    "max_channels": 56,
     "sub_control": "kMuteAssign3",
     "value": 2,
     "min_value": 0,
@@ -5660,6 +5783,7 @@
   {
     "control_group": "kInputMute",
     "control_id": 62,
+    "max_channels": 56,
     "sub_control": "kMuteAssign4",
     "value": 3,
     "min_value": 0,
@@ -5706,6 +5830,7 @@
   {
     "control_group": "kInputMute",
     "control_id": 62,
+    "max_channels": 56,
     "sub_control": "kMuteAssign5",
     "value": 4,
     "min_value": 0,
@@ -5752,6 +5877,7 @@
   {
     "control_group": "kInputMute",
     "control_id": 62,
+    "max_channels": 56,
     "sub_control": "kMuteAssign6",
     "value": 5,
     "min_value": 0,
@@ -5798,6 +5924,7 @@
   {
     "control_group": "kInputMute",
     "control_id": 62,
+    "max_channels": 56,
     "sub_control": "kMuteAssign7",
     "value": 6,
     "min_value": 0,
@@ -5844,6 +5971,7 @@
   {
     "control_group": "kInputMute",
     "control_id": 62,
+    "max_channels": 56,
     "sub_control": "kMuteAssign8",
     "value": 7,
     "min_value": 0,
@@ -5890,6 +6018,7 @@
   {
     "control_group": "kInputDCA",
     "control_id": 63,
+    "max_channels": 56,
     "sub_control": "kDCAAssign1",
     "value": 0,
     "min_value": 0,
@@ -5936,6 +6065,7 @@
   {
     "control_group": "kInputDCA",
     "control_id": 63,
+    "max_channels": 56,
     "sub_control": "kDCAAssign2",
     "value": 1,
     "min_value": 0,
@@ -5982,6 +6112,7 @@
   {
     "control_group": "kInputDCA",
     "control_id": 63,
+    "max_channels": 56,
     "sub_control": "kDCAAssign3",
     "value": 2,
     "min_value": 0,
@@ -6028,6 +6159,7 @@
   {
     "control_group": "kInputDCA",
     "control_id": 63,
+    "max_channels": 56,
     "sub_control": "kDCAAssign4",
     "value": 3,
     "min_value": 0,
@@ -6074,6 +6206,7 @@
   {
     "control_group": "kInputDCA",
     "control_id": 63,
+    "max_channels": 56,
     "sub_control": "kDCAAssign5",
     "value": 4,
     "min_value": 0,
@@ -6120,6 +6253,7 @@
   {
     "control_group": "kInputDCA",
     "control_id": 63,
+    "max_channels": 56,
     "sub_control": "kDCAAssign6",
     "value": 5,
     "min_value": 0,
@@ -6166,6 +6300,7 @@
   {
     "control_group": "kInputDCA",
     "control_id": 63,
+    "max_channels": 56,
     "sub_control": "kDCAAssign7",
     "value": 6,
     "min_value": 0,
@@ -6212,6 +6347,7 @@
   {
     "control_group": "kInputDCA",
     "control_id": 63,
+    "max_channels": 56,
     "sub_control": "kDCAAssign8",
     "value": 7,
     "min_value": 0,
@@ -6258,6 +6394,7 @@
   {
     "control_group": "kInputToStereo",
     "control_id": 64,
+    "max_channels": 56,
     "sub_control": "kToStereoOn",
     "value": 0,
     "min_value": 0,
@@ -6304,6 +6441,7 @@
   {
     "control_group": "kInputToMono",
     "control_id": 65,
+    "max_channels": 56,
     "sub_control": "kToMonoOn",
     "value": 0,
     "min_value": 0,
@@ -6350,6 +6488,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kInputToMixLoc",
     "value": 0,
     "min_value": 0,
@@ -6396,6 +6535,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kFixedMixPan",
     "value": 1,
     "min_value": 0,
@@ -6442,6 +6582,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kFollowPan",
     "value": 2,
     "min_value": 0,
@@ -6488,6 +6629,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix1On",
     "value": 3,
     "min_value": 0,
@@ -6534,6 +6676,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix1Pos",
     "value": 4,
     "min_value": 0,
@@ -6580,6 +6723,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix1Level",
     "value": 5,
     "min_value": 0,
@@ -6626,6 +6770,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix2On",
     "value": 6,
     "min_value": 0,
@@ -6672,6 +6817,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix2Pos",
     "value": 7,
     "min_value": 0,
@@ -6718,6 +6864,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix2Level",
     "value": 8,
     "min_value": 0,
@@ -6764,6 +6911,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix3On",
     "value": 9,
     "min_value": 0,
@@ -6810,6 +6958,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix3Pos",
     "value": 10,
     "min_value": 0,
@@ -6856,6 +7005,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix3Level",
     "value": 11,
     "min_value": 0,
@@ -6902,6 +7052,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix4On",
     "value": 12,
     "min_value": 0,
@@ -6948,6 +7099,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix4Pos",
     "value": 13,
     "min_value": 0,
@@ -6994,6 +7146,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix4Level",
     "value": 14,
     "min_value": 0,
@@ -7040,6 +7193,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix5On",
     "value": 15,
     "min_value": 0,
@@ -7086,6 +7240,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix5Pos",
     "value": 16,
     "min_value": 0,
@@ -7132,6 +7287,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix5Level",
     "value": 17,
     "min_value": 0,
@@ -7178,6 +7334,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix6On",
     "value": 18,
     "min_value": 0,
@@ -7224,6 +7381,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix6Pos",
     "value": 19,
     "min_value": 0,
@@ -7270,6 +7428,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix6Level",
     "value": 20,
     "min_value": 0,
@@ -7316,6 +7475,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix7On",
     "value": 21,
     "min_value": 0,
@@ -7362,6 +7522,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix7Pos",
     "value": 22,
     "min_value": 0,
@@ -7408,6 +7569,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix7Level",
     "value": 23,
     "min_value": 0,
@@ -7454,6 +7616,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix8On",
     "value": 24,
     "min_value": 0,
@@ -7500,6 +7663,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix8Pos",
     "value": 25,
     "min_value": 0,
@@ -7546,6 +7710,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix8Level",
     "value": 26,
     "min_value": 0,
@@ -7592,6 +7757,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix9On",
     "value": 27,
     "min_value": 0,
@@ -7638,6 +7804,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix9Pos",
     "value": 28,
     "min_value": 0,
@@ -7684,6 +7851,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix9Level",
     "value": 29,
     "min_value": 0,
@@ -7730,6 +7898,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix10On",
     "value": 30,
     "min_value": 0,
@@ -7776,6 +7945,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix10Pos",
     "value": 31,
     "min_value": 0,
@@ -7822,6 +7992,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix10Level",
     "value": 32,
     "min_value": 0,
@@ -7868,6 +8039,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix11On",
     "value": 33,
     "min_value": 0,
@@ -7914,6 +8086,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix11Pos",
     "value": 34,
     "min_value": 0,
@@ -7960,6 +8133,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix11Level",
     "value": 35,
     "min_value": 0,
@@ -8006,6 +8180,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix12On",
     "value": 36,
     "min_value": 0,
@@ -8052,6 +8227,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix12Pos",
     "value": 37,
     "min_value": 0,
@@ -8098,6 +8274,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix12Level",
     "value": 38,
     "min_value": 0,
@@ -8144,6 +8321,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix13On",
     "value": 39,
     "min_value": 0,
@@ -8190,6 +8368,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix13Pos",
     "value": 40,
     "min_value": 0,
@@ -8236,6 +8415,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix13Level",
     "value": 41,
     "min_value": 0,
@@ -8282,6 +8462,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix14On",
     "value": 42,
     "min_value": 0,
@@ -8328,6 +8509,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix14Pos",
     "value": 43,
     "min_value": 0,
@@ -8374,6 +8556,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix14Level",
     "value": 44,
     "min_value": 0,
@@ -8420,6 +8603,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix15On",
     "value": 45,
     "min_value": 0,
@@ -8466,6 +8650,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix15Pos",
     "value": 46,
     "min_value": 0,
@@ -8512,6 +8697,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix15Level",
     "value": 47,
     "min_value": 0,
@@ -8558,6 +8744,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix16On",
     "value": 48,
     "min_value": 0,
@@ -8604,6 +8791,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix16Pos",
     "value": 49,
     "min_value": 0,
@@ -8650,6 +8838,7 @@
   {
     "control_group": "kInputToMix",
     "control_id": 66,
+    "max_channels": 56,
     "sub_control": "kMix16Level",
     "value": 50,
     "min_value": 0,
@@ -8696,6 +8885,7 @@
   {
     "control_group": "kInputToMixPan",
     "control_id": 67,
+    "max_channels": 56,
     "sub_control": "kMix0102Pan",
     "value": 0,
     "min_value": -63,
@@ -8742,6 +8932,7 @@
   {
     "control_group": "kInputToMixPan",
     "control_id": 67,
+    "max_channels": 56,
     "sub_control": "kMix0304Pan",
     "value": 1,
     "min_value": -63,
@@ -8788,6 +8979,7 @@
   {
     "control_group": "kInputToMixPan",
     "control_id": 67,
+    "max_channels": 56,
     "sub_control": "kMix0506Pan",
     "value": 2,
     "min_value": -63,
@@ -8834,6 +9026,7 @@
   {
     "control_group": "kInputToMixPan",
     "control_id": 67,
+    "max_channels": 56,
     "sub_control": "kMix0708Pan",
     "value": 3,
     "min_value": -63,
@@ -8880,6 +9073,7 @@
   {
     "control_group": "kInputToMixPan",
     "control_id": 67,
+    "max_channels": 56,
     "sub_control": "kMix0910Pan",
     "value": 4,
     "min_value": -63,
@@ -8926,6 +9120,7 @@
   {
     "control_group": "kInputToMixPan",
     "control_id": 67,
+    "max_channels": 56,
     "sub_control": "kMix1112Pan",
     "value": 5,
     "min_value": -63,
@@ -8972,6 +9167,7 @@
   {
     "control_group": "kInputToMixPan",
     "control_id": 67,
+    "max_channels": 56,
     "sub_control": "kMix1314Pan",
     "value": 6,
     "min_value": -63,
@@ -9018,6 +9214,7 @@
   {
     "control_group": "kInputToMixPan",
     "control_id": 67,
+    "max_channels": 56,
     "sub_control": "kMix1516Pan",
     "value": 7,
     "min_value": -63,
@@ -9064,6 +9261,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kToMatrixLoc",
     "value": 0,
     "min_value": 0,
@@ -9110,6 +9308,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kFixedMatrixPan",
     "value": 1,
     "min_value": 0,
@@ -9156,6 +9355,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kFollowPan",
     "value": 2,
     "min_value": 0,
@@ -9202,6 +9402,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix1On",
     "value": 3,
     "min_value": 0,
@@ -9248,6 +9449,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix1Pos",
     "value": 4,
     "min_value": 0,
@@ -9294,6 +9496,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix1Level",
     "value": 5,
     "min_value": 0,
@@ -9340,6 +9543,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix2On",
     "value": 6,
     "min_value": 0,
@@ -9386,6 +9590,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix2Pos",
     "value": 7,
     "min_value": 0,
@@ -9432,6 +9637,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix2Level",
     "value": 8,
     "min_value": 0,
@@ -9478,6 +9684,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix3On",
     "value": 9,
     "min_value": 0,
@@ -9524,6 +9731,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix3Pos",
     "value": 10,
     "min_value": 0,
@@ -9570,6 +9778,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix3Level",
     "value": 11,
     "min_value": 0,
@@ -9616,6 +9825,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix4On",
     "value": 12,
     "min_value": 0,
@@ -9662,6 +9872,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix4Pos",
     "value": 13,
     "min_value": 0,
@@ -9708,6 +9919,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix4Level",
     "value": 14,
     "min_value": 0,
@@ -9754,6 +9966,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix5On",
     "value": 15,
     "min_value": 0,
@@ -9800,6 +10013,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix5Pos",
     "value": 16,
     "min_value": 0,
@@ -9846,6 +10060,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix5Level",
     "value": 17,
     "min_value": 0,
@@ -9892,6 +10107,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix6On",
     "value": 18,
     "min_value": 0,
@@ -9938,6 +10154,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix6Pos",
     "value": 19,
     "min_value": 0,
@@ -9984,6 +10201,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix6Level",
     "value": 20,
     "min_value": 0,
@@ -10030,6 +10248,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix7On",
     "value": 21,
     "min_value": 0,
@@ -10076,6 +10295,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix7Pos",
     "value": 22,
     "min_value": 0,
@@ -10122,6 +10342,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix7Level",
     "value": 23,
     "min_value": 0,
@@ -10168,6 +10389,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix8On",
     "value": 24,
     "min_value": 0,
@@ -10214,6 +10436,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix8Pos",
     "value": 25,
     "min_value": 0,
@@ -10260,6 +10483,7 @@
   {
     "control_group": "kInputToMatrix",
     "control_id": 68,
+    "max_channels": 56,
     "sub_control": "kMatrix8Level",
     "value": 26,
     "min_value": 0,
@@ -10306,6 +10530,7 @@
   {
     "control_group": "kInputToMatrixPan",
     "control_id": 69,
+    "max_channels": 56,
     "sub_control": "kMatrix0102Pan",
     "value": 0,
     "min_value": -63,
@@ -10352,6 +10577,7 @@
   {
     "control_group": "kInputToMatrixPan",
     "control_id": 69,
+    "max_channels": 56,
     "sub_control": "kMatrix0304Pan",
     "value": 1,
     "min_value": -63,
@@ -10398,6 +10624,7 @@
   {
     "control_group": "kInputToMatrixPan",
     "control_id": 69,
+    "max_channels": 56,
     "sub_control": "kMatrix0506Pan",
     "value": 2,
     "min_value": -63,
@@ -10444,6 +10671,7 @@
   {
     "control_group": "kInputToMatrixPan",
     "control_id": 69,
+    "max_channels": 56,
     "sub_control": "kMatrix0708Pan",
     "value": 3,
     "min_value": -63,
@@ -10490,6 +10718,7 @@
   {
     "control_group": "kMixPostToStereo",
     "control_id": 70,
+    "max_channels": 16,
     "sub_control": "kPostToStereo",
     "value": 0,
     "min_value": 0,
@@ -10536,6 +10765,7 @@
   {
     "control_group": "kMixStMonoLCR",
     "control_id": 71,
+    "max_channels": 16,
     "sub_control": "kStMonoLCR",
     "value": 0,
     "min_value": 0,
@@ -10582,6 +10812,7 @@
   {
     "control_group": "kMixLCR",
     "control_id": 72,
+    "max_channels": 16,
     "sub_control": "kLCROn",
     "value": 0,
     "min_value": 0,
@@ -10628,6 +10859,7 @@
   {
     "control_group": "kMixLCR",
     "control_id": 72,
+    "max_channels": 16,
     "sub_control": "kLCRControl",
     "value": 1,
     "min_value": 0,
@@ -10674,6 +10906,7 @@
   {
     "control_group": "kMixFadeTime",
     "control_id": 73,
+    "max_channels": 16,
     "sub_control": "kFadeLevelOn",
     "value": 0,
     "min_value": 0,
@@ -10720,6 +10953,7 @@
   {
     "control_group": "kMixFadeTime",
     "control_id": 73,
+    "max_channels": 16,
     "sub_control": "kFadeStartOffset",
     "value": 1,
     "min_value": 0,
@@ -10766,6 +11000,7 @@
   {
     "control_group": "kMixFadeTime",
     "control_id": 73,
+    "max_channels": 16,
     "sub_control": "kFadeTime",
     "value": 2,
     "min_value": 0,
@@ -10812,6 +11047,7 @@
   {
     "control_group": "kMixInsert",
     "control_id": 74,
+    "max_channels": 16,
     "sub_control": "kInsertOn",
     "value": 0,
     "min_value": 0,
@@ -10858,6 +11094,7 @@
   {
     "control_group": "kMixInsert",
     "control_id": 74,
+    "max_channels": 16,
     "sub_control": "kInsertLocation",
     "value": 1,
     "min_value": 0,
@@ -10904,6 +11141,7 @@
   {
     "control_group": "kMixOn",
     "control_id": 75,
+    "max_channels": 16,
     "sub_control": "kChannelOn",
     "value": 0,
     "min_value": 0,
@@ -10950,6 +11188,7 @@
   {
     "control_group": "kMixBalance",
     "control_id": 76,
+    "max_channels": 16,
     "sub_control": "kBalance",
     "value": 0,
     "min_value": -63,
@@ -10996,6 +11235,7 @@
   {
     "control_group": "kMixFader",
     "control_id": 77,
+    "max_channels": 16,
     "sub_control": "kFader",
     "value": 0,
     "min_value": 0,
@@ -11042,6 +11282,7 @@
   {
     "control_group": "kMixAttenuator",
     "control_id": 78,
+    "max_channels": 16,
     "sub_control": "kAttGang",
     "value": 0,
     "min_value": 0,
@@ -11088,6 +11329,7 @@
   {
     "control_group": "kMixAttenuator",
     "control_id": 78,
+    "max_channels": 16,
     "sub_control": "kAtt",
     "value": 1,
     "min_value": -960,
@@ -11134,6 +11376,7 @@
   {
     "control_group": "kMixDynaPair",
     "control_id": 79,
+    "max_channels": 16,
     "sub_control": "kPair",
     "value": 0,
     "min_value": 0,
@@ -11180,6 +11423,7 @@
   {
     "control_group": "kMixDynaLink",
     "control_id": 80,
+    "max_channels": 16,
     "sub_control": "kLink",
     "value": 0,
     "min_value": 0,
@@ -11226,6 +11470,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaOn",
     "value": 0,
     "min_value": 0,
@@ -11272,6 +11517,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaType",
     "value": 1,
     "min_value": 2,
@@ -11318,6 +11564,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kAutoOn",
     "value": 2,
     "min_value": 0,
@@ -11364,6 +11611,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kLeftSideChain",
     "value": 3,
     "min_value": 0,
@@ -11410,6 +11658,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaKeyIn",
     "value": 4,
     "min_value": 0,
@@ -11456,6 +11705,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaFilterOn",
     "value": 5,
     "min_value": 0,
@@ -11502,6 +11752,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaFilterType",
     "value": 6,
     "min_value": 0,
@@ -11548,6 +11799,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaFilterFreq",
     "value": 7,
     "min_value": 72,
@@ -11594,6 +11846,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaFilterQ",
     "value": 8,
     "min_value": 0,
@@ -11640,6 +11893,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaAttack",
     "value": 9,
     "min_value": 0,
@@ -11686,6 +11940,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaRange",
     "value": 10,
     "min_value": 0,
@@ -11732,6 +11987,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaHold",
     "value": 11,
     "min_value": 0,
@@ -11778,6 +12034,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaRelease",
     "value": 12,
     "min_value": 0,
@@ -11824,6 +12081,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaRatio",
     "value": 13,
     "min_value": 0,
@@ -11870,6 +12128,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaGain",
     "value": 14,
     "min_value": 0,
@@ -11916,6 +12175,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaKnee",
     "value": 15,
     "min_value": 0,
@@ -11962,6 +12222,7 @@
   {
     "control_group": "kMixDynamics",
     "control_id": 81,
+    "max_channels": 16,
     "sub_control": "kDynaThreshold",
     "value": 16,
     "min_value": -540,
@@ -12008,6 +12269,7 @@
   {
     "control_group": "kMixEQLink",
     "control_id": 82,
+    "max_channels": 16,
     "sub_control": "kLink",
     "value": 0,
     "min_value": 0,
@@ -12054,6 +12316,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQFlat",
     "value": 0,
     "min_value": 0,
@@ -12100,6 +12363,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQType",
     "value": 1,
     "min_value": 0,
@@ -12146,6 +12410,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQOn",
     "value": 2,
     "min_value": 0,
@@ -12192,6 +12457,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ1Type",
     "value": 3,
     "min_value": 0,
@@ -12238,6 +12504,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ4Type",
     "value": 4,
     "min_value": 0,
@@ -12284,6 +12551,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ1HPFOn",
     "value": 5,
     "min_value": 0,
@@ -12330,6 +12598,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ4LPFOn",
     "value": 6,
     "min_value": 0,
@@ -12376,6 +12645,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ1Bypass",
     "value": 7,
     "min_value": 0,
@@ -12422,6 +12692,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ1Q",
     "value": 8,
     "min_value": -4,
@@ -12468,6 +12739,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ1F",
     "value": 9,
     "min_value": 4,
@@ -12514,6 +12786,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ1G",
     "value": 10,
     "min_value": -180,
@@ -12560,6 +12833,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ2Bypass",
     "value": 11,
     "min_value": 0,
@@ -12606,6 +12880,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ2Q",
     "value": 12,
     "min_value": -4,
@@ -12652,6 +12927,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ2F",
     "value": 13,
     "min_value": 4,
@@ -12698,6 +12974,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ2G",
     "value": 14,
     "min_value": -180,
@@ -12744,6 +13021,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ3Bypass",
     "value": 15,
     "min_value": 0,
@@ -12790,6 +13068,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ3Q",
     "value": 16,
     "min_value": -4,
@@ -12836,6 +13115,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ3F",
     "value": 17,
     "min_value": 4,
@@ -12882,6 +13162,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ3G",
     "value": 18,
     "min_value": -180,
@@ -12928,6 +13209,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ4Bypass",
     "value": 19,
     "min_value": 0,
@@ -12974,6 +13256,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ4Q",
     "value": 20,
     "min_value": -4,
@@ -13020,6 +13303,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ4F",
     "value": 21,
     "min_value": 4,
@@ -13066,6 +13350,7 @@
   {
     "control_group": "kMixEQ",
     "control_id": 83,
+    "max_channels": 16,
     "sub_control": "kEQ4G",
     "value": 22,
     "min_value": -180,
@@ -13112,6 +13397,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kToMatrixLoc",
     "value": 0,
     "min_value": 0,
@@ -13158,6 +13444,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kFixedMatrixPan",
     "value": 1,
     "min_value": 0,
@@ -13204,6 +13491,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kFollowPan",
     "value": 2,
     "min_value": 0,
@@ -13250,6 +13538,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix1On",
     "value": 3,
     "min_value": 0,
@@ -13296,6 +13585,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix1Pos",
     "value": 4,
     "min_value": 0,
@@ -13342,6 +13632,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix1Level",
     "value": 5,
     "min_value": 0,
@@ -13388,6 +13679,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix2On",
     "value": 6,
     "min_value": 0,
@@ -13434,6 +13726,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix2Pos",
     "value": 7,
     "min_value": 0,
@@ -13480,6 +13773,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix2Level",
     "value": 8,
     "min_value": 0,
@@ -13526,6 +13820,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix3On",
     "value": 9,
     "min_value": 0,
@@ -13572,6 +13867,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix3Pos",
     "value": 10,
     "min_value": 0,
@@ -13618,6 +13914,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix3Level",
     "value": 11,
     "min_value": 0,
@@ -13664,6 +13961,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix4On",
     "value": 12,
     "min_value": 0,
@@ -13710,6 +14008,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix4Pos",
     "value": 13,
     "min_value": 0,
@@ -13756,6 +14055,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix4Level",
     "value": 14,
     "min_value": 0,
@@ -13802,6 +14102,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix5On",
     "value": 15,
     "min_value": 0,
@@ -13848,6 +14149,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix5Pos",
     "value": 16,
     "min_value": 0,
@@ -13894,6 +14196,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix5Level",
     "value": 17,
     "min_value": 0,
@@ -13940,6 +14243,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix6On",
     "value": 18,
     "min_value": 0,
@@ -13986,6 +14290,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix6Pos",
     "value": 19,
     "min_value": 0,
@@ -14032,6 +14337,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix6Level",
     "value": 20,
     "min_value": 0,
@@ -14078,6 +14384,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix7On",
     "value": 21,
     "min_value": 0,
@@ -14124,6 +14431,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix7Pos",
     "value": 22,
     "min_value": 0,
@@ -14170,6 +14478,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix7Level",
     "value": 23,
     "min_value": 0,
@@ -14216,6 +14525,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix8On",
     "value": 24,
     "min_value": 0,
@@ -14262,6 +14572,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix8Pos",
     "value": 25,
     "min_value": 0,
@@ -14308,6 +14619,7 @@
   {
     "control_group": "kMixToMatrix",
     "control_id": 84,
+    "max_channels": 16,
     "sub_control": "kMatrix8Level",
     "value": 26,
     "min_value": 0,
@@ -14354,6 +14666,7 @@
   {
     "control_group": "kMixToMatrixPan",
     "control_id": 85,
+    "max_channels": 16,
     "sub_control": "kToMatrixPan0102",
     "value": 0,
     "min_value": -63,
@@ -14400,6 +14713,7 @@
   {
     "control_group": "kMixToMatrixPan",
     "control_id": 85,
+    "max_channels": 16,
     "sub_control": "kToMatrixPan0304",
     "value": 1,
     "min_value": -63,
@@ -14446,6 +14760,7 @@
   {
     "control_group": "kMixToMatrixPan",
     "control_id": 85,
+    "max_channels": 16,
     "sub_control": "kToMatrixPan0506",
     "value": 2,
     "min_value": -63,
@@ -14492,6 +14807,7 @@
   {
     "control_group": "kMixToMatrixPan",
     "control_id": 85,
+    "max_channels": 16,
     "sub_control": "kToMatrixPan0708",
     "value": 3,
     "min_value": -63,
@@ -14538,6 +14854,7 @@
   {
     "control_group": "kMixToStereo",
     "control_id": 86,
+    "max_channels": 16,
     "sub_control": "kMixToStereoOn",
     "value": 0,
     "min_value": 0,
@@ -14584,6 +14901,7 @@
   {
     "control_group": "kMixToStereo",
     "control_id": 86,
+    "max_channels": 16,
     "sub_control": "kMixToStereoPre",
     "value": 1,
     "min_value": 0,
@@ -14630,6 +14948,7 @@
   {
     "control_group": "kMixToStereo",
     "control_id": 86,
+    "max_channels": 16,
     "sub_control": "kMixToStereoPan",
     "value": 2,
     "min_value": -63,
@@ -14676,6 +14995,7 @@
   {
     "control_group": "kMixToMono",
     "control_id": 87,
+    "max_channels": 16,
     "sub_control": "kMixToMonoOn",
     "value": 0,
     "min_value": 0,
@@ -14722,6 +15042,7 @@
   {
     "control_group": "kMixGroup",
     "control_id": 88,
+    "max_channels": 16,
     "sub_control": "kMuteAssign1",
     "value": 0,
     "min_value": 0,
@@ -14768,6 +15089,7 @@
   {
     "control_group": "kMixGroup",
     "control_id": 88,
+    "max_channels": 16,
     "sub_control": "kMuteAssign2",
     "value": 1,
     "min_value": 0,
@@ -14814,6 +15136,7 @@
   {
     "control_group": "kMixGroup",
     "control_id": 88,
+    "max_channels": 16,
     "sub_control": "kMuteAssign3",
     "value": 2,
     "min_value": 0,
@@ -14860,6 +15183,7 @@
   {
     "control_group": "kMixGroup",
     "control_id": 88,
+    "max_channels": 16,
     "sub_control": "kMuteAssign4",
     "value": 3,
     "min_value": 0,
@@ -14906,6 +15230,7 @@
   {
     "control_group": "kMixGroup",
     "control_id": 88,
+    "max_channels": 16,
     "sub_control": "kMuteAssign5",
     "value": 4,
     "min_value": 0,
@@ -14952,6 +15277,7 @@
   {
     "control_group": "kMixGroup",
     "control_id": 88,
+    "max_channels": 16,
     "sub_control": "kMuteAssign6",
     "value": 5,
     "min_value": 0,
@@ -14998,6 +15324,7 @@
   {
     "control_group": "kMixGroup",
     "control_id": 88,
+    "max_channels": 16,
     "sub_control": "kMuteAssign7",
     "value": 6,
     "min_value": 0,
@@ -15044,6 +15371,7 @@
   {
     "control_group": "kMixGroup",
     "control_id": 88,
+    "max_channels": 16,
     "sub_control": "kMuteAssign8",
     "value": 7,
     "min_value": 0,
@@ -15090,6 +15418,7 @@
   {
     "control_group": "kMixDCA",
     "control_id": 89,
+    "max_channels": 16,
     "sub_control": "kDCAAssign1",
     "value": 0,
     "min_value": 0,
@@ -15136,6 +15465,7 @@
   {
     "control_group": "kMixDCA",
     "control_id": 89,
+    "max_channels": 16,
     "sub_control": "kDCAAssign2",
     "value": 1,
     "min_value": 0,
@@ -15182,6 +15512,7 @@
   {
     "control_group": "kMixDCA",
     "control_id": 89,
+    "max_channels": 16,
     "sub_control": "kDCAAssign3",
     "value": 2,
     "min_value": 0,
@@ -15228,6 +15559,7 @@
   {
     "control_group": "kMixDCA",
     "control_id": 89,
+    "max_channels": 16,
     "sub_control": "kDCAAssign4",
     "value": 3,
     "min_value": 0,
@@ -15274,6 +15606,7 @@
   {
     "control_group": "kMixDCA",
     "control_id": 89,
+    "max_channels": 16,
     "sub_control": "kDCAAssign5",
     "value": 4,
     "min_value": 0,
@@ -15320,6 +15653,7 @@
   {
     "control_group": "kMixDCA",
     "control_id": 89,
+    "max_channels": 16,
     "sub_control": "kDCAAssign6",
     "value": 5,
     "min_value": 0,
@@ -15366,6 +15700,7 @@
   {
     "control_group": "kMixDCA",
     "control_id": 89,
+    "max_channels": 16,
     "sub_control": "kDCAAssign7",
     "value": 6,
     "min_value": 0,
@@ -15412,6 +15747,7 @@
   {
     "control_group": "kMixDCA",
     "control_id": 89,
+    "max_channels": 16,
     "sub_control": "kDCAAssign8",
     "value": 7,
     "min_value": 0,
@@ -15458,6 +15794,7 @@
   {
     "control_group": "kMatrixFadeTime",
     "control_id": 90,
+    "max_channels": 8,
     "sub_control": "kFadeLevelOn",
     "value": 0,
     "min_value": 0,
@@ -15504,6 +15841,7 @@
   {
     "control_group": "kMatrixFadeTime",
     "control_id": 90,
+    "max_channels": 8,
     "sub_control": "kFadeStartOffset",
     "value": 1,
     "min_value": 0,
@@ -15550,6 +15888,7 @@
   {
     "control_group": "kMatrixFadeTime",
     "control_id": 90,
+    "max_channels": 8,
     "sub_control": "kFadeTime",
     "value": 2,
     "min_value": 0,
@@ -15596,6 +15935,7 @@
   {
     "control_group": "kMatrixInsert",
     "control_id": 91,
+    "max_channels": 8,
     "sub_control": "kInsertOn",
     "value": 0,
     "min_value": 0,
@@ -15642,6 +15982,7 @@
   {
     "control_group": "kMatrixInsert",
     "control_id": 91,
+    "max_channels": 8,
     "sub_control": "kInsertLocation",
     "value": 1,
     "min_value": 0,
@@ -15688,6 +16029,7 @@
   {
     "control_group": "kMatrixOn",
     "control_id": 92,
+    "max_channels": 8,
     "sub_control": "kChannelOn",
     "value": 0,
     "min_value": 0,
@@ -15734,6 +16076,7 @@
   {
     "control_group": "kMatrixBalance",
     "control_id": 93,
+    "max_channels": 8,
     "sub_control": "kBalance",
     "value": 0,
     "min_value": -63,
@@ -15780,6 +16123,7 @@
   {
     "control_group": "kMatrixFader",
     "control_id": 94,
+    "max_channels": 8,
     "sub_control": "kFader",
     "value": 0,
     "min_value": 0,
@@ -15826,6 +16170,7 @@
   {
     "control_group": "kMatrixAttenuator",
     "control_id": 95,
+    "max_channels": 8,
     "sub_control": "kAttGang",
     "value": 0,
     "min_value": 0,
@@ -15872,6 +16217,7 @@
   {
     "control_group": "kMatrixAttenuator",
     "control_id": 95,
+    "max_channels": 8,
     "sub_control": "kAtt",
     "value": 1,
     "min_value": -960,
@@ -15918,6 +16264,7 @@
   {
     "control_group": "kMatrixDynaPair",
     "control_id": 96,
+    "max_channels": 8,
     "sub_control": "kPair",
     "value": 0,
     "min_value": 0,
@@ -15964,6 +16311,7 @@
   {
     "control_group": "kMatrixDynaLink",
     "control_id": 97,
+    "max_channels": 8,
     "sub_control": "kLink",
     "value": 0,
     "min_value": 0,
@@ -16010,6 +16358,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaOn",
     "value": 0,
     "min_value": 0,
@@ -16056,6 +16405,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaType",
     "value": 1,
     "min_value": 2,
@@ -16102,6 +16452,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kAutoOn",
     "value": 2,
     "min_value": 0,
@@ -16148,6 +16499,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kLeftSideChain",
     "value": 3,
     "min_value": 0,
@@ -16194,6 +16546,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaKeyIn",
     "value": 4,
     "min_value": 0,
@@ -16240,6 +16593,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaFilterOn",
     "value": 5,
     "min_value": 0,
@@ -16286,6 +16640,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaFilterType",
     "value": 6,
     "min_value": 0,
@@ -16332,6 +16687,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaFilterFreq",
     "value": 7,
     "min_value": 72,
@@ -16378,6 +16734,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaFilterQ",
     "value": 8,
     "min_value": 0,
@@ -16424,6 +16781,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaAttack",
     "value": 9,
     "min_value": 0,
@@ -16470,6 +16828,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaRange",
     "value": 10,
     "min_value": 0,
@@ -16516,6 +16875,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaHold",
     "value": 11,
     "min_value": 0,
@@ -16562,6 +16922,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaRelease",
     "value": 12,
     "min_value": 0,
@@ -16608,6 +16969,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaRatio",
     "value": 13,
     "min_value": 0,
@@ -16654,6 +17016,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaGain",
     "value": 14,
     "min_value": 0,
@@ -16700,6 +17063,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaKnee",
     "value": 15,
     "min_value": 0,
@@ -16746,6 +17110,7 @@
   {
     "control_group": "kMatrixDynamics",
     "control_id": 98,
+    "max_channels": 8,
     "sub_control": "kDynaThreshold",
     "value": 16,
     "min_value": -540,
@@ -16792,6 +17157,7 @@
   {
     "control_group": "kMatrixEQLink",
     "control_id": 99,
+    "max_channels": 8,
     "sub_control": "kLink",
     "value": 0,
     "min_value": 0,
@@ -16838,6 +17204,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQFlat",
     "value": 0,
     "min_value": 0,
@@ -16884,6 +17251,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQType",
     "value": 1,
     "min_value": 0,
@@ -16930,6 +17298,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQOn",
     "value": 2,
     "min_value": 0,
@@ -16976,6 +17345,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ1Type",
     "value": 3,
     "min_value": 0,
@@ -17022,6 +17392,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ4Type",
     "value": 4,
     "min_value": 0,
@@ -17068,6 +17439,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ1HPFOn",
     "value": 5,
     "min_value": 0,
@@ -17114,6 +17486,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ4LPFOn",
     "value": 6,
     "min_value": 0,
@@ -17160,6 +17533,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ1Bypass",
     "value": 7,
     "min_value": 0,
@@ -17206,6 +17580,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ1Q",
     "value": 8,
     "min_value": -4,
@@ -17252,6 +17627,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ1F",
     "value": 9,
     "min_value": 4,
@@ -17298,6 +17674,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ1G",
     "value": 10,
     "min_value": -180,
@@ -17344,6 +17721,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ2Bypass",
     "value": 11,
     "min_value": 0,
@@ -17390,6 +17768,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ2Q",
     "value": 12,
     "min_value": -4,
@@ -17436,6 +17815,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ2F",
     "value": 13,
     "min_value": 4,
@@ -17482,6 +17862,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ2G",
     "value": 14,
     "min_value": -180,
@@ -17528,6 +17909,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ3Bypass",
     "value": 15,
     "min_value": 0,
@@ -17574,6 +17956,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ3Q",
     "value": 16,
     "min_value": -4,
@@ -17620,6 +18003,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ3F",
     "value": 17,
     "min_value": 4,
@@ -17666,6 +18050,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ3G",
     "value": 18,
     "min_value": -180,
@@ -17712,6 +18097,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ4Bypass",
     "value": 19,
     "min_value": 0,
@@ -17758,6 +18144,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ4Q",
     "value": 20,
     "min_value": -4,
@@ -17804,6 +18191,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ4F",
     "value": 21,
     "min_value": 4,
@@ -17850,6 +18238,7 @@
   {
     "control_group": "kMatrixEQ",
     "control_id": 100,
+    "max_channels": 8,
     "sub_control": "kEQ4G",
     "value": 22,
     "min_value": -180,
@@ -17896,6 +18285,7 @@
   {
     "control_group": "kMatrixGroup",
     "control_id": 101,
+    "max_channels": 8,
     "sub_control": "kMuteAssign1",
     "value": 0,
     "min_value": 0,
@@ -17942,6 +18332,7 @@
   {
     "control_group": "kMatrixGroup",
     "control_id": 101,
+    "max_channels": 8,
     "sub_control": "kMuteAssign2",
     "value": 1,
     "min_value": 0,
@@ -17988,6 +18379,7 @@
   {
     "control_group": "kMatrixGroup",
     "control_id": 101,
+    "max_channels": 8,
     "sub_control": "kMuteAssign3",
     "value": 2,
     "min_value": 0,
@@ -18034,6 +18426,7 @@
   {
     "control_group": "kMatrixGroup",
     "control_id": 101,
+    "max_channels": 8,
     "sub_control": "kMuteAssign4",
     "value": 3,
     "min_value": 0,
@@ -18080,6 +18473,7 @@
   {
     "control_group": "kMatrixGroup",
     "control_id": 101,
+    "max_channels": 8,
     "sub_control": "kMuteAssign5",
     "value": 4,
     "min_value": 0,
@@ -18126,6 +18520,7 @@
   {
     "control_group": "kMatrixGroup",
     "control_id": 101,
+    "max_channels": 8,
     "sub_control": "kMuteAssign6",
     "value": 5,
     "min_value": 0,
@@ -18172,6 +18567,7 @@
   {
     "control_group": "kMatrixGroup",
     "control_id": 101,
+    "max_channels": 8,
     "sub_control": "kMuteAssign7",
     "value": 6,
     "min_value": 0,
@@ -18218,6 +18614,7 @@
   {
     "control_group": "kMatrixGroup",
     "control_id": 101,
+    "max_channels": 8,
     "sub_control": "kMuteAssign8",
     "value": 7,
     "min_value": 0,
@@ -18264,6 +18661,7 @@
   {
     "control_group": "kMatrixDCA",
     "control_id": 102,
+    "max_channels": 8,
     "sub_control": "kDCAAssign1",
     "value": 0,
     "min_value": 0,
@@ -18310,6 +18708,7 @@
   {
     "control_group": "kMatrixDCA",
     "control_id": 102,
+    "max_channels": 8,
     "sub_control": "kDCAAssign2",
     "value": 1,
     "min_value": 0,
@@ -18356,6 +18755,7 @@
   {
     "control_group": "kMatrixDCA",
     "control_id": 102,
+    "max_channels": 8,
     "sub_control": "kDCAAssign3",
     "value": 2,
     "min_value": 0,
@@ -18402,6 +18802,7 @@
   {
     "control_group": "kMatrixDCA",
     "control_id": 102,
+    "max_channels": 8,
     "sub_control": "kDCAAssign4",
     "value": 3,
     "min_value": 0,
@@ -18448,6 +18849,7 @@
   {
     "control_group": "kMatrixDCA",
     "control_id": 102,
+    "max_channels": 8,
     "sub_control": "kDCAAssign5",
     "value": 4,
     "min_value": 0,
@@ -18494,6 +18896,7 @@
   {
     "control_group": "kMatrixDCA",
     "control_id": 102,
+    "max_channels": 8,
     "sub_control": "kDCAAssign6",
     "value": 5,
     "min_value": 0,
@@ -18540,6 +18943,7 @@
   {
     "control_group": "kMatrixDCA",
     "control_id": 102,
+    "max_channels": 8,
     "sub_control": "kDCAAssign7",
     "value": 6,
     "min_value": 0,
@@ -18586,6 +18990,7 @@
   {
     "control_group": "kMatrixDCA",
     "control_id": 102,
+    "max_channels": 8,
     "sub_control": "kDCAAssign8",
     "value": 7,
     "min_value": 0,
@@ -18632,6 +19037,7 @@
   {
     "control_group": "kStereoPair",
     "control_id": 103,
+    "max_channels": 3,
     "sub_control": "kPair",
     "value": 0,
     "min_value": 1,
@@ -18678,6 +19084,7 @@
   {
     "control_group": "kStereoFadeTime",
     "control_id": 104,
+    "max_channels": 3,
     "sub_control": "kFadeLevelOn",
     "value": 0,
     "min_value": 0,
@@ -18724,6 +19131,7 @@
   {
     "control_group": "kStereoFadeTime",
     "control_id": 104,
+    "max_channels": 3,
     "sub_control": "kFadeStartOffset",
     "value": 1,
     "min_value": 0,
@@ -18770,6 +19178,7 @@
   {
     "control_group": "kStereoFadeTime",
     "control_id": 104,
+    "max_channels": 3,
     "sub_control": "kFadeTime",
     "value": 2,
     "min_value": 0,
@@ -18816,6 +19225,7 @@
   {
     "control_group": "kStereoInsert",
     "control_id": 105,
+    "max_channels": 3,
     "sub_control": "kInsertOn",
     "value": 0,
     "min_value": 0,
@@ -18862,6 +19272,7 @@
   {
     "control_group": "kStereoInsert",
     "control_id": 105,
+    "max_channels": 3,
     "sub_control": "kInsertLocation",
     "value": 1,
     "min_value": 0,
@@ -18908,6 +19319,7 @@
   {
     "control_group": "kStereoOn",
     "control_id": 106,
+    "max_channels": 3,
     "sub_control": "kChannelOn",
     "value": 0,
     "min_value": 0,
@@ -18954,6 +19366,7 @@
   {
     "control_group": "kStereoBalance",
     "control_id": 107,
+    "max_channels": 3,
     "sub_control": "kBalance",
     "value": 0,
     "min_value": -63,
@@ -19000,6 +19413,7 @@
   {
     "control_group": "kStereoFader",
     "control_id": 108,
+    "max_channels": 3,
     "sub_control": "kFader",
     "value": 0,
     "min_value": 0,
@@ -19046,6 +19460,7 @@
   {
     "control_group": "kStereoAttenuator",
     "control_id": 109,
+    "max_channels": 3,
     "sub_control": "kAttGang",
     "value": 0,
     "min_value": 0,
@@ -19092,6 +19507,7 @@
   {
     "control_group": "kStereoAttenuator",
     "control_id": 109,
+    "max_channels": 3,
     "sub_control": "kAtt",
     "value": 1,
     "min_value": -960,
@@ -19138,6 +19554,7 @@
   {
     "control_group": "kStereoDynaPair",
     "control_id": 110,
+    "max_channels": 3,
     "sub_control": "kPair",
     "value": 0,
     "min_value": 0,
@@ -19184,6 +19601,7 @@
   {
     "control_group": "kStereoDynaLink",
     "control_id": 111,
+    "max_channels": 3,
     "sub_control": "kLink",
     "value": 0,
     "min_value": 0,
@@ -19230,6 +19648,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaOn",
     "value": 0,
     "min_value": 0,
@@ -19276,6 +19695,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaType",
     "value": 1,
     "min_value": 2,
@@ -19322,6 +19742,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kAutoOn",
     "value": 2,
     "min_value": 0,
@@ -19368,6 +19789,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kLeftSideChain",
     "value": 3,
     "min_value": 0,
@@ -19414,6 +19836,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaKeyIn",
     "value": 4,
     "min_value": 0,
@@ -19460,6 +19883,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaFilterOn",
     "value": 5,
     "min_value": 0,
@@ -19506,6 +19930,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaFilterType",
     "value": 6,
     "min_value": 0,
@@ -19552,6 +19977,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaFilterFreq",
     "value": 7,
     "min_value": 72,
@@ -19598,6 +20024,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaFilterQ",
     "value": 8,
     "min_value": 0,
@@ -19644,6 +20071,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaAttack",
     "value": 9,
     "min_value": 0,
@@ -19690,6 +20118,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaRange",
     "value": 10,
     "min_value": 0,
@@ -19736,6 +20165,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaHold",
     "value": 11,
     "min_value": 0,
@@ -19782,6 +20212,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaRelease",
     "value": 12,
     "min_value": 0,
@@ -19828,6 +20259,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaRatio",
     "value": 13,
     "min_value": 0,
@@ -19874,6 +20306,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaGain",
     "value": 14,
     "min_value": 0,
@@ -19920,6 +20353,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaKnee",
     "value": 15,
     "min_value": 0,
@@ -19966,6 +20400,7 @@
   {
     "control_group": "kStereoDynamics",
     "control_id": 112,
+    "max_channels": 3,
     "sub_control": "kDynaThreshold",
     "value": 16,
     "min_value": -540,
@@ -20012,6 +20447,7 @@
   {
     "control_group": "kStereoEQLink",
     "control_id": 113,
+    "max_channels": 3,
     "sub_control": "kLink",
     "value": 0,
     "min_value": 0,
@@ -20058,6 +20494,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQFlat",
     "value": 0,
     "min_value": 0,
@@ -20104,6 +20541,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQType",
     "value": 1,
     "min_value": 0,
@@ -20150,6 +20588,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQOn",
     "value": 2,
     "min_value": 0,
@@ -20196,6 +20635,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ1Type",
     "value": 3,
     "min_value": 0,
@@ -20242,6 +20682,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ4Type",
     "value": 4,
     "min_value": 0,
@@ -20288,6 +20729,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ1HPFOn",
     "value": 5,
     "min_value": 0,
@@ -20334,6 +20776,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ4LPFOn",
     "value": 6,
     "min_value": 0,
@@ -20380,6 +20823,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ1Bypass",
     "value": 7,
     "min_value": 0,
@@ -20426,6 +20870,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ1Q",
     "value": 8,
     "min_value": -4,
@@ -20472,6 +20917,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ1F",
     "value": 9,
     "min_value": 4,
@@ -20518,6 +20964,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ1G",
     "value": 10,
     "min_value": -180,
@@ -20564,6 +21011,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ2Bypass",
     "value": 11,
     "min_value": 0,
@@ -20610,6 +21058,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ2Q",
     "value": 12,
     "min_value": -4,
@@ -20656,6 +21105,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ2F",
     "value": 13,
     "min_value": 4,
@@ -20702,6 +21152,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ2G",
     "value": 14,
     "min_value": -180,
@@ -20748,6 +21199,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ3Bypass",
     "value": 15,
     "min_value": 0,
@@ -20794,6 +21246,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ3Q",
     "value": 16,
     "min_value": -4,
@@ -20840,6 +21293,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ3F",
     "value": 17,
     "min_value": 4,
@@ -20886,6 +21340,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ3G",
     "value": 18,
     "min_value": -180,
@@ -20932,6 +21387,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ4Bypass",
     "value": 19,
     "min_value": 0,
@@ -20978,6 +21434,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ4Q",
     "value": 20,
     "min_value": -4,
@@ -21024,6 +21481,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ4F",
     "value": 21,
     "min_value": 4,
@@ -21070,6 +21528,7 @@
   {
     "control_group": "kStereoEQ",
     "control_id": 114,
+    "max_channels": 3,
     "sub_control": "kEQ4G",
     "value": 22,
     "min_value": -180,
@@ -21116,6 +21575,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kToMatrixLoc",
     "value": 0,
     "min_value": 0,
@@ -21162,6 +21622,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kFixedMatrixPan",
     "value": 1,
     "min_value": 0,
@@ -21208,6 +21669,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kFollowPan",
     "value": 2,
     "min_value": 0,
@@ -21254,6 +21716,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix1On",
     "value": 3,
     "min_value": 0,
@@ -21300,6 +21763,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix1Pos",
     "value": 4,
     "min_value": 0,
@@ -21346,6 +21810,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix1Level",
     "value": 5,
     "min_value": 0,
@@ -21392,6 +21857,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix2On",
     "value": 6,
     "min_value": 0,
@@ -21438,6 +21904,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix2Pos",
     "value": 7,
     "min_value": 0,
@@ -21484,6 +21951,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix2Level",
     "value": 8,
     "min_value": 0,
@@ -21530,6 +21998,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix3On",
     "value": 9,
     "min_value": 0,
@@ -21576,6 +22045,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix3Pos",
     "value": 10,
     "min_value": 0,
@@ -21622,6 +22092,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix3Level",
     "value": 11,
     "min_value": 0,
@@ -21668,6 +22139,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix4On",
     "value": 12,
     "min_value": 0,
@@ -21714,6 +22186,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix4Pos",
     "value": 13,
     "min_value": 0,
@@ -21760,6 +22233,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix4Level",
     "value": 14,
     "min_value": 0,
@@ -21806,6 +22280,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix5On",
     "value": 15,
     "min_value": 0,
@@ -21852,6 +22327,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix5Pos",
     "value": 16,
     "min_value": 0,
@@ -21898,6 +22374,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix5Level",
     "value": 17,
     "min_value": 0,
@@ -21944,6 +22421,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix6On",
     "value": 18,
     "min_value": 0,
@@ -21990,6 +22468,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix6Pos",
     "value": 19,
     "min_value": 0,
@@ -22036,6 +22515,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix6Level",
     "value": 20,
     "min_value": 0,
@@ -22082,6 +22562,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix7On",
     "value": 21,
     "min_value": 0,
@@ -22128,6 +22609,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix7Pos",
     "value": 22,
     "min_value": 0,
@@ -22174,6 +22656,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix7Level",
     "value": 23,
     "min_value": 0,
@@ -22220,6 +22703,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix8On",
     "value": 24,
     "min_value": 0,
@@ -22266,6 +22750,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix8Pos",
     "value": 25,
     "min_value": 0,
@@ -22312,6 +22797,7 @@
   {
     "control_group": "kStereoToMatrix",
     "control_id": 115,
+    "max_channels": 3,
     "sub_control": "kMatrix8Level",
     "value": 26,
     "min_value": 0,
@@ -22358,6 +22844,7 @@
   {
     "control_group": "kStereoToMatrixPan",
     "control_id": 116,
+    "max_channels": 3,
     "sub_control": "kToMatrixPan0102",
     "value": 0,
     "min_value": -63,
@@ -22404,6 +22891,7 @@
   {
     "control_group": "kStereoToMatrixPan",
     "control_id": 116,
+    "max_channels": 3,
     "sub_control": "kToMatrixPan0304",
     "value": 1,
     "min_value": -63,
@@ -22450,6 +22938,7 @@
   {
     "control_group": "kStereoToMatrixPan",
     "control_id": 116,
+    "max_channels": 3,
     "sub_control": "kToMatrixPan0506",
     "value": 2,
     "min_value": -63,
@@ -22496,6 +22985,7 @@
   {
     "control_group": "kStereoToMatrixPan",
     "control_id": 116,
+    "max_channels": 3,
     "sub_control": "kToMatrixPan0708",
     "value": 3,
     "min_value": -63,
@@ -22542,6 +23032,7 @@
   {
     "control_group": "kStereoGroup",
     "control_id": 117,
+    "max_channels": 3,
     "sub_control": "kMuteAssign1",
     "value": 0,
     "min_value": 0,
@@ -22588,6 +23079,7 @@
   {
     "control_group": "kStereoGroup",
     "control_id": 117,
+    "max_channels": 3,
     "sub_control": "kMuteAssign2",
     "value": 1,
     "min_value": 0,
@@ -22634,6 +23126,7 @@
   {
     "control_group": "kStereoGroup",
     "control_id": 117,
+    "max_channels": 3,
     "sub_control": "kMuteAssign3",
     "value": 2,
     "min_value": 0,
@@ -22680,6 +23173,7 @@
   {
     "control_group": "kStereoGroup",
     "control_id": 117,
+    "max_channels": 3,
     "sub_control": "kMuteAssign4",
     "value": 3,
     "min_value": 0,
@@ -22726,6 +23220,7 @@
   {
     "control_group": "kStereoGroup",
     "control_id": 117,
+    "max_channels": 3,
     "sub_control": "kMuteAssign5",
     "value": 4,
     "min_value": 0,
@@ -22772,6 +23267,7 @@
   {
     "control_group": "kStereoGroup",
     "control_id": 117,
+    "max_channels": 3,
     "sub_control": "kMuteAssign6",
     "value": 5,
     "min_value": 0,
@@ -22818,6 +23314,7 @@
   {
     "control_group": "kStereoGroup",
     "control_id": 117,
+    "max_channels": 3,
     "sub_control": "kMuteAssign7",
     "value": 6,
     "min_value": 0,
@@ -22864,6 +23361,7 @@
   {
     "control_group": "kStereoGroup",
     "control_id": 117,
+    "max_channels": 3,
     "sub_control": "kMuteAssign8",
     "value": 7,
     "min_value": 0,
@@ -22910,6 +23408,7 @@
   {
     "control_group": "kStereoDCA",
     "control_id": 118,
+    "max_channels": 3,
     "sub_control": "kDCAAssign1",
     "value": 0,
     "min_value": 0,
@@ -22956,6 +23455,7 @@
   {
     "control_group": "kStereoDCA",
     "control_id": 118,
+    "max_channels": 3,
     "sub_control": "kDCAAssign2",
     "value": 1,
     "min_value": 0,
@@ -23002,6 +23502,7 @@
   {
     "control_group": "kStereoDCA",
     "control_id": 118,
+    "max_channels": 3,
     "sub_control": "kDCAAssign3",
     "value": 2,
     "min_value": 0,
@@ -23048,6 +23549,7 @@
   {
     "control_group": "kStereoDCA",
     "control_id": 118,
+    "max_channels": 3,
     "sub_control": "kDCAAssign4",
     "value": 3,
     "min_value": 0,
@@ -23094,6 +23596,7 @@
   {
     "control_group": "kStereoDCA",
     "control_id": 118,
+    "max_channels": 3,
     "sub_control": "kDCAAssign5",
     "value": 4,
     "min_value": 0,
@@ -23140,6 +23643,7 @@
   {
     "control_group": "kStereoDCA",
     "control_id": 118,
+    "max_channels": 3,
     "sub_control": "kDCAAssign6",
     "value": 5,
     "min_value": 0,
@@ -23186,6 +23690,7 @@
   {
     "control_group": "kStereoDCA",
     "control_id": 118,
+    "max_channels": 3,
     "sub_control": "kDCAAssign7",
     "value": 6,
     "min_value": 0,
@@ -23232,6 +23737,7 @@
   {
     "control_group": "kStereoDCA",
     "control_id": 118,
+    "max_channels": 3,
     "sub_control": "kDCAAssign8",
     "value": 7,
     "min_value": 0,
@@ -23278,6 +23784,7 @@
   {
     "control_group": "kDCAMute",
     "control_id": 119,
+    "max_channels": 8,
     "sub_control": "kDCAMuteOn",
     "value": 0,
     "min_value": 0,
@@ -23324,6 +23831,7 @@
   {
     "control_group": "kDCAFadeTime",
     "control_id": 120,
+    "max_channels": 8,
     "sub_control": "kFadeLevelOn",
     "value": 0,
     "min_value": 0,
@@ -23370,6 +23878,7 @@
   {
     "control_group": "kDCAFadeTime",
     "control_id": 120,
+    "max_channels": 8,
     "sub_control": "kFadeStartOffset",
     "value": 1,
     "min_value": 0,
@@ -23416,6 +23925,7 @@
   {
     "control_group": "kDCAFadeTime",
     "control_id": 120,
+    "max_channels": 8,
     "sub_control": "kFadeTime",
     "value": 2,
     "min_value": 0,
@@ -23462,6 +23972,7 @@
   {
     "control_group": "kDCAFader",
     "control_id": 121,
+    "max_channels": 8,
     "sub_control": "kFader",
     "value": 0,
     "min_value": 0,
@@ -23508,6 +24019,7 @@
   {
     "control_group": "kDCAName",
     "control_id": 123,
+    "max_channels": 8,
     "sub_control": "kNameShort1",
     "value": 0,
     "min_value": 0,
@@ -23554,6 +24066,7 @@
   {
     "control_group": "kDCAName",
     "control_id": 123,
+    "max_channels": 8,
     "sub_control": "kNameShort2",
     "value": 1,
     "min_value": 0,
@@ -23600,6 +24113,7 @@
   {
     "control_group": "kIconDCA",
     "control_id": 124,
+    "max_channels": 8,
     "sub_control": "kIconID",
     "value": 0,
     "min_value": 0,
@@ -23646,6 +24160,7 @@
   {
     "control_group": "kRackMount",
     "control_id": 125,
+    "max_channels": 8,
     "sub_control": "kRackMountType",
     "value": 0,
     "min_value": 0,
@@ -23692,6 +24207,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQType",
     "value": 0,
     "min_value": 0,
@@ -23738,6 +24254,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQLink",
     "value": 1,
     "min_value": 0,
@@ -23784,6 +24301,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQLRLink",
     "value": 2,
     "min_value": 0,
@@ -23830,6 +24348,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQOnL",
     "value": 3,
     "min_value": 0,
@@ -23876,6 +24395,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQOnR",
     "value": 4,
     "min_value": 0,
@@ -23922,6 +24442,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQFlatL",
     "value": 5,
     "min_value": 0,
@@ -23968,6 +24489,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQFlatR",
     "value": 6,
     "min_value": 0,
@@ -24014,6 +24536,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kAvailableBandsL",
     "value": 7,
     "min_value": 0,
@@ -24060,6 +24583,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kAvailableBandsR",
     "value": 8,
     "min_value": 0,
@@ -24106,6 +24630,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL1",
     "value": 9,
     "min_value": -150,
@@ -24152,6 +24677,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL2",
     "value": 10,
     "min_value": -150,
@@ -24198,6 +24724,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL3",
     "value": 11,
     "min_value": -150,
@@ -24244,6 +24771,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL4",
     "value": 12,
     "min_value": -150,
@@ -24290,6 +24818,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL5",
     "value": 13,
     "min_value": -150,
@@ -24336,6 +24865,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL6",
     "value": 14,
     "min_value": -150,
@@ -24382,6 +24912,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL7",
     "value": 15,
     "min_value": -150,
@@ -24428,6 +24959,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL8",
     "value": 16,
     "min_value": -150,
@@ -24474,6 +25006,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL9",
     "value": 17,
     "min_value": -150,
@@ -24520,6 +25053,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL10",
     "value": 18,
     "min_value": -150,
@@ -24566,6 +25100,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL11",
     "value": 19,
     "min_value": -150,
@@ -24612,6 +25147,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL12",
     "value": 20,
     "min_value": -150,
@@ -24658,6 +25194,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL13",
     "value": 21,
     "min_value": -150,
@@ -24704,6 +25241,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL14",
     "value": 22,
     "min_value": -150,
@@ -24750,6 +25288,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL15",
     "value": 23,
     "min_value": -150,
@@ -24796,6 +25335,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL16",
     "value": 24,
     "min_value": -150,
@@ -24842,6 +25382,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL17",
     "value": 25,
     "min_value": -150,
@@ -24888,6 +25429,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL18",
     "value": 26,
     "min_value": -150,
@@ -24934,6 +25476,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL19",
     "value": 27,
     "min_value": -150,
@@ -24980,6 +25523,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL20",
     "value": 28,
     "min_value": -150,
@@ -25026,6 +25570,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL21",
     "value": 29,
     "min_value": -150,
@@ -25072,6 +25617,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL22",
     "value": 30,
     "min_value": -150,
@@ -25118,6 +25664,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL23",
     "value": 31,
     "min_value": -150,
@@ -25164,6 +25711,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL24",
     "value": 32,
     "min_value": -150,
@@ -25210,6 +25758,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL25",
     "value": 33,
     "min_value": -150,
@@ -25256,6 +25805,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL26",
     "value": 34,
     "min_value": -150,
@@ -25302,6 +25852,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL27",
     "value": 35,
     "min_value": -150,
@@ -25348,6 +25899,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL28",
     "value": 36,
     "min_value": -150,
@@ -25394,6 +25946,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL29",
     "value": 37,
     "min_value": -150,
@@ -25440,6 +25993,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL30",
     "value": 38,
     "min_value": -150,
@@ -25486,6 +26040,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainL31",
     "value": 39,
     "min_value": -150,
@@ -25532,6 +26087,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR1",
     "value": 40,
     "min_value": -150,
@@ -25578,6 +26134,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR2",
     "value": 41,
     "min_value": -150,
@@ -25624,6 +26181,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR3",
     "value": 42,
     "min_value": -150,
@@ -25670,6 +26228,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR4",
     "value": 43,
     "min_value": -150,
@@ -25716,6 +26275,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR5",
     "value": 44,
     "min_value": -150,
@@ -25762,6 +26322,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR6",
     "value": 45,
     "min_value": -150,
@@ -25808,6 +26369,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR7",
     "value": 46,
     "min_value": -150,
@@ -25854,6 +26416,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR8",
     "value": 47,
     "min_value": -150,
@@ -25900,6 +26463,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR9",
     "value": 48,
     "min_value": -150,
@@ -25946,6 +26510,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR10",
     "value": 49,
     "min_value": -150,
@@ -25992,6 +26557,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR11",
     "value": 50,
     "min_value": -150,
@@ -26038,6 +26604,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR12",
     "value": 51,
     "min_value": -150,
@@ -26084,6 +26651,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR13",
     "value": 52,
     "min_value": -150,
@@ -26130,6 +26698,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR14",
     "value": 53,
     "min_value": -150,
@@ -26176,6 +26745,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR15",
     "value": 54,
     "min_value": -150,
@@ -26222,6 +26792,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR16",
     "value": 55,
     "min_value": -150,
@@ -26268,6 +26839,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR17",
     "value": 56,
     "min_value": -150,
@@ -26314,6 +26886,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR18",
     "value": 57,
     "min_value": -150,
@@ -26360,6 +26933,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR19",
     "value": 58,
     "min_value": -150,
@@ -26406,6 +26980,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR20",
     "value": 59,
     "min_value": -150,
@@ -26452,6 +27027,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR21",
     "value": 60,
     "min_value": -150,
@@ -26498,6 +27074,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR22",
     "value": 61,
     "min_value": -150,
@@ -26544,6 +27121,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR23",
     "value": 62,
     "min_value": -150,
@@ -26590,6 +27168,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR24",
     "value": 63,
     "min_value": -150,
@@ -26636,6 +27215,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR25",
     "value": 64,
     "min_value": -150,
@@ -26682,6 +27262,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR26",
     "value": 65,
     "min_value": -150,
@@ -26728,6 +27309,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR27",
     "value": 66,
     "min_value": -150,
@@ -26774,6 +27356,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR28",
     "value": 67,
     "min_value": -150,
@@ -26820,6 +27403,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR29",
     "value": 68,
     "min_value": -150,
@@ -26866,6 +27450,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR30",
     "value": 69,
     "min_value": -150,
@@ -26912,6 +27497,7 @@
   {
     "control_group": "kGEQ",
     "control_id": 126,
+    "max_channels": 8,
     "sub_control": "kGEQGainR31",
     "value": 70,
     "min_value": -150,
@@ -26958,6 +27544,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kTitle1",
     "value": 0,
     "min_value": 0,
@@ -27004,6 +27591,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kTitle2",
     "value": 1,
     "min_value": 0,
@@ -27050,6 +27638,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kTitle3",
     "value": 2,
     "min_value": 0,
@@ -27096,6 +27685,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kTitle4",
     "value": 3,
     "min_value": 0,
@@ -27142,6 +27732,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectBPM",
     "value": 4,
     "min_value": 25,
@@ -27188,6 +27779,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectMode",
     "value": 5,
     "min_value": 0,
@@ -27234,6 +27826,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectBypass",
     "value": 6,
     "min_value": 0,
@@ -27280,6 +27873,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectUtility",
     "value": 7,
     "min_value": 0,
@@ -27326,6 +27920,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectReserved",
     "value": 8,
     "min_value": 0,
@@ -27372,6 +27967,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectMix",
     "value": 9,
     "min_value": 0,
@@ -27418,6 +28014,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectType",
     "value": 10,
     "min_value": 0,
@@ -27464,6 +28061,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam1",
     "value": 11,
     "min_value": 0,
@@ -27510,6 +28108,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam2",
     "value": 12,
     "min_value": 0,
@@ -27556,6 +28155,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam3",
     "value": 13,
     "min_value": 0,
@@ -27602,6 +28202,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam4",
     "value": 14,
     "min_value": 0,
@@ -27648,6 +28249,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam5",
     "value": 15,
     "min_value": 0,
@@ -27694,6 +28296,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam6",
     "value": 16,
     "min_value": 0,
@@ -27740,6 +28343,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam7",
     "value": 17,
     "min_value": 0,
@@ -27786,6 +28390,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam8",
     "value": 18,
     "min_value": 0,
@@ -27832,6 +28437,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam9",
     "value": 19,
     "min_value": 0,
@@ -27878,6 +28484,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam10",
     "value": 20,
     "min_value": 0,
@@ -27924,6 +28531,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam11",
     "value": 21,
     "min_value": 0,
@@ -27970,6 +28578,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam12",
     "value": 22,
     "min_value": 0,
@@ -28016,6 +28625,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam13",
     "value": 23,
     "min_value": 0,
@@ -28062,6 +28672,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam14",
     "value": 24,
     "min_value": 0,
@@ -28108,6 +28719,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam15",
     "value": 25,
     "min_value": 0,
@@ -28154,6 +28766,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam16",
     "value": 26,
     "min_value": 0,
@@ -28200,6 +28813,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam17",
     "value": 27,
     "min_value": 0,
@@ -28246,6 +28860,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam18",
     "value": 28,
     "min_value": 0,
@@ -28292,6 +28907,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam19",
     "value": 29,
     "min_value": 0,
@@ -28338,6 +28954,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam20",
     "value": 30,
     "min_value": 0,
@@ -28384,6 +29001,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam21",
     "value": 31,
     "min_value": 0,
@@ -28430,6 +29048,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam22",
     "value": 32,
     "min_value": 0,
@@ -28476,6 +29095,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam23",
     "value": 33,
     "min_value": 0,
@@ -28522,6 +29142,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam24",
     "value": 34,
     "min_value": 0,
@@ -28568,6 +29189,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam25",
     "value": 35,
     "min_value": 0,
@@ -28614,6 +29236,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam26",
     "value": 36,
     "min_value": 0,
@@ -28660,6 +29283,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam27",
     "value": 37,
     "min_value": 0,
@@ -28706,6 +29330,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam28",
     "value": 38,
     "min_value": 0,
@@ -28752,6 +29377,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam29",
     "value": 39,
     "min_value": 0,
@@ -28798,6 +29424,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam30",
     "value": 40,
     "min_value": 0,
@@ -28844,6 +29471,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam31",
     "value": 41,
     "min_value": 0,
@@ -28890,6 +29518,7 @@
   {
     "control_group": "kEffect",
     "control_id": 127,
+    "max_channels": 4,
     "sub_control": "kEffectParam32",
     "value": 42,
     "min_value": 0,
@@ -28936,6 +29565,7 @@
   {
     "control_group": "kRP_Input_Fader",
     "control_id": 129,
+    "max_channels": 56,
     "sub_control": "kRP_Level",
     "value": 0,
     "min_value": 0,
@@ -28982,6 +29612,7 @@
   {
     "control_group": "kRP_Mix_Fader",
     "control_id": 130,
+    "max_channels": 16,
     "sub_control": "kRP_Level",
     "value": 0,
     "min_value": 0,
@@ -29028,6 +29659,7 @@
   {
     "control_group": "kRP_Matrix_Fader",
     "control_id": 131,
+    "max_channels": 8,
     "sub_control": "kRP_Level",
     "value": 0,
     "min_value": 0,
@@ -29074,6 +29706,7 @@
   {
     "control_group": "kRP_Stereo_Fader",
     "control_id": 132,
+    "max_channels": 3,
     "sub_control": "kRP_Level",
     "value": 0,
     "min_value": 0,
@@ -29120,6 +29753,7 @@
   {
     "control_group": "kGroupID_Input",
     "control_id": 133,
+    "max_channels": 56,
     "sub_control": "kGroupID",
     "value": 0,
     "min_value": 0,
@@ -29166,6 +29800,7 @@
   {
     "control_group": "kGroupID_Mix",
     "control_id": 134,
+    "max_channels": 16,
     "sub_control": "kGroupID",
     "value": 0,
     "min_value": 0,
@@ -29212,6 +29847,7 @@
   {
     "control_group": "kGroupID_Matrix",
     "control_id": 135,
+    "max_channels": 8,
     "sub_control": "kGroupID",
     "value": 0,
     "min_value": 0,
@@ -29258,6 +29894,7 @@
   {
     "control_group": "kGroupID_Stereo",
     "control_id": 136,
+    "max_channels": 3,
     "sub_control": "kGroupID",
     "value": 0,
     "min_value": 0,
@@ -29304,6 +29941,7 @@
   {
     "control_group": "kPatchInInput",
     "control_id": 138,
+    "max_channels": 56,
     "sub_control": "kPatchIn",
     "value": 0,
     "min_value": 0,
@@ -29350,6 +29988,7 @@
   {
     "control_group": "kPatchInInsertInput",
     "control_id": 139,
+    "max_channels": 56,
     "sub_control": "kPatchIn",
     "value": 0,
     "min_value": 0,
@@ -29396,6 +30035,7 @@
   {
     "control_group": "kPatchInInsertMix",
     "control_id": 140,
+    "max_channels": 16,
     "sub_control": "kPatchIn",
     "value": 0,
     "min_value": 0,
@@ -29442,6 +30082,7 @@
   {
     "control_group": "kPatchInInsertMatrix",
     "control_id": 141,
+    "max_channels": 8,
     "sub_control": "kPatchIn",
     "value": 0,
     "min_value": 0,
@@ -29488,6 +30129,7 @@
   {
     "control_group": "kPatchInInsertStereo",
     "control_id": 142,
+    "max_channels": 3,
     "sub_control": "kPatchIn",
     "value": 0,
     "min_value": 0,
@@ -29534,6 +30176,7 @@
   {
     "control_group": "kPatchInCascadeMix",
     "control_id": 143,
+    "max_channels": 16,
     "sub_control": "kPatchIn",
     "value": 0,
     "min_value": 0,
@@ -29580,6 +30223,7 @@
   {
     "control_group": "kPatchInCascadeMatrix",
     "control_id": 144,
+    "max_channels": 8,
     "sub_control": "kPatchIn",
     "value": 0,
     "min_value": 0,
@@ -29626,6 +30270,7 @@
   {
     "control_group": "kPatchInCascadeStereo",
     "control_id": 145,
+    "max_channels": 3,
     "sub_control": "kPatchIn",
     "value": 0,
     "min_value": 0,
@@ -29672,6 +30317,7 @@
   {
     "control_group": "kPatchInCascadeCue",
     "control_id": 146,
+    "max_channels": 2,
     "sub_control": "kPatchIn",
     "value": 0,
     "min_value": 0,
@@ -29718,6 +30364,7 @@
   {
     "control_group": "kNameInputChannel",
     "control_id": 147,
+    "max_channels": 56,
     "sub_control": "kNameShort1",
     "value": 0,
     "min_value": 0,
@@ -29764,6 +30411,7 @@
   {
     "control_group": "kNameInputChannel",
     "control_id": 147,
+    "max_channels": 56,
     "sub_control": "kNameShort2",
     "value": 1,
     "min_value": 0,
@@ -29810,6 +30458,7 @@
   {
     "control_group": "kIconInputChannel",
     "control_id": 148,
+    "max_channels": 56,
     "sub_control": "kIconID",
     "value": 0,
     "min_value": 0,
@@ -29856,6 +30505,7 @@
   {
     "control_group": "kPatchOutOmniOutSrc",
     "control_id": 149,
+    "max_channels": 32,
     "sub_control": "kOmniOut",
     "value": 0,
     "min_value": 0,
@@ -29902,6 +30552,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut1",
     "value": 0,
     "min_value": 0,
@@ -29948,6 +30599,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut2",
     "value": 1,
     "min_value": 0,
@@ -29994,6 +30646,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut3",
     "value": 2,
     "min_value": 0,
@@ -30040,6 +30693,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut4",
     "value": 3,
     "min_value": 0,
@@ -30086,6 +30740,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut5",
     "value": 4,
     "min_value": 0,
@@ -30132,6 +30787,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut6",
     "value": 5,
     "min_value": 0,
@@ -30178,6 +30834,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut7",
     "value": 6,
     "min_value": 0,
@@ -30224,6 +30881,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut8",
     "value": 7,
     "min_value": 0,
@@ -30270,6 +30928,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut9",
     "value": 8,
     "min_value": 0,
@@ -30316,6 +30975,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut10",
     "value": 9,
     "min_value": 0,
@@ -30362,6 +31022,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut11",
     "value": 10,
     "min_value": 0,
@@ -30408,6 +31069,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut12",
     "value": 11,
     "min_value": 0,
@@ -30454,6 +31116,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut13",
     "value": 12,
     "min_value": 0,
@@ -30500,6 +31163,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut14",
     "value": 13,
     "min_value": 0,
@@ -30546,6 +31210,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut15",
     "value": 14,
     "min_value": 0,
@@ -30592,6 +31257,7 @@
   {
     "control_group": "kPatchOutSlotOutSrc",
     "control_id": 150,
+    "max_channels": 3,
     "sub_control": "kSlotOut16",
     "value": 15,
     "min_value": 0,
@@ -30638,6 +31304,7 @@
   {
     "control_group": "kPatchOutRackSrc",
     "control_id": 151,
+    "max_channels": 8,
     "sub_control": "kRackIn1",
     "value": 0,
     "min_value": 0,
@@ -30684,6 +31351,7 @@
   {
     "control_group": "kPatchOutRackSrc",
     "control_id": 151,
+    "max_channels": 8,
     "sub_control": "kRackIn2",
     "value": 1,
     "min_value": 0,
@@ -30730,6 +31398,7 @@
   {
     "control_group": "kPatchOutD2trSrc",
     "control_id": 152,
+    "max_channels": 2,
     "sub_control": "kD2trOut",
     "value": 0,
     "min_value": 0,
@@ -30776,6 +31445,7 @@
   {
     "control_group": "kNameMixModule",
     "control_id": 153,
+    "max_channels": 16,
     "sub_control": "kNameShort1",
     "value": 0,
     "min_value": 0,
@@ -30822,6 +31492,7 @@
   {
     "control_group": "kNameMixModule",
     "control_id": 153,
+    "max_channels": 16,
     "sub_control": "kNameShort2",
     "value": 1,
     "min_value": 0,
@@ -30868,6 +31539,7 @@
   {
     "control_group": "kNameMatrixModule",
     "control_id": 154,
+    "max_channels": 8,
     "sub_control": "kNameShort1",
     "value": 0,
     "min_value": 0,
@@ -30914,6 +31586,7 @@
   {
     "control_group": "kNameMatrixModule",
     "control_id": 154,
+    "max_channels": 8,
     "sub_control": "kNameShort2",
     "value": 1,
     "min_value": 0,
@@ -30960,6 +31633,7 @@
   {
     "control_group": "kNameStereoOutModule",
     "control_id": 155,
+    "max_channels": 3,
     "sub_control": "kNameShort1",
     "value": 0,
     "min_value": 0,
@@ -31006,6 +31680,7 @@
   {
     "control_group": "kNameStereoOutModule",
     "control_id": 155,
+    "max_channels": 3,
     "sub_control": "kNameShort2",
     "value": 1,
     "min_value": 0,
@@ -31052,6 +31727,7 @@
   {
     "control_group": "kIconMixChannel",
     "control_id": 156,
+    "max_channels": 16,
     "sub_control": "kIconID",
     "value": 0,
     "min_value": 0,
@@ -31098,6 +31774,7 @@
   {
     "control_group": "kIconMatrixChannel",
     "control_id": 157,
+    "max_channels": 8,
     "sub_control": "kIconID",
     "value": 0,
     "min_value": 0,
@@ -31144,6 +31821,7 @@
   {
     "control_group": "kIconStereoChannel",
     "control_id": 158,
+    "max_channels": 3,
     "sub_control": "kIconID",
     "value": 0,
     "min_value": 0,
@@ -31190,6 +31868,7 @@
   {
     "control_group": "kAD824Host",
     "control_id": 159,
+    "max_channels": 1,
     "sub_control": "kAD824HostID",
     "value": 0,
     "min_value": 0,
@@ -31236,6 +31915,7 @@
   {
     "control_group": "kAD824Host",
     "control_id": 159,
+    "max_channels": 1,
     "sub_control": "kQuickSetupOn",
     "value": 1,
     "min_value": 0,
@@ -31282,6 +31962,7 @@
   {
     "control_group": "kAD824Host",
     "control_id": 159,
+    "max_channels": 1,
     "sub_control": "kNetworkMode",
     "value": 2,
     "min_value": 0,
@@ -31328,6 +32009,7 @@
   {
     "control_group": "kAD824Host",
     "control_id": 159,
+    "max_channels": 1,
     "sub_control": "kASIOStreamer",
     "value": 3,
     "min_value": 0,
@@ -31374,6 +32056,7 @@
   {
     "control_group": "kAD824Host",
     "control_id": 159,
+    "max_channels": 1,
     "sub_control": "kASIOFrom",
     "value": 4,
     "min_value": 0,
@@ -31420,6 +32103,7 @@
   {
     "control_group": "kAD824Setup",
     "control_id": 160,
+    "max_channels": 6,
     "sub_control": "kAD824Port",
     "value": 0,
     "min_value": 0,
@@ -31466,6 +32150,7 @@
   {
     "control_group": "kAD824Setup",
     "control_id": 160,
+    "max_channels": 6,
     "sub_control": "kAD824PortValidity",
     "value": 1,
     "min_value": 0,
@@ -31512,6 +32197,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Type",
     "value": 0,
     "min_value": 0,
@@ -31558,6 +32244,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824GainGang12",
     "value": 1,
     "min_value": 0,
@@ -31604,6 +32291,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824GainGang34",
     "value": 2,
     "min_value": 0,
@@ -31650,6 +32338,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824GainGang56",
     "value": 3,
     "min_value": 0,
@@ -31696,6 +32385,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824GainGang78",
     "value": 4,
     "min_value": 0,
@@ -31742,6 +32432,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Gain1",
     "value": 5,
     "min_value": 0,
@@ -31788,6 +32479,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Gain2",
     "value": 6,
     "min_value": 0,
@@ -31834,6 +32526,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Gain3",
     "value": 7,
     "min_value": 0,
@@ -31880,6 +32573,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Gain4",
     "value": 8,
     "min_value": 0,
@@ -31926,6 +32620,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Gain5",
     "value": 9,
     "min_value": 0,
@@ -31972,6 +32667,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Gain6",
     "value": 10,
     "min_value": 0,
@@ -32018,6 +32714,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Gain7",
     "value": 11,
     "min_value": 0,
@@ -32064,6 +32761,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Gain8",
     "value": 12,
     "min_value": 0,
@@ -32110,6 +32808,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPF1",
     "value": 13,
     "min_value": 0,
@@ -32156,6 +32855,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPF2",
     "value": 14,
     "min_value": 0,
@@ -32202,6 +32902,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPF3",
     "value": 15,
     "min_value": 0,
@@ -32248,6 +32949,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPF4",
     "value": 16,
     "min_value": 0,
@@ -32294,6 +32996,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPF5",
     "value": 17,
     "min_value": 0,
@@ -32340,6 +33043,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPF6",
     "value": 18,
     "min_value": 0,
@@ -32386,6 +33090,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPF7",
     "value": 19,
     "min_value": 0,
@@ -32432,6 +33137,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPF8",
     "value": 20,
     "min_value": 0,
@@ -32478,6 +33184,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPFFreq1",
     "value": 21,
     "min_value": 4,
@@ -32524,6 +33231,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPFFreq2",
     "value": 22,
     "min_value": 4,
@@ -32570,6 +33278,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPFFreq3",
     "value": 23,
     "min_value": 4,
@@ -32616,6 +33325,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPFFreq4",
     "value": 24,
     "min_value": 4,
@@ -32662,6 +33372,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPFFreq5",
     "value": 25,
     "min_value": 4,
@@ -32708,6 +33419,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPFFreq6",
     "value": 26,
     "min_value": 4,
@@ -32754,6 +33466,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPFFreq7",
     "value": 27,
     "min_value": 4,
@@ -32800,6 +33513,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824HPFFreq8",
     "value": 28,
     "min_value": 4,
@@ -32846,6 +33560,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Phantom1",
     "value": 29,
     "min_value": 0,
@@ -32892,6 +33607,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Phantom2",
     "value": 30,
     "min_value": 0,
@@ -32938,6 +33654,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Phantom3",
     "value": 31,
     "min_value": 0,
@@ -32984,6 +33701,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Phantom4",
     "value": 32,
     "min_value": 0,
@@ -33030,6 +33748,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Phantom5",
     "value": 33,
     "min_value": 0,
@@ -33076,6 +33795,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Phantom6",
     "value": 34,
     "min_value": 0,
@@ -33122,6 +33842,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Phantom7",
     "value": 35,
     "min_value": 0,
@@ -33168,6 +33889,7 @@
   {
     "control_group": "kAD824",
     "control_id": 161,
+    "max_channels": 6,
     "sub_control": "kAD824Phantom8",
     "value": 36,
     "min_value": 0,
@@ -33214,6 +33936,7 @@
   {
     "control_group": "kSetupPreference",
     "control_id": 162,
+    "max_channels": 48,
     "sub_control": "kPreference",
     "value": 0,
     "min_value": 0,
@@ -33260,6 +33983,7 @@
   {
     "control_group": "kSetupPreferenceByte",
     "control_id": 163,
+    "max_channels": 8,
     "sub_control": "kPreference",
     "value": 0,
     "min_value": 0,
@@ -33306,6 +34030,7 @@
   {
     "control_group": "kSetupDCAAssign",
     "control_id": 173,
+    "max_channels": 6,
     "sub_control": "kDCAAssign1",
     "value": 0,
     "min_value": 0,
@@ -33352,6 +34077,7 @@
   {
     "control_group": "kSetupDCAAssign",
     "control_id": 173,
+    "max_channels": 6,
     "sub_control": "kDCAAssign2",
     "value": 1,
     "min_value": 0,
@@ -33398,6 +34124,7 @@
   {
     "control_group": "kSetupDCAAssign",
     "control_id": 173,
+    "max_channels": 6,
     "sub_control": "kDCAAssign3",
     "value": 2,
     "min_value": 0,
@@ -33444,6 +34171,7 @@
   {
     "control_group": "kSetupDCAAssign",
     "control_id": 173,
+    "max_channels": 6,
     "sub_control": "kDCAAssign4",
     "value": 3,
     "min_value": 0,
@@ -33490,6 +34218,7 @@
   {
     "control_group": "kSetupDCAAssign",
     "control_id": 173,
+    "max_channels": 6,
     "sub_control": "kDCAAssign5",
     "value": 4,
     "min_value": 0,
@@ -33536,6 +34265,7 @@
   {
     "control_group": "kSetupDCAAssign",
     "control_id": 173,
+    "max_channels": 6,
     "sub_control": "kDCAAssign6",
     "value": 5,
     "min_value": 0,
@@ -33582,6 +34312,7 @@
   {
     "control_group": "kSetupDCAAssign",
     "control_id": 173,
+    "max_channels": 6,
     "sub_control": "kDCAAssign7",
     "value": 6,
     "min_value": 0,
@@ -33628,6 +34359,7 @@
   {
     "control_group": "kSetupDCAAssign",
     "control_id": 173,
+    "max_channels": 6,
     "sub_control": "kDCAAssign8",
     "value": 7,
     "min_value": 0,
@@ -33674,6 +34406,7 @@
   {
     "control_group": "kSetupDelayFunc",
     "control_id": 174,
+    "max_channels": 1,
     "sub_control": "kDelayFuncUnit",
     "value": 0,
     "min_value": 0,
@@ -33720,6 +34453,7 @@
   {
     "control_group": "kSetupDelayFunc",
     "control_id": 174,
+    "max_channels": 1,
     "sub_control": "kDelayFuncNote",
     "value": 1,
     "min_value": 0,
@@ -33766,6 +34500,7 @@
   {
     "control_group": "kSetupDelayFunc",
     "control_id": 174,
+    "max_channels": 1,
     "sub_control": "kDelayFuncTempo",
     "value": 2,
     "min_value": 20,
@@ -33812,6 +34547,7 @@
   {
     "control_group": "kSetupAD824",
     "control_id": 182,
+    "max_channels": 12,
     "sub_control": "kAD824Port",
     "value": 0,
     "min_value": 0,
@@ -33858,6 +34594,7 @@
   {
     "control_group": "kSetupAD824",
     "control_id": 182,
+    "max_channels": 12,
     "sub_control": "kAD824PortValidity",
     "value": 1,
     "min_value": 0,
@@ -33904,6 +34641,7 @@
   {
     "control_group": "kSetupAD824Type",
     "control_id": 183,
+    "max_channels": 12,
     "sub_control": "kAD824Type",
     "value": 0,
     "min_value": 0,
@@ -33950,6 +34688,7 @@
   {
     "control_group": "kSetupTalkback",
     "control_id": 185,
+    "max_channels": 1,
     "sub_control": "kTalkbackOn",
     "value": 0,
     "min_value": 0,
@@ -33996,6 +34735,7 @@
   {
     "control_group": "kSetupTalkback",
     "control_id": 185,
+    "max_channels": 1,
     "sub_control": "kTalkbackADOn",
     "value": 1,
     "min_value": 0,
@@ -34042,6 +34782,7 @@
   {
     "control_group": "kSetupTalkback",
     "control_id": 185,
+    "max_channels": 1,
     "sub_control": "kTalkbackADCh",
     "value": 2,
     "min_value": 0,
@@ -34088,6 +34829,7 @@
   {
     "control_group": "kSetupTalkback",
     "control_id": 185,
+    "max_channels": 1,
     "sub_control": "kTalkbackNeverLatch",
     "value": 3,
     "min_value": 0,
@@ -34134,6 +34876,7 @@
   {
     "control_group": "kSetupTalkback",
     "control_id": 185,
+    "max_channels": 1,
     "sub_control": "kTalkbackDimLevel",
     "value": 4,
     "min_value": -96,
@@ -34180,6 +34923,7 @@
   {
     "control_group": "kSetupTalkback",
     "control_id": 185,
+    "max_channels": 1,
     "sub_control": "kTalkbackPhantom",
     "value": 5,
     "min_value": 0,
@@ -34226,6 +34970,7 @@
   {
     "control_group": "kSetupTalkbackDimmer",
     "control_id": 186,
+    "max_channels": 5,
     "sub_control": "kTalkbackDimmerOn",
     "value": 0,
     "min_value": 0,
@@ -34272,6 +35017,7 @@
   {
     "control_group": "kSetupTBAssign",
     "control_id": 187,
+    "max_channels": 27,
     "sub_control": "kTBAssign",
     "value": 0,
     "min_value": 0,
@@ -34318,6 +35064,7 @@
   {
     "control_group": "kSetupOscAssign",
     "control_id": 188,
+    "max_channels": 27,
     "sub_control": "kOscAssign",
     "value": 0,
     "min_value": 0,
@@ -34364,6 +35111,7 @@
   {
     "control_group": "kSetupMeterSetup",
     "control_id": 189,
+    "max_channels": 1,
     "sub_control": "kMeterSetupInpPoint",
     "value": 0,
     "min_value": 0,
@@ -34410,6 +35158,7 @@
   {
     "control_group": "kSetupMeterSetup",
     "control_id": 189,
+    "max_channels": 1,
     "sub_control": "kMeterSetupOutPoint",
     "value": 1,
     "min_value": 0,
@@ -34456,6 +35205,7 @@
   {
     "control_group": "kSetupMeterSetup",
     "control_id": 189,
+    "max_channels": 1,
     "sub_control": "kMeterSetupCuePoint",
     "value": 2,
     "min_value": 0,
@@ -34502,6 +35252,7 @@
   {
     "control_group": "kSetupMeterSetup",
     "control_id": 189,
+    "max_channels": 1,
     "sub_control": "kMeterSetupFollowLayer",
     "value": 3,
     "min_value": 0,
@@ -34548,6 +35299,7 @@
   {
     "control_group": "kSetupMeterSetup",
     "control_id": 189,
+    "max_channels": 1,
     "sub_control": "kMeterSetupPeakHold",
     "value": 4,
     "min_value": 0,
@@ -34594,6 +35346,7 @@
   {
     "control_group": "kSetupMeterSetup",
     "control_id": 189,
+    "max_channels": 1,
     "sub_control": "kMeterSetupFastFall",
     "value": 5,
     "min_value": 0,
@@ -34640,6 +35393,7 @@
   {
     "control_group": "kSetupMeterSetup",
     "control_id": 189,
+    "max_channels": 1,
     "sub_control": "kMeterSetupChPreAtt",
     "value": 6,
     "min_value": 0,
@@ -34686,6 +35440,7 @@
   {
     "control_group": "kSetupPortNameAD",
     "control_id": 201,
+    "max_channels": 56,
     "sub_control": "kNameShort1",
     "value": 0,
     "min_value": 0,
@@ -34732,6 +35487,7 @@
   {
     "control_group": "kSetupPortNameAD",
     "control_id": 201,
+    "max_channels": 56,
     "sub_control": "kNameShort2",
     "value": 1,
     "min_value": 0,
@@ -34778,6 +35534,7 @@
   {
     "control_group": "kSetupPortNameSlotIn",
     "control_id": 202,
+    "max_channels": 48,
     "sub_control": "kNameShort1",
     "value": 0,
     "min_value": 0,
@@ -34824,6 +35581,7 @@
   {
     "control_group": "kSetupPortNameSlotIn",
     "control_id": 202,
+    "max_channels": 48,
     "sub_control": "kNameShort2",
     "value": 1,
     "min_value": 0,
@@ -34870,6 +35628,7 @@
   {
     "control_group": "kSetupPortNameSlotOut",
     "control_id": 203,
+    "max_channels": 48,
     "sub_control": "kNameShort1",
     "value": 0,
     "min_value": 0,
@@ -34916,6 +35675,7 @@
   {
     "control_group": "kSetupPortNameSlotOut",
     "control_id": 203,
+    "max_channels": 48,
     "sub_control": "kNameShort2",
     "value": 1,
     "min_value": 0,
@@ -34962,6 +35722,7 @@
   {
     "control_group": "kSetupPortNameD2TrOut",
     "control_id": 204,
+    "max_channels": 2,
     "sub_control": "kNameShort1",
     "value": 0,
     "min_value": 0,
@@ -35008,6 +35769,7 @@
   {
     "control_group": "kSetupPortNameD2TrOut",
     "control_id": 204,
+    "max_channels": 2,
     "sub_control": "kNameShort2",
     "value": 1,
     "min_value": 0,
@@ -35054,6 +35816,7 @@
   {
     "control_group": "kSetupDIOParam",
     "control_id": 205,
+    "max_channels": 1,
     "sub_control": "kDIOWcMaster",
     "value": 0,
     "min_value": 0,
@@ -35100,6 +35863,7 @@
   {
     "control_group": "kSetupDIOParam",
     "control_id": 205,
+    "max_channels": 1,
     "sub_control": "kDIOSRC2TrD1Out",
     "value": 1,
     "min_value": 0,
@@ -35146,6 +35910,7 @@
   {
     "control_group": "kSetupDIOParam",
     "control_id": 205,
+    "max_channels": 1,
     "sub_control": "kDIOFs2TrD1Out",
     "value": 2,
     "min_value": 0,
@@ -35192,6 +35957,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotHighFsFormIn",
     "value": 0,
     "min_value": 0,
@@ -35238,6 +36004,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotHighFsFormOut",
     "value": 1,
     "min_value": 0,
@@ -35284,6 +36051,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC0102Bt",
     "value": 2,
     "min_value": 0,
@@ -35330,6 +36098,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC0304Bt",
     "value": 3,
     "min_value": 0,
@@ -35376,6 +36145,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC0506Bt",
     "value": 4,
     "min_value": 0,
@@ -35422,6 +36192,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC0708Bt",
     "value": 5,
     "min_value": 0,
@@ -35468,6 +36239,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC0910Bt",
     "value": 6,
     "min_value": 0,
@@ -35514,6 +36286,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC1112Bt",
     "value": 7,
     "min_value": 0,
@@ -35560,6 +36333,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC1314Bt",
     "value": 8,
     "min_value": 0,
@@ -35606,6 +36380,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC1516Bt",
     "value": 9,
     "min_value": 0,
@@ -35652,6 +36427,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC0102Fs",
     "value": 10,
     "min_value": 0,
@@ -35698,6 +36474,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC0304Fs",
     "value": 11,
     "min_value": 0,
@@ -35744,6 +36521,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC0506Fs",
     "value": 12,
     "min_value": 0,
@@ -35790,6 +36568,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC0708Fs",
     "value": 13,
     "min_value": 0,
@@ -35836,6 +36615,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC0910Fs",
     "value": 14,
     "min_value": 0,
@@ -35882,6 +36662,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC1112Fs",
     "value": 15,
     "min_value": 0,
@@ -35928,6 +36709,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC1314Fs",
     "value": 16,
     "min_value": 0,
@@ -35974,6 +36756,7 @@
   {
     "control_group": "kSetupSlotParam",
     "control_id": 206,
+    "max_channels": 3,
     "sub_control": "kSlotSRC1516Fs",
     "value": 17,
     "min_value": 0,
@@ -36020,6 +36803,7 @@
   {
     "control_group": "kSetupDIODitherSlot",
     "control_id": 207,
+    "max_channels": 3,
     "sub_control": "kDitherBit0102",
     "value": 0,
     "min_value": 0,
@@ -36066,6 +36850,7 @@
   {
     "control_group": "kSetupDIODitherSlot",
     "control_id": 207,
+    "max_channels": 3,
     "sub_control": "kDitherBit0304",
     "value": 1,
     "min_value": 0,
@@ -36112,6 +36897,7 @@
   {
     "control_group": "kSetupDIODitherSlot",
     "control_id": 207,
+    "max_channels": 3,
     "sub_control": "kDitherBit0506",
     "value": 2,
     "min_value": 0,
@@ -36158,6 +36944,7 @@
   {
     "control_group": "kSetupDIODitherSlot",
     "control_id": 207,
+    "max_channels": 3,
     "sub_control": "kDitherBit0708",
     "value": 3,
     "min_value": 0,
@@ -36204,6 +36991,7 @@
   {
     "control_group": "kSetupDIODitherSlot",
     "control_id": 207,
+    "max_channels": 3,
     "sub_control": "kDitherBit0910",
     "value": 4,
     "min_value": 0,
@@ -36250,6 +37038,7 @@
   {
     "control_group": "kSetupDIODitherSlot",
     "control_id": 207,
+    "max_channels": 3,
     "sub_control": "kDitherBit1112",
     "value": 5,
     "min_value": 0,
@@ -36296,6 +37085,7 @@
   {
     "control_group": "kSetupDIODitherSlot",
     "control_id": 207,
+    "max_channels": 3,
     "sub_control": "kDitherBit1314",
     "value": 6,
     "min_value": 0,
@@ -36342,6 +37132,7 @@
   {
     "control_group": "kSetupDIODitherSlot",
     "control_id": 207,
+    "max_channels": 3,
     "sub_control": "kDitherBit1516",
     "value": 7,
     "min_value": 0,
@@ -36388,6 +37179,7 @@
   {
     "control_group": "kSetupDIODitherD2Tr",
     "control_id": 208,
+    "max_channels": 1,
     "sub_control": "kDither2Tr1",
     "value": 0,
     "min_value": 0,
@@ -36434,6 +37226,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkRecall",
     "value": 0,
     "min_value": 0,
@@ -36480,6 +37273,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkStore",
     "value": 1,
     "min_value": 0,
@@ -36526,6 +37320,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkSolo",
     "value": 2,
     "min_value": 0,
@@ -36572,6 +37367,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkDimmer",
     "value": 3,
     "min_value": 0,
@@ -36618,6 +37414,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkInMeterPoint",
     "value": 4,
     "min_value": 0,
@@ -36664,6 +37461,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkOutMeterPoint",
     "value": 5,
     "min_value": 0,
@@ -36710,6 +37508,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkPeakHold",
     "value": 6,
     "min_value": 0,
@@ -36756,6 +37555,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkLCDPage",
     "value": 7,
     "min_value": 0,
@@ -36802,6 +37602,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkBrightness",
     "value": 8,
     "min_value": 0,
@@ -36848,6 +37649,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkEncoderMode",
     "value": 9,
     "min_value": 0,
@@ -36894,6 +37696,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkFaderMode",
     "value": 10,
     "min_value": 0,
@@ -36940,6 +37743,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkMixSelect",
     "value": 11,
     "min_value": 0,
@@ -36986,6 +37790,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkDCA1",
     "value": 12,
     "min_value": 0,
@@ -37032,6 +37837,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkDCA2",
     "value": 13,
     "min_value": 0,
@@ -37078,6 +37884,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkDCA3",
     "value": 14,
     "min_value": 0,
@@ -37124,6 +37931,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkDCA4",
     "value": 15,
     "min_value": 0,
@@ -37170,6 +37978,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkDCA5",
     "value": 16,
     "min_value": 0,
@@ -37216,6 +38025,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkDCA6",
     "value": 17,
     "min_value": 0,
@@ -37262,6 +38072,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkDCA7",
     "value": 18,
     "min_value": 0,
@@ -37308,6 +38119,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkDCA8",
     "value": 19,
     "min_value": 0,
@@ -37354,6 +38166,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkMute1",
     "value": 20,
     "min_value": 0,
@@ -37400,6 +38213,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkMute2",
     "value": 21,
     "min_value": 0,
@@ -37446,6 +38260,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkMute3",
     "value": 22,
     "min_value": 0,
@@ -37492,6 +38307,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkMute4",
     "value": 23,
     "min_value": 0,
@@ -37538,6 +38354,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkMute5",
     "value": 24,
     "min_value": 0,
@@ -37584,6 +38401,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkMute6",
     "value": 25,
     "min_value": 0,
@@ -37630,6 +38448,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkMute7",
     "value": 26,
     "min_value": 0,
@@ -37676,6 +38495,7 @@
   {
     "control_group": "kSetupDIOCascadeLink",
     "control_id": 209,
+    "max_channels": 1,
     "sub_control": "kCascadeLinkMute8",
     "value": 27,
     "min_value": 0,
@@ -37722,6 +38542,7 @@
   {
     "control_group": "kSetupDIOCascade",
     "control_id": 210,
+    "max_channels": 1,
     "sub_control": "kDIOCascadeMode",
     "value": 0,
     "min_value": 0,
@@ -37768,6 +38589,7 @@
   {
     "control_group": "kSetupDIOCascade",
     "control_id": 210,
+    "max_channels": 1,
     "sub_control": "kDIOCascadeMaster",
     "value": 1,
     "min_value": 0,
@@ -37814,6 +38636,7 @@
   {
     "control_group": "kSetupDIOCascade",
     "control_id": 210,
+    "max_channels": 1,
     "sub_control": "kDIOCascadeFrom",
     "value": 2,
     "min_value": 0,
@@ -37860,6 +38683,7 @@
   {
     "control_group": "kSetupDIOCascade",
     "control_id": 210,
+    "max_channels": 1,
     "sub_control": "kDIOCascadeTo",
     "value": 3,
     "min_value": 0,
@@ -37906,6 +38730,7 @@
   {
     "control_group": "kSetupDIOCascade",
     "control_id": 210,
+    "max_channels": 1,
     "sub_control": "kDIOCascadeInPortSel",
     "value": 4,
     "min_value": 0,
@@ -37952,6 +38777,7 @@
   {
     "control_group": "kSetupDIOCascade",
     "control_id": 210,
+    "max_channels": 1,
     "sub_control": "kDIOCascadeOutSrcSel",
     "value": 5,
     "min_value": 0,
@@ -37998,6 +38824,7 @@
   {
     "control_group": "kSetupDIOCascade",
     "control_id": 210,
+    "max_channels": 1,
     "sub_control": "kDIOCascadeOn",
     "value": 6,
     "min_value": 0,
@@ -38044,6 +38871,7 @@
   {
     "control_group": "kSetupDIOCascadeIO",
     "control_id": 211,
+    "max_channels": 29,
     "sub_control": "kDIOCascadeInOn",
     "value": 0,
     "min_value": 0,
@@ -38090,6 +38918,7 @@
   {
     "control_group": "kSetupDIOCascadeIO",
     "control_id": 211,
+    "max_channels": 29,
     "sub_control": "kDIOCascadeOutOn",
     "value": 1,
     "min_value": 0,
@@ -38136,6 +38965,7 @@
   {
     "control_group": "kSetupDIOCascadeIO",
     "control_id": 211,
+    "max_channels": 29,
     "sub_control": "kDIOCascadeInSource",
     "value": 2,
     "min_value": 0,
@@ -38182,6 +39012,7 @@
   {
     "control_group": "kSetupDIOTASCAM",
     "control_id": 212,
+    "max_channels": 4,
     "sub_control": "kDIOTASCAM",
     "value": 0,
     "min_value": 0,
@@ -38228,6 +39059,7 @@
   {
     "control_group": "kSetupSoloSafeInput",
     "control_id": 213,
+    "max_channels": 56,
     "sub_control": "kSoloSafe",
     "value": 0,
     "min_value": 0,
@@ -38274,6 +39106,7 @@
   {
     "control_group": "kSetupSoloSafeMix",
     "control_id": 214,
+    "max_channels": 16,
     "sub_control": "kSoloSafe",
     "value": 0,
     "min_value": 0,
@@ -38320,6 +39153,7 @@
   {
     "control_group": "kSetupSoloSafeMatrix",
     "control_id": 215,
+    "max_channels": 8,
     "sub_control": "kSoloSafe",
     "value": 0,
     "min_value": 0,
@@ -38366,6 +39200,7 @@
   {
     "control_group": "kSetupSoloSafeStereo",
     "control_id": 216,
+    "max_channels": 3,
     "sub_control": "kSoloSafe",
     "value": 0,
     "min_value": 0,
@@ -38412,6 +39247,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kCueOutOn",
     "value": 0,
     "min_value": 0,
@@ -38458,6 +39294,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kSoloOn",
     "value": 1,
     "min_value": 0,
@@ -38504,6 +39341,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kCueLast",
     "value": 2,
     "min_value": 0,
@@ -38550,6 +39388,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kCueDCAUnity",
     "value": 3,
     "min_value": 0,
@@ -38596,6 +39435,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kCueActive",
     "value": 4,
     "min_value": 0,
@@ -38642,6 +39482,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kCueLocInput",
     "value": 5,
     "min_value": 0,
@@ -38688,6 +39529,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kCueLocDCA",
     "value": 6,
     "min_value": 0,
@@ -38734,6 +39576,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kCueLocOutput",
     "value": 7,
     "min_value": 0,
@@ -38780,6 +39623,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kCueTrimInput",
     "value": 8,
     "min_value": 0,
@@ -38826,6 +39670,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kCueTrimDCA",
     "value": 9,
     "min_value": 0,
@@ -38872,6 +39717,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kCueTrimOutput",
     "value": 10,
     "min_value": 0,
@@ -38918,6 +39764,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kMixCueLink",
     "value": 11,
     "min_value": 0,
@@ -38964,6 +39811,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kCueSelLink",
     "value": 12,
     "min_value": 0,
@@ -39010,6 +39858,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kFaderCueRelease",
     "value": 13,
     "min_value": 0,
@@ -39056,6 +39905,7 @@
   {
     "control_group": "kSetupCue",
     "control_id": 217,
+    "max_channels": 1,
     "sub_control": "kClearCue",
     "value": 14,
     "min_value": 0,
@@ -39102,6 +39952,7 @@
   {
     "control_group": "kSetupCueInput",
     "control_id": 218,
+    "max_channels": 60,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39148,6 +39999,7 @@
   {
     "control_group": "kSetupCueMix",
     "control_id": 219,
+    "max_channels": 20,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39194,6 +40046,7 @@
   {
     "control_group": "kSetupCueMatrix",
     "control_id": 220,
+    "max_channels": 12,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39240,6 +40093,7 @@
   {
     "control_group": "kSetupCueStereo",
     "control_id": 221,
+    "max_channels": 7,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39286,6 +40140,7 @@
   {
     "control_group": "kSetupCueDCA",
     "control_id": 222,
+    "max_channels": 12,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39332,6 +40187,7 @@
   {
     "control_group": "kSetupCueKeyIn",
     "control_id": 223,
+    "max_channels": 60,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39378,6 +40234,7 @@
   {
     "control_group": "kSetupCueEffect",
     "control_id": 224,
+    "max_channels": 8,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39424,6 +40281,7 @@
   {
     "control_group": "kSetupCueExternal",
     "control_id": 225,
+    "max_channels": 5,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39470,6 +40328,7 @@
   {
     "control_group": "kSetupCueStack",
     "control_id": 226,
+    "max_channels": 6,
     "sub_control": "kCueStack",
     "value": 0,
     "min_value": 0,
@@ -39516,6 +40375,7 @@
   {
     "control_group": "kSetupCueStackInput",
     "control_id": 227,
+    "max_channels": 60,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39562,6 +40422,7 @@
   {
     "control_group": "kSetupCueStackMix",
     "control_id": 228,
+    "max_channels": 20,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39608,6 +40469,7 @@
   {
     "control_group": "kSetupCueStackMatrix",
     "control_id": 229,
+    "max_channels": 12,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39654,6 +40516,7 @@
   {
     "control_group": "kSetupCueStackStereo",
     "control_id": 230,
+    "max_channels": 7,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39700,6 +40563,7 @@
   {
     "control_group": "kSetupCueStackDCA",
     "control_id": 231,
+    "max_channels": 12,
     "sub_control": "kCueOn",
     "value": 0,
     "min_value": 0,
@@ -39746,6 +40610,7 @@
   {
     "control_group": "kMuteSafeInput",
     "control_id": 236,
+    "max_channels": 56,
     "sub_control": "kMuteSafeOn",
     "value": 0,
     "min_value": 0,
@@ -39792,6 +40657,7 @@
   {
     "control_group": "kMuteSafeMix",
     "control_id": 237,
+    "max_channels": 16,
     "sub_control": "kMuteSafeOn",
     "value": 0,
     "min_value": 0,
@@ -39838,6 +40704,7 @@
   {
     "control_group": "kMuteSafeMatrix",
     "control_id": 238,
+    "max_channels": 8,
     "sub_control": "kMuteSafeOn",
     "value": 0,
     "min_value": 0,
@@ -39884,6 +40751,7 @@
   {
     "control_group": "kMuteSafeStereo",
     "control_id": 239,
+    "max_channels": 3,
     "sub_control": "kMuteSafeOn",
     "value": 0,
     "min_value": 0,
@@ -39930,6 +40798,7 @@
   {
     "control_group": "kSetupNameAutoCopy",
     "control_id": 240,
+    "max_channels": 1,
     "sub_control": "kNameInputAutoCopy",
     "value": 0,
     "min_value": 0,
@@ -39976,6 +40845,7 @@
   {
     "control_group": "kSetupNameAutoCopy",
     "control_id": 240,
+    "max_channels": 1,
     "sub_control": "kNameOutputAutoCopy",
     "value": 1,
     "min_value": 0,
@@ -40022,6 +40892,7 @@
   {
     "control_group": "kSetupNameAutoCopy",
     "control_id": 240,
+    "max_channels": 1,
     "sub_control": "kChNameInputAutoCopy",
     "value": 2,
     "min_value": 0,
@@ -40068,6 +40939,7 @@
   {
     "control_group": "kSetupNameAutoCopy",
     "control_id": 240,
+    "max_channels": 1,
     "sub_control": "kChNameOutputAutoCopy",
     "value": 3,
     "min_value": 0,
@@ -40114,6 +40986,7 @@
   {
     "control_group": "kSetupMIDIRx",
     "control_id": 241,
+    "max_channels": 1,
     "sub_control": "kMIDIRxTerminal",
     "value": 0,
     "min_value": 0,
@@ -40160,6 +41033,7 @@
   {
     "control_group": "kSetupMIDIRx",
     "control_id": 241,
+    "max_channels": 1,
     "sub_control": "kMIDIRxPortNum",
     "value": 1,
     "min_value": 0,
@@ -40206,6 +41080,7 @@
   {
     "control_group": "kSetupMIDIRx",
     "control_id": 241,
+    "max_channels": 1,
     "sub_control": "kMIDIRxMidiCh",
     "value": 2,
     "min_value": 0,
@@ -40252,6 +41127,7 @@
   {
     "control_group": "kSetupMIDITx",
     "control_id": 242,
+    "max_channels": 1,
     "sub_control": "kMIDITxTerminal",
     "value": 0,
     "min_value": 0,
@@ -40298,6 +41174,7 @@
   {
     "control_group": "kSetupMIDITx",
     "control_id": 242,
+    "max_channels": 1,
     "sub_control": "kMIDITxPortNum",
     "value": 1,
     "min_value": 0,
@@ -40344,6 +41221,7 @@
   {
     "control_group": "kSetupMIDITx",
     "control_id": 242,
+    "max_channels": 1,
     "sub_control": "kMIDITxMidiCh",
     "value": 2,
     "min_value": 0,
@@ -40390,6 +41268,7 @@
   {
     "control_group": "kSetupMIDIThruPort",
     "control_id": 243,
+    "max_channels": 2,
     "sub_control": "kMIDIThruTerminal",
     "value": 0,
     "min_value": 0,
@@ -40436,6 +41315,7 @@
   {
     "control_group": "kSetupMIDIThruPort",
     "control_id": 243,
+    "max_channels": 2,
     "sub_control": "kMIDIThruPortNum",
     "value": 1,
     "min_value": 0,
@@ -40482,6 +41362,7 @@
   {
     "control_group": "kSetupStudioMgrPort",
     "control_id": 244,
+    "max_channels": 1,
     "sub_control": "kMIDIStudioMgrTerminal",
     "value": 0,
     "min_value": 0,
@@ -40528,6 +41409,7 @@
   {
     "control_group": "kSetupStudioMgrPort",
     "control_id": 244,
+    "max_channels": 1,
     "sub_control": "kMIDIStudioMgrPortNum",
     "value": 1,
     "min_value": 0,
@@ -40574,6 +41456,7 @@
   {
     "control_group": "kSetupStudioMgrPort",
     "control_id": 244,
+    "max_channels": 1,
     "sub_control": "kMIDIStudioMgrID",
     "value": 2,
     "min_value": 0,
@@ -40620,6 +41503,7 @@
   {
     "control_group": "kSetupMIDITxEnable",
     "control_id": 245,
+    "max_channels": 1,
     "sub_control": "kTxEnablePgmChange",
     "value": 0,
     "min_value": 0,
@@ -40666,6 +41550,7 @@
   {
     "control_group": "kSetupMIDITxEnable",
     "control_id": 245,
+    "max_channels": 1,
     "sub_control": "kTxEnableCtlChange",
     "value": 1,
     "min_value": 0,
@@ -40712,6 +41597,7 @@
   {
     "control_group": "kSetupMIDITxEnable",
     "control_id": 245,
+    "max_channels": 1,
     "sub_control": "kTxEnablePrmChange",
     "value": 2,
     "min_value": 0,
@@ -40758,6 +41644,7 @@
   {
     "control_group": "kSetupMIDITxEnable",
     "control_id": 245,
+    "max_channels": 1,
     "sub_control": "kTxEnableBulk",
     "value": 3,
     "min_value": 0,
@@ -40804,6 +41691,7 @@
   {
     "control_group": "kSetupMIDITxEnable",
     "control_id": 245,
+    "max_channels": 1,
     "sub_control": "kTxEnableMTC",
     "value": 4,
     "min_value": 0,
@@ -40850,6 +41738,7 @@
   {
     "control_group": "kSetupMIDITxEnable",
     "control_id": 245,
+    "max_channels": 1,
     "sub_control": "kTxEnableOthers",
     "value": 5,
     "min_value": 0,
@@ -40896,6 +41785,7 @@
   {
     "control_group": "kSetupMIDITxEnable",
     "control_id": 245,
+    "max_channels": 1,
     "sub_control": "kTxBulkInterval",
     "value": 6,
     "min_value": 0,
@@ -40942,6 +41832,7 @@
   {
     "control_group": "kSetupMIDIRxEnable",
     "control_id": 246,
+    "max_channels": 1,
     "sub_control": "kRxEnablePgmChange",
     "value": 0,
     "min_value": 0,
@@ -40988,6 +41879,7 @@
   {
     "control_group": "kSetupMIDIRxEnable",
     "control_id": 246,
+    "max_channels": 1,
     "sub_control": "kRxEnableCtlChange",
     "value": 1,
     "min_value": 0,
@@ -41034,6 +41926,7 @@
   {
     "control_group": "kSetupMIDIRxEnable",
     "control_id": 246,
+    "max_channels": 1,
     "sub_control": "kRxEnablePrmChange",
     "value": 2,
     "min_value": 0,
@@ -41080,6 +41973,7 @@
   {
     "control_group": "kSetupMIDIRxEnable",
     "control_id": 246,
+    "max_channels": 1,
     "sub_control": "kRxEnableBulk",
     "value": 3,
     "min_value": 0,
@@ -41126,6 +42020,7 @@
   {
     "control_group": "kSetupMIDIRxEnable",
     "control_id": 246,
+    "max_channels": 1,
     "sub_control": "kRxEnableMTC",
     "value": 4,
     "min_value": 0,
@@ -41172,6 +42067,7 @@
   {
     "control_group": "kSetupMIDIRxEnable",
     "control_id": 246,
+    "max_channels": 1,
     "sub_control": "kRxEnableOthers",
     "value": 5,
     "min_value": 0,
@@ -41218,6 +42114,7 @@
   {
     "control_group": "kSetupMIDIOmniEnable",
     "control_id": 247,
+    "max_channels": 1,
     "sub_control": "kOmniEnablePgmChange",
     "value": 0,
     "min_value": 0,
@@ -41264,6 +42161,7 @@
   {
     "control_group": "kSetupMIDIOmniEnable",
     "control_id": 247,
+    "max_channels": 1,
     "sub_control": "kOmniEnableCtlChange",
     "value": 1,
     "min_value": 0,
@@ -41310,6 +42208,7 @@
   {
     "control_group": "kSetupMIDIOmniEnable",
     "control_id": 247,
+    "max_channels": 1,
     "sub_control": "kOmniEnablePrmChange",
     "value": 2,
     "min_value": 0,
@@ -41356,6 +42255,7 @@
   {
     "control_group": "kSetupMIDIOmniEnable",
     "control_id": 247,
+    "max_channels": 1,
     "sub_control": "kOmniEnableBulk",
     "value": 3,
     "min_value": 0,
@@ -41402,6 +42302,7 @@
   {
     "control_group": "kSetupMIDIOmniEnable",
     "control_id": 247,
+    "max_channels": 1,
     "sub_control": "kOmniEnableMTC",
     "value": 4,
     "min_value": 0,
@@ -41448,6 +42349,7 @@
   {
     "control_group": "kSetupMIDIOmniEnable",
     "control_id": 247,
+    "max_channels": 1,
     "sub_control": "kOmniEnableOthers",
     "value": 5,
     "min_value": 0,
@@ -41494,6 +42396,7 @@
   {
     "control_group": "kSetupMIDIEchoEnable",
     "control_id": 248,
+    "max_channels": 1,
     "sub_control": "kEchoEnablePgmChange",
     "value": 0,
     "min_value": 0,
@@ -41540,6 +42443,7 @@
   {
     "control_group": "kSetupMIDIEchoEnable",
     "control_id": 248,
+    "max_channels": 1,
     "sub_control": "kEchoEnableCtlChange",
     "value": 1,
     "min_value": 0,
@@ -41586,6 +42490,7 @@
   {
     "control_group": "kSetupMIDIEchoEnable",
     "control_id": 248,
+    "max_channels": 1,
     "sub_control": "kEchoEnablePrmChange",
     "value": 2,
     "min_value": 0,
@@ -41632,6 +42537,7 @@
   {
     "control_group": "kSetupMIDIEchoEnable",
     "control_id": 248,
+    "max_channels": 1,
     "sub_control": "kEchoEnableBulk",
     "value": 3,
     "min_value": 0,
@@ -41678,6 +42584,7 @@
   {
     "control_group": "kSetupMIDIEchoEnable",
     "control_id": 248,
+    "max_channels": 1,
     "sub_control": "kEchoEnableMTC",
     "value": 4,
     "min_value": 0,
@@ -41724,6 +42631,7 @@
   {
     "control_group": "kSetupMIDIEchoEnable",
     "control_id": 248,
+    "max_channels": 1,
     "sub_control": "kEchoEnableOthers",
     "value": 5,
     "min_value": 0,
@@ -41770,6 +42678,7 @@
   {
     "control_group": "kSetupMIDIProgram",
     "control_id": 249,
+    "max_channels": 1,
     "sub_control": "kMIDIPGMMulti",
     "value": 0,
     "min_value": 0,
@@ -41816,6 +42725,7 @@
   {
     "control_group": "kSetupMIDIProgram",
     "control_id": 249,
+    "max_channels": 1,
     "sub_control": "kMIDIPGMOmni",
     "value": 1,
     "min_value": 0,
@@ -41862,6 +42772,7 @@
   {
     "control_group": "kSetupMIDIProgram",
     "control_id": 249,
+    "max_channels": 1,
     "sub_control": "kMIDIPGMBankOff",
     "value": 2,
     "min_value": 0,
@@ -41908,6 +42819,7 @@
   {
     "control_group": "kSetupMIDIControl",
     "control_id": 250,
+    "max_channels": 1,
     "sub_control": "kMIDIControlMode",
     "value": 0,
     "min_value": 0,
@@ -41954,6 +42866,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTable0",
     "value": 0,
     "min_value": 0,
@@ -42000,6 +42913,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTable1",
     "value": 1,
     "min_value": 0,
@@ -42046,6 +42960,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTable2",
     "value": 2,
     "min_value": 0,
@@ -42092,6 +43007,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTable3",
     "value": 3,
     "min_value": 0,
@@ -42138,6 +43054,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTable4",
     "value": 4,
     "min_value": 0,
@@ -42184,6 +43101,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTable5",
     "value": 5,
     "min_value": 0,
@@ -42230,6 +43148,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTable6",
     "value": 6,
     "min_value": 0,
@@ -42276,6 +43195,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTable7",
     "value": 7,
     "min_value": 0,
@@ -42322,6 +43242,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTable8",
     "value": 8,
     "min_value": 0,
@@ -42368,6 +43289,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTable9",
     "value": 9,
     "min_value": 0,
@@ -42414,6 +43336,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTableA",
     "value": 10,
     "min_value": 0,
@@ -42460,6 +43383,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTableB",
     "value": 11,
     "min_value": 0,
@@ -42506,6 +43430,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTableC",
     "value": 12,
     "min_value": 0,
@@ -42552,6 +43477,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTableD",
     "value": 13,
     "min_value": 0,
@@ -42598,6 +43524,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTableE",
     "value": 14,
     "min_value": 0,
@@ -42644,6 +43571,7 @@
   {
     "control_group": "kSetupPGMChangeTable",
     "control_id": 251,
+    "max_channels": 128,
     "sub_control": "kPGMChangeTableF",
     "value": 15,
     "min_value": 0,
@@ -42690,6 +43618,7 @@
   {
     "control_group": "kSetupCntrlChangeTable",
     "control_id": 252,
+    "max_channels": 120,
     "sub_control": "kCntrlChangeTable0_1",
     "value": 0,
     "min_value": 0,
@@ -42736,6 +43665,7 @@
   {
     "control_group": "kSetupCntrlChangeTable",
     "control_id": 252,
+    "max_channels": 120,
     "sub_control": "kCntrlChangeTable0_2",
     "value": 1,
     "min_value": 0,
@@ -42782,6 +43712,7 @@
   {
     "control_group": "kSetupCntrlChangeTable",
     "control_id": 252,
+    "max_channels": 120,
     "sub_control": "kCntrlChangeTable0_3",
     "value": 2,
     "min_value": 0,
@@ -42828,6 +43759,7 @@
   {
     "control_group": "kSetupOutPortAttLevel",
     "control_id": 259,
+    "max_channels": 82,
     "sub_control": "kOutPortLevel",
     "value": 0,
     "min_value": -960,
@@ -42874,6 +43806,7 @@
   {
     "control_group": "kSetupRecallSafeIn",
     "control_id": 260,
+    "max_channels": 56,
     "sub_control": "kRecallSafeOn",
     "value": 0,
     "min_value": 0,
@@ -42920,6 +43853,7 @@
   {
     "control_group": "kSetupRecallSafeIn",
     "control_id": 260,
+    "max_channels": 56,
     "sub_control": "kRecallSafeMode",
     "value": 1,
     "min_value": 0,
@@ -42966,6 +43900,7 @@
   {
     "control_group": "kSetupRecallSafeMix",
     "control_id": 261,
+    "max_channels": 16,
     "sub_control": "kRecallSafeOn",
     "value": 0,
     "min_value": 0,
@@ -43012,6 +43947,7 @@
   {
     "control_group": "kSetupRecallSafeMix",
     "control_id": 261,
+    "max_channels": 16,
     "sub_control": "kRecallSafeMode",
     "value": 1,
     "min_value": 0,
@@ -43058,6 +43994,7 @@
   {
     "control_group": "kSetupRecallSafeMatrix",
     "control_id": 262,
+    "max_channels": 8,
     "sub_control": "kRecallSafeOn",
     "value": 0,
     "min_value": 0,
@@ -43104,6 +44041,7 @@
   {
     "control_group": "kSetupRecallSafeMatrix",
     "control_id": 262,
+    "max_channels": 8,
     "sub_control": "kRecallSafeMode",
     "value": 1,
     "min_value": 0,
@@ -43150,6 +44088,7 @@
   {
     "control_group": "kSetupRecallSafeStereo",
     "control_id": 263,
+    "max_channels": 3,
     "sub_control": "kRecallSafeOn",
     "value": 0,
     "min_value": 0,
@@ -43196,6 +44135,7 @@
   {
     "control_group": "kSetupRecallSafeStereo",
     "control_id": 263,
+    "max_channels": 3,
     "sub_control": "kRecallSafeMode",
     "value": 1,
     "min_value": 0,
@@ -43242,6 +44182,7 @@
   {
     "control_group": "kSetupRecallSafeRack",
     "control_id": 264,
+    "max_channels": 8,
     "sub_control": "kRecallSafeOn",
     "value": 0,
     "min_value": 0,
@@ -43288,6 +44229,7 @@
   {
     "control_group": "kSetupRecallSafeDCA",
     "control_id": 265,
+    "max_channels": 8,
     "sub_control": "kRecallSafeOn",
     "value": 0,
     "min_value": 0,
@@ -43334,6 +44276,7 @@
   {
     "control_group": "kSetupRecallSafeDCAAll",
     "control_id": 266,
+    "max_channels": 8,
     "sub_control": "kRecallSafeOn",
     "value": 0,
     "min_value": 0,
@@ -43380,6 +44323,7 @@
   {
     "control_group": "kSetupRecallSafeMuteMaster",
     "control_id": 267,
+    "max_channels": 1,
     "sub_control": "kRecallSafeOn",
     "value": 0,
     "min_value": 1,
@@ -43426,6 +44370,7 @@
   {
     "control_group": "kSetupRecallSafeInputName",
     "control_id": 268,
+    "max_channels": 1,
     "sub_control": "kRecallSafeOn",
     "value": 0,
     "min_value": 0,
@@ -43472,6 +44417,7 @@
   {
     "control_group": "kSetupRecallSafeOutputName",
     "control_id": 269,
+    "max_channels": 1,
     "sub_control": "kRecallSafeOn",
     "value": 0,
     "min_value": 0,
@@ -43518,6 +44464,7 @@
   {
     "control_group": "kSetupRecallSafeInputPatch",
     "control_id": 270,
+    "max_channels": 1,
     "sub_control": "kRecallSafeOn",
     "value": 0,
     "min_value": 0,
@@ -43564,6 +44511,7 @@
   {
     "control_group": "kSetupRecallSafeOutputPatch",
     "control_id": 271,
+    "max_channels": 1,
     "sub_control": "kRecallSafeOn",
     "value": 0,
     "min_value": 0,
@@ -43610,6 +44558,7 @@
   {
     "control_group": "kSetupOscSetting",
     "control_id": 278,
+    "max_channels": 1,
     "sub_control": "kOscSettingOn",
     "value": 0,
     "min_value": 0,
@@ -43656,6 +44605,7 @@
   {
     "control_group": "kSetupOscSetting",
     "control_id": 278,
+    "max_channels": 1,
     "sub_control": "kOscSettingForm",
     "value": 1,
     "min_value": 0,
@@ -43702,6 +44652,7 @@
   {
     "control_group": "kSetupOscSetting",
     "control_id": 278,
+    "max_channels": 1,
     "sub_control": "kOscSettingLevel1",
     "value": 2,
     "min_value": -96,
@@ -43748,6 +44699,7 @@
   {
     "control_group": "kSetupOscSetting",
     "control_id": 278,
+    "max_channels": 1,
     "sub_control": "kOscSettingLevel2",
     "value": 3,
     "min_value": -96,
@@ -43794,6 +44746,7 @@
   {
     "control_group": "kSetupOscSetting",
     "control_id": 278,
+    "max_channels": 1,
     "sub_control": "kOscSettingFreq1",
     "value": 4,
     "min_value": 4,
@@ -43840,6 +44793,7 @@
   {
     "control_group": "kSetupOscSetting",
     "control_id": 278,
+    "max_channels": 1,
     "sub_control": "kOscSettingFreq2",
     "value": 5,
     "min_value": 4,
@@ -43886,6 +44840,7 @@
   {
     "control_group": "kSetupOscSetting",
     "control_id": 278,
+    "max_channels": 1,
     "sub_control": "kOscSettingHPFOn",
     "value": 6,
     "min_value": 0,
@@ -43932,6 +44887,7 @@
   {
     "control_group": "kSetupOscSetting",
     "control_id": 278,
+    "max_channels": 1,
     "sub_control": "kOscSettingHPFFreq",
     "value": 7,
     "min_value": 4,
@@ -43978,6 +44934,7 @@
   {
     "control_group": "kSetupOscSetting",
     "control_id": 278,
+    "max_channels": 1,
     "sub_control": "kOscSettingLPFOn",
     "value": 8,
     "min_value": 0,
@@ -44024,6 +44981,7 @@
   {
     "control_group": "kSetupOscSetting",
     "control_id": 278,
+    "max_channels": 1,
     "sub_control": "kOscSettingLPFFreq",
     "value": 9,
     "min_value": 4,
@@ -44070,6 +45028,7 @@
   {
     "control_group": "kSetupOscSetting",
     "control_id": 278,
+    "max_channels": 1,
     "sub_control": "kOscSettingWidth",
     "value": 10,
     "min_value": 1,
@@ -44116,6 +45075,7 @@
   {
     "control_group": "kSetupOscSetting",
     "control_id": 278,
+    "max_channels": 1,
     "sub_control": "kOscSettingInterval",
     "value": 11,
     "min_value": 1,
@@ -44162,6 +45122,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorSelect",
     "value": 0,
     "min_value": 0,
@@ -44208,6 +45169,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorStereoA",
     "value": 1,
     "min_value": 0,
@@ -44254,6 +45216,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorStereoB",
     "value": 2,
     "min_value": 0,
@@ -44300,6 +45263,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorStereoLCR",
     "value": 3,
     "min_value": 0,
@@ -44346,6 +45310,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorDefineAssignL",
     "value": 4,
     "min_value": 0,
@@ -44392,6 +45357,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorDefineAssignR",
     "value": 5,
     "min_value": 0,
@@ -44438,6 +45404,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorMono",
     "value": 6,
     "min_value": 0,
@@ -44484,6 +45451,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorCueInterruption",
     "value": 7,
     "min_value": 0,
@@ -44530,6 +45498,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorOn",
     "value": 8,
     "min_value": 0,
@@ -44576,6 +45545,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorDim",
     "value": 9,
     "min_value": 0,
@@ -44622,6 +45592,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorDimLevel",
     "value": 10,
     "min_value": -96,
@@ -44668,6 +45639,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorMeterPostDelay",
     "value": 11,
     "min_value": 0,
@@ -44714,6 +45686,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorSurrLevel",
     "value": 12,
     "min_value": 0,
@@ -44760,6 +45733,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorLevel",
     "value": 13,
     "min_value": 0,
@@ -44806,6 +45780,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorMonoPlus",
     "value": 14,
     "min_value": 0,
@@ -44852,6 +45827,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorOutL",
     "value": 15,
     "min_value": 0,
@@ -44898,6 +45874,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorOutR",
     "value": 16,
     "min_value": 0,
@@ -44944,6 +45921,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorOutC",
     "value": 17,
     "min_value": 0,
@@ -44990,6 +45968,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorLevelLink",
     "value": 18,
     "min_value": 0,
@@ -45036,6 +46015,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorDigitalLevel",
     "value": 19,
     "min_value": 0,
@@ -45082,6 +46062,7 @@
   {
     "control_group": "kSetupMonitor",
     "control_id": 279,
+    "max_channels": 1,
     "sub_control": "kMonitorDigitalAssign",
     "value": 20,
     "min_value": 0,
@@ -45128,6 +46109,7 @@
   {
     "control_group": "kSetupMonitorDefineAssign",
     "control_id": 280,
+    "max_channels": 30,
     "sub_control": "kMonitorDefineAssign",
     "value": 0,
     "min_value": 0,
@@ -45174,6 +46156,7 @@
   {
     "control_group": "kSetupSlotDelay",
     "control_id": 281,
+    "max_channels": 48,
     "sub_control": "kDelayOn",
     "value": 0,
     "min_value": 0,
@@ -45220,6 +46203,7 @@
   {
     "control_group": "kSetupSlotDelay",
     "control_id": 281,
+    "max_channels": 48,
     "sub_control": "kDelayGang",
     "value": 1,
     "min_value": 0,
@@ -45266,6 +46250,7 @@
   {
     "control_group": "kSetupSlotDelay",
     "control_id": 281,
+    "max_channels": 48,
     "sub_control": "kDelayTime",
     "value": 2,
     "min_value": 0,
@@ -45312,6 +46297,7 @@
   {
     "control_group": "kSetupOmniDelay",
     "control_id": 282,
+    "max_channels": 32,
     "sub_control": "kDelayOn",
     "value": 0,
     "min_value": 0,
@@ -45358,6 +46344,7 @@
   {
     "control_group": "kSetupOmniDelay",
     "control_id": 282,
+    "max_channels": 32,
     "sub_control": "kDelayGang",
     "value": 1,
     "min_value": 0,
@@ -45404,6 +46391,7 @@
   {
     "control_group": "kSetupOmniDelay",
     "control_id": 282,
+    "max_channels": 32,
     "sub_control": "kDelayTime",
     "value": 2,
     "min_value": 0,
@@ -45450,6 +46438,7 @@
   {
     "control_group": "kSetupD2TrOutDelay",
     "control_id": 283,
+    "max_channels": 2,
     "sub_control": "kDelayOn",
     "value": 0,
     "min_value": 0,
@@ -45496,6 +46485,7 @@
   {
     "control_group": "kSetupD2TrOutDelay",
     "control_id": 283,
+    "max_channels": 2,
     "sub_control": "kDelayGang",
     "value": 1,
     "min_value": 0,
@@ -45542,6 +46532,7 @@
   {
     "control_group": "kSetupD2TrOutDelay",
     "control_id": 283,
+    "max_channels": 2,
     "sub_control": "kDelayTime",
     "value": 2,
     "min_value": 0,
@@ -45588,6 +46579,7 @@
   {
     "control_group": "kSetupMonitorDelay",
     "control_id": 284,
+    "max_channels": 3,
     "sub_control": "kDelayOn",
     "value": 0,
     "min_value": 0,
@@ -45634,6 +46626,7 @@
   {
     "control_group": "kSetupMonitorDelay",
     "control_id": 284,
+    "max_channels": 3,
     "sub_control": "kDelayGang",
     "value": 1,
     "min_value": 0,
@@ -45680,6 +46673,7 @@
   {
     "control_group": "kSetupMonitorDelay",
     "control_id": 284,
+    "max_channels": 3,
     "sub_control": "kDelayTime",
     "value": 2,
     "min_value": 0,
@@ -45726,6 +46720,7 @@
   {
     "control_group": "kSetupCueDelay",
     "control_id": 285,
+    "max_channels": 2,
     "sub_control": "kDelayOn",
     "value": 0,
     "min_value": 0,
@@ -45772,6 +46767,7 @@
   {
     "control_group": "kSetupCueDelay",
     "control_id": 285,
+    "max_channels": 2,
     "sub_control": "kDelayGang",
     "value": 1,
     "min_value": 0,
@@ -45818,6 +46814,7 @@
   {
     "control_group": "kSetupCueDelay",
     "control_id": 285,
+    "max_channels": 2,
     "sub_control": "kDelayTime",
     "value": 2,
     "min_value": 0,
@@ -45864,6 +46861,7 @@
   {
     "control_group": "kSetupCueDelay",
     "control_id": 285,
+    "max_channels": 2,
     "sub_control": "kDelayBypass",
     "value": 3,
     "min_value": 0,
@@ -45910,6 +46908,7 @@
   {
     "control_group": "kSetupSlotOutPhase",
     "control_id": 286,
+    "max_channels": 48,
     "sub_control": "kPhase",
     "value": 0,
     "min_value": 0,
@@ -45956,6 +46955,7 @@
   {
     "control_group": "kSetupOmniOutPhase",
     "control_id": 287,
+    "max_channels": 32,
     "sub_control": "kPhase",
     "value": 0,
     "min_value": 0,
@@ -46002,6 +47002,7 @@
   {
     "control_group": "kSetupD2TrOutPhase",
     "control_id": 288,
+    "max_channels": 2,
     "sub_control": "kPhase",
     "value": 0,
     "min_value": 0,
@@ -46048,6 +47049,7 @@
   {
     "control_group": "kSetupBrightnessBank",
     "control_id": 289,
+    "max_channels": 1,
     "sub_control": "kBrightnessBank",
     "value": 0,
     "min_value": 0,
@@ -46094,6 +47096,7 @@
   {
     "control_group": "kSetupBrightness",
     "control_id": 290,
+    "max_channels": 2,
     "sub_control": "kLCDBrightness",
     "value": 0,
     "min_value": 0,
@@ -46140,6 +47143,7 @@
   {
     "control_group": "kSetupBrightness",
     "control_id": 290,
+    "max_channels": 2,
     "sub_control": "kPanelBrightness",
     "value": 1,
     "min_value": 0,
@@ -46186,6 +47190,7 @@
   {
     "control_group": "kSetupBrightness",
     "control_id": 290,
+    "max_channels": 2,
     "sub_control": "kLampBrightness",
     "value": 2,
     "min_value": 0,
@@ -46232,6 +47237,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kIPAddressByte0",
     "value": 0,
     "min_value": 1,
@@ -46278,6 +47284,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kIPAddressByte1",
     "value": 1,
     "min_value": 0,
@@ -46324,6 +47331,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kIPAddressByte2",
     "value": 2,
     "min_value": 0,
@@ -46370,6 +47378,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kIPAddressByte3",
     "value": 3,
     "min_value": 0,
@@ -46416,6 +47425,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kSubnetMaskByte0",
     "value": 4,
     "min_value": 0,
@@ -46462,6 +47472,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kSubnetMaskByte1",
     "value": 5,
     "min_value": 0,
@@ -46508,6 +47519,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kSubnetMaskByte2",
     "value": 6,
     "min_value": 0,
@@ -46554,6 +47566,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kSubnetMaskByte3",
     "value": 7,
     "min_value": 0,
@@ -46600,6 +47613,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kGatewayAddressByte0",
     "value": 8,
     "min_value": 1,
@@ -46646,6 +47660,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kGatewayAddressByte1",
     "value": 9,
     "min_value": 0,
@@ -46692,6 +47707,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kGatewayAddressByte2",
     "value": 10,
     "min_value": 0,
@@ -46738,6 +47754,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kGatewayAddressByte3",
     "value": 11,
     "min_value": 0,
@@ -46784,6 +47801,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kLinkMode",
     "value": 12,
     "min_value": 0,
@@ -46830,6 +47848,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kMacAddressByte0",
     "value": 13,
     "min_value": 0,
@@ -46876,6 +47895,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kMacAddressByte1",
     "value": 14,
     "min_value": 0,
@@ -46922,6 +47942,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kMacAddressByte2",
     "value": 15,
     "min_value": 0,
@@ -46968,6 +47989,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kMacAddressByte3",
     "value": 16,
     "min_value": 0,
@@ -47014,6 +48036,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kMacAddressByte4",
     "value": 17,
     "min_value": 0,
@@ -47060,6 +48083,7 @@
   {
     "control_group": "kSetupNetwork",
     "control_id": 291,
+    "max_channels": 1,
     "sub_control": "kMacAddressByte5",
     "value": 18,
     "min_value": 0,
@@ -47106,6 +48130,7 @@
   {
     "control_group": "kSetupDateTimeFormat",
     "control_id": 292,
+    "max_channels": 1,
     "sub_control": "kDateFormat",
     "value": 0,
     "min_value": 0,
@@ -47152,6 +48177,7 @@
   {
     "control_group": "kSetupDateTimeFormat",
     "control_id": 292,
+    "max_channels": 1,
     "sub_control": "kTimeFormat",
     "value": 1,
     "min_value": 0,
@@ -47198,6 +48224,7 @@
   {
     "control_group": "kSetupAD824CommPort",
     "control_id": 295,
+    "max_channels": 1,
     "sub_control": "kAD824CommPort",
     "value": 0,
     "min_value": 0,

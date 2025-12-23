@@ -20,6 +20,8 @@ def parse_01v96i_sysex(xls_path, output_json):
             control_group = str(row[1]).strip()
         if str(row[2]).strip():
             control_id = safe_int(row[2])
+        if str(row[1]).strip():
+            max_channels = safe_int(row[3])
 
         sub_control = str(row[4]).strip()
         if not sub_control:
@@ -62,6 +64,7 @@ def parse_01v96i_sysex(xls_path, output_json):
         mapping = {
             "control_group": control_group or "UnknownElement",
             "control_id": control_id if control_id is not None else None,
+            "max_channels": (max_channels+1) if max_channels is not None else 1,
             "sub_control": sub_control,
             "value": value if value is not None else None,
             "min_value": min_value if min_value is not None else None,
@@ -108,4 +111,4 @@ def safe_int(val):
 
 
 # Example usage
-parse_01v96i_sysex("01v96iParamChangeList.xls", "01V96i_sysex_mappings.json")
+parse_01v96i_sysex("01v96iParamChangeList.xls", "01v96i_sysex_mappings.json")

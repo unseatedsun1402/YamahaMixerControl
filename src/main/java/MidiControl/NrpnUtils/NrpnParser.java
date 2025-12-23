@@ -1,13 +1,9 @@
 package MidiControl.NrpnUtils;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 
 import javax.sound.midi.ShortMessage;
 
 public class NrpnParser {
-    private final NrpnRegistry registry = NrpnRegistry.getInstance();
-    private final Logger logger = Logger.getLogger(NrpnParser.class.getName());
-    
+
     private int currentMsb = -1;
     private int currentLsb = -1;
     private int currentValueMsb = -1;
@@ -18,106 +14,74 @@ public class NrpnParser {
     private boolean hasValueMsb = false;
     private boolean hasValueLsb = false;
 
-    public void parse(ShortMessage msg) {
-        int data1 = msg.getData1();
-        int data2 = msg.getData2();
+    /**
+     * Parse a CC ShortMessage and return a complete NRPN event if available.
+     * Otherwise return null.
+     */
+    public NrpnMessage parse(ShortMessage msg) {
 
-        switch (data1) {
-            case 99 -> {
-                currentMsb = data2;
+        int cc = msg.getData1();
+        int data = msg.getData2();
+
+        switch (cc) {
+
+            case 99 -> { // NRPN MSB
+                // If we already had a pending NRPN, emit it before starting a new one
+                if (hasMsb && hasLsb && hasValueMsb) {
+                    NrpnMessage result = buildMessage();
+                    reset();
+                    // Start new NRPN
+                    currentMsb = data;
+                    hasMsb = true;
+                    return result;
+                }
+                currentMsb = data;
                 hasMsb = true;
             }
-            case 98 -> {
-                currentLsb = data2;
+
+            case 98 -> { // NRPN LSB
+                currentLsb = data;
                 hasLsb = true;
             }
-            case 6 -> {
-                currentValueMsb = data2;
+
+            case 6 -> { // Data Entry MSB
+                currentValueMsb = data;
                 hasValueMsb = true;
             }
-            case 38 -> {
-                currentValueLsb = data2;
+
+            case 38 -> { // Data Entry LSB
+                currentValueLsb = data;
                 hasValueLsb = true;
+
+                // Full 14-bit NRPN complete
+                NrpnMessage result = buildMessage();
+                reset();
+                return result;
+            }
+
+            default -> {
+                // If we receive ANY other CC and we have a pending NRPN (MSB+LSB+valueMSB),
+                // emit it immediately as a 7-bit NRPN.
+                if (hasMsb && hasLsb && hasValueMsb) {
+                    NrpnMessage result = buildMessage();
+                    reset();
+                    return result;
+                }
             }
         }
 
-        if (hasMsb && hasLsb && hasValueMsb) {
-            int value = (currentValueMsb << 7) | (hasValueLsb ? currentValueLsb : 0);
-            handleValue(value);
-
-            // Reset
-            hasMsb = hasLsb = hasValueMsb = hasValueLsb = false;
-            currentMsb = currentLsb = currentValueMsb = currentValueLsb = -1;
-        }
+        // If we have MSB+LSB+valueMSB but no LSB yet, do NOT emit yet.
+        // We wait to see if CC 38 arrives next.
+        return null;
     }
 
-     public void parse(byte[] msg) {
-        int data1 = msg[1];
-        int data2 = msg[2];
-
-        switch (data1) {
-            case 99 -> {
-                currentMsb = data2;
-                hasMsb = true;
-            }
-            case 98 -> {
-                currentLsb = data2;
-                hasLsb = true;
-            }
-            case 6 -> {
-                currentValueMsb = data2;
-                hasValueMsb = true;
-            }
-            case 38 -> {
-                currentValueLsb = data2;
-                hasValueLsb = true;
-            }
-        }
-
-        if (hasMsb && hasLsb && hasValueMsb) {
-            logger.fine("Valid Nrpn received " + currentMsb + " " + currentLsb);
-            int value = (currentValueMsb << 7) | (hasValueLsb ? currentValueLsb : 0);
-            handleValue(value);
-
-            // Reset
-            hasMsb = hasLsb = hasValueMsb = hasValueLsb = false;
-            currentMsb = currentLsb = currentValueMsb = currentValueLsb = -1;
-        }
+    private NrpnMessage buildMessage() {
+        int value = (currentValueMsb << 7) | (hasValueLsb ? currentValueLsb : 0);
+        return new NrpnMessage(currentMsb, currentLsb, value);
     }
 
-
-    private void handleValue(int value) {
-        if (currentMsb < 0 || currentLsb < 0) return;
-
-        var resolved = NrpnRegistry.resolve(currentMsb, currentLsb);
-        if (resolved.isPresent()) {
-            var mapping = resolved.get();
-
-            if (dispatchTarget != null) {
-                logger.info(String.format("Dispatching NRPN: %s, Value=%d", mapping.channelIndex(), value));
-                dispatchTarget.handleResolvedNRPN(mapping, value);
-            }
-            else {
-                logger.warning("Dispatch target not set. Cannot dispatch NRPN.");
-            }
-
-            logger.info(String.format("Resolved NRPN:Channel %s, Value=%d", mapping.channelIndex(), value));
-        }
-    
-            
-        else {
-            logger.warning(String.format("Unknown NRPN: MSB=0x%02X, LSB=0x%02X, Value=%d", currentMsb, currentLsb, value));
-        }
-
-        // Reset after handling
-        currentMsb = -1;
-        currentLsb = -1;
+    private void reset() {
+        hasMsb = hasLsb = hasValueMsb = hasValueLsb = false;
+        currentMsb = currentLsb = currentValueMsb = currentValueLsb = -1;
     }
-
-    private static NRPNDispatchTarget dispatchTarget;
-
-    public static void setDispatchTarget(NRPNDispatchTarget target) {
-        dispatchTarget = target;
-    }
-
 }

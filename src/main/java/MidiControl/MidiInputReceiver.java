@@ -28,6 +28,6 @@ public class MidiInputReceiver implements Receiver {
       return;
     }
     if (open) inputBuffer.add(message);
-    logger.info("Added to inputBuffer: " + SysexParser.bytesToHex(message.getMessage()));
+    logger.fine("Added to inputBuffer: " + SysexParser.bytesToHex(message.getMessage()));
   }
 }

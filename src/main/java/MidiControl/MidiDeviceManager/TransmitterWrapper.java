@@ -26,7 +26,7 @@ public class TransmitterWrapper implements MidiInput {
     if (!device.isOpen()) {
       device.open();
       Logger.getLogger(TransmitterWrapper.class.getName())
-          .log(Level.INFO, "Opened MIDI device for transmitter.");
+          .log(Level.INFO, "Opened MIDI device for transmitter: "+device.getDeviceInfo().getName());
     }
 
     transmitter = device.getTransmitter();
