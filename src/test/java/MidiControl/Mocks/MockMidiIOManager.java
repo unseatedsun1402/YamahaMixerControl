@@ -69,6 +69,11 @@ public class MockMidiIOManager extends MidiIOManager {
         this.in = in;
     }
 
+    @Override
+    public void sendAsync(byte[] message){
+        this.out.sendMessage(message);
+    }
+
     /**
      * Copy state from another MockMidiIoManager.
      * Used by the rewritten ServerRouterTest helper.

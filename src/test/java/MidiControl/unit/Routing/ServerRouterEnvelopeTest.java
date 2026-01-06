@@ -13,6 +13,8 @@ import MidiControl.Server.MidiServer;
 import MidiControl.UserInterface.UiModelFactory;
 import MidiControl.UserInterface.DTO.UiModelDTO;
 import MidiControl.Mocks.FakeSession;
+import MidiControl.Mocks.MockCanonicalRegistry;
+import MidiControl.Mocks.MockMidiServer;
 
 import java.util.List;
 
@@ -28,12 +30,6 @@ class MinimalUiModelFactory extends UiModelFactory {
     @Override
     public UiModelDTO buildUiModel(String contextId) {
         return model;
-    }
-}
-
-class StubMidiServer extends MidiServer {
-    public StubMidiServer() {
-        super(null);
     }
 }
 
@@ -53,7 +49,7 @@ public class ServerRouterEnvelopeTest {
         fakeModel.controls = List.of();
 
         MinimalUiModelFactory factory = new MinimalUiModelFactory(fakeModel);
-        StubMidiServer midi = new StubMidiServer();
+        MockMidiServer midi = new MockMidiServer(new MockCanonicalRegistry());
 
         ServerRouter router = new ServerRouter(factory, midi, new SubscriptionManager());
 

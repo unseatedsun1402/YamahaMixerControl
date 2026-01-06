@@ -6,6 +6,14 @@
     font-family: sans-serif;
 }
 
+#strip-container {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    padding: 8px;
+    height: 98vh;
+}
+
 /* -------------------------------
    CHANNEL STRIP CONTAINER
 -------------------------------- */
@@ -13,7 +21,7 @@
     display: flex;
     flex-direction: column;
     width: 220px;
-    height: 98vh;
+    height: 98%;
     background: #1b1b1b;
     border-radius: 8px;
     padding: 12px;
@@ -34,6 +42,7 @@
 .strip-fader-area {
     margin-top: 12px;
     padding-top: 12px;
+    height: max-content;
     border-top: 1px solid #333;
 }
 
@@ -80,7 +89,7 @@
 ---------------------------- */
 .fader {
     width: 40px;
-    height: 200px;
+    min-height: 22vh;
     margin: 0 auto;
     writing-mode: vertical-rl; /* Firefox + modern browsers */
     transform: rotate(180deg); /* Corrects direction */
@@ -89,13 +98,13 @@
 /* Fader track + thumb styling (optional) */
 .fader::-webkit-slider-runnable-track {
     background: #444;
-    height: 6px;
+    height: 8px;
 }
 .fader::-webkit-slider-thumb {
     -webkit-appearance: none;
-    background: #0a84ff;
-    width: 16px;
-    height: 16px;
+    background: #fff30a;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     margin-top: -5px;
 }
@@ -105,9 +114,9 @@
     height: 6px;
 }
 .fader::-moz-range-thumb {
-    background: #0a84ff;
-    width: 16px;
-    height: 16px;
+    background: #e6e6e6;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
 }
 

@@ -3,6 +3,7 @@ package MidiControl.UserInterface.DTO;
 import MidiControl.ContextModel.Context;
 import MidiControl.ContextModel.ViewControl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,11 @@ public class DTOMapper {
         dto.controls = controls.stream()
                                .map(this::toDto)
                                .collect(Collectors.toList());
+        dto.metadata = new HashMap<>();
+        dto.metadata.put("label", ctx.getLabel());
+        dto.metadata.put("contextType", ctx.getContextType().name());
+        dto.metadata.put("rolesAllowed", ctx.getRolesAllowed());
+        dto.metadata.put("filters", ctx.getFilters());
         return dto;
     }
 
@@ -35,6 +41,7 @@ public class DTOMapper {
         dto.hwGroup = vc.hwGroup;            // e.g. "kInputPan"
         dto.hwSubcontrol = vc.hwSubcontrol;  // e.g. "kChannelPan"
         dto.hwInstance = vc.hwInstance;      // e.g. 1
+        dto.canonicalId = (vc.hwGroup+"."+vc.hwSubcontrol+"."+vc.hwInstance);
 
         // ---------------------------------------------------------------------
         // Value Range

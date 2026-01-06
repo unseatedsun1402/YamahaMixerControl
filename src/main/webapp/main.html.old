@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MidiControl UI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/basic-view-style.css"/>
+
+    <script type="module" src="js/websocketClient.js"></script>
+    <script type="module" src="js/uiRenderer.js"></script>
+
+    <script type="module">
+    import { WebSocketClient } from './js/websocketClient.js';
+    import { renderUiModel } from './js/uiRenderer.js';
+
+    console.log(">>> bootstrap script running <<<");
+
+    // Create the client
+    const contextPath = window.location.pathname.split('/')[1];
+    const wsUrl = `ws://${location.host}/${contextPath}/endpoint`;
+
+    const ws = new WebSocketClient(wsUrl);
+
+    // -----------------------------
+    // Event Handlers
+    // -----------------------------
+
+    ws.on("connected", () => {
+        console.log("[Bootstrap] Connected — waiting for ui-bank…");
+    });
+
+    // 1. Receive the bank structure
+    ws.on("ui-bank", (msg) => {
+        console.log("[Bootstrap] Bank received:", msg);
+
+        const bank = msg.payload;
+
+        // Clear strip container (NOT ui-root)
+        const stripContainer = document.getElementById("strip-container");
+        stripContainer.innerHTML = "";
+
+        // Request + subscribe to each context in the bank
+        for (const ctxId of bank.contexts) {
+            console.log(`[Bootstrap] Requesting model for ${ctxId}`);
+            ws.requestUiModel(ctxId);
+            ws.subscribe(ctxId);
+        }
+    });
+
+    // 2. Receive each UI model
+    ws.on("ui-model", (msg) => {
+        console.log("[Bootstrap] UI model received:", msg);
+        renderUiModel(msg.payload.model);   // ← FIXED
+    });
+
+    // Error handler
+    ws.on("error", (err) => {
+        console.error("[Bootstrap] Error from server:", err);
+    });
+
+    // Start the connection
+    ws.connect();
+
+    // Expose for debugging
+    window.wsClient = ws;
+</script>
+</head>
+
+<body>
+    <div id="ui-root">
+        <div id="strip-container"></div>
+    </div>
+</body>
+
+</html>

@@ -71,8 +71,8 @@ public class ReceiverWrapper implements MidiOutput {
                 sysex.setMessage(data, data.length);
                 receiver.send(sysex, -1);
 
-                if (!DEBUG) {
-                    logger.info("Sent SysEx: " + SysexParser.bytesToHex(data));
+                if (DEBUG) {
+                    logger.fine("Sent SysEx: " + SysexParser.bytesToHex(data));
                 }
                 return;
             }
@@ -96,7 +96,7 @@ public class ReceiverWrapper implements MidiOutput {
                 );
                 receiver.send(sm, -1);
 
-                if (!DEBUG) {
+                if (DEBUG) {
                     logger.fine(String.format(
                         "Sent ShortMessage: cmd=%02X data1=%02X data2=%02X",
                         data[0] & 0xFF, data[1] & 0xFF, data[2] & 0xFF
@@ -123,7 +123,7 @@ public class ReceiverWrapper implements MidiOutput {
 
             receiver.send(message, -1);
 
-            if (!DEBUG) {
+            if (DEBUG) {
                 logger.fine("Sent MIDI (legacy): "
                         + SysexParser.bytesToHex(message.getMessage()));
             }

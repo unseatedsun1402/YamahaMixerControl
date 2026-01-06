@@ -4,64 +4,78 @@
     <title>MidiControl UI</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Existing styles -->
-    <!--link rel="stylesheet" href="css/style.css"/>
-    <link rel="stylesheet" href="css/fader-style.css"/>
-    <link rel="stylesheet" href="css/responsive-style.css"/-->
-
-    <!-- New Styles -->
-    <!--link rel="stylesheet" href="css/channel-strip.css"/>
-    <link rel="stylesheet" href="css/responsive-layer.css"/>
-    <link rel="stylesheet" href="css/section-headers.css"/>
-    <link rel="stylesheet" href="css/button.css"/>
-    <link rel="stylesheet" href="css/fader-styling.css"/>
-    <link rel="stylesheet" href="css/number-control.css"/>
-    <link rel="stylesheet" href="css/label-styling.css"/-->
     <link rel="stylesheet" href="css/basic-view-style.css"/>
 
-    <script type="module" src="js/websocketClient.js"></script>
-
-    <script type="module" src="js/uiRenderer.js"></script>
-
+    <!-- Bootstrap -->
     <script type="module">
-    import { WebSocketClient } from './js/websocketClient.js';
-    import { renderUiModel } from './js/uiRenderer.js';
+        import { WebSocketClient } from './js/websocketClient.js';
+        import { renderUiModel } from './js/new-ui-renderer.js';
+        import { applyControlUpdate } from './js/partial-update.js';
 
-    console.log(">>> bootstrap script running <<<");
+        console.log(">>> MidiControl UI bootstrap running <<<");
 
-    // Create the client
-    const contextPath = window.location.pathname.split('/')[1];
-    const wsUrl = `ws://${location.host}/${contextPath}/endpoint`;
+        // Build WebSocket URL
+        const contextPath = window.location.pathname.split('/')[1];
+        const wsUrl = `ws://${location.host}/${contextPath}/endpoint`;
 
-    const ws = new WebSocketClient(wsUrl);
+        // Create WebSocket client
+        const ws = new WebSocketClient(wsUrl);
 
-    // Register handlers
-    ws.on("connected", () => {
-        console.log("[Bootstrap] Connected — requesting UI model");
-        ws.requestUiModel("channel.1");
-        ws.subscribe("channel.1");
-    });
+        // -----------------------------
+        // Event Handlers
+        // -----------------------------
 
-    ws.on("ui-model", (msg) => {
-        console.log("[Bootstrap] UI model received:", msg);
-        const model = msg.payload.model;
-        renderUiModel(model);
-    });
+        ws.on("connected", () => {
+            console.log("[Bootstrap] Connected — waiting for ui-bank…");
+        });
 
-    ws.on("error", (err) => {
-        console.error("[Bootstrap] Error from server:", err);
-    });
+        // 1. Receive the bank structure
+        ws.on("ui-bank", (msg) => {
+            console.log("[Bootstrap] Bank received:", msg);
 
-    // Start the connection
-    ws.connect();
+            const bank = msg.payload;
 
-    // Expose for debugging
-    window.wsClient = ws;
-</script>
+            // Clear strip container
+            const stripContainer = document.getElementById("strip-container");
+            stripContainer.innerHTML = "";
+
+            // Request + subscribe to each context
+            for (const ctxId of bank.contexts) {
+                console.log(`[Bootstrap] Requesting model for ${ctxId}`);
+                ws.requestUiModel(ctxId);
+                ws.subscribe(ctxId);
+            }
+        });
+
+        // 2. Receive each full UI model
+        ws.on("ui-model", (msg) => {
+            console.log("[Bootstrap] UI model received:", msg);
+            renderUiModel(msg.payload.model);
+        });
+
+        // 3. Receive incremental updates
+        ws.on("control-update", (payload) => {
+            console.log("[Bootstrap] Control update:", payload);
+            applyControlUpdate(payload);
+        });
+
+        // Error handler
+        ws.on("error", (err) => {
+            console.error("[Bootstrap] Error from server:", err);
+        });
+
+        // Start connection
+        ws.connect();
+
+        // Expose globally for widgets
+        window.wsClient = ws;
+    </script>
 </head>
 
 <body>
-    <div id="ui-root">Loading UI…</div>
+    <div id="ui-root">
+        <div id="strip-container"></div>
+    </div>
 </body>
+
 </html>

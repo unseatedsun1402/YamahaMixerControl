@@ -374,8 +374,4 @@
 {"canonical_id":"kAuxFader.kFader.5","msb":"0x00","lsb":"0x6D"},
 {"canonical_id":"kAuxFader.kFader.6","msb":"0x00","lsb":"0x6E"},
 {"canonical_id":"kAuxFader.kFader.7","msb":"0x00","lsb":"0x6F"},
-{"canonical_id":"kStereoFader.kFader.0","msb":"0x00","lsb":"0x79"},
-{"canonical_id":"kStereoFader.kFader.1","msb":"0x00","lsb":"0x7A"},
-{"canonical_id":"kStereoFader.kFader.2","msb":"0x00","lsb":"0x7B"},
-{"canonical_id":"kStereoFader.kFader.3","msb":"0x00","lsb":"0x7C"},
-{"canonical_id":"kStereoFader.kFader.4","msb":"0x00","lsb":"0x7D"}]
+{"canonical_id":"kStereoFader.kFader.0","msb":"0x00","lsb":"0x79"}]

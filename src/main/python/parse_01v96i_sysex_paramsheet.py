@@ -60,6 +60,8 @@ def parse_01v96i_sysex(xls_path, output_json):
             | (sub_control_val << 8)
             | param
         )
+        
+        priority = compute_priority(sub_control)
 
         mapping = {
             "control_group": control_group or "UnknownElement",
@@ -74,6 +76,7 @@ def parse_01v96i_sysex(xls_path, output_json):
             "key": key,  # precomputed long key
             "parameter_change_format": change_fmt,
             "parameter_request_format": request_fmt,
+            "priority":priority
         }
         mappings.append(mapping)
 
@@ -81,6 +84,20 @@ def parse_01v96i_sysex(xls_path, output_json):
         json.dump(mappings, f, indent=2)
 
     print(f"Parsed {len(mappings)} unique control type mappings into {output_json}")
+
+def compute_priority(sub_control: str) -> int:
+    sc = sub_control.lower()
+
+    # Priority 1: faders and channel on/off
+    if "kfader" in sc or "kchannelon" in sc:
+        return 1
+
+    # Priority 2: level/gain suffixes
+    if sc.endswith("level") or sc.endswith("gain"):
+        return 2
+
+    # Default: priority 3
+    return 3
 
 
 def parse_bytes(cells):

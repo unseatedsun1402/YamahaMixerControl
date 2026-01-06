@@ -3,6 +3,8 @@ package MidiControl.Mocks;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Server.MidiServer;
+import MidiControl.Server.RehydrationManager;
+import MidiControl.Server.ServerRouter;
 
 public class MockMidiServer extends MidiServer {
 
@@ -11,11 +13,16 @@ public class MockMidiServer extends MidiServer {
 
     public String lastSent;
     public int lastValue;
+    private RehydrationManager rehydrationManager;
+    private ServerRouter serverRouter;
 
     public MockMidiServer(CanonicalRegistry registry) {
-        super(); // If MidiServer requires args, adjust accordingly
+        super(registry); // ← use the test constructor, NOT the default one
         this.registry = registry;
         this.io = new MockMidiIOManager(this);
+
+        // If you want rehydration in tests:
+        this.rehydrationManager = new RehydrationManager();
     }
 
     @Override
@@ -36,7 +43,6 @@ public class MockMidiServer extends MidiServer {
         this.io = io;
     }
 
-    // Called by ServerRouter when handling set-control-value
     public void recordGuiChange(String canonicalId, int value) {
         this.lastSent = canonicalId;
         this.lastValue = value;

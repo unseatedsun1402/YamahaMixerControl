@@ -7,11 +7,12 @@ export class WebSocketClient {
 
     this.handlers = {
       "ui-model": [],
+      "ui-bank": [],
       "control-update": [],
       "error": [],
       "connected": [],
       "disconnected": [],
-      "midi-device-list": [] 
+      "midi-device-list": []
     };
 
     this.requestCounter = 0;
@@ -77,6 +78,11 @@ export class WebSocketClient {
     console.log("[WebSocketClient] Routing message:", msg);
 
     switch (msg.type) {
+
+      case "ui-bank":
+        this._emit("ui-bank", msg);
+        break;
+
       case "ui-model":
         this._emit("ui-model", msg);
         break;
@@ -88,10 +94,10 @@ export class WebSocketClient {
       case "error":
         this._emit("error", msg.payload);
         break;
-      
+
       case "ack":
-          if(debugFlag != true){console.debug("[WebSocketClient] ACK received:", msg.payload);}
-          break;
+        if (debugFlag != true) console.debug("[WebSocketClient] ACK received:", msg.payload);
+        break;
 
       case "midi-device-list":
         this._emit("midi-device-list", msg.payload.devices);

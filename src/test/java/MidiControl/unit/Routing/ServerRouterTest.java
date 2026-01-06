@@ -43,11 +43,7 @@ public class ServerRouterTest {
         env.io = new MockMidiIOManager(env.server);
         env.server.setMockIo(env.io);
 
-        env.router = new ServerRouter(
-            new MockUiModelFactory(),
-            env.server,
-            new MockSubscriptionManager()
-        );
+        env.router = new ServerRouter(env.server);
 
         env.session = new FakeSession("1");
         return env;

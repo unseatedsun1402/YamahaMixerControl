@@ -2,6 +2,8 @@ package MidiControl.ControlServer;
 
 import java.util.logging.Logger;
 
+import MidiControl.Routing.OutputRouter;
+
 public class GuiInputHandler {
 
     private final OutputRouter router;

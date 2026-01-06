@@ -17,6 +17,7 @@ public class ViewControlDTO {
     public String hwGroup;       // e.g. "kInputPan"
     public String hwSubcontrol;  // e.g. "kChannelPan"
     public int hwInstance;       // e.g. 1
+    public String canonicalId;
 
     // ---------------------------------------------------------------------
     // Values

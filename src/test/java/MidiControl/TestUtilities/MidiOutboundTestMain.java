@@ -6,11 +6,11 @@ import java.util.logging.Logger;
 
 import MidiControl.ControlServer.GuiInputHandler;
 import MidiControl.ControlServer.HardwareInputHandler;
-import MidiControl.ControlServer.OutputRouter;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.MidiDeviceManager.ReceiverWrapper;
 import MidiControl.MidiDeviceManager.TransportMode;
+import MidiControl.Routing.OutputRouter;
 import MidiControl.Server.MidiServer;
 
 public class MidiOutboundTestMain {
@@ -24,7 +24,7 @@ public class MidiOutboundTestMain {
         Logger root = Logger.getLogger("");
         root.setLevel(Level.FINE);
         for (Handler h : root.getHandlers()) {
-            h.setLevel(Level.FINE);
+            h.setLevel(Level.INFO);
         }
 
         System.out.println("Available devices:");
@@ -33,12 +33,12 @@ public class MidiOutboundTestMain {
             System.out.println(i + ": " + devices.get(i).name);
         }
 
-        io.trySetOutputDevice(5); // example
-        io.trySetInputDevice(14); // example
+        io.trySetOutputDevice(4); // example
+        io.trySetInputDevice(13); // example
 
         server.run(); // REQUIRED for input + SyncSend
 
-        OutputRouter outputRouter = new OutputRouter(server);
+        OutputRouter outputRouter = new OutputRouter(server.getCanonicalRegistry(),io);
         GuiInputHandler gui = new GuiInputHandler(outputRouter);
 
         // Resolve the faders
@@ -58,7 +58,7 @@ public class MidiOutboundTestMain {
         // GuiInputHandler.enableDebug();
         // OutputRouter.enableDebug();
         // ReceiverWrapper.enableDebug();
-        HardwareInputHandler.enableDebug();
+        // HardwareInputHandler.enableDebug();
 
         // Sweep the faders up
         for (int v = 0; v <= 1023; v += 32) {

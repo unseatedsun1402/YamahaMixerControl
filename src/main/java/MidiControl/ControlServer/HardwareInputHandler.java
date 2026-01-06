@@ -37,7 +37,7 @@ public class HardwareInputHandler {
                 return null;
             }
 
-            logger.info("Received SysEx: " + Arrays.toString(full));
+            logger.fine("Received SysEx: " + Arrays.toString(full));
             return CanonicalInputEvent.fromSysex(full);
         }
 

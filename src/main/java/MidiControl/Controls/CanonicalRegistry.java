@@ -1,6 +1,5 @@
 package MidiControl.Controls;
 
-import MidiControl.Routing.WebSocketEndpoint;
 import MidiControl.ControlServer.CanonicalInputEvent;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexParser;
@@ -10,12 +9,14 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.ShortMessage;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
-public class CanonicalRegistry {
+public class CanonicalRegistry implements SourceAllInstances {
 
     private final Map<String, ControlGroup> groups = new HashMap<>();
     private final Map<String, ControlInstance> controlsById = new HashMap<>();
@@ -62,27 +63,27 @@ public class CanonicalRegistry {
             for (SubControl sc : cg.getSubcontrols().values()) {
                 for (ControlInstance ci : sc.getInstances()) {
                     ci.addListener((instance, newValue) -> {
-                        String json = buildDualFormatJson(instance, newValue);
-                        WebSocketEndpoint.broadcast(json);
+                        // String json = buildDualFormatJson(instance, newValue);
+                        // WebSocketEndpoint.broadcast(json);
                     });
                 }
             }
         }
     }
 
-    private String buildDualFormatJson(ControlInstance instance, int value) {
-        var nrpn = instance.getNrpn().orElse(null);
-        int msb = nrpn != null ? nrpn.msbInt() : -1;
-        int lsb = nrpn != null ? nrpn.lsbInt() : -1;
+    // private String buildDualFormatJson(ControlInstance instance, int value) {
+    //     var nrpn = instance.getNrpn().orElse(null);
+    //     int msb = nrpn != null ? nrpn.msbInt() : -1;
+    //     int lsb = nrpn != null ? nrpn.lsbInt() : -1;
 
-        return String.format(
-            "{\"canonicalId\":\"%s\",\"value\":%d,\"msb\":%d,\"lsb\":%d}",
-            instance.getCanonicalId(),
-            value,
-            msb,
-            lsb
-        );
-    }
+    //     return String.format(
+    //         "{\"canonicalId\":\"%s\",\"value\":%d,\"msb\":%d,\"lsb\":%d}",
+    //         instance.getCanonicalId(),
+    //         value,
+    //         msb,
+    //         lsb
+    //     );
+    // }
 
     public void attachNrpnMappings(List<NrpnMapping> nrpnMappings) {
         for (NrpnMapping nrpn : nrpnMappings) {
@@ -198,6 +199,14 @@ public class CanonicalRegistry {
         return result;
     }
 
+    @Override
+    public Collection<ControlInstance> getAllInstances() {
+        return groups.values().stream()
+            .flatMap(cg -> cg.getSubcontrols().values().stream())
+            .flatMap(sc -> sc.getInstances().stream())
+            .collect(Collectors.toUnmodifiableList());
+    }
+
     /**
      * Extracts the numeric instance index from a context ID.
      * Examples:
@@ -224,15 +233,15 @@ public class CanonicalRegistry {
         }
     }
 
-    public ControlInstance resolve(String string) {
-        if(!string.matches("([A-Za-z])*\\.([A-Za-z])*([0-9])*([A-Za-z])*\\.\\d?")){return null;}
-        int index = Integer.parseInt(string.split("\\.")[2]);
-        if (index < 0)
-            return null;
-
-        ControlGroup group = this.getGroup(string.split("\\.")[0]);
-        SubControl subControl = group.getSubcontrol(string.split("\\.")[1]);
-        if(index < subControl.getInstances().size()){return subControl.getInstances().get(index);}
+public ControlInstance resolve(String string) {
+    if(!string.matches("^[A-Za-z0-9_]+\\.[A-Za-z0-9_]+\\.[0-9]+$")){return null;}
+    int index = Integer.parseInt(string.split("\\.")[2]);
+    if (index < 0)
         return null;
-    }
+
+    ControlGroup group = this.getGroup(string.split("\\.")[0]);
+    SubControl subControl = group.getSubcontrol(string.split("\\.")[1]);
+    if(index < subControl.getInstances().size()){return subControl.getInstances().get(index);}
+    return null;
+}
 }

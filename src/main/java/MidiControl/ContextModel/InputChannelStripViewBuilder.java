@@ -94,6 +94,7 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
                 ci.getMin(),
                 ci.getMax(),
                 ci.getValue(),
+                ci.getSysex().getDefault_value(),
                 ci.getGroup(),
                 ci.getSubcontrol(),
                 ci.getInstanceIndex()
@@ -110,6 +111,7 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
                 ci.getMin(),
                 ci.getMax(),
                 ci.getValue(),
+                ci.getSysex().getDefault_value(),
                 ci.getGroup(),
                 ci.getSubcontrol(),
                 ci.getInstanceIndex()
@@ -130,6 +132,7 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
                 ci.getMin(),
                 ci.getMax(),
                 ci.getValue(),
+                ci.getSysex().getDefault_value(),
                 ci.getGroup(),
                 ci.getSubcontrol(),
                 ci.getInstanceIndex()
@@ -146,6 +149,7 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
                 ci.getMin(),
                 ci.getMax(),
                 ci.getValue(),
+                ci.getSysex().getDefault_value(),
                 ci.getGroup(),
                 ci.getSubcontrol(),
                 ci.getInstanceIndex()

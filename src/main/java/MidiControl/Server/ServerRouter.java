@@ -8,10 +8,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import MidiControl.ControlServer.GuiInputHandler;
-import MidiControl.ControlServer.OutputRouter;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.MidiDeviceManager.MidiDeviceDTO;
 import MidiControl.MidiDeviceManager.MidiIOManager;
+import MidiControl.Routing.OutputRouter;
 import MidiControl.Routing.WebSocketEndpoint;
 import MidiControl.UserInterface.UiModelFactory;
 import MidiControl.UserInterface.DTO.UiModelDTO;
@@ -27,7 +27,18 @@ public class ServerRouter {
     private final OutputRouter outputRouter;
     private static final Logger logger = Logger.getLogger(ServerRouter.class.getName());
     private final MidiIOManager ioManager;
+    private App app;
 
+    public ServerRouter(MidiServer server) 
+    {
+        this.midi = server;
+        this.uiFactory = midi.getUiModelFactory();
+        this.ioManager = midi.getMidiDeviceManager();
+        this.subscriptions = midi.getSubscriptionManager();
+        this.outputRouter = new OutputRouter(midi.getCanonicalRegistry(),this.ioManager);
+        this.guiInputHandler = new GuiInputHandler(outputRouter);
+        this.app = null;
+    }
 
     public ServerRouter(UiModelFactory uiFactory, MidiServer server, SubscriptionManager subscriptions) 
     {
@@ -36,11 +47,14 @@ public class ServerRouter {
         this.ioManager = midi.getMidiDeviceManager();
         this.subscriptions = subscriptions;
 
-        this.outputRouter = new OutputRouter(server);
+        this.outputRouter = new OutputRouter(midi.getCanonicalRegistry(),this.ioManager);
         this.guiInputHandler = new GuiInputHandler(outputRouter);
+        this.app = null;
     }
 
-
+    public void injectApp(App app){
+        this.app = app;
+    }
 
     public void handleMessage(Session session, String message) {
         JsonObject root = gson.fromJson(message, JsonObject.class);
@@ -84,13 +98,11 @@ public class ServerRouter {
         int value = payload.get("value").getAsInt();
         logger.fine("Update from "+canonicalId+" val: "+value);
 
-        if(midi.getCanonicalRegistry().resolve(canonicalId) != null){guiInputHandler.handleGuiChange(canonicalId, value);
-
-        // ControlInstance ci = midi.getCanonicalRegistry().resolveCanonicalId(canonicalId);
-        // if (ci != null) {
-            // ci.updateValue(value);
+        ControlInstance ci = midi.getCanonicalRegistry().resolveCanonicalId(canonicalId);
+        if (ci != null) {
+            ci.updateValue(value);
+            guiInputHandler.handleGuiChange(canonicalId, value);
             // subscriptions.broadcastControlUpdate(canonicalId, value);
-
         } else {
             logger.warning("Unknown canonicalId in set-control-value: " + canonicalId);
         }
@@ -217,6 +229,11 @@ public class ServerRouter {
         // Apply input device
         boolean inOk = ioManager.trySetInputDevice(newInput);
 
+        if (inOk && outOk) {
+            if(app.equals(null)){logger.severe("App for rehydration is null - cannot rehydrate");}
+            app.rehydrate();
+        }
+
         // --- Future settings (commented out for now) ---
         // String inputChannel = payload.get("inputChannel").getAsString();
         // int outputChannel = payload.get("outputChannel").getAsInt();
@@ -237,5 +254,9 @@ public class ServerRouter {
         ack.add("payload", p);
 
         WebSocketEndpoint.send(session, ack.toString());
+    }
+
+    public OutputRouter getOutputRouter() {
+        return outputRouter;
     }
 }

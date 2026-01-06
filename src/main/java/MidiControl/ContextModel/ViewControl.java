@@ -44,6 +44,7 @@ public class ViewControl {
     public int min;
     public int max;
     public int value;
+    public int defaultValue;
 
     // ---------------------------------------------------------------------
     // Optional UI hints
@@ -59,10 +60,14 @@ public class ViewControl {
     public List<ControlInstance> multi = null;
 
     // ---------------------------------------------------------------------
-    // Canonical ID helper
+    // helpers
     // ---------------------------------------------------------------------
     public String getCanonicalId() {
         return hwGroup + "." + hwSubcontrol + "." + hwInstance;
+    }
+
+    public String getLogicalId(){
+        return this.logicId;
     }
 
     // ---------------------------------------------------------------------
@@ -77,6 +82,7 @@ public class ViewControl {
             int min,
             int max,
             int value,
+            int defaultValue,
             String hwGroup,
             String hwSubcontrol,
             int hwInstance
@@ -90,6 +96,7 @@ public class ViewControl {
         this.min = min;
         this.max = max;
         this.value = value;
+        this.defaultValue = defaultValue;
 
         this.hwGroup = hwGroup;
         this.hwSubcontrol = hwSubcontrol;

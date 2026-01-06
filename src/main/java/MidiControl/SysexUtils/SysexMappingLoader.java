@@ -51,7 +51,7 @@ public class SysexMappingLoader {
 
             List<SysexMapping> mappings = new Gson().fromJson(reader, listType);
             initializeMappings(mappings);
-            logger.info("Loaded "+mappings.size() + "from "+resourceName);
+            logger.info("Loaded "+mappings.size() + " from "+resourceName);
             return mappings;
 
         } catch (Exception e) {

@@ -1,7 +1,6 @@
 package MidiControl.functional.GuiToHardware;
 
 import MidiControl.ControlServer.GuiInputHandler;
-import MidiControl.ControlServer.OutputRouter;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlGroup;
 import MidiControl.Controls.ControlInstance;
@@ -10,6 +9,7 @@ import MidiControl.MidiDeviceManager.TransportMode;
 import MidiControl.Mocks.MockMidiOut;
 import MidiControl.Mocks.MockMidiServer;
 import MidiControl.NrpnUtils.NrpnMapping;
+import MidiControl.Routing.OutputRouter;
 import MidiControl.Server.MidiServer;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
@@ -36,7 +36,7 @@ public class GuiToHardwareChangeTest {
         MidiServer server = new MockMidiServer(registry);
         MockMidiOut out = new MockMidiOut();
         server.getMidiDeviceManager().setMidiOutForTest(out);
-        OutputRouter router = new OutputRouter(server);
+        OutputRouter router = new OutputRouter(registry,server.getMidiDeviceManager());
         GuiInputHandler gui = new GuiInputHandler(router);
 
         ControlInstance ci =
@@ -75,7 +75,7 @@ public class GuiToHardwareChangeTest {
 
         server.getMidiDeviceManager().setTransportMode(TransportMode.NRPN);
 
-        OutputRouter router = new OutputRouter(server);
+        OutputRouter router = new OutputRouter(registry,server.getMidiDeviceManager());;
         GuiInputHandler gui = new GuiInputHandler(router);
 
         // Pick ANY real control instance

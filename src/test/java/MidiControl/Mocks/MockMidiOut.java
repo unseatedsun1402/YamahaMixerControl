@@ -10,6 +10,7 @@ import java.util.List;
 public class MockMidiOut implements MidiOutput {
 
     public final List<byte[]> sent = new ArrayList<>();
+    private Boolean openFlag = true;
 
     @Override
     public void sendMessage(byte[] message) {
@@ -23,11 +24,13 @@ public class MockMidiOut implements MidiOutput {
 
     @Override
     public boolean isOpen() {
-        return true;
+        return openFlag;
     }
 
     @Override
-    public void close() {}
+    public void close() {
+        openFlag = false;
+    }
 
     @Override
     public void sendMessage(MidiMessage message) {

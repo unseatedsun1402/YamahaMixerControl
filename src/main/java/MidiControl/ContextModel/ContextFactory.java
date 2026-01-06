@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import MidiControl.Controls.CanonicalRegistry;
-import MidiControl.Controls.ControlGroup;
-import MidiControl.Controls.SubControl;
 public class ContextFactory {
 
     public static Context buildChannelStrip(CanonicalRegistry registry, int channelIndex) {
@@ -130,7 +128,7 @@ public class ContextFactory {
         return new Context(
             "stereo." + stereoIndex,
             "Stereo " + stereoIndex,
-            ContextType.STEREO_INPUT,
+            ContextType.STEREO_OUTPUT,
             List.of("admin", "engineer"),
             filters
         );

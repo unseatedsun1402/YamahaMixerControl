@@ -1,14 +1,18 @@
 package MidiControl.unit.ContextModel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import MidiControl.ContextModel.BankContext;
+import MidiControl.ContextModel.BankFilter;
 import MidiControl.ContextModel.Context;
 import MidiControl.ContextModel.ContextDiscoveryEngine;
+import MidiControl.ContextModel.ContextType;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
@@ -54,11 +58,11 @@ public class ContextDiscoveryTest {
         String json =
             "[" +
             "{" +
-                "\"control_group\": \"kInputAUX\"," +
+                "\"control_group\": \"kAUXFader\"," +
                 "\"control_id\": 34," +
-                "\"max_channels\": 39," +
-                "\"sub_control\": \"kAUX1Level\"," +
-                "\"value\": 2," +
+                "\"max_channels\": 8," +
+                "\"sub_control\": \"kFader\"," +
+                "\"value\": 0," +
                 "\"min_value\": 0," +
                 "\"max_value\": 1023," +
                 "\"default_value\": 0," +
@@ -75,10 +79,10 @@ public class ContextDiscoveryTest {
         ContextDiscoveryEngine engine = new ContextDiscoveryEngine(registry);
         List<Context> contexts = engine.discoverContexts();
 
-        boolean mix1Found = contexts.stream()
-            .anyMatch(c -> c.getId().equals("mix.1"));
+        boolean aux1Found = contexts.stream()
+            .anyMatch(c -> c.getId().equals("aux.1"));
 
-        assertTrue(mix1Found, "Expected mix.1 context from kAUX1Level");
+        assertTrue(aux1Found, "Expected aux.1 context from kAUXFader");
     }
 
     @Test
@@ -87,11 +91,11 @@ public class ContextDiscoveryTest {
         String json =
             "[" +
             "{" +
-                "\"control_group\": \"kInputToMatrix\"," +
+                "\"control_group\": \"kMatrixFader\"," +
                 "\"control_id\": 68," +
-                "\"max_channels\": 55," +
-                "\"sub_control\": \"kMatrix1Level\"," +
-                "\"value\": 5," +
+                "\"max_channels\": 8," +
+                "\"sub_control\": \"kFader\"," +
+                "\"value\": 0," +
                 "\"min_value\": 0," +
                 "\"max_value\": 1023," +
                 "\"default_value\": 0," +
@@ -111,7 +115,7 @@ public class ContextDiscoveryTest {
         boolean matrix1Found = contexts.stream()
             .anyMatch(c -> c.getId().equals("matrix.1"));
 
-        assertTrue(matrix1Found, "Expected matrix.1 context from kMatrix1Level");
+        assertTrue(matrix1Found, "Expected matrix.1 context from kMatrixFader");
     }
 
     @Test
@@ -125,13 +129,128 @@ public class ContextDiscoveryTest {
         List<Context> contexts = engine.discoverContexts();
 
         long channels = contexts.stream().filter(c -> c.getId().startsWith("channel.")).count();
-        long mixes    = contexts.stream().filter(c -> c.getId().startsWith("mix.")).count();
-        long matrices = contexts.stream().filter(c -> c.getId().startsWith("matrix.")).count();
-        long outputs  = contexts.stream().filter(c -> c.getId().startsWith("bus.")).count();
+        long buses    = contexts.stream().filter(c -> c.getId().startsWith("mix")).count();
 
         assertTrue(channels > 0, "Expected channels");
-        assertTrue(mixes > 0, "Expected mixes");
-        assertTrue(matrices >= 0, "Matrices may be zero for some desks");
-        assertTrue(outputs > 0, "Expected Outputs");
+        assertTrue(buses > 0, "Expected buses");
     }
+
+    // Helper to build a minimal Context
+    private Context ctx(String id, ContextType type) {
+        return new Context(
+                id,
+                id,
+                type,
+                List.of(),
+                List.of()
+        );
+    }
+
+    // Helper to build a BankContext with filters
+    private BankContext bank(BankFilter... filters) {
+        BankContext bc =  new BankContext();
+        for(BankFilter fileter : filters){
+            bc.addFilter(fileter);
+        }
+        return bc;
+    }
+
+    // Engine with empty registry (matchesFilters does not use registry)
+    private ContextDiscoveryEngine engine() {
+        return new ContextDiscoveryEngine(new CanonicalRegistry(List.of(), null));
+    }
+
+    // ---------------------------------------------------------------------
+    // TESTS
+    // ---------------------------------------------------------------------
+
+    @Test
+    public void testPrefixMatch() {
+        Context ctx = ctx("channel.5", ContextType.CHANNEL);
+        BankContext bank = bank(new BankFilter("channel", null, null));
+
+        assertTrue(engine().matchesFilters(ctx, bank));
+    }
+
+    @Test
+    public void testPrefixMismatch() {
+        Context ctx = ctx("mix.2", ContextType.MIX);
+        BankContext bank = bank(new BankFilter("channel", null, null));
+
+        assertFalse(engine().matchesFilters(ctx, bank));
+    }
+
+    @Test
+    public void testIndexMatch() {
+        Context ctx = ctx("channel.7", ContextType.CHANNEL);
+        BankContext bank = bank(new BankFilter("channel", 7, null));
+
+        assertTrue(engine().matchesFilters(ctx, bank));
+    }
+
+    @Test
+    public void testIndexMismatch() {
+        Context ctx = ctx("channel.3", ContextType.CHANNEL);
+        BankContext bank = bank(new BankFilter("channel", 5, null));
+
+        assertFalse(engine().matchesFilters(ctx, bank));
+    }
+
+    @Test
+    public void testTypeMatch() {
+        Context ctx = ctx("mix.1", ContextType.MIX);
+        BankContext bank = bank(new BankFilter(null, null, ContextType.MIX));
+
+        assertTrue(engine().matchesFilters(ctx, bank));
+    }
+
+    @Test
+    public void testTypeMismatch() {
+        Context ctx = ctx("mix.1", ContextType.MIX);
+        BankContext bank = bank(new BankFilter(null, null, ContextType.CHANNEL));
+
+        assertFalse(engine().matchesFilters(ctx, bank));
+    }
+
+    @Test
+    public void testMultipleFiltersOneMatches() {
+        Context ctx = ctx("channel.4", ContextType.CHANNEL);
+
+        BankFilter bad = new BankFilter("mix", null, null);
+        BankFilter good = new BankFilter("channel", 4, ContextType.CHANNEL);
+
+        BankContext bank = bank(bad, good);
+
+        assertTrue(engine().matchesFilters(ctx, bank));
+    }
+
+    @Test
+    public void testMultipleFiltersNoneMatch() {
+        Context ctx = ctx("channel.4", ContextType.CHANNEL);
+
+        BankFilter f1 = new BankFilter("mix", null, null);
+        BankFilter f2 = new BankFilter("aux", null, null);
+
+        BankContext bank = bank(f1, f2);
+
+        assertFalse(engine().matchesFilters(ctx, bank));
+    }
+
+    @Test
+    public void testMalformedContextId() {
+        Context ctx = ctx("invalid", ContextType.CHANNEL);
+        BankContext bank = bank(new BankFilter("invalid", 3, null));
+
+        // Should not crash, should simply not match
+        assertFalse(engine().matchesFilters(ctx, bank));
+    }
+
+    @Test
+    public void testFilterWithAllNullFieldsMatchesEverything() {
+        Context ctx = ctx("anything.123", ContextType.MATRIX);
+        BankContext bank = bank(new BankFilter(null, null, null));
+
+        assertTrue(engine().matchesFilters(ctx, bank));
+    }
+
 }

@@ -23,6 +23,8 @@ public class SysexMapping {
     private int[] valueByteIndices;
     private int[] indexByteIndices;
 
+    public int priority;
+
     // TODO: make this configurable from outside if needed
     private static int deviceNumber = 0; // 0–15, default 0
 
@@ -39,7 +41,8 @@ public class SysexMapping {
             int default_value,
             String comment,
             List<String> parameter_change_format,
-            List<String> parameter_request_format
+            List<String> parameter_request_format,
+            int priority
     ) {
         this.control_group = control_group;
         this.control_id = control_id;
@@ -54,9 +57,14 @@ public class SysexMapping {
         this.comment = comment;
         this.parameter_change_format = parameter_change_format;
         this.parameter_request_format = parameter_request_format;
+        this.priority = priority;
 
         computeValueByteIndices();
         computeIndexByteIndices();
+    }
+
+    public SysexMapping() {
+        //TODO Auto-generated constructor stub
     }
 
     public void initialize() {
@@ -309,5 +317,10 @@ public class SysexMapping {
     // Optionally expose device number control later
     public static void setDeviceNumber(int n) {
         deviceNumber = n & 0x0F;
+    }
+
+    public void setMin_value(int min) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setMin_value'");
     }
 }

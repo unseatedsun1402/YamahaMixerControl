@@ -1422,8 +1422,4 @@
 {"canonical_id":"kMatrixFader.kFader.5","msb":"0x00","lsb":"0x75"},
 {"canonical_id":"kMatrixFader.kFader.6","msb":"0x00","lsb":"0x76"},
 {"canonical_id":"kMatrixFader.kFader.7","msb":"0x00","lsb":"0x77"},
-{"canonical_id":"kStereoFader.kFader.0","msb":"0x00","lsb":"0x78"},
-{"canonical_id":"kStereoFader.kFader.1","msb":"0x00","lsb":"0x79"},
-{"canonical_id":"kStereoFader.kFader.2","msb":"0x00","lsb":"0x7A"},
-{"canonical_id":"kStereoFader.kFader.3","msb":"0x00","lsb":"0x7B"},
-{"canonical_id":"kStereoFader.kFader.4","msb":"0x00","lsb":"0x7C"}]
+{"canonical_id":"kStereoFader.kFader.0","msb":"0x00","lsb":"0x78"}]

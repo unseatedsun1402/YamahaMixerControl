@@ -30,4 +30,8 @@ public class MidiInputReceiver implements Receiver {
     if (open) inputBuffer.add(message);
     logger.fine("Added to inputBuffer: " + SysexParser.bytesToHex(message.getMessage()));
   }
+
+  public Boolean isOpen() {
+    return this.open;
+  }
 }

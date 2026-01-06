@@ -8,20 +8,19 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import MidiControl.ControlServer.GuiInputHandler;
-import MidiControl.ControlServer.OutputRouter;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.MidiDeviceManager.MidiIOManager;
-import MidiControl.MidiDeviceManager.ReceiverWrapper;
 import MidiControl.Mocks.MockMidiOut;
 import MidiControl.NrpnUtils.NrpnMapping;
 import MidiControl.NrpnUtils.NrpnMappingLoader;
+import MidiControl.Routing.OutputRouter;
 import MidiControl.Server.MidiServer;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
-
 public class ServerToHardwareTest {
+
     @Test
     public void testResolveAndBuildForFader1() throws Exception {
 
@@ -84,11 +83,10 @@ public class ServerToHardwareTest {
         byte[] built = mapping.buildChangeMessage(testValue, instance.getIndex());
 
         // Route through the OutputRouter
-        OutputRouter router = new OutputRouter(server);
+        OutputRouter router = new OutputRouter(registry,server.getMidiDeviceManager());
         MidiIOManager manager = server.getMidiDeviceManager();
         MockMidiOut out = new MockMidiOut();
         manager.setMidiOutForTest(out);
-        ReceiverWrapper.enableDebug();
 
         router.applyChange(canonicalId, testValue);
 
@@ -122,9 +120,8 @@ public class ServerToHardwareTest {
             MidiIOManager manager = server.getMidiDeviceManager();
             MockMidiOut out = new MockMidiOut();
             manager.setMidiOutForTest(out);
-            ReceiverWrapper.enableDebug();
 
-            OutputRouter router = new OutputRouter(server);
+            OutputRouter router = new OutputRouter(registry,server.getMidiDeviceManager());
             GuiInputHandler handler = new GuiInputHandler(router);
             
             handler.handleGuiChange(canonicalId, testValue);

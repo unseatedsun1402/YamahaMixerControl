@@ -1,5 +1,9 @@
 package MidiControl.Server;
 
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -15,8 +19,13 @@ public class MidiServerListener implements ServletContextListener {
             CONTEXT = sce.getServletContext();
 
             MidiServer server = new MidiServer();
-            server.run();
 
+            server.run();
+            Logger root = Logger.getLogger("");
+            root.setLevel(Level.FINE);
+            for (Handler h : root.getHandlers()) {
+                h.setLevel(Level.INFO);
+            }
             CONTEXT.setAttribute("midiServer", server);
         }
 

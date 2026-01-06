@@ -22,6 +22,7 @@ public class ControlInstance {
     private NrpnMapping nrpnMapping;
     private SysexMapping sysexMapping;
     private static Logger logger = Logger.getLogger(ControlInstance.class.getName());
+    private int priority = 3;
 
     public ControlInstance(SubControl parent,
                         int index,
@@ -35,9 +36,7 @@ public class ControlInstance {
             parent.getParentGroup().getName() + "." +
             parent.getName() + "." +
             index;
-
-        
-
+        if(sysex != null){this.priority= sysex.priority;}
     }
     
     public byte getResolution() {
@@ -47,6 +46,14 @@ public class ControlInstance {
             if (range <= 1023) return (byte) 0xF0;      // 10-bit
             return (byte)0xFF;                          // 14-bit
         }
+    
+    public int getPriority(){
+        return this.priority;
+    }
+
+    public void setPriority(int priority){
+        this.priority = priority;
+    }
 
     public void addListener(ControlListener listener) {
         listeners.add(listener);
@@ -78,7 +85,7 @@ public class ControlInstance {
         for (ControlListener l : listeners) {
             l.onControlChanged(this, value);
         }
-        logger.info("New value for "+this.canonicalId + " is: "+ this.value);
+        logger.fine("New value for "+this.canonicalId + " is: "+ this.value);
         return this.value;
     }
 
