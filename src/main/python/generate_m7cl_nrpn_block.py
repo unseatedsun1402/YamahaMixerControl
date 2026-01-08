@@ -15,7 +15,7 @@ def generate_block(start_hex, canonical_prefix, instances=56):
         lsb = nrpn & 0xFF
 
         entry = {
-            "canonical_id": f"{canonical_prefix}.{i+1}",
+            "canonical_id": f"{canonical_prefix}.{i}",
             "msb": f"0x{msb:02X}",
             "lsb": f"0x{lsb:02X}"
         }

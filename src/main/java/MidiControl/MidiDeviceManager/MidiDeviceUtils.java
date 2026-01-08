@@ -7,6 +7,8 @@ import javax.sound.midi.MidiUnavailableException;
 public final class MidiDeviceUtils {
 
   private MidiDeviceUtils() {} // prevent instantiation
+  public static MidiDevice.Info[] overrideDeviceInfos = null;
+  public static MidiDevice overrideDevice = null;
 
   public static MidiDevice getDevice(int index) throws MidiUnavailableException {
     MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();

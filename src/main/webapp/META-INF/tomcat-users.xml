@@ -51,7 +51,7 @@
   <user username="role1" password="<must-be-changed>" roles="role1"/>
 -->
     <user password="admin_password" roles="manager-script,admin" username="admin"/>
-    <user password="eb" roles="musician,keys,drums,bass" username="ethan"/>
+    <!--user password="eb" roles="musician,keys,drums,bass" username="ethan"/>
     <user password="sf" roles="musician,drums" username="sean"/>
     <user password="ja" roles="musician,drums,keys,bass" username="james"/>
     <user password="rb" roles="drums,keys" username="rich"/>
@@ -63,5 +63,5 @@
     <user password="cc" roles="bass" username="chris"/>
     <user password="mp" roles="musician,keys" username="megan"/>
     <user password="pa" roles="musician,keys" username="phil"/>
-    <user password="" roles="musician" username="sbguest"/>
+    <user password="" roles="musician" username="sbguest"/-->
 </tomcat-users>

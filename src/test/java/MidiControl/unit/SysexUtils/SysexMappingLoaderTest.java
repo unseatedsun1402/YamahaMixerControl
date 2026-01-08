@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 public class SysexMappingLoaderTest {
   @Test
   public void testLoadMappingsFromClasspath() {
-    List<SysexMapping> mappings = SysexMappingLoader.loadMappings();
+    List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
 
     // Basic sanity checks
     assertNotNull(mappings, "Mappings list should not be null");

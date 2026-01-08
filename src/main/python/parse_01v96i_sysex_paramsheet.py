@@ -20,6 +20,8 @@ def parse_01v96i_sysex(xls_path, output_json):
             control_group = str(row[1]).strip()
         if str(row[2]).strip():
             control_id = safe_int(row[2])
+        if str(row[1]).strip():
+            max_channels = safe_int(row[3])
 
         sub_control = str(row[4]).strip()
         if not sub_control:
@@ -58,10 +60,13 @@ def parse_01v96i_sysex(xls_path, output_json):
             | (sub_control_val << 8)
             | param
         )
+        
+        priority = compute_priority(sub_control)
 
         mapping = {
             "control_group": control_group or "UnknownElement",
             "control_id": control_id if control_id is not None else None,
+            "max_channels": (max_channels+1) if max_channels is not None else 1,
             "sub_control": sub_control,
             "value": value if value is not None else None,
             "min_value": min_value if min_value is not None else None,
@@ -71,6 +76,7 @@ def parse_01v96i_sysex(xls_path, output_json):
             "key": key,  # precomputed long key
             "parameter_change_format": change_fmt,
             "parameter_request_format": request_fmt,
+            "priority":priority
         }
         mappings.append(mapping)
 
@@ -78,6 +84,20 @@ def parse_01v96i_sysex(xls_path, output_json):
         json.dump(mappings, f, indent=2)
 
     print(f"Parsed {len(mappings)} unique control type mappings into {output_json}")
+
+def compute_priority(sub_control: str) -> int:
+    sc = sub_control.lower()
+
+    # Priority 1: faders and channel on/off
+    if "kfader" in sc or "kchannelon" in sc:
+        return 1
+
+    # Priority 2: level/gain suffixes
+    if sc.endswith("level") or sc.endswith("gain"):
+        return 2
+
+    # Default: priority 3
+    return 3
 
 
 def parse_bytes(cells):
@@ -108,4 +128,4 @@ def safe_int(val):
 
 
 # Example usage
-parse_01v96i_sysex("01v96iParamChangeList.xls", "01V96i_sysex_mappings.json")
+parse_01v96i_sysex("01v96iParamChangeList.xls", "01v96i_sysex_mappings.json")

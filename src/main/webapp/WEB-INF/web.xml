@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+<web-app version="6.0"
+         xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+
     <servlet>
         <servlet-name>GetDevices</servlet-name>
         <servlet-class>MidiControl.GetDevices</servlet-class>
@@ -8,7 +12,7 @@
         <servlet-name>GetDevices</servlet-name>
         <url-pattern>/devices</url-pattern>
     </servlet-mapping>
-    
+
     <servlet>
         <servlet-name>ChangeNames</servlet-name>
         <servlet-class>MidiControl.ChangeJSONNames</servlet-class>
@@ -17,7 +21,7 @@
         <servlet-name>ChangeNames</servlet-name>
         <url-pattern>/changenames</url-pattern>
     </servlet-mapping>
-    
+
     <servlet>
         <servlet-name>SetMidiOutputDevice</servlet-name>
         <servlet-class>MidiControl.SetMidiOutputDevice</servlet-class>
@@ -26,16 +30,16 @@
         <servlet-name>SetMidiOutputDevice</servlet-name>
         <url-pattern>/setmidioutputdevice</url-pattern>
     </servlet-mapping>
-    
+
     <servlet>
         <servlet-name>BuildMixView</servlet-name>
         <servlet-class>MidiControl.BuildPage</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>BuildMixView</servlet-name>
-    <url-pattern>/buildpage</url-pattern>
+        <url-pattern>/buildpage</url-pattern>
     </servlet-mapping>
-    
+
     <servlet>
         <servlet-name>GetInputDevices</servlet-name>
         <servlet-class>MidiControl.GetInputDevices</servlet-class>
@@ -44,7 +48,7 @@
         <servlet-name>GetInputDevices</servlet-name>
         <url-pattern>/GetInputDevices</url-pattern>
     </servlet-mapping>
-    
+
     <servlet>
         <servlet-name>SetMidiInputDevice</servlet-name>
         <servlet-class>MidiControl.SetMidiInputDevice</servlet-class>
@@ -53,11 +57,12 @@
         <servlet-name>SetMidiInputDevice</servlet-name>
         <url-pattern>/setmidiinputdevice</url-pattern>
     </servlet-mapping>
-    
+
+    <!--
     <login-config>
         <auth-method>BASIC</auth-method>
     </login-config>
-    
+
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>mix-pages</web-resource-name>
@@ -72,49 +77,41 @@
             <url-pattern>/mix_10.html</url-pattern>
             <url-pattern>/mix_11.html</url-pattern>
             <url-pattern>/mix_12.html</url-pattern>
-
         </web-resource-collection>
-
         <auth-constraint>
             <role-name>musician</role-name>
         </auth-constraint>
-    
     </security-constraint>
-    
+
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>mix_1</web-resource-name>
             <url-pattern>/mix_1.html</url-pattern>
         </web-resource-collection>
-
         <auth-constraint>
             <role-name>keys</role-name>
         </auth-constraint>
-    
     </security-constraint>
-    
+
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>mix_4</web-resource-name>
             <url-pattern>/mix_4.html</url-pattern>
         </web-resource-collection>
-
         <auth-constraint>
             <role-name>drums</role-name>
         </auth-constraint>
-    
     </security-constraint>
-    
+
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>mix_5</web-resource-name>
             <url-pattern>/mix_5.html</url-pattern>
         </web-resource-collection>
-
         <auth-constraint>
             <role-name>bass</role-name>
         </auth-constraint>
-    
     </security-constraint>
-  
+    -->
+
 </web-app>

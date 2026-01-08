@@ -7,62 +7,61 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class SysexRegistry {
-  private final Logger log = Logger.getLogger(this.getClass().getName());
-  private final List<SysexMapping> mappings;
 
-  // model → key → list of mappings
-  private final Map<Integer, Map<Long, List<SysexMapping>>> modelTables = new HashMap<>();
+    private final Logger log = Logger.getLogger(this.getClass().getName());
 
-  public SysexRegistry(List<SysexMapping> mappings) {
-    this.mappings = mappings;
-    buildModelTables(mappings);
-  }
+    private final List<SysexMapping> mappings;
 
-  private void buildModelTables(List<SysexMapping> mappings) {
-    for (SysexMapping m : mappings) {
-      Long key = m.getKey(); // consume precomputed key directly
-      if (key == null) continue;
+    private final Map<Integer, Map<Long, List<SysexMapping>>> modelTables = new HashMap<>();
 
-      int model = (int) (key >>> 32); // top 8 bits = model_id
-
-      modelTables
-          .computeIfAbsent(model, k -> new HashMap<>())
-          .computeIfAbsent(key, k -> new ArrayList<>())
-          .add(m);
+    public SysexRegistry(List<SysexMapping> mappings) {
+        this.mappings = mappings;
+        buildModelTables(mappings);
     }
-  }
 
-  public List<SysexMapping> getMappings() {
-    return mappings;
-  }
+    private void buildModelTables(List<SysexMapping> mappings) {
+        for (SysexMapping m : mappings) {
+            Long key = m.getKey();
 
-  public SysexMapping resolve(byte[] msg) {
-    if (msg.length < 10) return null;
-    if (msg[0] != (byte) 0xF0) return null;
-    if (msg[1] != (byte) 0x43) return null;
-    if (msg[msg.length - 1] != (byte) 0xF7) return null;
+            int model = (int) (key >>> 32); // top 8 bits = model_id
 
-    // Build key from incoming message bytes 3–7
-    int model = msg[3] & 0xFF;
-    int scope = msg[4] & 0xFF;
-    int controlGroup = msg[5] & 0xFF;
-    int subControl = msg[6] & 0xFF;
-    int param = msg[7] & 0xFF;
+            modelTables
+                .computeIfAbsent(model, k -> new HashMap<>())
+                .computeIfAbsent(key, k -> new ArrayList<>())
+                .add(m);
+        }
+    }
 
-    long key =
-        ((long) model << 32)
-            | ((long) scope << 24)
-            | ((long) controlGroup << 16)
-            | ((long) subControl << 8)
-            | (long) param;
+    public List<SysexMapping> getMappings() {
+        return mappings;
+    }
 
-    Map<Long, List<SysexMapping>> table = modelTables.get(model);
-    if (table == null) return null;
+    public SysexMapping resolve(byte[] msg) {
+        if (msg.length < 10) return null;
+        if (msg[0] != (byte) 0xF0) return null;
+        if (msg[1] != (byte) 0x43) return null;
+        if (msg[msg.length - 1] != (byte) 0xF7) return null;
 
-    List<SysexMapping> candidates = table.get(key);
-    if (candidates == null || candidates.isEmpty()) return null;
+        // Build key from incoming message bytes 3–7
+        int model        = msg[3] & 0xFF;
+        int scope        = msg[4] & 0xFF;
+        int controlGroup = msg[5] & 0xFF;
+        int subControl   = msg[6] & 0xFF;
+        int param        = msg[7] & 0xFF;
 
-    // Return the first mapping for this control type
-    return candidates.get(0);
-  }
+        long key =
+            ((long) model << 32)
+                | ((long) scope << 24)
+                | ((long) controlGroup << 16)
+                | ((long) subControl << 8)
+                | (long) param;
+
+        Map<Long, List<SysexMapping>> table = modelTables.get(model);
+        if (table == null) return null;
+
+        List<SysexMapping> candidates = table.get(key);
+        if (candidates == null || candidates.isEmpty()) return null;
+
+        return candidates.get(0);
+    }
 }

@@ -31,5 +31,9 @@ Therefore for live use protected areas are probably wise.
 Change the users in the conf area users.xml of the unpacked folder to suit your own needs. The mix pages are username and password protected to stop musicians from changing other peoples mixes, this can be disabled though if you take the page out of the auth group in the conf files.
 
 ## ====== SCREENSHOTS ======
-<img width="3802" height="1740" alt="image" src="https://github.com/user-attachments/assets/869e9448-68ba-4251-a0b4-23db9d132d6c" />
-Above: Main view where the foh is mixed, other views can use the url extension https://<ip-address-of-server>:8080/MidiControl/mix_<1-12>.html
+<img width="2950" height="2293" alt="image" src="https://github.com/user-attachments/assets/cfe81ed6-8821-4a3d-99f1-f65a8685c6ca" />
+
+<img width="3792" height="1769" alt="image" src="https://github.com/user-attachments/assets/fe0a7cbe-7ba0-414e-a865-4778927acb5d" />
+
+
+Above: Main view where the foh is mixed, other views can use the url extension e.g. https://<ip-address-of-server>:8080/MidiControl/main.html

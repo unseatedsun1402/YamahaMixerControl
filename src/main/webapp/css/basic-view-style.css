@@ -1,0 +1,287 @@
+/* --------------------------------
+   BODY
+---------------------------------- */
+.body {
+    background-color: #555;
+    font-family: sans-serif;
+}
+
+#strip-container {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    padding: 8px;
+    height: 98vh;
+}
+
+/* -------------------------------
+   CHANNEL STRIP CONTAINER
+-------------------------------- */
+.channel-strip {
+    display: flex;
+    flex-direction: column;
+    width: 220px;
+    height: 98%;
+    background: #1b1b1b;
+    border-radius: 8px;
+    padding: 12px;
+    color: #eee;
+    box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    font-family: monospace;
+}
+
+/* Scrollable area for everything above the fader */
+.strip-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px; /* avoids scrollbar overlap */
+}
+
+/* Fader stays fixed at the bottom */
+.strip-fader-area {
+    margin-top: 12px;
+    padding-top: 12px;
+    height: max-content;
+    border-top: 1px solid #333;
+}
+
+/* --------------------------
+   SECTION WRAPPERS
+--------------------------- */
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.section-title {
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #aaa;
+    margin-bottom: 4px;
+}
+
+/* ------------------------
+   CONTROL BASE STYLE
+---------------------------- */
+
+.control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+}
+
+.control-label {
+    font-size: 0.8rem;
+    color: #ccc;
+    text-align: center;
+}
+
+/* --------------------------
+   VERTICAL FADER — CROSS BROWSER
+---------------------------- */
+.fader {
+    width: 40px;
+    min-height: 22vh;
+    margin: 0 auto;
+    writing-mode: vertical-rl; /* Firefox + modern browsers */
+    transform: rotate(180deg); /* Corrects direction */
+}
+
+/* Fader track + thumb styling (optional) */
+.fader::-webkit-slider-runnable-track {
+    background: #444;
+    height: 8px;
+}
+.fader::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    background: #fff30a;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-top: -5px;
+}
+
+.fader::-moz-range-track {
+    background: #444;
+    height: 6px;
+}
+.fader::-moz-range-thumb {
+    background: #e6e6e6;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+/* --------------------------
+   KNOBS
+----------------------------- */
+.rotary-knob {
+    width: 48px;
+    height: 48px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    user-select: none;
+}
+
+/* --------------------------
+   Knob Dial (the circular base)
+----------------------------- */
+.knob-dial {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #333;
+    border: 2px solid #666;
+    position: relative;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.6);
+    transform-origin: 50% 50%;
+}
+
+/* -------------------------
+   Knob Value Indicator (the rotating pointer)
+---------------------------- */
+.knob-value {
+  width: 4px;
+  height: 18px;
+  background: #4da3ff;
+  position: absolute;
+  top: 10%;
+  left: 45%;
+  transform-origin: 50% 100%;
+  border-radius: 2px;
+  transition: transform 0.1s ease;
+}
+
+/* --------------------------
+   Visual Feedback Pulse
+----------------------------- */
+.knob-value.updated {
+    transition: transform 0.1s ease, background-color 0.1s ease;
+    background-color: #7fc2ff;
+}
+
+.rotary-knob:hover {
+  background-color: #2a2a2a;
+  border-radius: 50%;
+}
+
+/* ----------------------------
+   Active Drag Cursor
+------------------------------- */
+.rotary-knob:active {
+    cursor: grabbing;
+}
+
+/* --------------------------
+   TOGGLE BUTTONS
+----------------------------- */
+.toggle-control {
+    width: 100%;
+    padding: 8px;
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: #eee;
+    cursor: pointer;
+    text-align: center;
+    font-size: 0.9rem;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.toggle-control:hover {
+    background: #444;
+}
+
+.toggle-control.active {
+    background: #0a84ff;
+    border-color: #0a84ff;
+    color: white;
+}
+
+/* -----------------------------------
+   SELECT (EQ Type)
+-------------------------------------- */
+select {
+    width: 100%;
+    padding: 6px;
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #eee;
+}
+
+/* ----------------------------------
+   STRING DISPLAY
+------------------------------------*/
+.string-display {
+    background: #222;
+    border: 1px solid #444;
+    padding: 6px;
+    border-radius: 4px;
+    text-align: center;
+    color: #eee;
+}
+
+/* ---------------------------------
+   EQ SECTIONS
+------------------------------------*/
+.eq-section {
+    display: flex;
+    gap: 12px;
+    padding: 8px;
+    background: #222;
+    border-radius: 6px;
+    border: 1px solid #333;
+}
+
+.eq-band {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #1e1e1e;
+    padding: 6px;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.eq-band-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #aaa;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+/* -----------------------------
+     MIX SECTION
+--------------------------------*/
+.group-kInputToMix {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+/* ------------------------------
+   RESPONSIVE
+--------------------------------- */
+@media (max-width: 600px) {
+    .channel-strip {
+        width: 160px;
+        padding: 8px;
+    }
+
+    .fader {
+        height: 150px;
+    }
+}
