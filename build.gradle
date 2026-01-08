@@ -50,4 +50,8 @@ sourceSets {
 test {
     useJUnitPlatform()
     failOnNoDiscoveredTests = true
+    
+}
+test {
+    include 'MidiControl/unit/**'
 }

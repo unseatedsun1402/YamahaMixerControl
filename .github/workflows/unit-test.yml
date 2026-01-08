@@ -1,0 +1,26 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 18
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Run unit tests only
+        run: ./gradlew test
