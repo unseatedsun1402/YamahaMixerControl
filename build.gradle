@@ -40,6 +40,7 @@ sourceSets {
     test {
         java {
             srcDirs = ['src/test/java']
+            
         }
         resources {
             srcDirs = ['src/test/resources']
@@ -50,4 +51,8 @@ sourceSets {
 test {
     useJUnitPlatform()
     failOnNoDiscoveredTests = true
+
+}
+    test {
+    include 'MidiControl/unit/**'
 }

@@ -12,10 +12,8 @@ build/test-results
 build/repo/
 build/logs/
 build/jacoco/
-build/libs/*.jar
 .gradle/*
 .vscode/*
-gradlew*
 bin/*
 build/libs/YamahaMixerControl.war
 src/main/webapp/qrcodes
