@@ -17,9 +17,6 @@ public class DynamicUiInputModelTest {
     @Test
     public void testUiModelForChannel() {
 
-        // ------------------------------------------------------------
-        // 1. Load real mappings
-        // ------------------------------------------------------------
         List<SysexMapping> mappings =
                 SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
 
@@ -41,9 +38,6 @@ public class DynamicUiInputModelTest {
                 dummyIndex
         );
 
-        // ------------------------------------------------------------
-        // 2. Build UI model for channel.1
-        // ------------------------------------------------------------
         UiModelDTO model = factory.buildUiModel("channel.1");
 
         assertNotNull(model, "UI model must not be null");
@@ -52,9 +46,6 @@ public class DynamicUiInputModelTest {
         assertNotNull(model.controls, "Controls list must not be null");
         assertFalse(model.controls.isEmpty(), "Channel strip must have controls");
 
-        // ------------------------------------------------------------
-        // 3. Validate expected controls exist
-        // ------------------------------------------------------------
         assertTrue(
                 model.controls.stream().anyMatch(c -> "CHANNEL_ON".equals(c.logicId)),
                 "CHANNEL_ON missing"
@@ -75,9 +66,6 @@ public class DynamicUiInputModelTest {
                 "FADER missing"
         );
 
-        // ------------------------------------------------------------
-        // 4. Validate canonical identity
-        // ------------------------------------------------------------
         for (ViewControlDTO vc : model.controls) {
 
             // Canonical identity must exist

@@ -26,33 +26,21 @@ public class DTOMapper {
     private ViewControlDTO toDto(ViewControl vc) {
         ViewControlDTO dto = new ViewControlDTO();
 
-        // ---------------------------------------------------------------------
-        // UI Identity
-        // ---------------------------------------------------------------------
         dto.logicId = vc.logicId;        // e.g. "PAN", "SEND_MIX1"
         dto.uiGroup = vc.uiGroup;        // e.g. "kInputPan"
         dto.label = vc.label;            // e.g. "Pan"
         dto.type = vc.type.name();       // e.g. "SLIDER_HORIZONTAL"
         dto.index = vc.index;            // ordering within group
 
-        // ---------------------------------------------------------------------
-        // Hardware Identity (canonical_id)
-        // ---------------------------------------------------------------------
         dto.hwGroup = vc.hwGroup;            // e.g. "kInputPan"
         dto.hwSubcontrol = vc.hwSubcontrol;  // e.g. "kChannelPan"
         dto.hwInstance = vc.hwInstance;      // e.g. 1
         dto.canonicalId = (vc.hwGroup+"."+vc.hwSubcontrol+"."+vc.hwInstance);
 
-        // ---------------------------------------------------------------------
-        // Value Range
-        // ---------------------------------------------------------------------
         dto.value = vc.value;
         dto.min = vc.min;
         dto.max = vc.max;
 
-        // ---------------------------------------------------------------------
-        // UI Hints
-        // ---------------------------------------------------------------------
         dto.bipolar = vc.bipolar;
         dto.stepped = vc.stepped;
         dto.readOnly = vc.readOnly;

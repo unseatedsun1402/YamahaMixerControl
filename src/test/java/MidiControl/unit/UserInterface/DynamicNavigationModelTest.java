@@ -19,9 +19,6 @@ public class DynamicNavigationModelTest {
     @Test
     public void testNavigationModel() {
 
-        // ------------------------------------------------------------
-        // 1. Load real mappings (M7CL, 01V96i, etc.)
-        // ------------------------------------------------------------
         List<SysexMapping> mappings =
                 SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
 
@@ -31,17 +28,11 @@ public class DynamicNavigationModelTest {
 
         NavigationContextFactory factory = new NavigationContextFactory(registry, schema);
 
-        // ------------------------------------------------------------
-        // 2. Build navigation model
-        // ------------------------------------------------------------
         NavigationModel nav = factory.buildNavigation();
 
         assertNotNull(nav, "Navigation model must not be null");
         assertFalse(nav.navigation.isEmpty(), "Navigation categories must not be empty");
 
-        // ------------------------------------------------------------
-        // 3. Validate each category
-        // ------------------------------------------------------------
         for (NavigationCategory cat : nav.navigation) {
 
             assertNotNull(cat.category, "Category name must not be null");
@@ -86,9 +77,6 @@ public class DynamicNavigationModelTest {
             }
         }
 
-        // ------------------------------------------------------------
-        // 4. Validate counts match registry
-        // ------------------------------------------------------------
         Map<String, Integer> expectedCounts = new HashMap<>();
         expectedCounts.put("Inputs", schema.detectIndexedRangeForAnyGroup("kFader"));
         expectedCounts.put("Mixes", schema.detectIndexedRangeForAnyGroup("kMix"));

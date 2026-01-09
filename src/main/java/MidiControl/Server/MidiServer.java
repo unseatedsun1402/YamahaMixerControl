@@ -57,10 +57,6 @@ public class MidiServer implements Runnable, UiModelService{
 
     private static final Logger logger = Logger.getLogger(MidiServer.class.getName());
 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
     // 1. Default constructor (used by ServletContextListener)
     public MidiServer() {
 

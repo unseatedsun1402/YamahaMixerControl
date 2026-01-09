@@ -160,10 +160,6 @@ public class ContextDiscoveryTest {
         return new ContextDiscoveryEngine(new CanonicalRegistry(List.of(), null));
     }
 
-    // ---------------------------------------------------------------------
-    // TESTS
-    // ---------------------------------------------------------------------
-
     @Test
     public void testPrefixMatch() {
         Context ctx = ctx("channel.5", ContextType.CHANNEL);

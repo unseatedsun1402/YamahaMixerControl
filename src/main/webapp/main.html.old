@@ -21,9 +21,6 @@
 
     const ws = new WebSocketClient(wsUrl);
 
-    // -----------------------------
-    // Event Handlers
-    // -----------------------------
 
     ws.on("connected", () => {
         console.log("[Bootstrap] Connected — waiting for ui-bank…");

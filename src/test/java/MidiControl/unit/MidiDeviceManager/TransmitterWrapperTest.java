@@ -14,9 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TransmitterWrapperTest {
 
-    // ------------------------------------------------------------
-    // Mock Transmitter
-    // ------------------------------------------------------------
+
     private static class MockTransmitter implements Transmitter {
 
         public Receiver receiver;
@@ -38,9 +36,6 @@ public class TransmitterWrapperTest {
         }
     }
 
-    // ------------------------------------------------------------
-    // Mock Receiver (for setReceiver tests)
-    // ------------------------------------------------------------
     private static class MockReceiver implements Receiver {
         public boolean closed = false;
         public MidiMessage lastMessage;
@@ -56,9 +51,6 @@ public class TransmitterWrapperTest {
         }
     }
 
-    // ------------------------------------------------------------
-    // Mock MidiDevice
-    // ------------------------------------------------------------
     private static class MockMidiDevice implements MidiDevice {
 
         private boolean open = false;
@@ -109,9 +101,6 @@ public class TransmitterWrapperTest {
         }
     }
 
-    // ------------------------------------------------------------
-    // TEST: Device opens and transmitter is attached
-    // ------------------------------------------------------------
     @Test
     public void testSetupOpensDeviceAndAttachesReceiver() throws Exception {
         MockMidiDevice device = new MockMidiDevice();
@@ -125,10 +114,6 @@ public class TransmitterWrapperTest {
                 "Receiver should be a MidiInputReceiver");
     }
 
-    // ------------------------------------------------------------
-    // TEST: Incoming MIDI messages land in the input buffer
-    // ------------------------------------------------------------
-    @Test
     public void testIncomingMidiMessagesGoToBuffer() throws Exception {
         MockMidiDevice device = new MockMidiDevice();
         ConcurrentLinkedQueue<MidiMessage> buffer = new ConcurrentLinkedQueue<>();
@@ -145,9 +130,6 @@ public class TransmitterWrapperTest {
         assertEquals(msg, buffer.peek(), "Message should match the one sent");
     }
 
-    // ------------------------------------------------------------
-    // TEST: setReceiver() replaces the receiver
-    // ------------------------------------------------------------
     @Test
     public void testSetReceiverReplacesReceiver() throws Exception {
         MockMidiDevice device = new MockMidiDevice();
@@ -162,9 +144,6 @@ public class TransmitterWrapperTest {
                 "Receiver should be replaced by setReceiver()");
     }
 
-    // ------------------------------------------------------------
-    // TEST: close() closes transmitter, inputReceiver, and device
-    // ------------------------------------------------------------
     @Test
     public void testCloseClosesEverything() throws Exception {
         MockMidiDevice device = new MockMidiDevice();
@@ -182,9 +161,6 @@ public class TransmitterWrapperTest {
         assertFalse(inputReceiver.isOpen(), "InputReceiver should be closed");
     }
 
-    // ------------------------------------------------------------
-    // TEST: getDeviceInfo() returns correct info
-    // ------------------------------------------------------------
     @Test
     public void testGetDeviceInfo() throws Exception {
         MockMidiDevice device = new MockMidiDevice();

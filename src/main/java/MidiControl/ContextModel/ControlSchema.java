@@ -15,9 +15,6 @@ public class ControlSchema {
         this.registry = registry;
     }
 
-    // ------------------------------------------------------------
-    // 1. Group → Prefixes
-    // ------------------------------------------------------------
     public Set<String> getPrefixesForGroup(String groupName) {
         Set<String> prefixes = new HashSet<>();
 
@@ -37,9 +34,6 @@ public class ControlSchema {
         return prefixes;
     }
 
-    // ------------------------------------------------------------
-    // 2. Prefix → Groups
-    // ------------------------------------------------------------
     public Set<String> getGroupsForPrefix(String prefix) {
         Set<String> groups = new HashSet<>();
 
@@ -55,9 +49,6 @@ public class ControlSchema {
         return groups;
     }
 
-    // ------------------------------------------------------------
-    // 3. All prefixes in the registry
-    // ------------------------------------------------------------
     public Set<String> getAllPrefixes() {
         Set<String> prefixes = new HashSet<>();
 
@@ -72,9 +63,6 @@ public class ControlSchema {
         return prefixes;
     }
 
-    // ------------------------------------------------------------
-    // 4. Detect indexed range (kMix1, kMix2, …)
-    // ------------------------------------------------------------
     public int detectIndexedRange(String groupName, String prefix) {
         ControlGroup group = registry.getGroup(groupName);
         if (group == null)
@@ -95,9 +83,6 @@ public class ControlSchema {
         return maxIndex;
     }
 
-    // ------------------------------------------------------------
-    // Helpers
-    // ------------------------------------------------------------
 
     private String extractPrefix(String name) {
         // Prefix ends before the first digit

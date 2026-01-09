@@ -27,8 +27,6 @@ public class ReceiverWrapper implements MidiOutput {
         logger.info("ReceiverWrapper debug enabled");
     }
 
-    // ------------------------------------------------------------
-
     public ReceiverWrapper(MidiDevice device) throws MidiUnavailableException {
         this.device = device;
         setup();
@@ -59,9 +57,6 @@ public class ReceiverWrapper implements MidiOutput {
         }
 
         try {
-            // ------------------------------------------------------------
-            // SysEx
-            // ------------------------------------------------------------
             if ((data[0] & 0xFF) == 0xF0) {
                 if (DEBUG) {
                     logger.info("ReceiverWrapper SEND SysEx: " + SysexParser.bytesToHex(data));
@@ -77,9 +72,6 @@ public class ReceiverWrapper implements MidiOutput {
                 return;
             }
 
-            // ------------------------------------------------------------
-            // ShortMessage (CC, NRPN, Note, etc.)
-            // ------------------------------------------------------------
             if (data.length >= 3) {
                 if (DEBUG) {
                     logger.info(String.format(

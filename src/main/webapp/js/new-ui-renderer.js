@@ -8,9 +8,6 @@ import { updateStrip } from "./strip-renderer.js";
 const renderedStrips = new Map();
 const stripContainer = document.getElementById("strip-container");
 
-// ------------------------------------------------------------
-// PUBLIC API — called when a full UI model arrives
-// ------------------------------------------------------------
 export function renderUiModel(model) {
     if (!stripContainer) return;
 

@@ -33,10 +33,6 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
         return buildCompact(context);
     }
 
-    // -------------------------------------------------------------------------
-    // MAIN BUILD METHOD
-    // -------------------------------------------------------------------------
-
     public List<ViewControl> buildCompact(Context context) {
         List<ViewControl> result = new ArrayList<>();
 
@@ -79,10 +75,6 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
 
         return result;
     }
-
-    // -------------------------------------------------------------------------
-    // CONTROL FACTORIES
-    // -------------------------------------------------------------------------
 
     private ViewControl createChannelOn(ControlInstance ci) {
         return new ViewControl(
@@ -155,10 +147,6 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
                 ci.getInstanceIndex()
         );
     }
-
-    // -------------------------------------------------------------------------
-    // HELPERS
-    // -------------------------------------------------------------------------
 
     private int extractContextIndex(String contextId) {
         int dot = contextId.lastIndexOf('.');

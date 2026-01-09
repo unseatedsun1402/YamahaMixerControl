@@ -12,10 +12,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ContextFactoryTest {
 
-    // ------------------------------------------------------------
-    // Helpers
-    // ------------------------------------------------------------
-
     private SysexMapping dummyMap(String group, String sub, int min, int max) {
         return new SysexMapping(
                 group,
@@ -67,9 +63,6 @@ public class ContextFactoryTest {
         );
     }
 
-    // ------------------------------------------------------------
-    // CHANNEL STRIP
-    // ------------------------------------------------------------
     @Test
     public void testBuildChannelStrip_Unit() {
 
@@ -111,9 +104,6 @@ public class ContextFactoryTest {
         assertTrue(containsFilter(filters, "kAUX", "kAUX", 1));
     }
 
-    // ------------------------------------------------------------
-    // MIX STRIP
-    // ------------------------------------------------------------
     @Test
     public void testBuildMixStrip_Unit() {
 
@@ -135,9 +125,6 @@ public class ContextFactoryTest {
         assertTrue(containsFilter(filters, "kMixNameLong", "kMixNameLong", null));
     }
 
-    // ------------------------------------------------------------
-    // MATRIX STRIP
-    // ------------------------------------------------------------
     @Test
     public void testBuildMatrixStrip_Unit() {
 
@@ -169,9 +156,7 @@ public class ContextFactoryTest {
         assertTrue(containsFilter(filters, "kMatrixEQ", "kMatrixEQ", 3));
     }
 
-    // ------------------------------------------------------------
-    // DCA STRIP
-    // ------------------------------------------------------------
+
     @Test
     public void testBuildDcaStrip_Unit() {
 
@@ -193,9 +178,6 @@ public class ContextFactoryTest {
         assertTrue(containsFilter(filters, "kDCANameLong", "kDCANameLong", null));
     }
 
-    // ------------------------------------------------------------
-    // STEREO INPUT
-    // ------------------------------------------------------------
     @Test
     public void testBuildStereoInput_Unit() {
 
@@ -227,9 +209,6 @@ public class ContextFactoryTest {
         assertTrue(containsFilter(filters, "kStereoSend", "kStereoSend", 3));
     }
 
-    // ------------------------------------------------------------
-    // fromId()
-    // ------------------------------------------------------------
     @Test
     public void testFromId_Unit() {
         MockCanonicalRegistry reg = registry();

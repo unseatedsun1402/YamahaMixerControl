@@ -81,9 +81,6 @@ public class OutputRouter implements OutputRequestSender{
         ioManager.sendAsync(msg);
     }
 
-    // -------------------------------------------------------------------------
-    // Transport-specific send helpers
-    // -------------------------------------------------------------------------
 
     private void sendNrpn(ControlInstance ci, int newValue) {
         List<byte[]> msgs = ci.getNrpn().get().buildNrpnBytes(Optional.of(ci), newValue);
@@ -110,7 +107,6 @@ public class OutputRouter implements OutputRequestSender{
 
         ioManager.sendAsync(msg);
     }
-    // -------------------------------------------------------------------------
 
     private static String bytesToHex(byte[] data) {
         StringBuilder sb = new StringBuilder();

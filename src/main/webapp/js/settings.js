@@ -6,25 +6,16 @@ console.log(">>> settings.js LOADED <<<");
 const wsClient = new WebSocketClient(`ws://${location.host}/MidiControl/endpoint`);
 wsClient.connect();
 
-// ---------------------------------------------
-// When connected, request device list
-// ---------------------------------------------
 wsClient.on("connected", () => {
   console.log("[Settings] Connected, requesting device list...");
   wsClient.requestMidiDevices();
 });
 
-// ---------------------------------------------
-// Handle incoming device list
-// ---------------------------------------------
 wsClient.on("midi-device-list", (devices) => {
   console.log("[Settings] Received device list:", devices);
   populateDeviceDropdowns(devices);
 });
 
-// ---------------------------------------------
-// Apply button handler
-// ---------------------------------------------
 document.getElementById("apply-settings").addEventListener("click", () => {
 
   const inputDeviceId = parseInt(document.getElementById("midi-input-device").value, 10);
@@ -49,16 +40,10 @@ document.getElementById("apply-settings").addEventListener("click", () => {
   showStatus("Settings applied");
 });
 
-// ---------------------------------------------
-// Rescan button
-// ---------------------------------------------
 document.getElementById("rescan-devices").addEventListener("click", () => {
   wsClient.requestMidiDevices();
 });
 
-// ---------------------------------------------
-// UI Helpers
-// ---------------------------------------------
 function populateDeviceDropdowns(devices) {
   const inputSelect = document.getElementById("midi-input-device");
   const outputSelect = document.getElementById("midi-output-device");

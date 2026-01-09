@@ -40,9 +40,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SendSysexToWebSocketTest {
 
-    // ---------------------------------------------------------
-    // Fake WebSocket Session that captures outgoing text
-    // ---------------------------------------------------------
     static class CapturingSession implements Session {
 
         private final String id;
@@ -218,15 +215,9 @@ public class SendSysexToWebSocketTest {
     @Test
     void testSysexBroadcastToWebSocket() throws Exception {
 
-        // ---------------------------------------------------------
-        // Capture WebSocket output
-        // ---------------------------------------------------------
         StringBuilder captured = new StringBuilder();
         Session fakeSession = new CapturingSession("S1", captured);
 
-        // ---------------------------------------------------------
-        // Build real server components
-        // ---------------------------------------------------------
         List<SysexMapping> mappings = SysexMappingLoader.loadAllMappings();
         SysexParser parser = new SysexParser(mappings);
         CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
@@ -248,9 +239,6 @@ public class SendSysexToWebSocketTest {
         MidiServer server = new MidiServer(registry);
         server.setGuiBroadcastListener(listener);
 
-        // ---------------------------------------------------------
-        // Feed a real SYSEX message
-        // ---------------------------------------------------------
         byte[] faderMsg = {
             (byte) 0xF0, (byte) 0x43, (byte) 0x10, (byte) 0x3E,
             (byte) 0x7F, (byte) 0x01, (byte) 0x1C, (byte) 0x00,
@@ -263,9 +251,6 @@ public class SendSysexToWebSocketTest {
         server.addtoinputqueue(msg);
         server.processIncomingMidiForTest();
 
-        // ---------------------------------------------------------
-        // Assertions
-        // ---------------------------------------------------------
         assertFalse(captured.toString().isEmpty(),
             "Expected WebSocket to receive a broadcast");
 
