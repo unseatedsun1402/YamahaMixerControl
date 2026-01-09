@@ -40,3 +40,4 @@ public class BankFilter {
     public ContextType getType() { return type; }
     public Map<String, Object> getMetadata() { return metadata; }
 }
+

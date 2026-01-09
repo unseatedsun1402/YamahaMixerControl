@@ -1,5 +1,7 @@
 console.log(">>> websocketClient.js LOADED <<<");
+
 const debugFlag = false;
+
 export class WebSocketClient {
   constructor(url) {
     this.url = url;
@@ -19,7 +21,6 @@ export class WebSocketClient {
 
     console.log("[WebSocketClient] Initialized with URL:", url);
   }
-
 
   // ------------------------------------------------------------
   // Connection
@@ -80,11 +81,11 @@ export class WebSocketClient {
     switch (msg.type) {
 
       case "ui-bank":
-        this._emit("ui-bank", msg);
+        this._emit("ui-bank", msg.payload);
         break;
 
       case "ui-model":
-        this._emit("ui-model", msg);
+        this._emit("ui-model", msg.payload);
         break;
 
       case "control-update":
@@ -96,7 +97,7 @@ export class WebSocketClient {
         break;
 
       case "ack":
-        if (debugFlag != true) console.debug("[WebSocketClient] ACK received:", msg.payload);
+        if (!debugFlag) console.debug("[WebSocketClient] ACK:", msg.payload);
         break;
 
       case "midi-device-list":
@@ -113,16 +114,26 @@ export class WebSocketClient {
   // ------------------------------------------------------------
   // Outgoing messages
   // ------------------------------------------------------------
-  requestUiModel(contextId) {
+  requestUiModel(contextId, uiType = "basic-input-view") {
     const requestId = `req-${++this.requestCounter}`;
     const message = {
       type: "get-ui-model",
       requestId,
-      payload: { contextId }
+      payload: { contextId, uiType }
     };
-    console.log("[WebSocketClient] Sending UI model request:", message);
+
+    console.log(`[WebSocketClient] Requesting UI model: context=${contextId}, uiType=${uiType}`);
     this.ws.send(JSON.stringify(message));
     return requestId;
+  }
+
+  requestBank(bankId) {
+    const message = {
+        type: "get-ui-bank",
+        payload: { bankId }
+    };
+    console.log("[WebSocketClient] Requesting UI bank:", message);
+    this.ws.send(JSON.stringify(message));
   }
 
   subscribe(contextId) {
@@ -162,5 +173,4 @@ export class WebSocketClient {
     console.log("[WebSocketClient] Applying MIDI settings:", message);
     this.ws.send(JSON.stringify(message));
   }
-
 }

@@ -8,7 +8,7 @@ public class MockUiModelFactory extends UiModelFactory {
     public UiModelDTO dto = new UiModelDTO();
 
     public MockUiModelFactory() {
-        super(null, null, null, null); // safe because we override buildUiModel
+        super(null, null, null); // safe because we override buildUiModel
     }
 
     @Override

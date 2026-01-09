@@ -61,8 +61,8 @@ public class MixAuxBusViewBuilderTest {
         ControlGroup dynRatio = makeGroup("kMixDyn", "kRatio", 1);
 
         // EQ (gain only)
-        ControlGroup eqLow = makeGroup("kMixEQ", "kLowGain", 1);
-        ControlGroup eqHigh = makeGroup("kMixEQ", "kHighGain", 1);
+        ControlGroup eqLow = makeGroup("kMixEQ", "k1G", 1);
+        ControlGroup eqHigh = makeGroup("kMixEQ", "k2G", 1);
 
         // Add groups to registry
         registry.getGroups().put("kMixFader", fader);

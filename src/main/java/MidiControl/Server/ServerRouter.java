@@ -8,46 +8,38 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import MidiControl.ControlServer.GuiInputHandler;
+import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.MidiDeviceManager.MidiDeviceDTO;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Routing.OutputRouter;
 import MidiControl.Routing.WebSocketEndpoint;
-import MidiControl.UserInterface.UiModelFactory;
+import MidiControl.UserInterface.UiModelService;
 import MidiControl.UserInterface.DTO.UiModelDTO;
 import jakarta.websocket.Session;
 
 public class ServerRouter {
 
-    private final UiModelFactory uiFactory;
-    private final MidiServer midi;
+    private final UiModelService uiModels;
     private final Gson gson = new Gson();
     private final SubscriptionManager subscriptions;
     private final GuiInputHandler guiInputHandler;
     private final OutputRouter outputRouter;
     private static final Logger logger = Logger.getLogger(ServerRouter.class.getName());
     private final MidiIOManager ioManager;
+    private final CanonicalRegistry registry;
     private App app;
 
-    public ServerRouter(MidiServer server) 
+    public ServerRouter(UiModelService uiModels,
+                        SubscriptionManager subscriptions,
+                        CanonicalRegistry registry,
+                        MidiIOManager ioManager)
     {
-        this.midi = server;
-        this.uiFactory = midi.getUiModelFactory();
-        this.ioManager = midi.getMidiDeviceManager();
-        this.subscriptions = midi.getSubscriptionManager();
-        this.outputRouter = new OutputRouter(midi.getCanonicalRegistry(),this.ioManager);
-        this.guiInputHandler = new GuiInputHandler(outputRouter);
-        this.app = null;
-    }
-
-    public ServerRouter(UiModelFactory uiFactory, MidiServer server, SubscriptionManager subscriptions) 
-    {
-        this.uiFactory = uiFactory;
-        this.midi = server;
-        this.ioManager = midi.getMidiDeviceManager();
+        this.uiModels = uiModels;
         this.subscriptions = subscriptions;
-
-        this.outputRouter = new OutputRouter(midi.getCanonicalRegistry(),this.ioManager);
+        this.registry = registry;
+        this.ioManager = ioManager;
+        this.outputRouter = new OutputRouter(registry, this.ioManager);
         this.guiInputHandler = new GuiInputHandler(outputRouter);
         this.app = null;
     }
@@ -77,16 +69,22 @@ public class ServerRouter {
 
     private void handleGetUiModel(Session session, String requestId, JsonObject payload) {
         String contextId = payload.get("contextId").getAsString();
+        String uiType = payload.has("uiType")
+                ? payload.get("uiType").getAsString()
+                : "basic-input-view";
 
-        UiModelDTO model = uiFactory.buildUiModel(contextId);
+        // Build the model (UiModelDTO must already be flattened)
+        UiModelDTO model = uiModels.buildUiModel(contextId, uiType);
 
         JsonObject response = new JsonObject();
         response.addProperty("type", "ui-model");
         if (requestId != null) response.addProperty("requestId", requestId);
 
+        // FLATTENED PAYLOAD — matches what the client expects
         JsonObject out = new JsonObject();
-        out.addProperty("contextId", contextId);
-        out.add("model", gson.toJsonTree(model));
+        out.addProperty("contextId", model.contextId);
+        out.add("controls", gson.toJsonTree(model.controls));
+        out.add("metadata", gson.toJsonTree(model.metadata));
 
         response.add("payload", out);
 
@@ -98,7 +96,7 @@ public class ServerRouter {
         int value = payload.get("value").getAsInt();
         logger.fine("Update from "+canonicalId+" val: "+value);
 
-        ControlInstance ci = midi.getCanonicalRegistry().resolveCanonicalId(canonicalId);
+        ControlInstance ci = registry.resolveCanonicalId(canonicalId);
         if (ci != null) {
             ci.updateValue(value);
             guiInputHandler.handleGuiChange(canonicalId, value);
@@ -230,8 +228,8 @@ public class ServerRouter {
         boolean inOk = ioManager.trySetInputDevice(newInput);
 
         if (inOk && outOk) {
-            if(app.equals(null)){logger.severe("App for rehydration is null - cannot rehydrate");}
-            app.rehydrate();
+            if(app == null){logger.severe("App for rehydration is null - cannot rehydrate");}
+            else { app.rehydrate(); }
         }
 
         // --- Future settings (commented out for now) ---

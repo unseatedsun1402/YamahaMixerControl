@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DynamicUiModelTest {
+public class DynamicUiInputModelTest {
 
     @Test
     public void testUiModelForChannel() {
@@ -25,13 +25,21 @@ public class DynamicUiModelTest {
 
         SysexParser parser = new SysexParser(mappings);
         CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
-        ControlSchema schema = new ControlSchema(registry);
 
         // Use the new compact builder
-        ViewBuilder viewBuilder = new InputChannelStripViewBuilder(registry);
+        ViewRegistry views = new ViewRegistry();
+        views.addView(new InputChannelStripViewBuilder(registry), "basic-input-view");
 
         UiContextIndex dummyIndex = new UiContextIndex();
-        UiModelFactory factory = new UiModelFactory(registry, schema, viewBuilder, dummyIndex);
+
+        ContextDiscoveryEngine discovery = new ContextDiscoveryEngine(registry);
+        dummyIndex.addAll(discovery.discoverContexts());
+
+        UiModelFactory factory = new UiModelFactory(
+                registry,
+                views.getView("basic-input-view").orElseThrow(),
+                dummyIndex
+        );
 
         // ------------------------------------------------------------
         // 2. Build UI model for channel.1

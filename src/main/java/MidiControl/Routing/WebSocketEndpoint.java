@@ -5,9 +5,7 @@ import MidiControl.Server.MidiServer;
 import MidiControl.Server.MidiServerListener;
 import MidiControl.Server.SubscriptionManager;
 import MidiControl.UserInterface.UiBankFactory;
-import MidiControl.UserInterface.UiModelFactory;
 import MidiControl.UserInterface.DTO.UiBankDTO;
-import MidiControl.UserInterface.DTO.UiModelDTO;
 
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.OnMessage;
@@ -22,21 +20,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @ServerEndpoint(value = "/endpoint")
 public class WebSocketEndpoint {
 
     private static final Set<Session> sessions = ConcurrentHashMap.newKeySet();
     private static final Logger logger = Logger.getLogger(WebSocketEndpoint.class.getName());
-
     private static final Gson gson = new Gson();
 
     private MidiServer server;
     private SubscriptionManager subscriptions;
 
-    // ---------------------------------------------------------
-    // Local JSON envelope (no external dependency)
-    // ---------------------------------------------------------
     private static String encode(String type, Object payload) {
         Map<String, Object> envelope = new HashMap<>();
         envelope.put("type", type);
@@ -53,28 +49,37 @@ public class WebSocketEndpoint {
         sessions.add(session);
         System.out.println("Client connected: " + session.getId());
 
-        // ---------------------------------------------------------
-        // UI BOOTSTRAP SEQUENCE
-        // ---------------------------------------------------------
-
-        UiBankFactory bankFactory = server.getUiBankFactory();
-        UiModelFactory modelFactory = server.getUiModelFactory();
-
-        String bankId = "bank.inputs";
-        BankContext bankCtx = server.getBankCatalog().getBank(bankId);
-
-        UiBankDTO bankDto = bankFactory.buildBank(bankId, bankCtx);
-        send(session, encode("ui-bank", bankDto));
-
-        for (String ctxId : bankDto.contexts) {
-            UiModelDTO model = modelFactory.buildUiModel(ctxId);
-            send(session, encode("ui-model", model));
-        }
+        // Do NOT send any UI models here.
+        // Do NOT send a bank here.
+        // The client will request the bank it wants.
     }
 
     @OnMessage
     public void onMessage(String message, Session session) {
-        server.getServerRouter().handleMessage(session, message);
+        try {
+            JsonObject json = JsonParser.parseString(message).getAsJsonObject();
+            String type = json.get("type").getAsString();
+
+            switch (type) {
+
+                case "get-ui-bank": {
+                    String bankId = json.getAsJsonObject("payload").get("bankId").getAsString();
+                    UiBankFactory bankFactory = server.getUiBankFactory();
+                    BankContext bankCtx = server.getBankCatalog().getBank(bankId);
+                    UiBankDTO bankDto = bankFactory.buildBank(bankId, bankCtx);
+                    send(session, encode("ui-bank", bankDto));
+                    break;
+                }
+
+                default:
+                    // Forward all other messages to the router
+                    server.getServerRouter().handleMessage(session, message);
+                    break;
+            }
+
+        } catch (Exception e) {
+            logger.severe("Failed to process message: " + e.getMessage());
+        }
     }
 
     @OnClose
@@ -82,10 +87,6 @@ public class WebSocketEndpoint {
         subscriptions.removeSession(session);
         sessions.remove(session);
     }
-
-    // ---------------------------------------------------------
-    // Sending helpers
-    // ---------------------------------------------------------
 
     public static void send(Session session, String message) {
         try {

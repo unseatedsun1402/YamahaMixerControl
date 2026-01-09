@@ -25,6 +25,7 @@ public class BankCatalog {
         // -------------------------
         BankContext mixes = new BankContext();
         mixes.addFilter(new BankFilter("mix", null, ContextType.MIX));
+        mixes.addFilter(new BankFilter("aux", null, ContextType.MIX));
         banks.put("bank.mixes", mixes);
 
         // -------------------------
