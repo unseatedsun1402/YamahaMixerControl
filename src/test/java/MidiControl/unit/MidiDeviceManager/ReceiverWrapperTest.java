@@ -11,9 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ReceiverWrapperTest {
 
-    // ---------------------------------------------------------------------
-    // Mock Receiver that records all messages sent to it
-    // ---------------------------------------------------------------------
     private static class MockReceiver implements Receiver {
 
         public final List<MidiMessage> received = new ArrayList<>();
@@ -30,9 +27,6 @@ public class ReceiverWrapperTest {
         }
     }
 
-    // ---------------------------------------------------------------------
-    // Mock MidiDevice that returns our MockReceiver
-    // ---------------------------------------------------------------------
     private static class MockMidiDevice implements MidiDevice {
 
         private final Info info = new Info("MockDevice", "Test", "UnitTest", "1.0") {};
@@ -87,9 +81,6 @@ public class ReceiverWrapperTest {
         }
     }
 
-    // ---------------------------------------------------------------------
-    // TEST: SysEx message is wrapped and sent correctly
-    // ---------------------------------------------------------------------
     @Test
     public void testSendSysEx() throws Exception {
         MockMidiDevice device = new MockMidiDevice();
@@ -106,9 +97,6 @@ public class ReceiverWrapperTest {
         assertArrayEquals(sysex, msg.getMessage());
     }
 
-    // ---------------------------------------------------------------------
-    // TEST: ShortMessage is wrapped and sent correctly
-    // ---------------------------------------------------------------------
     @Test
     public void testSendShortMessage() throws Exception {
         MockMidiDevice device = new MockMidiDevice();
@@ -127,9 +115,7 @@ public class ReceiverWrapperTest {
         assertEquals(0x7F, msg.getData2());
     }
 
-    // ---------------------------------------------------------------------
-    // TEST: Invalid message length is ignored safely
-    // ---------------------------------------------------------------------
+
     @Test
     public void testInvalidMessageLength() throws Exception {
         MockMidiDevice device = new MockMidiDevice();
@@ -140,9 +126,6 @@ public class ReceiverWrapperTest {
         assertEquals(0, device.receiver.received.size());
     }
 
-    // ---------------------------------------------------------------------
-    // TEST: Legacy sendMessage(MidiMessage)
-    // ---------------------------------------------------------------------
     @Test
     public void testLegacySendMessage() throws Exception {
         MockMidiDevice device = new MockMidiDevice();
@@ -157,9 +140,6 @@ public class ReceiverWrapperTest {
         assertEquals(sm, device.receiver.received.get(0));
     }
 
-    // ---------------------------------------------------------------------
-    // TEST: Device open/close behavior
-    // ---------------------------------------------------------------------
     @Test
     public void testOpenClose() throws Exception {
         MockMidiDevice device = new MockMidiDevice();
@@ -174,9 +154,6 @@ public class ReceiverWrapperTest {
         assertTrue(device.receiver.closed);
     }
 
-    // ---------------------------------------------------------------------
-    // TEST: getRawReceiver returns the underlying receiver
-    // ---------------------------------------------------------------------
     @Test
     public void testGetRawReceiver() throws Exception {
         MockMidiDevice device = new MockMidiDevice();

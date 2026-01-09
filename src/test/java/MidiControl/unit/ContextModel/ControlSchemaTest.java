@@ -72,10 +72,6 @@ public class ControlSchemaTest {
                 // 2. Build the schema
                 ControlSchema schema = new ControlSchema(registry);
 
-                // ------------------------------------------------------------
-                // 3. Validate REAL prefixes from the REAL JSON you provided
-                // ------------------------------------------------------------
-
                 // kInputAUX should contain prefix "kAUX"
                 Set<String> auxPrefixes = schema.getPrefixesForGroup("kInputAUX");
                 assertTrue(auxPrefixes.contains("kAUX"),
@@ -94,10 +90,7 @@ public class ControlSchemaTest {
                 Set<String> groupsForFader = schema.getGroupsForPrefix("kFader");
                 assertTrue(groupsForFader.contains("kInputFader"),
                         "Prefix kFader should map back to group kInputFader");
-
-                // ------------------------------------------------------------
-                // 4. Print for visual inspection
-                // ------------------------------------------------------------
+                        
                 System.out.println("---- Prefixes per Group (01V96i) ----");
                 registry.getGroups().forEach((group, g) -> {
                         System.out.println(group + " → " + schema.getPrefixesForGroup(group));

@@ -11,9 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class BusContextDiscovererTest {
 
-    // ------------------------------------------------------------
-    // Helpers
-    // ------------------------------------------------------------
 
     private ControlGroup makeGroup(String name, String subName, int instances) {
         ControlGroup g = new ControlGroup(name);

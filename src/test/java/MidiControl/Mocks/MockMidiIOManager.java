@@ -11,9 +11,6 @@ import java.util.List;
 
 public class MockMidiIOManager extends MidiIOManager {
 
-    // ------------------------------------------------------------
-    // Constructor — DO NOT run real MidiIOManager logic
-    // ------------------------------------------------------------
     public MockMidiIOManager(MidiServer server) {
         super(server);
     }
@@ -27,9 +24,6 @@ public class MockMidiIOManager extends MidiIOManager {
     public boolean setResult = true;   // result returned by trySetOutputDevice
     public int lastSetIndex = -1;      // track which device index was requested
 
-    // ------------------------------------------------------------
-    // Overrides of real public API
-    // ------------------------------------------------------------
 
     @Override
     public MidiOutput getMidiOut() {
@@ -56,10 +50,6 @@ public class MockMidiIOManager extends MidiIOManager {
     public List<MidiDeviceDTO> listDeviceDTOs() {
         return devices;
     }
-
-    // ------------------------------------------------------------
-    // Test helpers
-    // ------------------------------------------------------------
 
     public void setMidiOutForTest(MidiOutput out) {
         this.out = out;

@@ -135,9 +135,6 @@ public class ContextFactory {
     }
 
 
-    // ------------------------------------------------------------
-    // Helpers
-    // ------------------------------------------------------------
 
     private static void addDynamicFilter(
         ControlSchema schema,

@@ -17,9 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class OutputRouterTest {
 
-    // ------------------------------------------------------------
-    // Mock MIDI OUT
-    // ------------------------------------------------------------
+
     private static class MockMidiOut implements MidiOutput {
         public final List<byte[]> sent = new ArrayList<>();
 
@@ -49,9 +47,6 @@ public class OutputRouterTest {
         }
     }
 
-    // ------------------------------------------------------------
-    // Mock IO Manager
-    // ------------------------------------------------------------
     private static class MockIOManager extends MidiIOManager {
         private final TransportMode mode;
         private final MockMidiOut out;
@@ -78,9 +73,6 @@ public class OutputRouterTest {
         }
     }
 
-    // ------------------------------------------------------------
-    // Mock Registry
-    // ------------------------------------------------------------
     private static class MockRegistry extends CanonicalRegistry {
         private final Map<String, ControlInstance> map = new HashMap<>();
 
@@ -98,9 +90,6 @@ public class OutputRouterTest {
         }
     }
 
-    // ------------------------------------------------------------
-    // Mock Server
-    // ------------------------------------------------------------
     private static class MockServer extends MidiServer {
         private final MockRegistry registry;
         private final MidiIOManager io;
@@ -122,9 +111,7 @@ public class OutputRouterTest {
         }
     }
 
-    // ------------------------------------------------------------
-    // Helpers to build fake mappings
-    // ------------------------------------------------------------
+
     private SysexMapping fakeSysex() {
         return new SysexMapping(
                 "g", 0, 1, "s", 0, 0L,
@@ -170,10 +157,6 @@ public class OutputRouterTest {
 
         return ci;
     }
-
-    // ------------------------------------------------------------
-    // TESTS
-    // ------------------------------------------------------------
 
     @Test
     public void testApplyChange_SysexMode() {

@@ -22,46 +22,28 @@ import java.util.List;
  */
 public class ViewControl {
 
-    // ---------------------------------------------------------------------
-    // UI Identity (canonical UI model)
-    // ---------------------------------------------------------------------
     public String logicId;     // e.g. "PAN", "CHANNEL_ON", "SEND_MIX1"
     public String uiGroup;     // e.g. "kInputPan", "kInputToMix"
     public String label;       // e.g. "Pan", "On", "Mix 1"
     public ControlType type;   // KNOB, FADER, TOGGLE, SLIDER_HORIZONTAL
     public int index;          // ordering within uiGroup
 
-    // ---------------------------------------------------------------------
-    // Hardware Identity (canonical_id)
-    // ---------------------------------------------------------------------
     public String hwGroup;       // e.g. "kInputPan"
     public String hwSubcontrol;  // e.g. "kChannelPan"
     public int hwInstance;       // e.g. 1 (channel index)
 
-    // ---------------------------------------------------------------------
-    // Hardware Value Range
-    // ---------------------------------------------------------------------
     public int min;
     public int max;
     public int value;
     public int defaultValue;
 
-    // ---------------------------------------------------------------------
-    // Optional UI hints
-    // ---------------------------------------------------------------------
     public boolean bipolar = false;
     public boolean stepped = false;
     public boolean readOnly = false;
     public String unit = null;
 
-    // ---------------------------------------------------------------------
-    // Optional composite controls (e.g. channel name)
-    // ---------------------------------------------------------------------
     public List<ControlInstance> multi = null;
 
-    // ---------------------------------------------------------------------
-    // helpers
-    // ---------------------------------------------------------------------
     public String getCanonicalId() {
         return hwGroup + "." + hwSubcontrol + "." + hwInstance;
     }
@@ -70,9 +52,6 @@ public class ViewControl {
         return this.logicId;
     }
 
-    // ---------------------------------------------------------------------
-    // Constructor
-    // ---------------------------------------------------------------------
     public ViewControl(
             String logicId,
             String uiGroup,

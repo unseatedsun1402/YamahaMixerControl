@@ -1,13 +1,9 @@
 package MidiControl.unit.Server;
 
-import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.Controls.SourceAllInstances;
 import MidiControl.Routing.OutputRequestSender;
 import MidiControl.Server.RehydrationManager;
-import MidiControl.SysexUtils.SysexMapping;
-import MidiControl.SysexUtils.SysexParser;
-
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -23,9 +19,6 @@ import org.junit.jupiter.api.Test;
 
 class RehydrationManagerTest {
 
-    // ------------------------------------------------------------
-    // Fake OutputRouter for testing
-    // ------------------------------------------------------------
     static class FakeOutputRouter implements OutputRequestSender {
         String lastRequestedId = null;
         int callCount = 0;
@@ -36,19 +29,13 @@ class RehydrationManagerTest {
             this.callCount++;
         }
     }
-    // ------------------------------------------------------------
-    // Fake Registry for testing
-    // (We don't need real instances yet — just a stub)
-    // ------------------------------------------------------------
+
     static class FakeRegistry implements SourceAllInstances{
         public Collection<ControlInstance> getAllInstances() {
             return List.of();
         }
     }
 
-    // ------------------------------------------------------------
-    // Fake scheduler (no tasks needed yet)
-    // ------------------------------------------------------------
     static class FakeScheduler extends java.util.concurrent.ScheduledThreadPoolExecutor {
         FakeScheduler() { super(1); }
         @Override
@@ -58,9 +45,6 @@ class RehydrationManagerTest {
         }
     }
 
-    // ------------------------------------------------------------
-    // The test
-    // ------------------------------------------------------------
     @Test
     void request_callsOutputRouterApplyRequest() {
         // Arrange

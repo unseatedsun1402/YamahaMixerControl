@@ -19,9 +19,6 @@ public class OutputContextDiscoverer implements ContextDiscoverer {
         discoverOmniOutputs(out, registry);   // optional but useful
     }
 
-    // ------------------------------------------------------------
-    // 1. Discover Stereo LR (Main Output)
-    // ------------------------------------------------------------
     private void discoverStereoLR(List<Context> out, CanonicalRegistry registry) {
 
         Optional<OutputMapping> stereo = findStereoOutMapping(registry);
@@ -88,9 +85,6 @@ public class OutputContextDiscoverer implements ContextDiscoverer {
         return i + 1;
     }
 
-    // ------------------------------------------------------------
-    // 2. Discover Omni Outputs (M7CL, LS9, QL/CL)
-    // ------------------------------------------------------------
     private void discoverOmniOutputs(List<Context> out, CanonicalRegistry registry) {
 
         Map<Integer, List<OutputMapping>> omniMap = new HashMap<>();
@@ -177,9 +171,6 @@ public class OutputContextDiscoverer implements ContextDiscoverer {
         }
     }
 
-    // ------------------------------------------------------------
-    // Helper classes
-    // ------------------------------------------------------------
     private static class OutputMapping {
         final String groupName;
         final String prefix;

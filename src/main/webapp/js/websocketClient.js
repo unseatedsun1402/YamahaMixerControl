@@ -22,9 +22,6 @@ export class WebSocketClient {
     console.log("[WebSocketClient] Initialized with URL:", url);
   }
 
-  // ------------------------------------------------------------
-  // Connection
-  // ------------------------------------------------------------
   connect() {
     console.log("[WebSocketClient] Connecting to:", this.url);
     this.ws = new WebSocket(this.url);
@@ -55,8 +52,7 @@ export class WebSocketClient {
   }
 
   // ------------------------------------------------------------
-  // Event subscription
-  // ------------------------------------------------------------
+
   on(type, handler) {
     if (!this.handlers[type]) {
       throw new Error(`Unknown event type: ${type}`);
@@ -73,8 +69,7 @@ export class WebSocketClient {
   }
 
   // ------------------------------------------------------------
-  // Message routing
-  // ------------------------------------------------------------
+
   _routeMessage(msg) {
     console.log("[WebSocketClient] Routing message:", msg);
 
@@ -112,8 +107,7 @@ export class WebSocketClient {
   }
 
   // ------------------------------------------------------------
-  // Outgoing messages
-  // ------------------------------------------------------------
+
   requestUiModel(contextId, uiType = "basic-input-view") {
     const requestId = `req-${++this.requestCounter}`;
     const message = {

@@ -20,10 +20,6 @@
         // Create WebSocket client
         const ws = new WebSocketClient(wsUrl);
 
-        // ------------------------------------------------------------
-        // Event Handlers
-        // ------------------------------------------------------------
-
         ws.on("connected", () => {
             console.log("[Bootstrap] Connected — requesting bank.inputs…");
             ws.requestBank("bank.inputs");
