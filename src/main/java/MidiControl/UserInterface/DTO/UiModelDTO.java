@@ -7,4 +7,6 @@ public class UiModelDTO {
     public String contextId;
     public List<ViewControlDTO> controls;
     public Map<String, Object> metadata;
+
+    public UiModelDTO(){}
 }

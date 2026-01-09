@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MidiControl UI</title>
+    <title>Input Mix UI</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/basic-view-style.css"/>
 
-    <!-- Bootstrap -->
     <script type="module">
         import { WebSocketClient } from './js/websocketClient.js';
         import { renderUiModel } from './js/new-ui-renderer.js';
@@ -21,36 +20,34 @@
         // Create WebSocket client
         const ws = new WebSocketClient(wsUrl);
 
-        // -----------------------------
+        // ------------------------------------------------------------
         // Event Handlers
-        // -----------------------------
+        // ------------------------------------------------------------
 
         ws.on("connected", () => {
-            console.log("[Bootstrap] Connected — waiting for ui-bank…");
+            console.log("[Bootstrap] Connected — requesting bank.inputs…");
+            ws.requestBank("bank.inputs");
         });
 
         // 1. Receive the bank structure
-        ws.on("ui-bank", (msg) => {
-            console.log("[Bootstrap] Bank received:", msg);
+        ws.on("ui-bank", (bank) => {
+            console.log("[Bootstrap] Bank received:", bank);
 
-            const bank = msg.payload;
-
-            // Clear strip container
             const stripContainer = document.getElementById("strip-container");
             stripContainer.innerHTML = "";
 
             // Request + subscribe to each context
             for (const ctxId of bank.contexts) {
                 console.log(`[Bootstrap] Requesting model for ${ctxId}`);
-                ws.requestUiModel(ctxId);
+                ws.requestUiModel(ctxId, "basic-input-view");
                 ws.subscribe(ctxId);
             }
         });
 
         // 2. Receive each full UI model
-        ws.on("ui-model", (msg) => {
-            console.log("[Bootstrap] UI model received:", msg);
-            renderUiModel(msg.payload.model);
+        ws.on("ui-model", (model) => {
+            console.log("[Bootstrap] UI model received:", model);
+            renderUiModel(model);
         });
 
         // 3. Receive incremental updates

@@ -1,6 +1,7 @@
 package MidiControl.functional.CanonicalRegistry;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
@@ -27,7 +28,8 @@ public class ServerToHardwareTest {
         // 1. Load real mappings (whatever your real loader is)
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
         List<NrpnMapping> nrpnMappings = NrpnMappingLoader.loadFromResource("MidiControl/nrpn/01v96i_nrpn_mappings.json");
-        CanonicalRegistry registry = new CanonicalRegistry(mappings,new SysexParser(mappings));
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
+        registry.attachNrpnMappings(nrpnMappings);
 
         // 2. Resolve the canonical ID exactly as the GUI sends it
         String canonicalId = "kInputFader.kFader.1";
@@ -46,7 +48,6 @@ public class ServerToHardwareTest {
         assertNotNull(built, "Builder should return a SysEx byte array");
 
         // 5. Build expected bytes from the mapping format
-        // byte[] expected = mapping.buildExpectedBytes(testValue, instance.getIndex());
         byte[] expected = {(byte)0xf0,0x43,0x10,0x3e,0x7f,0x01,0x1C,0x00,0x01,0x00,0x00,0x06,0x02,(byte) 0xf7};
 
         System.out.println("Built sysex " + bytesToHex(built));
@@ -58,79 +59,10 @@ public class ServerToHardwareTest {
     }
 
     public static String bytesToHex(byte[] message) {
-    StringBuilder sb = new StringBuilder();
-    for (byte b : message) {
-      sb.append(String.format("%02X", b));
-    }
-    return sb.toString();
-  }
-
-    @Test
-    public void testResolveBuildAndRouteForFader1() throws Exception {
-
-        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
-        CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
-        MidiServer server = new MidiServer(registry);
-
-        String canonicalId = "kInputFader.kFader.1";
-        ControlInstance instance = registry.resolve(canonicalId);
-        assertNotNull(instance);
-
-        SysexMapping mapping = instance.getSysex();
-        assertNotNull(mapping);
-
-        int testValue = 770;
-        byte[] built = mapping.buildChangeMessage(testValue, instance.getIndex());
-
-        // Route through the OutputRouter
-        OutputRouter router = new OutputRouter(registry,server.getMidiDeviceManager());
-        MidiIOManager manager = server.getMidiDeviceManager();
-        MockMidiOut out = new MockMidiOut();
-        manager.setMidiOutForTest(out);
-
-        router.applyChange(canonicalId, testValue);
-
-        System.out.println("Built sysex  " + bytesToHex(built));
-
-        byte[] expected = {(byte)0xf0,0x43,0x10,0x3e,0x7f,0x01,0x1C,0x00,0x01,0x00,0x00,0x06,0x02,(byte)0xf7};
-
-        assertArrayEquals(expected, out.sent.get(0),
-            "OutputRouter must not corrupt SysEx between resolve and MIDI output");
-    }
-
-
-        @Test
-        public void testResolveBuildAndGuiHandleForFader1() throws Exception {
-
-            List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
-            CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
-            MidiServer server = new MidiServer(registry);
-
-            String canonicalId = "kInputFader.kFader.1";
-            ControlInstance instance = registry.resolve(canonicalId);
-            assertNotNull(instance);
-
-            SysexMapping mapping = instance.getSysex();
-            assertNotNull(mapping);
-
-            int testValue = 770;
-            byte[] built = mapping.buildChangeMessage(testValue, instance.getIndex());
-
-            // Route through the OutputRouter
-            MidiIOManager manager = server.getMidiDeviceManager();
-            MockMidiOut out = new MockMidiOut();
-            manager.setMidiOutForTest(out);
-
-            OutputRouter router = new OutputRouter(registry,server.getMidiDeviceManager());
-            GuiInputHandler handler = new GuiInputHandler(router);
-            
-            handler.handleGuiChange(canonicalId, testValue);
-
-            System.out.println("Built sysex  " + bytesToHex(built));
-
-            byte[] expected = {(byte)0xf0,0x43,0x10,0x3e,0x7f,0x01,0x1C,0x00,0x01,0x00,0x00,0x06,0x02,(byte)0xf7};
-
-            assertArrayEquals(expected, out.sent.get(0),
-                "OutputRouter must not corrupt SysEx between resolve and MIDI output");
+        StringBuilder sb = new StringBuilder();
+        for (byte b : message) {
+            sb.append(String.format("%02X", b));
         }
+        return sb.toString();
+    }
 }

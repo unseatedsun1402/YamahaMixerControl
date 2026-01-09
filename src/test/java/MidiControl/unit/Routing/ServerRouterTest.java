@@ -16,6 +16,8 @@ import MidiControl.Server.ServerRouter;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexParser;
+import MidiControl.UserInterface.UiModelService;
+import MidiControl.UserInterface.DTO.UiModelDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,17 @@ public class ServerRouterTest {
         List<SysexMapping> mappings = new ArrayList<>();
         SysexParser parser = new SysexParser(mappings);
         return new CanonicalRegistry(mappings, parser);
+    }
+
+    // Minimal UiModelService stub for tests
+    private static class MockUiModelService implements UiModelService {
+        @Override
+        public UiModelDTO buildUiModel(String contextId, String uiType) {
+            UiModelDTO dto = new UiModelDTO();
+            dto.contextId = contextId;
+            dto.controls = List.of();
+            return dto;
+        }
     }
 
     private static class Env {
@@ -43,7 +56,12 @@ public class ServerRouterTest {
         env.io = new MockMidiIOManager(env.server);
         env.server.setMockIo(env.io);
 
-        env.router = new ServerRouter(env.server);
+        env.router = new ServerRouter(
+            new MockUiModelService(),
+            env.server.getSubscriptionManager(),
+            env.registry,
+            env.io
+        );
 
         env.session = new FakeSession("1");
         return env;
@@ -56,7 +74,7 @@ public class ServerRouterTest {
         env.router.handleMessage(env.session, """
             {"type":"set-control-value","payload":{"canonicalId":"fader1","value":77}}
         """);
-        
+
         String msg = env.session.lastSent;
         assertNotNull(msg, "Router did not send any response for set-control-value");
         // Depending on your real implementation, adjust these contains() checks:
@@ -128,9 +146,10 @@ public class ServerRouterTest {
         MockSubscriptionManager subs = new MockSubscriptionManager();
 
         ServerRouter router = new ServerRouter(
-            new MockUiModelFactory(),
-            server,
-            subs
+            new MockUiModelService(),
+            subs,
+            registry,
+            io
         );
 
         FakeSession session = new FakeSession("1");
@@ -155,9 +174,10 @@ public class ServerRouterTest {
         MockSubscriptionManager subs = new MockSubscriptionManager();
 
         ServerRouter router = new ServerRouter(
-            new MockUiModelFactory(),
-            server,
-            subs
+            new MockUiModelService(),
+            subs,
+            registry,
+            io
         );
 
         FakeSession session = new FakeSession("1");
@@ -179,12 +199,11 @@ public class ServerRouterTest {
         MockMidiIOManager io = new MockMidiIOManager(server);
         server.setMockIo(io);
 
-        MockUiModelFactory factory = new MockUiModelFactory();
-
         ServerRouter router = new ServerRouter(
-            factory,
-            server,
-            new MockSubscriptionManager()
+            new MockUiModelService(),
+            new MockSubscriptionManager(),
+            registry,
+            io
         );
 
         FakeSession session = new FakeSession("1");

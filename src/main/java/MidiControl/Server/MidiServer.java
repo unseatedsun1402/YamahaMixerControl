@@ -1,13 +1,18 @@
 package MidiControl.Server;
-import java.util.List; import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.logging.Level; import java.util.logging.Logger;
 import javax.sound.midi.MidiMessage;
 import org.apache.commons.math3.exception.OutOfRangeException;
 import MidiControl.ContextModel.BankCatalog;
+import MidiControl.ContextModel.Context;
 import MidiControl.ContextModel.ContextDiscoveryEngine;
+import MidiControl.ContextModel.ViewRegistry;
 import MidiControl.ContextModel.ControlSchema;
 import MidiControl.ContextModel.InputChannelStripViewBuilder;
+import MidiControl.ContextModel.MixAuxBusViewBuilder;
 import MidiControl.ContextModel.ViewBuilder;
 import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.Controls.CanonicalRegistry;
@@ -23,10 +28,12 @@ import MidiControl.SysexUtils.SysexParser;
 import MidiControl.UserInterface.UiBankFactory;
 import MidiControl.UserInterface.UiContextIndex;
 import MidiControl.UserInterface.UiModelFactory;
+import MidiControl.UserInterface.UiModelService;
+import MidiControl.UserInterface.DTO.UiModelDTO;
 import MidiControl.UserInterface.Frontend.GuiBroadcastListener;
 import MidiControl.UserInterface.Frontend.WebSocketGuiBroadcaster;
 import jakarta.annotation.PreDestroy;
-public class MidiServer implements Runnable {
+public class MidiServer implements Runnable, UiModelService{
     private volatile boolean shutdownFlag = false;
     private final ConcurrentLinkedQueue<MidiMessage> inputBuffer = new ConcurrentLinkedQueue<>();
     private final NrpnRegistry nrpnRegistry = new NrpnRegistry();
@@ -34,8 +41,10 @@ public class MidiServer implements Runnable {
     private final HardwareInputHandler inputHandler = new HardwareInputHandler(nrpnParser, nrpnRegistry);
     private final MidiIOManager deviceManager = new MidiIOManager(this);
     private final SubscriptionManager subscriptions;
-    private final ControlSchema schema; private final ViewBuilder viewBuilder;
-    private final UiContextIndex contextIndex; private final UiModelFactory uiFactory;
+    private final ControlSchema schema;
+    private final ViewRegistry viewBuilders;
+    private final UiContextIndex contextIndex;
+    private final UiModelFactory uiFactory;
     private final UiBankFactory bankFactory;
     private final BankCatalog bankCatalog;
     private final ServerRouter serverRouter;
@@ -70,20 +79,26 @@ public class MidiServer implements Runnable {
         catch (OutOfRangeException e) {
             logger.severe(e.toString());
         }
+        this.viewBuilders = new ViewRegistry();
+        this.uiFactory = null;
         // Safe fallback listener
         this.guiBroadcastListener = NO_OP_LISTENER;
 
         this.subscriptions = new SubscriptionManager();
         this.schema = new ControlSchema(canonicalRegistry);
-        this.viewBuilder = new InputChannelStripViewBuilder(canonicalRegistry);
+        
         this.contextIndex = new UiContextIndex();
+
+        this.viewBuilders.addView(new InputChannelStripViewBuilder(canonicalRegistry), "basic-input-view");
+        this.viewBuilders.addView(new MixAuxBusViewBuilder(canonicalRegistry), "basic-master-view");
+        
         this.guiBroadcastListener = new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
-        this.uiFactory = new UiModelFactory(canonicalRegistry, schema, viewBuilder, contextIndex);
         this.bankCatalog = new BankCatalog();
         this.discoveryEngine = new ContextDiscoveryEngine(canonicalRegistry);
         this.bankFactory = new UiBankFactory(discoveryEngine, this);
-        this.serverRouter = new ServerRouter(this);
+        this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
         this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(), (SourceAllInstances) this.canonicalRegistry, Executors.newSingleThreadScheduledExecutor());
+        initContextIndex();
         serverRouter.injectApp(new App(rehydrationManager, deviceManager));
         logger.info("MidiServer: CanonicalRegistry initialized with SYSEX + NRPN mappings.");
     }
@@ -91,16 +106,17 @@ public class MidiServer implements Runnable {
     // 2. Test constructor (registry only)
     public MidiServer(CanonicalRegistry registry) {
         this.canonicalRegistry = registry;
+        this.viewBuilders = new ViewRegistry();
+        this.viewBuilders.addView(new InputChannelStripViewBuilder(canonicalRegistry),"basic-input-view");
+        this.uiFactory = null;
         this.bankFactory = null;
         this.bankCatalog = new BankCatalog();
         this.guiBroadcastListener = NO_OP_LISTENER;
         this.subscriptions = new SubscriptionManager();
         this.schema = new ControlSchema(canonicalRegistry);
-        this.viewBuilder = new InputChannelStripViewBuilder(canonicalRegistry);
         this.contextIndex = new UiContextIndex();
         this.guiBroadcastListener = new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
-        this.uiFactory = new UiModelFactory(canonicalRegistry, schema, viewBuilder, contextIndex);
-        this.serverRouter = new ServerRouter(this);
+        this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
         this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(),
             (SourceAllInstances) this.canonicalRegistry,
             Executors.newSingleThreadScheduledExecutor());
@@ -113,11 +129,12 @@ public class MidiServer implements Runnable {
         this.guiBroadcastListener = guiListener;
         this.subscriptions = new SubscriptionManager();
         this.schema = new ControlSchema(canonicalRegistry);
-        this.viewBuilder = new InputChannelStripViewBuilder(canonicalRegistry);
+        this.viewBuilders = new ViewRegistry();
+        this.viewBuilders.addView(new InputChannelStripViewBuilder(canonicalRegistry),"basic-input-view");
         this.contextIndex = new UiContextIndex();
         this.guiBroadcastListener = new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
-        this.uiFactory = new UiModelFactory(canonicalRegistry, schema, viewBuilder, contextIndex);
-        this.serverRouter = new ServerRouter(this);
+        this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
+        this.uiFactory = null;
         this.bankFactory = null;
         this.bankCatalog = new BankCatalog();
         this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(),
@@ -163,8 +180,8 @@ public class MidiServer implements Runnable {
         return this.schema;
     }
 
-    public ViewBuilder getViewBuilder() {
-        return this.viewBuilder;
+    public Optional<ViewBuilder> getViewBuilder(String key) {
+        return this.viewBuilders.getView(key);
     }
 
     public UiContextIndex getContextIndex() {
@@ -228,5 +245,25 @@ public class MidiServer implements Runnable {
 
     public UiModelFactory getUiModelFactory() {
         return this.uiFactory;
+    }
+
+    private void initContextIndex(){
+        List<Context> contexts = discoveryEngine.discoverContexts();
+        contextIndex.addAll(contexts);
+    }
+
+    @Override
+    public UiModelDTO buildUiModel(String contextId, String uiType) {
+
+        ViewBuilder builder = viewBuilders.getView(uiType)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown uiType: " + uiType));
+
+        UiModelFactory factory = new UiModelFactory(
+                canonicalRegistry,
+                builder,
+                contextIndex
+        );
+
+        return factory.buildUiModel(contextId);
     }
 }

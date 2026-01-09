@@ -9,29 +9,30 @@ import org.junit.jupiter.api.Test;
 
 import MidiControl.Server.ServerRouter;
 import MidiControl.Server.SubscriptionManager;
-import MidiControl.Server.MidiServer;
-import MidiControl.UserInterface.UiModelFactory;
+import MidiControl.UserInterface.UiModelService;
 import MidiControl.UserInterface.DTO.UiModelDTO;
+import MidiControl.Controls.CanonicalRegistry;
+import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Mocks.FakeSession;
 import MidiControl.Mocks.MockCanonicalRegistry;
-import MidiControl.Mocks.MockMidiServer;
+import MidiControl.Mocks.MockMidiIOManager;
 
 import java.util.List;
 
-class MinimalUiModelFactory extends UiModelFactory {
+class MinimalUiModelService implements UiModelService {
 
     private final UiModelDTO model;
 
-    public MinimalUiModelFactory(UiModelDTO model) {
-        super(null, null, null, null);
+    public MinimalUiModelService(UiModelDTO model) {
         this.model = model;
     }
 
     @Override
-    public UiModelDTO buildUiModel(String contextId) {
+    public UiModelDTO buildUiModel(String contextId, String uiType) {
         return model;
     }
 }
+
 
 public class ServerRouterEnvelopeTest {
 
@@ -48,18 +49,29 @@ public class ServerRouterEnvelopeTest {
         fakeModel.contextId = "channel.1";
         fakeModel.controls = List.of();
 
-        MinimalUiModelFactory factory = new MinimalUiModelFactory(fakeModel);
-        MockMidiServer midi = new MockMidiServer(new MockCanonicalRegistry());
+        // New: use UiModelService instead of UiModelFactory
+        UiModelService uiModels = new MinimalUiModelService(fakeModel);
 
-        ServerRouter router = new ServerRouter(factory, midi, new SubscriptionManager());
+        // Minimal mocks for dependencies
+        CanonicalRegistry registry = new MockCanonicalRegistry();
+        MidiIOManager ioManager = new MockMidiIOManager(null);
+        SubscriptionManager subs = new SubscriptionManager();
+
+        // New constructor
+        ServerRouter router = new ServerRouter(
+            uiModels,
+            subs,
+            registry,
+            ioManager
+        );
 
         String incoming = """
         {
-          "type": "get-ui-model",
-          "requestId": "req-123",
-          "payload": {
+        "type": "get-ui-model",
+        "requestId": "req-123",
+        "payload": {
             "contextId": "channel.1"
-          }
+        }
         }
         """;
 
@@ -76,13 +88,12 @@ public class ServerRouterEnvelopeTest {
 
         JsonObject payload = json.getAsJsonObject("payload");
         assertEquals("channel.1", payload.get("contextId").getAsString());
-        assertTrue(payload.has("model"), "Expected model to be present in payload");
-
-        JsonObject modelJson = payload.getAsJsonObject("model");
+        System.out.println(payload.toString());
 
         // Validate DTO structure
-        assertEquals("channel.1", modelJson.get("contextId").getAsString());
-        assertTrue(modelJson.has("controls"));
-        assertTrue(modelJson.getAsJsonArray("controls").isEmpty());
+        assertEquals("channel.1", payload.get("contextId").getAsString());
+        assertTrue(payload.has("controls"));
+        assertTrue(payload.getAsJsonArray("controls").isEmpty());
     }
+
 }

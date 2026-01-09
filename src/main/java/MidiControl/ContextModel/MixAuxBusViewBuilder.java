@@ -7,17 +7,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Compact Mix/Aux Bus ViewBuilder
- *
- * Includes ONLY:
- *  - FADER          (kMixFader / kAUXFader)
- *  - PAN            (kMixPan / kAUXPan)
- *  - DYNAMICS       (kMixDyn* / kAUXDyn*)
- *  - 4‑KNOB EQ      (Gain controls only: kMixEQ*Gain / kAUXEQ*Gain)
- *
- * Everything else is intentionally ignored.
- */
 public class MixAuxBusViewBuilder implements ViewBuilder {
 
     private final CanonicalRegistry registry;
@@ -31,14 +20,9 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
         return buildCompact(context);
     }
 
-    // -------------------------------------------------------------------------
-    // MAIN BUILD METHOD
-    // -------------------------------------------------------------------------
-
     public List<ViewControl> buildCompact(Context context) {
         List<ViewControl> result = new ArrayList<>();
 
-        // Only handle mix.* and aux.* contexts
         if (!supports(context)) {
             return result;
         }
@@ -46,51 +30,48 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
         List<ControlInstance> all =
                 registry.getAllInstancesForContext(context.getId());
 
-        // Determine prefix: kMix or kAUX
-        String family = context.getId().split("\\.")[0]; // mix or aux
-        String prefix = "k" + family.substring(0,1).toUpperCase() + family.substring(1);
+        String family = context.getId().split("\\.")[0];
+        String prefix = switch (family) {
+            case "mix" -> "kMix";
+            case "aux" -> "kAUX";
+            default -> "";
+        };
 
-        // 1. FADER
         all.stream()
-                .filter(ci -> (prefix + "Fader").equals(ci.getGroup()))
-                .filter(ci -> "kFader".equals(ci.getSubcontrol()))
-                .findFirst()
-                .ifPresent(ci -> result.add(createFader(ci)));
+            .filter(ci -> (prefix + "Fader").equals(ci.getGroup()))
+            .filter(ci -> "kFader".equals(ci.getSubcontrol()))
+            .findFirst()
+            .ifPresent(ci -> result.add(createFader(ci)));
 
-        // 2. PAN (to stereo)
         all.stream()
-                .filter(ci -> (prefix + "Pan").equals(ci.getGroup()))
-                .findFirst()
-                .ifPresent(ci -> result.add(createPan(ci)));
+            .filter(ci ->
+            (prefix + "Pan").equals(ci.getGroup()) || (prefix + "Balance").equals(ci.getGroup())
+            )
+            .findFirst()
+            .ifPresent(ci -> result.add(createPan(ci)));
 
-        // 3. DYNAMICS (all dyn controls)
         all.stream()
-                .filter(ci -> ci.getGroup().startsWith(prefix + "Dyn"))
-                .sorted(Comparator.comparing(ci -> ci.getSubcontrol()))
-                .forEach(ci -> result.add(createDynamics(ci)));
+            .filter(ci ->
+                ci.getGroup().contains(prefix +"Comp") ||
+                ci.getGroup().contains(prefix + "Dyn")
+            )
+            .filter(ci -> ci.getSubcontrol().endsWith("Threshold"))
+            .sorted(Comparator.comparing(ControlInstance::getSubcontrol))
+            .forEach(ci -> result.add(createDynamics(ci)));
 
-        // 4. 4‑KNOB EQ (gain controls only)
         all.stream()
-                .filter(ci -> ci.getGroup().startsWith(prefix + "EQ"))
-                .filter(ci -> ci.getSubcontrol().contains("Gain"))
-                .sorted(Comparator.comparing(ci -> ci.getSubcontrol()))
-                .forEach(ci -> result.add(createEQGain(ci)));
+            .filter(ci -> ci.getGroup().startsWith(prefix + "EQ"))
+            .filter(ci -> ci.getSubcontrol().endsWith("G"))
+            .sorted(Comparator.comparing(ControlInstance::getSubcontrol))
+            .forEach(ci -> result.add(createEQGain(ci)));
 
         return result;
     }
-
-    // -------------------------------------------------------------------------
-    // SUPPORTS
-    // -------------------------------------------------------------------------
 
     public boolean supports(Context context) {
         return context.getId().startsWith("mix.") ||
                context.getId().startsWith("aux.");
     }
-
-    // -------------------------------------------------------------------------
-    // CONTROL FACTORIES
-    // -------------------------------------------------------------------------
 
     private ViewControl createFader(ControlInstance ci) {
         return new ViewControl(
@@ -130,7 +111,7 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
         return new ViewControl(
                 "DYN_" + ci.getSubcontrol(),
                 ci.getGroup(),
-                "Dyn",
+                "Dyn Thresh",
                 ControlType.KNOB,
                 0,
                 ci.getMin(),
@@ -147,7 +128,7 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
         return new ViewControl(
                 "EQ_" + ci.getSubcontrol(),
                 ci.getGroup(),
-                "EQ",
+                "EQ Gain",
                 ControlType.KNOB,
                 0,
                 ci.getMin(),
