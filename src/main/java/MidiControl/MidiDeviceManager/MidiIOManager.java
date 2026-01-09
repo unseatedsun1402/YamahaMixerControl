@@ -28,7 +28,7 @@ public class MidiIOManager {
     private final ScheduledExecutorService sendExecutor =
             Executors.newSingleThreadScheduledExecutor();
 
-    private static final long SEND_DELAY_MS = 8; // safe for Yamaha desks
+    private static final long SEND_DELAY_MS = 2;
     private volatile boolean sendLoopRunning = false;
 
 
