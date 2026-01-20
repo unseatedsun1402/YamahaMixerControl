@@ -4,28 +4,42 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class SysexParser {
-  private static final Logger logger = Logger.getLogger(SysexParser.class.getName());
-  private final SysexRegistry registry;
+
+    private static final Logger logger = Logger.getLogger(SysexParser.class.getName());
+    private final SysexRegistry registry;
 
     public SysexParser(List<SysexMapping> mappings) {
         this.registry = new SysexRegistry(mappings);
     }
 
-  public SysexMapping processMidiMessage(byte[] message) {
-    SysexMapping mapping = registry.resolve(message);
-    if (mapping != null) {
-      logger.info(mapping.getControlGroup() +" "+ mapping.getSubControl());
-      return mapping;
-    }
-    logger.warning("Unrecognized Sysex message: " + bytesToHex(message));
-    return null;
-  }
+    public SysexMapping processMidiMessage(byte[] message) {
 
-  public static String bytesToHex(byte[] message) {
-    StringBuilder sb = new StringBuilder();
-    for (byte b : message) {
-      sb.append(String.format("%02X", b));
+        // --- 1. Try native fast resolver first ---
+        SysexMapping fast = registry.resolveFast(message);
+
+        if (fast != null) {
+            logger.info("[FAST] " + fast.getControlGroup() + " " + fast.getSubControl());
+            return fast;
+        }
+
+        // --- 2. Fallback to Java resolver ---
+        SysexMapping slow = registry.resolve(message);
+
+        if (slow != null) {
+            logger.info("[SLOW] " + slow.getControlGroup() + " " + slow.getSubControl());
+            return slow;
+        }
+
+        // --- 3. No match ---
+        logger.warning("Unrecognized Sysex message: " + bytesToHex(message));
+        return null;
     }
-    return sb.toString();
-  }
+
+    public static String bytesToHex(byte[] message) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : message) {
+            sb.append(String.format("%02X", b));
+        }
+        return sb.toString();
+    }
 }

@@ -71,20 +71,6 @@ public class CanonicalRegistry implements SourceAllInstances {
         }
     }
 
-    // private String buildDualFormatJson(ControlInstance instance, int value) {
-    //     var nrpn = instance.getNrpn().orElse(null);
-    //     int msb = nrpn != null ? nrpn.msbInt() : -1;
-    //     int lsb = nrpn != null ? nrpn.lsbInt() : -1;
-
-    //     return String.format(
-    //         "{\"canonicalId\":\"%s\",\"value\":%d,\"msb\":%d,\"lsb\":%d}",
-    //         instance.getCanonicalId(),
-    //         value,
-    //         msb,
-    //         lsb
-    //     );
-    // }
-
     public void attachNrpnMappings(List<NrpnMapping> nrpnMappings) {
         for (NrpnMapping nrpn : nrpnMappings) {
             String[] parts = nrpn.getCanonicalId().split("\\.");
