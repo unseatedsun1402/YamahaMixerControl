@@ -114,7 +114,13 @@ public class OutputRouterTest {
 
     private SysexMapping fakeSysex() {
         return new SysexMapping(
-                "g", 0, 1, "s", 0, 0L,
+                "g",
+                0,
+                1,
+                "s",
+                0,
+                0L,
+                new int[]{0},new int[]{0},
                 0, 0, 127, 0,
                 "test",
                 List.of("F0", "01"), // change

@@ -1,0 +1,194 @@
+[        
+  {
+    "control_group": "Meter",
+    "sub_control": "Input",
+    "control_id": null,
+    "max_channels": 48,
+    "value": null,
+    "min_value": null,
+    "max_value": null,
+    "default_value": null,
+    "comment": "Synthetic meter block for M7CL",
+    "key": 286925056,
+    "address_bytes": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "index_bytes": [
+      8
+    ],
+    "parameter_request_format": [
+      240,
+      67,
+      "3n",
+      62,
+      17,
+      26,
+      33,
+      0,
+      "mp",
+      "sc",
+      "ch",
+      "cl",
+      247
+    ],
+    "parameter_change_format": [
+      240,
+      67,
+      "1n",
+      62,
+      17,
+      26,
+      33,
+      0,
+      "mp"
+    ],
+    "priority": 1
+  },
+  {
+    "control_group": "Meter",
+    "sub_control": "Mix",
+    "control_id": null,
+    "max_channels": 8,
+    "value": null,
+    "min_value": null,
+    "max_value": null,
+    "default_value": null,
+    "comment": "Synthetic meter block for M7CL",
+    "key": 286925057,
+    "address_bytes": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "index_bytes": [
+      8
+    ],
+    "parameter_request_format": [
+      240,
+      67,
+      "3n",
+      62,
+      17,
+      26,
+      33,
+      1,
+      "mp",
+      "sc",
+      "ch",
+      "cl",
+      247
+    ],
+    "parameter_change_format": [
+      240,
+      67,
+      "1n",
+      62,
+      17,
+      26,
+      33,
+      1,
+      "mp"
+    ],
+    "priority": 1
+  },
+  {
+    "control_group": "Meter",
+    "sub_control": "Matrix",
+    "control_id": null,
+    "max_channels": 8,
+    "value": null,
+    "min_value": null,
+    "max_value": null,
+    "default_value": null,
+    "comment": "Synthetic meter block for M7CL",
+    "key": 286925058,
+    "address_bytes": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "index_bytes": [
+      8
+    ],
+    "parameter_request_format": [
+      240,
+      67,
+      "3n",
+      62,
+      17,
+      26,
+      33,
+      2,
+      "mp",
+      "sc",
+      "ch",
+      "cl",
+      247
+    ],
+    "parameter_change_format": [
+      240,
+      67,
+      "1n",
+      62,
+      17,
+      26,
+      33,
+      2,
+      "mp"
+    ],
+    "priority": 1
+  },
+  {
+    "control_group": "Meter",
+    "sub_control": "Stereo",
+    "control_id": null,
+    "max_channels": 2,
+    "value": null,
+    "min_value": null,
+    "max_value": null,
+    "default_value": null,
+    "comment": "Synthetic meter block for M7CL",
+    "key": 286925060,
+    "address_bytes": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "index_bytes": [
+      8
+    ],
+    "parameter_request_format": [
+      240,
+      67,
+      "3n",
+      62,
+      17,
+      26,
+      33,
+      4,
+      "mp",
+      "sc",
+      "ch",
+      "cl",
+      247
+    ],
+    "parameter_change_format": [
+      240,
+      67,
+      "1n",
+      62,
+      17,
+      26,
+      33,
+      4,
+      "mp"
+    ],
+    "priority": 1
+    }
+]

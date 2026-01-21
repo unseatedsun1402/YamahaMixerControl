@@ -36,6 +36,8 @@ public class InputChannelStripViewBuilderTest {
                 sub,                // sub_control
                 0,                  // channel_index
                 0L,                 // key
+                new int[]{0},       // address bytes
+                new int[]{0},       // index bytes
                 min,                // value
                 min,                // min_value
                 max,                // max_value

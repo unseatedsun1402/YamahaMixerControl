@@ -11,21 +11,20 @@ import MidiControl.Mocks.FakeSession;
 import MidiControl.Mocks.MockMidiIOManager;
 import MidiControl.Mocks.MockMidiServer;
 import MidiControl.Mocks.MockSubscriptionManager;
-import MidiControl.Mocks.MockUiModelFactory;
 import MidiControl.Server.ServerRouter;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.SysexUtils.SysexMapping;
+import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
 import MidiControl.UserInterface.UiModelService;
 import MidiControl.UserInterface.DTO.UiModelDTO;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ServerRouterTest {
 
     private CanonicalRegistry makeMinimalRegistry() {
-        List<SysexMapping> mappings = new ArrayList<>();
+        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
         SysexParser parser = new SysexParser(mappings);
         return new CanonicalRegistry(mappings, parser);
     }

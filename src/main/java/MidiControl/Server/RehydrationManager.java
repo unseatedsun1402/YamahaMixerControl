@@ -55,7 +55,7 @@ public class RehydrationManager {
      * Request a single control value from the desk.
      */
     public void request(String canonicalId) {
-        logger.info("Rehydration request: " + canonicalId);
+        logger.fine("Rehydration request: " + canonicalId);
         pending.put(canonicalId, System.currentTimeMillis());
         outputRouter.applyRequest(canonicalId);
 
@@ -127,7 +127,6 @@ public class RehydrationManager {
         Long expected = pending.remove(canonicalId);
         if (expected == null) {
             // Not a rehydration response — just process normally
-            logger.warning("Not a rehydration response or timed out:" + canonicalId);
             return;
         }
         logger.fine("Rehydrated "+canonicalId + " control value");

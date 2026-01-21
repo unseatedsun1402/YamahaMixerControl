@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.Mocks.FakeSession;
+import MidiControl.Mocks.FakeSysexMapping;
 import MidiControl.Server.SubscriptionManager;
 import MidiControl.SysexUtils.SysexMapping;
-import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
 import MidiControl.UserInterface.CanonicalContextResolver;
 import MidiControl.UserInterface.Frontend.GuiBroadcastListener;
@@ -24,33 +24,7 @@ public class GuiBroadcastListenerTest {
     @Test
     void testGuiBroadcastListenerWithRealControlInstance() throws Exception {
 
-        // Arrange: build a real control instance from JSON
-        String json =
-        "[{"
-            + "\"control_group\": \"kInputHA\","
-            + "\"control_id\": 41,"
-            + "\"sub_control\": \"kHAPhantom\","
-            + "\"value\": 0,"
-            + "\"min_value\": 0,"
-            + "\"max_value\": 1,"
-            + "\"max_channels\" : 56,"
-            + "\"default_value\": 0,"
-            + "\"comment\": \"Off, On\","
-            + "\"key\": 266573250601,"
-            + "\"parameter_change_format\": ["
-            + "240, 67, \"1n\", 62, 17, 1, 0, 41, 0, 0, "
-            + "\"cc\", \"cc\", "
-            + "\"dd\", \"dd\", \"dd\", \"dd\", \"dd\", "
-            + "247"
-            + "],"
-            + "\"parameter_request_format\": ["
-            + "240, 67, \"3n\", 62, 17, 1, 0, 41, 0, 0, "
-            + "\"cc\", \"cc\", "
-            + "247"
-            + "]"
-            + "}]";
-
-        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromString(json);
+        List<SysexMapping> mappings = FakeSysexMapping.fakeSysexMapping();
 
         CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
         ControlInstance instance = registry
@@ -99,30 +73,10 @@ public class GuiBroadcastListenerTest {
 
         GuiBroadcastListener listener = new GuiBroadcastListener(broadcaster, resolver);
 
-        // Build a tiny real mapping so ControlInstance is valid
-        String tinyJson =
-        "[{"
-        + "\"control_group\": \"TestGroup\","
-        + "\"control_id\": 1,"
-        + "\"sub_control\": \"TestSub\","
-        + "\"value\": 0,"
-        + "\"min_value\": 0,"
-        + "\"max_value\": 127,"
-        + "\"max_channels\": 1,"
-        + "\"default_value\": 0,"
-        + "\"comment\": \"\","
-        + "\"key\": 12345,"
-        + "\"parameter_change_format\": [240, 0, 0, 0, \"dd\", 247],"
-        + "\"parameter_request_format\": [240, 0, 0, 0, 247]"
-        + "}]";
+        List<SysexMapping> mappings = FakeSysexMapping.fakeSysexMapping();
+        CanonicalRegistry tinyRegistry = new CanonicalRegistry(mappings, new SysexParser(mappings));
 
-        List<SysexMapping> tinyMappings = SysexMappingLoader.loadMappingsFromString(tinyJson);
-        CanonicalRegistry tinyRegistry = new CanonicalRegistry(tinyMappings, new SysexParser(tinyMappings));
-
-        ControlInstance fake = tinyRegistry
-        .getGroups().get("TestGroup")
-        .getSubcontrols().get("TestSub")
-        .getInstances().get(0);
+        ControlInstance fake = tinyRegistry.getGroup("kInputHA").getSubcontrol("kHAPhantom").getInstances().get(0);
 
         listener.onControlChanged(fake, 55);
 

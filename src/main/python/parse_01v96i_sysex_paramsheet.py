@@ -47,18 +47,16 @@ def parse_01v96i_sysex(xls_path, output_json):
         if not fmt or len(fmt) < 8:
             continue
 
-        model = safe_int(fmt[3])
-        system_scope = safe_int(fmt[4])
-        control_group_val = safe_int(fmt[5])
-        sub_control_val = safe_int(fmt[6])
-        param = safe_int(fmt[7])
+        model = safe_int(fmt[4])
+        group = safe_int(fmt[5])
+        addressA = safe_int(fmt[6])
+        addressB = safe_int(fmt[7])
 
         key = (
-            (model << 32)
-            | (system_scope << 24)
-            | (control_group_val << 16)
-            | (sub_control_val << 8)
-            | param
+            (model << 24)   |
+            (group << 16)   |
+            (addressA << 8) |
+            addressB
         )
         
         priority = compute_priority(sub_control)
@@ -74,6 +72,8 @@ def parse_01v96i_sysex(xls_path, output_json):
             "default_value": default_value if default_value is not None else None,
             "comment": comment,
             "key": key,  # precomputed long key
+            "address_bytes": [4,5,6,7],
+            "index_bytes": [8],
             "parameter_change_format": change_fmt,
             "parameter_request_format": request_fmt,
             "priority":priority
@@ -83,7 +83,7 @@ def parse_01v96i_sysex(xls_path, output_json):
     with open(output_json, "w") as f:
         json.dump(mappings, f, indent=2)
 
-    print(f"Parsed {len(mappings)} unique control type mappings into {output_json}")
+    print(f"Parsed {len(mappings)} mappings (including synthetic meter blocks) into {output_json}")
 
 def compute_priority(sub_control: str) -> int:
     sc = sub_control.lower()
