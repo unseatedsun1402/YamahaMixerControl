@@ -128,15 +128,11 @@ public class CanonicalRegistry implements SourceAllInstances {
 
         int index = mapping.extractIndex(message);
 
-        // BEFORE the get() call:
-        if (index < 0 || index >= sc.getInstances().size()) {
-            // Let the test throw naturally:
-            return sc.getInstances().get(index); // this will throw
+        if (index < 0 || index >= mapping.getMax_Channels()) {
+            return null;
         }
 
-        ControlInstance ci = sc.getInstances().get(index);
-
-        return ci;
+        return sc.getInstances().get(index);
     }
 
     public ControlInstance resolveNrpn(int msb, int lsb) {

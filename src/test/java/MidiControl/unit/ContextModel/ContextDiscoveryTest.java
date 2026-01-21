@@ -34,6 +34,8 @@ public class ContextDiscoveryTest {
                 "\"default_value\": 0," +
                 "\"comment\": \"PRM TABLE #03\"," +
                 "\"key\": 12345," +
+                "\"address_bytes\": [0],"+
+                "\"index_bytes\": [0],"+
                 "\"parameter_change_format\": [240,67,\"1n\",62,17,1,0,50,0,0,\"cc\",\"cc\",\"dd\",\"dd\",\"dd\",\"dd\",\"dd\",247]," +
                 "\"parameter_request_format\": [240,67,\"3n\",62,17,1,0,50,0,0,\"cc\",\"cc\",247]" +
             "}]";
@@ -68,6 +70,8 @@ public class ContextDiscoveryTest {
                 "\"default_value\": 0," +
                 "\"comment\": \"PRM TABLE #05-2\"," +
                 "\"key\": 268418753282," +
+                "\"address_bytes\": [4,5,6,7],"+
+                "\"index_bytes\": [8],"+
                 "\"parameter_change_format\": [240,67,\"1n\",62,127,1,35,2,\"cc\",\"dd\",\"dd\",\"dd\",\"dd\",247]," +
                 "\"parameter_request_format\": [240,67,\"3n\",62,127,1,35,2,\"cc\",247]" +
             "}" +
@@ -101,6 +105,8 @@ public class ContextDiscoveryTest {
                 "\"default_value\": 0," +
                 "\"comment\": \"PRM TABLE #03\"," +
                 "\"key\": 266573250628," +
+                "\"address_bytes\": [4,5,6,7,8,9],"+
+                "\"index_bytes\": [10,11],"+
                 "\"parameter_change_format\": [240,67,\"1n\",62,17,1,0,68,0,5,\"cc\",\"cc\",\"dd\",\"dd\",\"dd\",\"dd\",\"dd\",247]," +
                 "\"parameter_request_format\": [240,67,\"3n\",62,17,1,0,68,0,5,\"cc\",\"cc\",247]" +
             "}" +

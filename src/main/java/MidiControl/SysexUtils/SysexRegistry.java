@@ -1,9 +1,7 @@
 package MidiControl.SysexUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 public class SysexRegistry {
@@ -11,66 +9,91 @@ public class SysexRegistry {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private final List<SysexMapping> mappings;
-    private final Map<Integer, Map<Long, List<SysexMapping>>> modelTables = new HashMap<>();
+    private final int[] addressBytes;
 
     public SysexRegistry(List<SysexMapping> mappings) {
         this.mappings = mappings;
-        buildModelTables(mappings);
-        pushToNative(mappings);
-    }
-
-    public record NativeSysexEntry(long key, int index) {}
-
-    private void buildModelTables(List<SysexMapping> mappings) {
-        for (SysexMapping m : mappings) {
-            long key = m.getKey();
-            int model = (int) (key >>> 32);
-
-            modelTables
-                .computeIfAbsent(model, k -> new HashMap<>())
-                .computeIfAbsent(key, k -> new ArrayList<>())
-                .add(m);
-        }
+        this.addressBytes = determineAddressBytes(mappings);
+        pushToNative(mappings, addressBytes);
     }
 
     public List<SysexMapping> getMappings() {
         return mappings;
     }
 
-    /**
-     * Java-only resolver
-     */
+    // Determine global address_bytes for this desk
+    // Handles nulls and enforces consistency
+    private int[] determineAddressBytes(List<SysexMapping> mappings) {
+        int[] first = null;
+
+        for (SysexMapping m : mappings) {
+            int[] addr = m.getAddressBytes();
+
+            // Skip mappings that don't define address_bytes (e.g. synthetic)
+            if (addr == null || addr.length == 0) {
+                continue;
+            }
+
+            if (first == null) {
+                first = addr;
+            } else if (!Arrays.equals(first, addr)) {
+                throw new IllegalStateException(
+                    "Mixed-desk mappings detected: address_bytes differ between mappings"
+                );
+            }
+        }
+
+        if (first == null) {
+            throw new IllegalStateException(
+                "No address_bytes metadata found in any mapping"
+            );
+        }
+
+        return first;
+    }
+
+    // Java slow resolver (metadata-driven)
     public SysexMapping resolve(byte[] msg) {
         if (msg.length < 10) return null;
         if (msg[0] != (byte) 0xF0) return null;
         if (msg[1] != (byte) 0x43) return null;
         if (msg[msg.length - 1] != (byte) 0xF7) return null;
 
-        int model        = msg[3] & 0xFF;
-        int scope        = msg[4] & 0xFF;
-        int controlGroup = msg[5] & 0xFF;
-        int subControl   = msg[6] & 0xFF;
-        int param        = msg[7] & 0xFF;
+        long key = computeKey(msg);
+        logger.fine("Computed key: "+Long.toString(key));
 
-        long key =
-            ((long) model << 32) |
-            ((long) scope << 24) |
-            ((long) controlGroup << 16) |
-            ((long) subControl << 8) |
-            (long) param;
+        for (SysexMapping m : mappings) {
+            if (key == m.getKey()) {
+                if (computeIndex(msg, m) != -1) {
+                return m;
+                }
+            }
+        }
 
-        Map<Long, List<SysexMapping>> table = modelTables.get(model);
-        if (table == null) return null;
-
-        List<SysexMapping> candidates = table.get(key);
-        if (candidates == null || candidates.isEmpty()) return null;
-
-        return candidates.get(0);
+        return null;
     }
 
+    private long computeKey(byte[] msg) {
+        long key = 0;
+        for (int b : addressBytes) {
+            key = (key << 8) | (msg[b] & 0x7F);
+        }
+        return key;
+    }
+
+    private int computeIndex(byte[] msg, SysexMapping m) {
+        int index = 0;
+        for (int b : m.getIndexBytes()) {
+            index = (index << 7) | (msg[b] & 0x7F);
+        }
+        if (index <= m.getMax_Channels()){return index;}
+        return -1;
+    }
+
+    // Native fast resolver
     public SysexMapping resolveFast(byte[] msg) {
         if (!NativeSysex.isNativeAvailable()) {
-            logger.warning("Native C method is unavailable for Sysex Resolve");
+            logger.warning("Native C method unavailable, falling back to Java resolver");
             return null;
         }
 
@@ -82,9 +105,10 @@ public class SysexRegistry {
         return mappings.get(index);
     }
 
-    private void pushToNative(List<SysexMapping> mappings) {
+    // Push metadata + lookup table to native resolver
+    private void pushToNative(List<SysexMapping> mappings, int[] addressBytes) {
         if (!NativeSysex.isNativeAvailable()) {
-            logger.warning("Native C method is unavailable for to update lookup");
+            logger.warning("Native C method unavailable, cannot update lookup");
             return;
         }
 
@@ -96,6 +120,6 @@ public class SysexRegistry {
             indexes[i] = i;
         }
 
-        NativeSysex.updateMappings(keys, indexes);
+        NativeSysex.updateMappings(keys, indexes, addressBytes);
     }
 }

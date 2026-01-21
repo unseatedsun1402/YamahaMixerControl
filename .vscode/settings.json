@@ -13,5 +13,6 @@
     "log-tail.logsPath": [
         "/home/dev/main/log/12-02-2024.log",
         "/home/qa/main/log/12-02-2024.log",
-    ]
+    ],
+    "C_Cpp.errorSquiggles": "enabled"
 }

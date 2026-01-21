@@ -17,6 +17,9 @@ def summarize_sysex(json_path):
 
     default_values = []
 
+    # Track key collisions
+    key_map = defaultdict(list)
+
     for entry in data:
         total_controls += 1
 
@@ -25,6 +28,10 @@ def summarize_sysex(json_path):
 
         group_counts[group_name] += 1
         subcontrol_counts[(group_name, sub_control)] += 1
+
+        # Track keys
+        key = entry.get("key")
+        key_map[key].append(entry)
 
         # Collect numeric stats
         if entry.get("default_value") is not None:
@@ -49,9 +56,7 @@ def summarize_sysex(json_path):
         print(f"  {group}: {count} controls")
 
     print("\nTop 5 largest sub-controls:")
-    for (group, sub), count in sorted(subcontrol_counts.items(), key=lambda x: -x[1])[
-        :5
-    ]:
+    for (group, sub), count in sorted(subcontrol_counts.items(), key=lambda x: -x[1])[:5]:
         print(f"  {group}/{sub}: {count} channels")
 
     print("\nMissing values:")
@@ -65,18 +70,31 @@ def summarize_sysex(json_path):
         print(f"  Min: {min(default_values)}")
         print(f"  Max: {max(default_values)}")
 
-    # --- Optional sanity check: print samples from top groups ---
-    top_groups = sorted(group_counts.items(), key=lambda x: -x[1])[:5]
-    top_group_names = {g for g, _ in top_groups}
+    # --- Key collision detection ---
+    collisions = {k: v for k, v in key_map.items() if len(v) > 1}
 
-    for entry in data:
-        if entry["control_group"] in top_group_names:
-            print(f"\nSample entry for group {entry['control_group']}:")
-            print(json.dumps(entry, indent=2))
-            top_group_names.remove(entry["control_group"])
-            if not top_group_names:
-                break
+    print("\n=== Key Collision Check ===")
+    if not collisions:
+        print("No key collisions detected.")
+    else:
+        print(f"Found {len(collisions)} keys with collisions:")
+        for key, entries in collisions.items():
+            print(f"\nKey {key} is shared by {len(entries)} entries:")
+            for e in entries:
+                print(f"  - {e.get('control_group')} / {e.get('sub_control')}")
+
+    # --- Optional sanity check: print samples from top groups ---
+    # top_groups = sorted(group_counts.items(), key=lambda x: -x[1])[:5]
+    # top_group_names = {g for g, _ in top_groups}
+
+    # for entry in data:
+    #     if entry["control_group"] in top_group_names:
+    #         print(f"\nSample entry for group {entry['control_group']}:")
+    #         print(json.dumps(entry, indent=2))
+    #         top_group_names.remove(entry["control_group"])
+    #         if not top_group_names:
+    #             break
 
 
 # Example usage
-summarize_sysex("m7cl_sysex_mappings.json")
+summarize_sysex("01v96i_sysex_mappings.json")

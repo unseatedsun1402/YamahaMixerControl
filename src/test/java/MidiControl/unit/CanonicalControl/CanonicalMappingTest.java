@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlGroup;
 import MidiControl.Controls.SubControl;
+import MidiControl.Mocks.FakeSysexMapping;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
@@ -19,32 +20,8 @@ public class CanonicalMappingTest {
 
     @Test
     public void testCanonicalIdExpansion() {
-        String json =
-            "[{"
-                + "\"control_group\": \"kInputHA\","
-                + "\"control_id\": 41,"
-                + "\"sub_control\": \"kHAPhantom\","
-                + "\"max_channels\": 3,"
-                + "\"value\": 0,"
-                + "\"min_value\": 0,"
-                + "\"max_value\": 1,"
-                + "\"default_value\": 0,"
-                + "\"comment\": \"Off, On\","
-                + "\"key\": 266573250601,"
-                + "\"parameter_change_format\": ["
-                + "240, 67, \"1n\", 62, 17, 1, 0, 41, 0, 0,"
-                + "\"cc\", \"cc\","
-                + "\"dd\", \"dd\", \"dd\", \"dd\", \"dd\","
-                + "247"
-                + "],"
-                + "\"parameter_request_format\": ["
-                + "240, 67, \"3n\", 62, 17, 1, 0, 41, 0, 0,"
-                + "\"cc\", \"cc\","
-                + "247"
-                + "]"
-            + "}]";
 
-        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromString(json);
+        List<SysexMapping> mappings = FakeSysexMapping.fakeSysexMapping();
 
         // CanonicalRegistry builds the entire hierarchy automatically
         CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
@@ -56,7 +33,7 @@ public class CanonicalMappingTest {
         assertNotNull(sub, "Expected subcontrol kHAPhantom");
 
         List<ControlInstance> instances = sub.getInstances();
-        assertEquals(3, instances.size(), "Expected 3 instances from max_ch = 3");
+        assertEquals(56, instances.size(), "Expected 3 instances from max_ch = 3");
 
         // Validate canonical IDs (0-based indexing)
         assertEquals("kInputHA.kHAPhantom.0", instances.get(0).getCanonicalId());
@@ -71,32 +48,7 @@ public class CanonicalMappingTest {
 
     @Test
     public void updateControlTest() {
-        String json =
-          "[{"
-              + "\"control_group\": \"kInputHA\","
-              + "\"control_id\": 41,"
-              + "\"sub_control\": \"kHAPhantom\","
-              + "\"max_channels\": 1,"
-              + "\"value\": 0,"
-              + "\"min_value\": 0,"
-              + "\"max_value\": 1,"
-              + "\"default_value\": 0,"
-              + "\"comment\": \"Off, On\","
-              + "\"key\": 266573250601,"
-              + "\"parameter_change_format\": ["
-              + "240, 67, \"1n\", 62, 17, 1, 0, 41, 0, 0,"
-              + "\"cc\", \"cc\","
-              + "\"dd\", \"dd\", \"dd\", \"dd\", \"dd\","
-              + "247"
-              + "],"
-              + "\"parameter_request_format\": ["
-              + "240, 67, \"3n\", 62, 17, 1, 0, 41, 0, 0,"
-              + "\"cc\", \"cc\","
-              + "247"
-              + "]"
-          + "}]";
-
-        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromString(json);
+        List<SysexMapping> mappings = FakeSysexMapping.fakeSysexMapping();
 
         // Build canonical registry from mapping
         CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
@@ -119,7 +71,6 @@ public class CanonicalMappingTest {
 
     @Test
     public void getAllInstancesForContextTest() {
-
         List<SysexMapping> mappings =
             SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
 

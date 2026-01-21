@@ -11,6 +11,7 @@ import javax.sound.midi.ShortMessage;
 import org.junit.jupiter.api.Test;
 
 import MidiControl.SyncSend;
+import MidiControl.Mocks.FakeSysexMapping;
 import MidiControl.Mocks.MockMidiIOManager;
 import MidiControl.Mocks.MockMidiOut;
 import MidiControl.Mocks.MockMidiServer;
@@ -18,13 +19,12 @@ import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.SysexUtils.SysexParser;
 import MidiControl.SysexUtils.SysexMapping;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SyncSendTest {
 
     private CanonicalRegistry makeMinimalRegistry() {
-        List<SysexMapping> sysex = new ArrayList<>();
+        List<SysexMapping> sysex = FakeSysexMapping.fakeSysexMapping();
         SysexParser parser = new SysexParser(sysex);
         return new CanonicalRegistry(sysex, parser);
     }

@@ -18,7 +18,7 @@ public class SysexParser {
         SysexMapping fast = registry.resolveFast(message);
 
         if (fast != null) {
-            logger.info("[FAST] " + fast.getControlGroup() + " " + fast.getSubControl());
+            // logger.fine("[FAST] " + fast.getControlGroup() + " " + fast.getSubControl());
             return fast;
         }
 
@@ -26,7 +26,7 @@ public class SysexParser {
         SysexMapping slow = registry.resolve(message);
 
         if (slow != null) {
-            logger.info("[SLOW] " + slow.getControlGroup() + " " + slow.getSubControl());
+            // logger.fine("[SLOW] " + slow.getControlGroup() + " " + slow.getSubControl());
             return slow;
         }
 

@@ -20,6 +20,8 @@ public class ContextFactoryTest {
                 sub,
                 0,
                 0L,
+                new int[]{0},
+                new int[]{0},
                 min,
                 min,
                 max,

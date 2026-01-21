@@ -21,3 +21,4 @@ build/libs/YamahaMixerControl.war
 src/main/webapp/qrcodes
 ParamChangeList_V350_M7CL.xls
 01v96iParamChangeList.xls
+*.log

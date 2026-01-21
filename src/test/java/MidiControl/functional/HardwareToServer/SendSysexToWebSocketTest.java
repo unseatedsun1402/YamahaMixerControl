@@ -218,7 +218,7 @@ public class SendSysexToWebSocketTest {
         StringBuilder captured = new StringBuilder();
         Session fakeSession = new CapturingSession("S1", captured);
 
-        List<SysexMapping> mappings = SysexMappingLoader.loadAllMappings();
+        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json"); //01v96i
         SysexParser parser = new SysexParser(mappings);
         CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
 

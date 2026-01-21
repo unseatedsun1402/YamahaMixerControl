@@ -23,6 +23,6 @@ public final class NativeSysex {
         return nativeAvailable;
     }
 
-    public static native void updateMappings(long[] keys, int[] indexes);
+    public static native void updateMappings(long[] keys, int[] indexes, int[] address_bytes);
     public static native int resolve(byte[] msg);
 }

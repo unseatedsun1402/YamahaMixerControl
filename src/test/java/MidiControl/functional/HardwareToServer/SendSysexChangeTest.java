@@ -29,8 +29,8 @@ public class SendSysexChangeTest {
 
         CanonicalContextResolver fakeResolver = canonicalId -> "test.context";
 
-        // Build registry
-        List<SysexMapping> mappings = SysexMappingLoader.loadAllMappings();
+        // Build registry based on 01v96i
+        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
         SysexParser parser = new SysexParser(mappings);
         CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
 

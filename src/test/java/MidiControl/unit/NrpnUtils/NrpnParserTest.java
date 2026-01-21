@@ -6,6 +6,7 @@ import MidiControl.ControlServer.CanonicalInputEvent;
 import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
+import MidiControl.Mocks.FakeSysexMapping;
 import MidiControl.NrpnUtils.NrpnMapping;
 import MidiControl.NrpnUtils.NrpnParser;
 import MidiControl.NrpnUtils.NrpnRegistry;
@@ -31,32 +32,7 @@ public class NrpnParserTest {
      * so we don't manually mutate internal collections.
      */
     private CanonicalRegistry buildTestRegistry(NrpnRegistry nrpnRegistry) {
-        String json =
-            "[{"
-                + "\"control_group\": \"test\","
-                + "\"control_id\": 1,"
-                + "\"sub_control\": \"group\","
-                + "\"max_channels\": 1,"
-                + "\"value\": 0,"
-                + "\"min_value\": 0,"
-                + "\"max_value\": 16383,"
-                + "\"default_value\": 0,"
-                + "\"comment\": \"Test NRPN target\","
-                + "\"key\": 1234567890,"
-                + "\"parameter_change_format\": ["
-                + "240, 67, \"1n\", 62, 17, 1, 0, 1, 0, 0,"
-                + "\"cc\","
-                + "\"dd\", \"dd\","
-                + "247"
-                + "],"
-                + "\"parameter_request_format\": ["
-                + "240, 67, \"3n\", 62, 17, 1, 0, 1, 0, 0,"
-                + "\"cc\","
-                + "247"
-                + "]"
-            + "}]";
-
-        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromString(json);
+        List<SysexMapping> mappings = FakeSysexMapping.fakeSysexMapping();
 
         // CanonicalRegistry builds groups/subcontrols/instances from Sysex mappings
         CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
@@ -72,7 +48,7 @@ public class NrpnParserTest {
 
         // MSB=1, LSB=0 → canonical ID must match what buildTestRegistry creates
         // control_group = "test", sub_control = "group", index 0 → "test.group.0"
-        NrpnMapping mapping = new NrpnMapping("1", "0", "test.group.0");
+        NrpnMapping mapping = new NrpnMapping("1", "0", "kInputHA.kHAPhantom.0");
 
         reg.replace(List.of(mapping));
         return reg;
@@ -94,7 +70,7 @@ public class NrpnParserTest {
         // Ensure NRPN resolves to a canonical control instance
         ControlInstance resolved = registry.resolveNrpn(1, 0);
         assertNotNull(resolved);
-        assertEquals("test.group.0", resolved.getCanonicalId());
+        assertEquals("kInputHA.kHAPhantom.0", resolved.getCanonicalId());
     }
 
     @Test
