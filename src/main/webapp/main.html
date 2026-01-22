@@ -10,7 +10,7 @@
         import { WebSocketClient } from './js/websocketClient.js';
         import { renderUiModel } from './js/new-ui-renderer.js';
         import { applyControlUpdate } from './js/partial-update.js';
-
+        
         console.log(">>> MidiControl UI bootstrap running <<<");
 
         // Build WebSocket URL
@@ -21,20 +21,20 @@
         const ws = new WebSocketClient(wsUrl);
 
         ws.on("connected", () => {
-            console.log("[Bootstrap] Connected — requesting bank.inputs…");
+            console.info("[Bootstrap] Connected — requesting bank.inputs…");
             ws.requestBank("bank.inputs");
         });
 
         // 1. Receive the bank structure
         ws.on("ui-bank", (bank) => {
-            console.log("[Bootstrap] Bank received:", bank);
+            console.info("[Bootstrap] Bank received:", bank);
 
             const stripContainer = document.getElementById("strip-container");
             stripContainer.innerHTML = "";
 
             // Request + subscribe to each context
             for (const ctxId of bank.contexts) {
-                console.log(`[Bootstrap] Requesting model for ${ctxId}`);
+                console.info(`[Bootstrap] Requesting model for ${ctxId}`);
                 ws.requestUiModel(ctxId, "basic-input-view");
                 ws.subscribe(ctxId);
             }
@@ -42,13 +42,13 @@
 
         // 2. Receive each full UI model
         ws.on("ui-model", (model) => {
-            console.log("[Bootstrap] UI model received:", model);
+            console.debug("[Bootstrap] UI model received:", model);
             renderUiModel(model);
         });
 
         // 3. Receive incremental updates
         ws.on("control-update", (payload) => {
-            console.log("[Bootstrap] Control update:", payload);
+            console.debug("[Bootstrap] Control update:", payload);
             applyControlUpdate(payload);
         });
 
@@ -69,6 +69,7 @@
     <div id="ui-root">
         <div id="strip-container"></div>
     </div>
+
 </body>
 
 </html>

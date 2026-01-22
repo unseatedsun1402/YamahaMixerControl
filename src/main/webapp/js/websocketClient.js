@@ -11,6 +11,7 @@ export class WebSocketClient {
       "ui-model": [],
       "ui-bank": [],
       "control-update": [],
+      "meter-update": [],
       "error": [],
       "connected": [],
       "disconnected": [],
@@ -19,25 +20,25 @@ export class WebSocketClient {
 
     this.requestCounter = 0;
 
-    console.log("[WebSocketClient] Initialized with URL:", url);
+    console.info("[WebSocketClient] Initialized with URL:", url);
   }
 
   connect() {
-    console.log("[WebSocketClient] Connecting to:", this.url);
+    console.info("[WebSocketClient] Connecting to:", this.url);
     this.ws = new WebSocket(this.url);
 
     this.ws.onopen = () => {
-      console.log("[WebSocketClient] Connection opened");
+      console.info("[WebSocketClient] Connection opened");
       this._emit("connected");
     };
 
     this.ws.onclose = () => {
-      console.log("[WebSocketClient] Connection closed");
+      console.info("[WebSocketClient] Connection closed");
       this._emit("disconnected");
     };
 
     this.ws.onmessage = (event) => {
-      console.log("[WebSocketClient] Message received:", event.data);
+      if (debugFlag) {console.debug("[WebSocketClient] Message received:", event.data);}
       try {
         const msg = JSON.parse(event.data);
         this._routeMessage(msg);
@@ -58,7 +59,7 @@ export class WebSocketClient {
       throw new Error(`Unknown event type: ${type}`);
     }
     this.handlers[type].push(handler);
-    console.log(`[WebSocketClient] Handler registered for: ${type}`);
+    console.info(`[WebSocketClient] Handler registered for: ${type}`);
   }
 
   _emit(type, payload) {
@@ -71,7 +72,7 @@ export class WebSocketClient {
   // ------------------------------------------------------------
 
   _routeMessage(msg) {
-    console.log("[WebSocketClient] Routing message:", msg);
+    // console.debug("[WebSocketClient] Routing message:", msg);
 
     switch (msg.type) {
 
@@ -85,6 +86,10 @@ export class WebSocketClient {
 
       case "control-update":
         this._emit("control-update", msg.payload);
+        break;
+      
+      case "meter-update":
+        this._emit("meter-update", msg.payload);
         break;
 
       case "error":
@@ -100,7 +105,7 @@ export class WebSocketClient {
         break;
 
       default:
-        console.warn("[WebSocketClient] Unknown message type:", msg.type);
+        console.warn("[WebSocketClient] Unknown message type:", msg.JSON);
         this._emit("error", msg);
         break;
     }
@@ -116,7 +121,7 @@ export class WebSocketClient {
       payload: { contextId, uiType }
     };
 
-    console.log(`[WebSocketClient] Requesting UI model: context=${contextId}, uiType=${uiType}`);
+    console.info(`[WebSocketClient] Requesting UI model: context=${contextId}, uiType=${uiType}`);
     this.ws.send(JSON.stringify(message));
     return requestId;
   }
@@ -126,7 +131,7 @@ export class WebSocketClient {
         type: "get-ui-bank",
         payload: { bankId }
     };
-    console.log("[WebSocketClient] Requesting UI bank:", message);
+    console.info("[WebSocketClient] Requesting UI bank:", message);
     this.ws.send(JSON.stringify(message));
   }
 
@@ -135,7 +140,7 @@ export class WebSocketClient {
       type: "subscribe-context",
       payload: { contextId }
     };
-    console.log("[WebSocketClient] Sending subscribe request:", message);
+    console.info("[WebSocketClient] Sending subscribe request:", message);
     this.ws.send(JSON.stringify(message));
   }
 
@@ -144,7 +149,16 @@ export class WebSocketClient {
       type: "set-control-value",
       payload: { canonicalId, value }
     };
-    console.log("[WebSocketClient] Sending control change:", message);
+    if (debugFlag){console.debug("[WebSocketClient] Sending control change: ", message);}
+    this.ws.send(JSON.stringify(message));
+  }
+
+  sendMeterKeepAlive() {
+    const message = {
+      type: "meter-keep-alive",
+      payload: { "timestamp": Date.now() }
+    };
+    if (debugFlag){console.debug("[WebSocketClient] Sending meter keep alive: ");}
     this.ws.send(JSON.stringify(message));
   }
 
@@ -154,7 +168,7 @@ export class WebSocketClient {
       requestId: `req-${++this.requestCounter}`,
       payload: {}
     };
-    console.log("[WebSocketClient] Requesting MIDI devices:", message);
+    console.info("[WebSocketClient] Requesting MIDI devices:", message);
     this.ws.send(JSON.stringify(message));
   }
 
@@ -164,7 +178,7 @@ export class WebSocketClient {
       requestId: `req-${++this.requestCounter}`,
       payload: settings
     };
-    console.log("[WebSocketClient] Applying MIDI settings:", message);
+    console.info("[WebSocketClient] Applying MIDI settings:", message);
     this.ws.send(JSON.stringify(message));
   }
 }

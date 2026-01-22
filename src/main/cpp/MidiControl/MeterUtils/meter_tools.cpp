@@ -1,118 +1,152 @@
+
+// MeterTools.cpp
+// Native JNI implementation for MidiControl.UserInterface.Meter.MeterTools
+// Exports:
+//   long convertSingle(byte[] raw, int bytesPer)
+//   void convertBlock(byte[] raw, int bytesPer, long[] out)
+
 #include <jni.h>
 #include <cstdint>
 #include <cstddef>
+#include <cmath>
+#include <climits>
 
-// 7‑bit Yamaha LS9/M7CL meter ->  dB lookup
+//
+// 7‑bit Yamaha meter law lookup (shared for all mixers with 1‑byte meters)
+//
+static const float YAMAHA_7BIT_DB[128] = {
+    -95,-94,-93,-92,-91,-90,-89,-89,
+    -88,-87,-86,-85,-84,-83,-82,-81,
+    -80,-79,-78,-78,-77,-76,-75,-74,
+    -73,-73,-72,-72,-71,-70,-69,-68,
+    -67,-67,-66,-65,-64,-63,-62,-62,
+    -61,-60,-59,-58,-57,-56,-55,-55,
+    -54,-53,-52,-51,-50,-50,-49,-48,
+    -48,-47,-46,-45,-44,-43,-42,-42,
+    -41,-40,-39,-38,-37,-36,-35,-34,
+    -33,-32,-31,-30,-29,-28,-27,-26,
+    -25,-24,-23,-22,-21,-20,-19,-18,
+    -17,-16,-15,-14,-13,-12,-11,-10,
+    -9,-8,-7,-6,-5,-4,-3,-2,
+    -1,0,1,2,3,4,5,6
+};
 
-float meterValueToDb(uint8_t value) {
-    static const float lookupTable[128] = {
-        -95.0f, -94.0f, -93.0f, -92.0f, -91.0f, -90.0f, -89.0f, -89.0f,
-        -88.0f, -87.0f, -86.0f, -85.0f, -84.0f, -83.0f, -82.0f, -81.0f,
-        -80.0f, -79.0f, -78.0f, -78.0f, -77.0f, -76.0f, -75.0f, -74.0f,
-        -73.0f, -73.0f, -72.0f, -72.0f, -71.0f, -70.0f, -69.0f, -68.0f,
-        -67.0f, -67.0f, -66.0f, -65.0f, -64.0f, -63.0f, -62.0f, -62.0f,
-        -61.0f, -60.0f, -59.0f, -58.0f, -57.0f, -56.0f, -55.0f, -55.0f,
-        -54.0f, -53.0f, -52.0f, -51.0f, -50.0f, -50.0f, -49.0f, -48.0f,
-        -48.0f, -47.0f, -46.0f, -45.0f, -44.0f, -43.0f, -42.0f, -42.0f,
-        -41.0f, -40.0f, -39.0f, -38.0f, -37.0f, -36.0f, -35.0f, -34.0f,
-        -33.0f, -32.0f, -31.0f, -30.0f, -29.0f, -28.0f, -27.0f, -26.0f,
-        -25.0f, -24.0f, -23.0f, -22.0f, -21.0f, -20.0f, -19.0f, -18.0f,
-        -17.0f, -16.0f, -15.0f, -14.0f, -13.0f, -12.0f, -11.0f, -10.0f,
-        -9.0f,  -8.0f,  -7.0f,  -6.0f,  -5.0f,  -4.0f,  -3.0f,  -2.0f,
-        -1.0f,   0.0f,   1.0f,   2.0f,   3.0f,   4.0f,   5.0f,   6.0f
-    };
-
-    return (value < 128) ? lookupTable[value] : -999.0f;
+static inline long db7_to_centi(uint8_t v) {
+    if (v >= 112) v = 111;
+    float db = YAMAHA_7BIT_DB[v];
+    return (long)std::llround(db * 100.0);
 }
 
-// Normalisation (14‑bit -> 7‑bit)
-
-inline uint8_t normalise14(uint16_t value) {
-    return static_cast<uint8_t>(value >> 7);
+//
+// Helpers for 2×7‑bit Yamaha values (01V96 etc.)
+//
+static inline uint16_t raw14_from_two7(const uint8_t* b) {
+    return (uint16_t)(((b[0] & 0x7F) << 7) | (b[1] & 0x7F));
 }
 
-// Single‑value conversion
+//
+// Correct 14‑bit → 7‑bit normalisation for 01V96
+// Range: 0..4368 = usable
+// 0x1FFF = clip
+//
+static inline uint8_t normalise14(uint16_t v14) {
+    if (v14 >= 0x1FFF)  // clip flag
+        return 127;
 
-float resolveMeterDb(uint16_t rawValue, bool needsNormalisation) {
-    uint8_t meterValue = needsNormalisation
-        ? normalise14(rawValue)
-        : static_cast<uint8_t>(rawValue);
+    if (v14 > 4368)
+        v14 = 4368;
 
-    return meterValueToDb(meterValue);
+    float scaled = (float)v14 * (127.0f / 4368.0f);
+    if (scaled < 0) scaled = 0;
+    if (scaled > 127) scaled = 127;
+
+    return (uint8_t)(scaled);
 }
 
-// JNI wrapper for single‑value conversion
-extern "C" JNIEXPORT jfloat JNICALL
-Java_MidiControl_MeterUtils_MeterTools_meterDb(
-    JNIEnv*, jclass, jint rawValue, jboolean normalise
-) {
-    return resolveMeterDb(
-        static_cast<uint16_t>(rawValue),
-        normalise == JNI_TRUE
-    );
-}
-
-// Block processors
-
-// 7‑bit block: raw[i] = 0–127
-void processMeterBlock7(const uint8_t* raw, size_t count, float* outDb) {
-    for (size_t i = 0; i < count; i++) {
-        outDb[i] = meterValueToDb(raw[i]);
-    }
-}
-
-// 14‑bit block: raw = [ll, hh, ll, hh, ...]
-void processMeterBlock14(const uint8_t* raw, size_t count, float* outDb) {
-    for (size_t i = 0; i < count; i++) {
-        uint16_t value = (raw[i * 2 + 1] << 7) | raw[i * 2];
-        uint8_t norm = normalise14(value);
-        outDb[i] = meterValueToDb(norm);
-    }
-}
-
-// JNI wrappers for block conversions
-
-// 7‑bit block JNI
-extern "C" JNIEXPORT void JNICALL
-Java_MidiControl_MeterUtils_MeterTools_processMeterBlock7(
+//
+// JNI: convert a single meter value
+//
+extern "C" JNIEXPORT jlong JNICALL
+Java_MidiControl_UserInterface_Meter_MeterTools_convertSingle(
     JNIEnv* env, jclass,
     jbyteArray rawArray,
-    jfloatArray outArray
+    jint bytesPer
 ) {
-    jsize count = env->GetArrayLength(rawArray);
+    if (!rawArray || bytesPer < 1 || bytesPer > 2)
+        return LONG_MIN;
+
+    jsize len = env->GetArrayLength(rawArray);
+    if (len < bytesPer)
+        return LONG_MIN;
 
     jbyte* rawPtr = env->GetByteArrayElements(rawArray, nullptr);
-    jfloat* outPtr = env->GetFloatArrayElements(outArray, nullptr);
+    if (!rawPtr)
+        return LONG_MIN;
 
-    processMeterBlock7(
-        reinterpret_cast<uint8_t*>(rawPtr),
-        static_cast<size_t>(count),
-        outPtr
-    );
+    const uint8_t* raw = reinterpret_cast<const uint8_t*>(rawPtr);
+    long result = LONG_MIN;
+
+    if (bytesPer == 1) {
+        result = db7_to_centi(raw[0] & 0x7F);
+    } else {
+        uint16_t v14 = raw14_from_two7(raw);
+        uint8_t v7 = normalise14(v14);
+        result = db7_to_centi(v7);
+    }
 
     env->ReleaseByteArrayElements(rawArray, rawPtr, JNI_ABORT);
-    env->ReleaseFloatArrayElements(outArray, outPtr, 0);
+    return result;
 }
 
-// 14‑bit block JNI
+//
+// JNI: convert a block of meter values
+//
 extern "C" JNIEXPORT void JNICALL
-Java_MidiControl_MeterUtils_MeterTools_processMeterBlock14(
+Java_MidiControl_UserInterface_Meter_MeterTools_convertBlock(
     JNIEnv* env, jclass,
     jbyteArray rawArray,
-    jfloatArray outArray
+    jint bytesPer,
+    jlongArray outArray
 ) {
+    if (!rawArray || !outArray || bytesPer < 1 || bytesPer > 2)
+        return;
+
     jsize byteCount = env->GetArrayLength(rawArray);
-    size_t meterCount = byteCount / 2;
+    if (byteCount <= 0)
+        return;
+
+    jsize count = byteCount / bytesPer;
+    jsize outLen = env->GetArrayLength(outArray);
+    if (outLen < count)
+        count = outLen;
 
     jbyte* rawPtr = env->GetByteArrayElements(rawArray, nullptr);
-    jfloat* outPtr = env->GetFloatArrayElements(outArray, nullptr);
+    if (!rawPtr)
+        return;
 
-    processMeterBlock14(
-        reinterpret_cast<uint8_t*>(rawPtr),
-        meterCount,
-        outPtr
-    );
+    jlong* outPtr = env->GetLongArrayElements(outArray, nullptr);
+    if (!outPtr) {
+        env->ReleaseByteArrayElements(rawArray, rawPtr, JNI_ABORT);
+        return;
+    }
+
+    const uint8_t* raw = reinterpret_cast<const uint8_t*>(rawPtr);
+
+    for (jsize i = 0; i < count; ++i) {
+        const uint8_t* p = raw + (i * bytesPer);
+        long val;
+
+        if (bytesPer == 1) {
+            val = db7_to_centi(p[0] & 0x7F);
+        } else {
+            uint16_t v14 = raw14_from_two7(p);
+            uint8_t v7 = normalise14(v14);
+            val = db7_to_centi(v7);
+        }
+
+        outPtr[i] = (jlong)val;
+    }
 
     env->ReleaseByteArrayElements(rawArray, rawPtr, JNI_ABORT);
-    env->ReleaseFloatArrayElements(outArray, outPtr, 0);
+    env->ReleaseLongArrayElements(outArray, outPtr, 0);
 }

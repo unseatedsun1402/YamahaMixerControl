@@ -1,13 +1,17 @@
 package MidiControl.TestUtilities;
 
+import java.util.ArrayList;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import MidiControl.MidiInputReceiver;
 import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Server.MidiProcessingLoop;
 import MidiControl.Server.MidiServer;
+import MidiControl.SysexUtils.SysexParser;
+import MidiControl.UserInterface.Meter.MeterRequest;
 
 public class MidiDebugMain {
     public static void main(String[] args) throws Exception {
@@ -18,11 +22,12 @@ public class MidiDebugMain {
         Logger root = Logger.getLogger("");
         root.setLevel(Level.FINE);
         for (Handler h : root.getHandlers()) {
-            h.setLevel(Level.INFO);
+            h.setLevel(Level.FINE);
         }
 
         // server.getCanonicalRegistry().enableDebug();
         // HardwareInputHandler.enableDebug();
+        MidiInputReceiver.enableDebug();
         // MidiProcessingLoop.enableDebug();
 
         System.out.println("Available devices:");
@@ -35,10 +40,18 @@ public class MidiDebugMain {
         io.trySetInputDevice(13); // example
 
         server.run(); // <-- REQUIRED for input + SyncSend
-        server.RehydrateSever();
+        Thread.sleep(50);
+
+        // server.RehydrateSever();
+        MeterRequest request = (new MeterRequest(0, 0x1A, 0x0,0x2));
+        request.setChannelCount(5);
+        request.setStartChannel(14);
+        byte[] requestArray = request.toByteArray();
+        System.out.println("Requesting "+ SysexParser.bytesToHex(requestArray).toString());
+        server.getMidiDeviceManager().getMidiOut().sendMessage( requestArray );
 
         System.out.println("Listening for MIDI input...");
-        Thread.sleep(Long.MAX_VALUE);
+        Thread.sleep(60);
     }
 }
 

@@ -63,6 +63,10 @@ public class SubscriptionManager {
         return contextToSessions.getOrDefault(contextId, Set.of());
     }
 
+    public Set<Session> getAllSessions(){
+        return sessionToContexts.keySet();
+    }
+
     public void broadcastControlUpdate(String canonicalId, int value) {
         // Determine contextId from canonicalId
         // Example: "kInputFader.kFader.1" → "kInputFader"

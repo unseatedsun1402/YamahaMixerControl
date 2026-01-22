@@ -8,7 +8,6 @@ import MidiControl.ContextModel.BankContext;
 import MidiControl.ContextModel.BankFilter;
 import MidiControl.ContextModel.Context;
 import MidiControl.ContextModel.ContextDiscoveryEngine;
-import MidiControl.ContextModel.ContextFactory;
 import MidiControl.ContextModel.ContextType;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Server.MidiServer;

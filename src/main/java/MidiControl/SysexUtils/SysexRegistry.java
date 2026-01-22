@@ -93,7 +93,7 @@ public class SysexRegistry {
     // Native fast resolver
     public SysexMapping resolveFast(byte[] msg) {
         if (!NativeSysex.isNativeAvailable()) {
-            logger.warning("Native C method unavailable, falling back to Java resolver");
+            logger.fine("Native C method unavailable, falling back to Java resolver");
             return null;
         }
 

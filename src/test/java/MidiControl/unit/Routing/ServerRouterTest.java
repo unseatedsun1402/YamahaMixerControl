@@ -1,14 +1,20 @@
 package MidiControl.unit.Routing;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 
 import MidiControl.MidiDeviceManager.MidiDeviceDTO;
+import MidiControl.MidiDeviceManager.MidiInput;
+import MidiControl.MidiDeviceManager.MidiOutput;
 import MidiControl.Mocks.FakeSession;
+import MidiControl.Mocks.MockMidiDevice;
 import MidiControl.Mocks.MockMidiIOManager;
+import MidiControl.Mocks.MockMidiOut;
 import MidiControl.Mocks.MockMidiServer;
 import MidiControl.Mocks.MockSubscriptionManager;
 import MidiControl.Server.ServerRouter;
@@ -20,6 +26,10 @@ import MidiControl.UserInterface.UiModelService;
 import MidiControl.UserInterface.DTO.UiModelDTO;
 
 import java.util.List;
+
+import javax.sound.midi.MidiDevice.Info;
+import javax.sound.midi.MidiMessage;
+import javax.sound.midi.Receiver;
 
 public class ServerRouterTest {
 
@@ -215,5 +225,37 @@ public class ServerRouterTest {
         assertNotNull(msg, "Router did not send ui-model response");
         assertTrue(msg.contains("\"type\":\"ui-model\""), msg);
         assertTrue(msg.contains("\"contextId\":\"ch1\""), msg);
+    }
+
+    @Test
+    void testUpdateSettingChangesMappings() {
+        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
+        assertNotNull(registry.getGroup("kAUXToMatrix"));
+        assertNull(registry.getGroup("kMixToMatrix"));
+
+        MockMidiServer server = new MockMidiServer(registry);
+        MockMidiIOManager io = new MockMidiIOManager(server);
+        server.setMockIo(io);
+
+        ServerRouter router = new ServerRouter(
+            new MockUiModelService(),
+            new MockSubscriptionManager(),
+            registry,
+            io
+        );
+
+        System.out.println("Old Size: "+server.getCanonicalRegistry().getAllInstances().size());
+        FakeSession session = new FakeSession("1");
+
+        router.handleMessage(session, """
+            {"type": "apply-midi-settings", "requestId": "req-1", "payload": {"inputDeviceId":0,"outputDeviceId":0,"consoleType":"YAMAHA_M7CL"}}
+        """);
+
+        System.out.println("New Size: "+server.getCanonicalRegistry().getAllInstances().size());
+
+        //m7cl will have controls that 01v96 has not and vice versa
+        assertNull(registry.getGroup("kAUXToMatrix"));
+        assertNotNull(registry.getGroup("kMixToMatrix"));
     }
 }

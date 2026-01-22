@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.Controls.SourceAllInstances;
 import MidiControl.Routing.OutputRequestSender;
+import MidiControl.SysexUtils.SysexParser;
+import MidiControl.UserInterface.Meter.MeterRequest;
 
 public class RehydrationManager {
 
@@ -138,7 +140,7 @@ public class RehydrationManager {
     private void checkTimeout(String canonicalId) {
         if (pending.containsKey(canonicalId)) {
             pending.remove(canonicalId);
-            logger.warning("Rehydration timeout for " + canonicalId);
+            logger.fine("Rehydration timeout for " + canonicalId);
         }
     }
 
@@ -149,5 +151,14 @@ public class RehydrationManager {
     public void clearPending() {
         pending.clear();
     }
+
+	public void requestMeters() {
+        MeterRequest request = (new MeterRequest(0, 0x1A, 0x0,0x0));
+        request.setChannelCount(24);
+        request.setStartChannel(0);
+        byte[] requestArray = request.toByteArray();
+        System.out.println("Requesting "+ SysexParser.bytesToHex(requestArray).toString());
+        outputRouter.send( requestArray );
+	}
 
 }

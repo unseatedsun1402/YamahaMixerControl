@@ -9,11 +9,16 @@ import javax.sound.midi.Receiver;
 /** Receives incoming MIDI messages and puts them into a buffer for processing. */
 public class MidiInputReceiver implements Receiver {
   private final ConcurrentLinkedQueue<MidiMessage> inputBuffer;
+  private static boolean DEBUG = false;
   private volatile boolean open = true;
-  private Logger logger = Logger.getLogger(getClass().getName());
+  private static Logger logger = Logger.getLogger(MidiInputReceiver.class.getName());
 
   public MidiInputReceiver(ConcurrentLinkedQueue<MidiMessage> inputBuffer) {
     this.inputBuffer = inputBuffer;
+  }
+
+  public static void enableDebug(){
+    DEBUG=true;
   }
 
   @Override
@@ -27,8 +32,8 @@ public class MidiInputReceiver implements Receiver {
       logger.warning("MidiMessage is null");
       return;
     }
-    if (open) inputBuffer.add(message);
-    logger.fine("Added to inputBuffer: " + SysexParser.bytesToHex(message.getMessage()));
+    if (open) {inputBuffer.add(message);}
+    if(DEBUG) {logger.fine("Added to inputBuffer: " + SysexParser.bytesToHex(message.getMessage()));}
   }
 
   public Boolean isOpen() {
