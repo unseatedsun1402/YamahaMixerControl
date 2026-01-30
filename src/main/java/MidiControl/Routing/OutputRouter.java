@@ -115,4 +115,9 @@ public class OutputRouter implements OutputRequestSender{
         }
         return sb.toString().trim();
     }
+
+    @Override
+    public void send(byte[] message) {
+        this.ioManager.sendAsync(message);
+    }
 }

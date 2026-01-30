@@ -93,7 +93,6 @@ export function renderKnob(control) {
 }
 
 export function updateKnob(el, rawValue) {
-    console.log("updateKnob called on:", el, "canonical:", el.dataset.canonicalId);
     const knob = el.querySelector(".rotary-knob");
     if (!knob) return;
 

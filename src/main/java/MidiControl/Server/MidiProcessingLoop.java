@@ -13,7 +13,7 @@ import MidiControl.SysexUtils.SysexParser;
 import MidiControl.UserInterface.Frontend.GuiBroadcastListener;
 
 public class MidiProcessingLoop implements Runnable {
-
+    private final int HEARTBEAT_INTERVAL= 9960; //ms
     private final ConcurrentLinkedQueue<MidiMessage> inputBuffer;
     private final HardwareInputHandler inputHandler;
     private final CanonicalRegistry canonicalRegistry;
@@ -52,8 +52,8 @@ public class MidiProcessingLoop implements Runnable {
             if (shutdownFlag){Thread.currentThread().interrupt(); continue;}
             processIncomingMidi();
 
-            if (System.currentTimeMillis() - lastHeartbeat > 5000) {
-                logger.info("Processing loop heartbeat: still alive");
+            if (System.currentTimeMillis() - lastHeartbeat > HEARTBEAT_INTERVAL) {
+                if(debug){logger.info("Processing loop heartbeat: still alive");}
                 lastHeartbeat = System.currentTimeMillis();
             }
 

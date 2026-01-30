@@ -28,6 +28,11 @@ class RehydrationManagerTest {
             this.lastRequestedId = canonicalId;
             this.callCount++;
         }
+
+        @Override
+        public void send(byte[] message) {
+            return;
+        }
     }
 
     static class FakeRegistry implements SourceAllInstances{

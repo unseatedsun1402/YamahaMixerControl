@@ -47,6 +47,11 @@ public class MockMidiIOManager extends MidiIOManager {
     }
 
     @Override
+    public boolean hasValidDevices(){
+        return true;
+    }
+
+    @Override
     public List<MidiDeviceDTO> listDeviceDTOs() {
         return devices;
     }

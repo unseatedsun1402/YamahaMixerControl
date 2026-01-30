@@ -20,7 +20,7 @@ public class CanonicalRegistry implements SourceAllInstances {
 
     private final Map<String, ControlGroup> groups = new HashMap<>();
     private final Map<String, ControlInstance> controlsById = new HashMap<>();
-    private final SysexParser sysexParser;
+    private SysexParser sysexParser;
     private static final Logger logger = Logger.getLogger(CanonicalRegistry.class.getName());
     private boolean debug = false;
 
@@ -215,15 +215,34 @@ public class CanonicalRegistry implements SourceAllInstances {
         }
     }
 
-public ControlInstance resolve(String string) {
-    if(!string.matches("^[A-Za-z0-9_]+\\.[A-Za-z0-9_]+\\.[0-9]+$")){return null;}
-    int index = Integer.parseInt(string.split("\\.")[2]);
-    if (index < 0)
-        return null;
+    public ControlInstance resolve(String string) {
+        if(!string.matches("^[A-Za-z0-9_]+\\.[A-Za-z0-9_]+\\.[0-9]+$")){return null;}
+        int index = Integer.parseInt(string.split("\\.")[2]);
+        if (index < 0)
+            return null;
 
-    ControlGroup group = this.getGroup(string.split("\\.")[0]);
-    SubControl subControl = group.getSubcontrol(string.split("\\.")[1]);
-    if(index < subControl.getInstances().size()){return subControl.getInstances().get(index);}
-    return null;
-}
+        ControlGroup group = this.getGroup(string.split("\\.")[0]);
+        SubControl subControl = group.getSubcontrol(string.split("\\.")[1]);
+        if(index < subControl.getInstances().size()){return subControl.getInstances().get(index);}
+        return null;
+    }
+
+
+    public void reloadMappings(List<SysexMapping> newMappings, SysexParser newParser) {
+        // Clear existing state
+        this.groups.clear();
+        this.controlsById.clear();
+
+        // Rebuild groups from new mappings
+        Map<String, ControlGroup> built = ControlFactory.fromSysexMappings(newMappings);
+        this.groups.putAll(built);
+
+        // Replace parser
+        // Note: sysexParser was final, so remove 'final' from its declaration
+        this.sysexParser = newParser;
+
+        // Re-index and attach listeners
+        indexControlsByCanonicalId();
+        attachBroadcastListeners();
+    }
 }

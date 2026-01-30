@@ -3,9 +3,12 @@ package MidiControl.functional.HardwareToServer;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
+import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.TestUtilities.MidiTestUtils;
 import MidiControl.UserInterface.Frontend.GuiBroadcaster;
+import MidiControl.UserInterface.Meter.MeterBroadcaster;
+import MidiControl.UserInterface.Meter.MeterDTO;
 import MidiControl.UserInterface.CanonicalContextResolver;
 import MidiControl.UserInterface.Frontend.GuiBroadcastListener;
 import MidiControl.Server.MidiServer;
@@ -58,6 +61,45 @@ public class SendSysexChangeTest {
         // Assertions
         assertFalse(broadcasts.isEmpty(), "Expected at least one broadcast message");
 
+        System.out.println("Broadcast JSON: " + broadcasts.get(0));
+    }
+
+    @Test
+    void testMeterBroadcast() throws Exception {
+
+        // Capture broadcast output
+        List<String> broadcasts = new ArrayList<>();
+        MeterBroadcaster fakeBroadcaster = new MeterBroadcaster(){
+            @Override public void onMeterUpdate(MidiControl.UserInterface.Meter.MeterDTO dto) {
+                broadcasts.add(dto.toJson());
+            }
+        };
+
+        // Build registry based on 01v96i
+        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
+        SysexParser parser = new SysexParser(mappings);
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
+
+        MidiServer server = new MidiServer(registry);
+
+        HardwareInputHandler.setMeterBroadcaster(fakeBroadcaster);
+
+        // F0 43 30 3E 1A 21 00 02 0E 00 05 F7
+        // Fake incoming sysex
+        byte[] faderMsg = {
+            (byte) 0xF0, (byte) 0x43, (byte) 0x10, (byte) 0x3E,
+            (byte) 0x1A, (byte) 0x21, (byte) 0x00, (byte) 0x0,
+            (byte) 0x0, (byte) 0x00,(byte) 0x14, (byte) 0xF7
+        };
+
+        SysexMessage msg = MidiTestUtils.createSysexMessage(faderMsg);
+
+        // Feed into server
+        server.addtoinputqueue(msg);
+        server.processIncomingMidiForTest();
+
+        // Assertions
+        assertFalse(broadcasts.isEmpty(), "Expected at least one broadcast message");
         System.out.println("Broadcast JSON: " + broadcasts.get(0));
     }
 }

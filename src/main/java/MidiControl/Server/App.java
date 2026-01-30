@@ -37,5 +37,10 @@ public class App {
         rehydrationManager.clearPending();
     }
 
+    public void requestMeters() {
+        logger.info("Requesting meter update");
+        rehydrationManager.requestMeters();
+    }
+
     // Other façade methods…
 }

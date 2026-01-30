@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Meter Panel</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/meter-style.css"/>
+    <script type="module">
+        import { WebSocketClient } from './js/websocketClient.js';
+        import { createFifteenSegmentMeter } from './js/widgets/meter.js';
+
+        console.log(">>> Meter Panel bootstrap running <<<");
+
+        const root = document.getElementById("meter-panel-root");
+        const meterWidgets = new Map();
+        const debugFlag = false;
+
+        // Build WebSocket URL
+        const contextPath = window.location.pathname.split('/')[1];
+        const wsUrl = `ws://${location.host}/${contextPath}/endpoint`;
+        const ws = new WebSocketClient(wsUrl);
+
+        ws.on("connected", () => {
+            console.info("[Meter Panel] Connected to server");
+
+            // Start keep-alive every 10 seconds
+            setInterval(() => {
+                ws.sendMeterKeepAlive();
+            }, 10_000);
+        });
+
+        ws.on("meter-update", (payload) => {
+            if (debugFlag){console.debug("[Meter Panel] Meter update:", payload);}
+            
+            const placeholder = document.getElementById("meter-placeholder");
+            if (placeholder) {
+                placeholder.remove();
+            }
+
+            const meterId = `${payload.category}-${payload.source}-${payload.offset}`;
+            let meterEl = meterWidgets.get(meterId);
+
+            if (!meterEl) {
+                meterEl = createFifteenSegmentMeter();
+                root.appendChild(meterEl);
+                meterWidgets.set(meterId, meterEl);
+            }
+
+            meterEl.update(payload.value, payload.dB, payload.is14Bit, payload.offset);
+        });
+
+        ws.connect();
+
+    </script>
+</head>
+<body>
+    <div id="meter-panel-root" class="meter-panel">
+        <div id="meter-placeholder">No meter data received yet…</div>
+    </div>
+</body>
+</html>

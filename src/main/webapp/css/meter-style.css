@@ -1,0 +1,72 @@
+.seven-segment-meter {
+    padding: 6px;
+    background: #000;
+    border-radius: 6px;
+    text-align: center;
+    min-width: 60px;
+}
+
+.seven-segment-display {
+    font-family: 'Digital-7 Mono', monospace;
+    font-size: 28px;
+    color: #0f0;
+}
+
+
+.fifteen-segment-meter {
+    display: flex;
+    flex-direction: column-reverse; /* bottom = low, top = high */
+    width: 20px;
+    gap: 2px;
+    margin: 0 10px;
+}
+
+.fifteen-segment-meter .segment {
+    width: 20px;
+    height: 6px;
+    background-color: #222; /* default off */
+    border-radius: 2px;
+}
+
+.meter-panel {
+    min-height: 200px;
+    border: 1px solid #888;
+    background: #1a1a1a;
+    padding: 10px;
+    font-family: sans-serif;
+}
+
+.meter-panel {
+    min-height: 200px;
+    border: 1px solid #888;
+    background: #1a1a1a;
+    padding: 10px;
+    font-family: sans-serif;
+
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end; /* bottom-align meters */
+    gap: 20px;
+}
+
+#meter-placeholder {
+    color: #ccc;
+    opacity: 0.7;
+    padding: 20px;
+    text-align: centre;
+}
+
+
+.meter-channel-label {
+    font-size: 10px;
+    text-align: center;
+    color: #aaa;
+}
+
+.meter-db-label {
+    font-size: 11px;
+    text-align: center;
+    color: #ccc;
+    margin-top: 2px;
+}
+

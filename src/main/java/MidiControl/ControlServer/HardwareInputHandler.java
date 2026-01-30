@@ -2,6 +2,8 @@ package MidiControl.ControlServer;
 
 import MidiControl.NrpnUtils.NrpnParser;
 import MidiControl.NrpnUtils.NrpnRegistry;
+import MidiControl.UserInterface.Meter.MeterBroadcaster;
+import MidiControl.UserInterface.Meter.MeterSimpleParser;
 import MidiControl.NrpnUtils.NrpnMessage;
 
 import javax.sound.midi.MidiMessage;
@@ -17,9 +19,19 @@ public class HardwareInputHandler {
     private final NrpnParser nrpnParser;
     private final NrpnRegistry nrpnRegistry;
     private static Boolean DEBUG = false;
+    private static MeterBroadcaster meterBroadcaster = new MeterBroadcaster();
+    
+    static {
+        MeterSimpleParser.addListener(meterBroadcaster);
+    }
 
     public static void enableDebug(){
         DEBUG = true;
+    }
+
+    public static MeterBroadcaster setMeterBroadcaster(MeterBroadcaster testHook){
+        MeterSimpleParser.addListener(testHook);
+        return meterBroadcaster = testHook;
     }
 
     public HardwareInputHandler(NrpnParser parser, NrpnRegistry registry) {
@@ -31,6 +43,11 @@ public class HardwareInputHandler {
 
         if (msg instanceof SysexMessage sysex) {
             byte[] full = sysex.getMessage();
+
+            if (isMeter(full)) {
+                MeterSimpleParser.parse(full);
+                return null;
+            }
 
             if (isYamahaHeartbeat(full)) {
                 if(DEBUG){logger.fine("Ignoring Yamaha heartbeat SysEx.");}
@@ -65,14 +82,21 @@ public class HardwareInputHandler {
         return null;
     }
 
+    private boolean isMeter(byte[] msg) {
+        if (msg == null || msg.length < 7) return false;
+        return (msg[0] & 0xFF) == 0xF0
+            && (msg[1] & 0xFF) == 0x43
+            && (msg[5] & 0xFF) == 0x21
+            && (msg[msg.length - 1] & 0xFF) == 0xF7;
+    }
+
     private boolean isYamahaHeartbeat(byte[] msg) {
         return msg.length == 7 &&
                 (msg[0] & 0xFF) == 0xF0 &&
                 (msg[1] & 0xFF) == 0x43 &&
                 (msg[2] & 0xF0) == 0x10 &&
                 (msg[3] & 0xF0) == 0x30 &&
-                (msg[4] & 0xFF) == 0x1A &&
                 (msg[5] & 0xFF) == 0x7F &&
-                (msg[6] & 0xFF) == 0xF7;
+                (msg[msg.length -1] & 0xFF) == 0xF7;
     }
 }

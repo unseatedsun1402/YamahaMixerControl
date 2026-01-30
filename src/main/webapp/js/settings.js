@@ -17,14 +17,14 @@ wsClient.on("midi-device-list", (devices) => {
 });
 
 document.getElementById("apply-settings").addEventListener("click", () => {
-
   const inputDeviceId = parseInt(document.getElementById("midi-input-device").value, 10);
   const outputDeviceId = parseInt(document.getElementById("midi-output-device").value, 10);
+  const consoleType = document.getElementById("console-type").value;
 
   const settings = {
     inputDeviceId,
-    outputDeviceId
-
+    outputDeviceId,
+    consoleType // NEW: include console type
     // Future settings:
     // inputChannel: document.getElementById("input-channel").value,
     // outputChannel: parseInt(document.getElementById("output-channel").value, 10),

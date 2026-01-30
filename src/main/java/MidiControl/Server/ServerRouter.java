@@ -14,6 +14,10 @@ import MidiControl.MidiDeviceManager.MidiDeviceDTO;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Routing.OutputRouter;
 import MidiControl.Routing.WebSocketEndpoint;
+import MidiControl.SysexUtils.MappingFiles;
+import MidiControl.SysexUtils.SysexMapping;
+import MidiControl.SysexUtils.SysexMappingLoader;
+import MidiControl.SysexUtils.SysexParser;
 import MidiControl.UserInterface.UiModelService;
 import MidiControl.UserInterface.DTO.UiModelDTO;
 import jakarta.websocket.Session;
@@ -25,9 +29,11 @@ public class ServerRouter {
     private final SubscriptionManager subscriptions;
     private final GuiInputHandler guiInputHandler;
     private final OutputRouter outputRouter;
+    private final int TIMEOUT_MS = 10000;
+    private int lastKeepAlive = 0;
     private static final Logger logger = Logger.getLogger(ServerRouter.class.getName());
     private final MidiIOManager ioManager;
-    private final CanonicalRegistry registry;
+    private CanonicalRegistry registry;
     private App app;
 
     public ServerRouter(UiModelService uiModels,
@@ -63,8 +69,15 @@ public class ServerRouter {
             case "list-midi-devices" -> handleListMidiDevices(session, requestId);
             case "set-midi-device" -> handleSetMidiDevice(session, requestId, payload);
             case "apply-midi-settings" -> handleApplyMidiSettings(session, requestId, payload);
+            case "meter-keep-alive" -> handleMeterKeepAlive(session,requestId,payload);
             default -> sendError(session, requestId, "UNKNOWN_TYPE", "Unknown message type: " + type);
         }
+    }
+
+    private void handleMeterKeepAlive(Session session, String requestId, JsonObject payload) {
+        int messageTime = payload.get("timestamp").getAsInt();
+        if ((messageTime - lastKeepAlive) > TIMEOUT_MS){app.requestMeters();}
+        else{lastKeepAlive = messageTime;}
     }
 
     private void handleGetUiModel(Session session, String requestId, JsonObject payload) {
@@ -216,31 +229,28 @@ public class ServerRouter {
     }
 
     private void handleApplyMidiSettings(Session session, String requestId, JsonObject payload) {
-
         // --- Required settings (supported now) ---
+        logger.info("DEBUG - "+payload.toString());
         int newInput = payload.get("inputDeviceId").getAsInt();
         int newOutput = payload.get("outputDeviceId").getAsInt();
+        String mappingString = payload.get("consoleType").getAsString();
 
         // Apply output device
         boolean outOk = ioManager.trySetOutputDevice(newOutput);
 
         // Apply input device
         boolean inOk = ioManager.trySetInputDevice(newInput);
+        
+        List<SysexMapping> newMappings = SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(mappingString));
+        if (newMappings != null ){
+            this.registry.reloadMappings(newMappings, new SysexParser(newMappings));
+            logger.info("New registry loaded "+ mappingString);
+        } 
 
-        if (inOk && outOk) {
+        if (ioManager.hasValidDevices()) {
             if(app == null){logger.severe("App for rehydration is null - cannot rehydrate");}
             else { app.rehydrate(); }
         }
-
-        // --- Future settings (commented out for now) ---
-        // String inputChannel = payload.get("inputChannel").getAsString();
-        // int outputChannel = payload.get("outputChannel").getAsInt();
-        // boolean enableNRPN = payload.get("enableNRPN").getAsBoolean();
-        // boolean enableSYSEX = payload.get("enableSYSEX").getAsBoolean();
-        // boolean enableCC = payload.get("enableCC").getAsBoolean();
-        // boolean debugLogging = payload.get("debugLogging").getAsBoolean();
-        // boolean showRaw = payload.get("showRaw").getAsBoolean();
-        // boolean showCanonical = payload.get("showCanonical").getAsBoolean();
 
         // --- ACK ---
         JsonObject ack = new JsonObject();
@@ -248,7 +258,9 @@ public class ServerRouter {
         if (requestId != null) ack.addProperty("requestId", requestId);
 
         JsonObject p = new JsonObject();
-        p.addProperty("status", (inOk && outOk) ? "ok" : "error");
+        p.addProperty("type", "apply-settings");
+        p.addProperty("midi_status", (inOk && outOk) ? "ok" : "error");
+        p.addProperty("mapping_status", (newMappings != null ) ? "ok" : "error");
         ack.add("payload", p);
 
         WebSocketEndpoint.send(session, ack.toString());

@@ -1,22 +1,16 @@
 package MidiControl.functional.CanonicalRegistry;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import MidiControl.ControlServer.GuiInputHandler;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
-import MidiControl.MidiDeviceManager.MidiIOManager;
-import MidiControl.Mocks.MockMidiOut;
 import MidiControl.NrpnUtils.NrpnMapping;
 import MidiControl.NrpnUtils.NrpnMappingLoader;
-import MidiControl.Routing.OutputRouter;
-import MidiControl.Server.MidiServer;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;

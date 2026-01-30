@@ -38,7 +38,7 @@ public class SysexParser {
     public static String bytesToHex(byte[] message) {
         StringBuilder sb = new StringBuilder();
         for (byte b : message) {
-            sb.append(String.format("%02X", b));
+            sb.append(String.format("%02X ", b));
         }
         return sb.toString();
     }
