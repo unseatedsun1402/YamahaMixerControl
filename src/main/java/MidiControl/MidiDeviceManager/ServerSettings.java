@@ -12,12 +12,12 @@ import com.google.gson.JsonObject;
 
 import MidiControl.SysexUtils.MappingFiles;
 import MidiControl.SystemTools.ConfigDirectoryProvider;
-import jakarta.json.Json;
 
 public class ServerSettings implements Settings{
   private static Logger logger = Logger.getLogger(ServerSettings.class.getName());
   private static final String SETTINGS_DIR="MidiControl";
   private static final String savePath;
+  private static String cache = null;
   
   public int inputDeviceIndex;
   public String inputDeviceName;
@@ -42,6 +42,7 @@ public class ServerSettings implements Settings{
 
   @Override
   public String getSettings(){
+    if(cache != null){logger.info("Cache hit "+cache); return cache;}
     try (BufferedReader reader = new BufferedReader(new FileReader(savePath))){
       boolean reading = true;
       String settings="";
@@ -61,12 +62,16 @@ public class ServerSettings implements Settings{
   }
 
   public void loadSettings(){
-    String json = getSettings();
-    if (json == "empty"){
-      logger.warning("Loading settings to "+this.getClass().getName()+" failed");
-      return;
+    String json;
+    if(cache == null){json = getSettings();
+      if (json == "empty"){
+        logger.warning("Loading settings to "+this.getClass().getName()+" from disk failed");
+        return;
+      }
+      cache = json;
+      logger.info("Cache hit - load settings");
     }
-    JsonObject loadedSettings = new Gson().fromJson(json,JsonObject.class);
+    JsonObject loadedSettings = new Gson().fromJson(cache,JsonObject.class);
     this.inputDeviceIndex = loadedSettings.get("inputDeviceIndex").getAsInt();
     this.outputDeviceIndex = loadedSettings.get("outputDeviceIndex").getAsInt();
     this.inputDeviceName = loadedSettings.get("inputDeviceName").getAsString();
@@ -98,20 +103,25 @@ public class ServerSettings implements Settings{
   }
 
   public boolean saveSettings() {
-    logger.fine("Saving settings "+toJson());
+    String toSave = toJson();
+    logger.info("Saving settings "+toSave);
     if(consoleName == null){
+      logger.warning("Save setings failed - the settings are empty");
       return false;
     }
-    if(evalSettings(getSettings())){
+    if(evalSettings(toSave)){
       logger.info("Settings have the same data, nothing new to write");
       return true;
     }
+    logger.finer("cache miss - dumping: "+getSettings());
+    logger.info("cache miss - dumping: "+getSettings());
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(savePath))) {
-        writer.write(toJson());
+        writer.write(toSave);
     } catch (IOException e) {
-        System.err.println("An error occurred while writing to the settings file: " + e.getMessage());
+        logger.severe("An error occurred while writing to the settings file: " + e.getMessage());
         return false;
     }
+    cache = toSave;
     logger.info("Written new settings to: "+savePath);
     return true;
   }
@@ -132,8 +142,8 @@ public class ServerSettings implements Settings{
   public boolean evalSettings(String json) {
       try {
           Gson gson = new Gson();
-          JsonObject expected = gson.fromJson(this.toJson(), JsonObject.class);
-          JsonObject actual   = gson.fromJson(json, JsonObject.class);
+          JsonObject expected = gson.fromJson(json, JsonObject.class);          //evaluate
+          JsonObject actual   = gson.fromJson(getSettings(), JsonObject.class); //cache version
           expected.remove("timestamp");
           actual.remove("timestamp");
           return expected.equals(actual);
@@ -142,5 +152,10 @@ public class ServerSettings implements Settings{
         logger.warning("Json comparision check to see if current settings have changed has failed" + e);
         return false;
       }
+  }
+
+  public static void clearCache(){
+    cache = null;
+    logger.info("Cache cleared manually");
   }
 }
