@@ -181,4 +181,14 @@ export class WebSocketClient {
     console.info("[WebSocketClient] Applying MIDI settings:", message);
     this.ws.send(JSON.stringify(message));
   }
+
+    saveMidiSettings(settings) {
+    const message = {
+      type: "save-midi-settings",
+      requestId: `req-${++this.requestCounter}`,
+      payload: settings
+    };
+    console.info("[WebSocketClient] Applying MIDI settings:", message);
+    this.ws.send(JSON.stringify(message));
+  }
 }

@@ -88,9 +88,9 @@
                 </label>
 
                 <div class="toggle-row">
-                    <label><input type="checkbox" id="enable-nrpn"> Enable NRPN</label>
+                    <!-- <label><input type="checkbox" id="enable-nrpn"> Enable NRPN</label> -->
                     <label><input type="checkbox" id="enable-sysex"> Enable SYSEX</label>
-                    <label><input type="checkbox" id="enable-cc"> Enable CC</label>
+                    <!-- <label><input type="checkbox" id="enable-cc"> Enable CC</label> -->
                 </div>
             </section>
 
@@ -101,8 +101,6 @@
             <select id="console-type">
                 <option value="YAMAHA_01V96I">Yamaha_01V96i</option>
                 <option value="YAMAHA_M7CL">Yamaha_M7CL</option>
-                <!-- <option value="cl">Yamaha CL Series</option>
-                <option value="ls9">Yamaha LS9</option> -->
             </select>
         </label>
     </section>
@@ -110,16 +108,14 @@
             <!-- ADVANCED -->
             <section class="settings-card">
                 <h2>Advanced</h2>
-
                 <label><input type="checkbox" id="debug-logging"> Debug Logging</label>
-                <label><input type="checkbox" id="show-raw"> Show Raw MIDI</label>
                 <label><input type="checkbox" id="show-canonical"> Show Canonical Events</label>
-
                 <button id="reset-midi">Reset MIDI Engine</button>
             </section>
 
             <section class="settings-card">
                 <button id="apply-settings" class="apply-button">Apply Settings</button>
+                <button id="save-settings" class="apply-button">Save Settings</button>
             </section>
 
         </section>
@@ -129,8 +125,8 @@
 
             <!-- LIVE MONITOR -->
             <section class="settings-card monitor-card">
-                <h2>Live MIDI Monitor</h2>
-                <div id="midi-log" class="monitor-log"></div>
+                <h2>Live Event Monitor</h2>
+                <div id="event-log" class="monitor-log"></div>
             </section>
 
             <!-- CONTROL MAPPING TABLE -->

@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import MidiControl.MidiInputReceiver;
 import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.MidiDeviceManager.MidiIOManager;
+import MidiControl.MidiDeviceManager.ServerSettings;
 import MidiControl.Server.MidiProcessingLoop;
 import MidiControl.Server.MidiServer;
 import MidiControl.SysexUtils.SysexParser;
@@ -27,14 +28,14 @@ public class MidiDebugMain {
 
         // server.getCanonicalRegistry().enableDebug();
         // HardwareInputHandler.enableDebug();
-        MidiInputReceiver.enableDebug();
+        // MidiInputReceiver.enableDebug();
         // MidiProcessingLoop.enableDebug();
 
-        System.out.println("Available devices:");
-        var devices = io.listDeviceDTOs();
-        for (int i = 0; i < devices.size(); i++) {
-            System.out.println(i + ": " + devices.get(i).name);
-        }
+        // System.out.println("Available devices:");
+        // var devices = io.listDeviceDTOs();
+        // for (int i = 0; i < devices.size(); i++) {
+        //     System.out.println(i + ": " + devices.get(i).name);
+        // }
 
         io.trySetOutputDevice(4); // example
         io.trySetInputDevice(13); // example

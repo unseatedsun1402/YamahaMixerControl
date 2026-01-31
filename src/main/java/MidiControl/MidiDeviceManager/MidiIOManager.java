@@ -16,7 +16,6 @@ import javax.sound.midi.MidiUnavailableException;
 import MidiControl.Server.MidiServer;
 
 public class MidiIOManager {
-
     private MidiOutput midiOut;
     private MidiInput  midiIn;
     private int        outPort;
@@ -31,13 +30,20 @@ public class MidiIOManager {
     private static final long SEND_DELAY_MS = 2;
     private volatile boolean sendLoopRunning = false;
 
-
-
     public MidiIOManager(MidiServer server) {
         this.server = server;
+        //try to recover any valid settings
+        Settings settings = new ServerSettings();
+        boolean inOk = trySetInputDevice(settings.getInputDeviceIndex());
+        boolean outOk= trySetOutputDevice(settings.getOutputDeviceIndex());
+        if(inOk && outOk){
+            logger.info("Loaded previous midi ports from settings");
+        }
+        else{logger.warning("loading settings failed: "+settings.toJson());}
+        logger.info("MidiIOManger available");
     }
 
-    public MidiIOManager(){}
+    public MidiIOManager(){logger.info("MidiIOManger available for tests");}
 
     public void setInputDevice(int index) throws MidiUnavailableException {
         if (midiIn != null) {

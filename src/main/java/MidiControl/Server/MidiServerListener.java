@@ -17,15 +17,13 @@ public class MidiServerListener implements ServletContextListener {
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             CONTEXT = sce.getServletContext();
-
-            MidiServer server = new MidiServer();
-
-            server.run();
             Logger root = Logger.getLogger("");
             root.setLevel(Level.FINE);
             for (Handler h : root.getHandlers()) {
                 h.setLevel(Level.INFO);
             }
+            MidiServer server = new MidiServer();
+            server.run();
             CONTEXT.setAttribute("midiServer", server);
         }
 

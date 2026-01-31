@@ -50,4 +50,8 @@ public class BankCatalog {
     public Map<String, BankContext> getAllBanks() {
         return banks;
     }
+
+    public BankContext addBankContext(String key, BankContext toAdd){
+        return banks.putIfAbsent(key, toAdd);
+    }
 }
