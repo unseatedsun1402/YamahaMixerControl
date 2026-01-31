@@ -12,6 +12,8 @@ import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.MidiDeviceManager.MidiDeviceDTO;
 import MidiControl.MidiDeviceManager.MidiIOManager;
+import MidiControl.MidiDeviceManager.ServerSettings;
+import MidiControl.MidiDeviceManager.Settings;
 import MidiControl.Routing.OutputRouter;
 import MidiControl.Routing.WebSocketEndpoint;
 import MidiControl.SysexUtils.MappingFiles;
@@ -35,6 +37,7 @@ public class ServerRouter {
     private final MidiIOManager ioManager;
     private CanonicalRegistry registry;
     private App app;
+    private Settings serverSettings = new ServerSettings();
 
     public ServerRouter(UiModelService uiModels,
                         SubscriptionManager subscriptions,
@@ -69,6 +72,7 @@ public class ServerRouter {
             case "list-midi-devices" -> handleListMidiDevices(session, requestId);
             case "set-midi-device" -> handleSetMidiDevice(session, requestId, payload);
             case "apply-midi-settings" -> handleApplyMidiSettings(session, requestId, payload);
+            case "save-midi-settings" -> handleSaveMidiSettings(session, requestId, payload);
             case "meter-keep-alive" -> handleMeterKeepAlive(session,requestId,payload);
             default -> sendError(session, requestId, "UNKNOWN_TYPE", "Unknown message type: " + type);
         }
@@ -228,9 +232,8 @@ public class ServerRouter {
             logger.warning("Session[" + session.getId() + "] failed to select MIDI output device index " + index);
     }
 
-    private void handleApplyMidiSettings(Session session, String requestId, JsonObject payload) {
-        // --- Required settings (supported now) ---
-        logger.info("DEBUG - "+payload.toString());
+    private boolean handleApplyMidiSettings(Session session, String requestId, JsonObject payload) {
+        logger.info("Applying new settings "+payload.toString());
         int newInput = payload.get("inputDeviceId").getAsInt();
         int newOutput = payload.get("outputDeviceId").getAsInt();
         String mappingString = payload.get("consoleType").getAsString();
@@ -264,6 +267,25 @@ public class ServerRouter {
         ack.add("payload", p);
 
         WebSocketEndpoint.send(session, ack.toString());
+        return ( inOk && outOk && (newMappings != null) );
+    }
+
+    private void handleSaveMidiSettings(Session session, String requestId, JsonObject payload) {
+        // --- Required settings (supported now) ---
+        logger.info("Saving settings "+payload.toString());
+        int newInput = payload.get("inputDeviceId").getAsInt();
+        int newOutput = payload.get("outputDeviceId").getAsInt();
+        String consoleName = payload.get("consoleType").getAsString();
+
+        if(handleApplyMidiSettings(session, requestId, payload)){
+                serverSettings.newSettings(newInput,                // in index
+                ioManager.getMidiIn().getDeviceInfo().getName(),    // in name
+                newOutput,                                          // out index
+                ioManager.getMidiOut().getDeviceInfo().getName(),   // out name
+                consoleName);                                       // console name
+            serverSettings.saveSettings();
+        }
+        else{logger.warning("Failed to save settings, configuration not accepted: "+payload);}
     }
 
     public OutputRouter getOutputRouter() {

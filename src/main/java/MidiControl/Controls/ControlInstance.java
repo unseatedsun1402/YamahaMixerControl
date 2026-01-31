@@ -14,6 +14,7 @@ public class ControlInstance {
 
     private final SubControl parent;
     private final int index;
+    private static boolean debug = false;
 
     private final List<ControlListener> listeners = new ArrayList<>();
 
@@ -23,6 +24,10 @@ public class ControlInstance {
     private SysexMapping sysexMapping;
     private static Logger logger = Logger.getLogger(ControlInstance.class.getName());
     private int priority = 3;
+
+    public static void enableDebug(){
+        debug = true;
+    }
 
     public ControlInstance(SubControl parent,
                         int index,
@@ -57,7 +62,7 @@ public class ControlInstance {
 
     public void addListener(ControlListener listener) {
         listeners.add(listener);
-        logger.fine("Created a new listener" + listener.hashCode() + "for "+this.canonicalId);
+        if(debug){logger.finer("Created a new listener" + listener.hashCode() + "for "+this.canonicalId);}
     }
 
     public int extractValue(CanonicalInputEvent event) {

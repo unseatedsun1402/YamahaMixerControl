@@ -24,7 +24,7 @@ document.getElementById("apply-settings").addEventListener("click", () => {
   const settings = {
     inputDeviceId,
     outputDeviceId,
-    consoleType // NEW: include console type
+    consoleType
     // Future settings:
     // inputChannel: document.getElementById("input-channel").value,
     // outputChannel: parseInt(document.getElementById("output-channel").value, 10),
@@ -38,6 +38,21 @@ document.getElementById("apply-settings").addEventListener("click", () => {
 
   wsClient.applyMidiSettings(settings);
   showStatus("Settings applied");
+});
+
+document.getElementById("save-settings").addEventListener("click", () => {
+  const inputDeviceId = parseInt(document.getElementById("midi-input-device").value, 10);
+  const outputDeviceId = parseInt(document.getElementById("midi-output-device").value, 10);
+  const consoleType = document.getElementById("console-type").value;
+
+  const settings = {
+    inputDeviceId,
+    outputDeviceId,
+    consoleType
+  };
+
+  wsClient.saveMidiSettings(settings);
+  showStatus("Settings saved");
 });
 
 document.getElementById("rescan-devices").addEventListener("click", () => {
