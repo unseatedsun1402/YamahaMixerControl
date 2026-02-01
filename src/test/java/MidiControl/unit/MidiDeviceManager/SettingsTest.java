@@ -38,7 +38,6 @@ public class SettingsTest {
         settings.newSettings(mockInDeviceIndex, mockInDeviceName, mockOutDeviceIndex, mockOutDeviceName, testConsoleName);
 
         String getSettings = settings.toJson();
-        System.out.println(getSettings);
         Gson gson = new Gson();
         JsonObject parsedJson = gson.fromJson(getSettings, JsonObject.class);
 
@@ -52,12 +51,11 @@ public class SettingsTest {
 
     @Test
     public void testSaveWhenEmptyFails(){
+        ServerSettings.clearCache();
         File file = new File(ServerSettings.getSavePath());
-        if(file.exists()){file.delete();}
-        Settings settings = new ServerSettings();
-        assertInstanceOf(Settings.class, settings);
+        if(file.exists()){file.delete();System.out.println("file deleted "+file.getAbsolutePath());}
 
-        assertFalse(settings.saveSettings());
+        assertFalse(new ServerSettings().saveSettings());
     }
 
     @Test
