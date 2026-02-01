@@ -11,8 +11,9 @@ import java.util.logging.Logger;
 
 import MidiControl.Controls.ControlInstance;
 import MidiControl.Controls.SourceAllInstances;
+import MidiControl.MidiDeviceManager.ServerSettings;
 import MidiControl.Routing.OutputRequestSender;
-import MidiControl.SysexUtils.SysexParser;
+import MidiControl.SysexUtils.ModelNumbers;
 import MidiControl.UserInterface.Meter.MeterRequest;
 
 public class RehydrationManager {
@@ -24,6 +25,8 @@ public class RehydrationManager {
     private final Map<String, Long> pending = new ConcurrentHashMap<>();
     private static final long TIMEOUT_MS = 350;
     private static final Logger logger = Logger.getLogger(RehydrationManager.class.getName());
+    private static byte[] cachedMeterRequest = null;
+    private static byte cachedModelNumber;
 
     public RehydrationManager(OutputRequestSender outputRouter,
                               SourceAllInstances registry,
@@ -152,13 +155,29 @@ public class RehydrationManager {
         pending.clear();
     }
 
-	public void requestMeters() {
-        MeterRequest request = (new MeterRequest(0, 0x1A, 0x0,0x0));
-        request.setChannelCount(24);
+    public synchronized void requestMeters() {
+        byte checkModelNumber = ModelNumbers.getModelByteByString(
+                new ServerSettings().getConsoleName()
+        );
+
+        if (checkModelNumber < 0 || checkModelNumber > 127) {
+            logger.warning("Cannot make a request, the model number is invalid " + checkModelNumber);
+            return;
+        }
+
+        if (cachedMeterRequest == null || checkModelNumber != cachedModelNumber) {
+            cachedMeterRequest = buildRequestBytes(checkModelNumber).clone();
+        }
+
+        outputRouter.send(cachedMeterRequest);
+    }
+
+    private byte[] buildRequestBytes(byte modelNumber) {
+        cachedModelNumber = modelNumber;
+        MeterRequest request = new MeterRequest(0, modelNumber, 0x0, 0x0);
+        request.setChannelCount(32);
         request.setStartChannel(0);
-        byte[] requestArray = request.toByteArray();
-        System.out.println("Requesting "+ SysexParser.bytesToHex(requestArray).toString());
-        outputRouter.send( requestArray );
-	}
+        return request.toByteArray();
+    }
 
 }
