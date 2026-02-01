@@ -24,10 +24,15 @@
         ws.on("connected", () => {
             console.info("[Meter Panel] Connected to server");
 
-            // Start keep-alive every 10 seconds
-            setInterval(() => {
-                ws.sendMeterKeepAlive();
-            }, 10_000);
+            // Always send a keep-alive right away
+            ws.sendMeterKeepAlive();
+
+            // Start periodic keep-alives
+            if (!ws.keepAliveInterval) {
+                ws.keepAliveInterval = setInterval(() => {
+                    ws.sendMeterKeepAlive();
+                }, 10_000);
+            }
         });
 
         ws.on("meter-update", (payload) => {

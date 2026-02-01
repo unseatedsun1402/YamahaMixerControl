@@ -55,7 +55,8 @@ export function createSevenSegmentMeter() {
     wrapper.appendChild(dbLabel);
 
     wrapper.update = throttle((value, dB, offset) => {
-        channelLabel.textContent = `CH ${offset}`;
+        ch = offset+1;
+        channelLabel.textContent = `CH ${ch}`;
         display.textContent = value;
         dbLabel.textContent = `${dB} dB`;
 
