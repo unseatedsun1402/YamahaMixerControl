@@ -3,25 +3,20 @@ package MidiControl.UserInterface.Meter;
 
 import java.util.logging.Logger;
 
+import MidiControl.SystemTools.NativeLoader;
+
 public final class MeterTools {
     private static final Logger logger = Logger.getLogger(MeterTools.class.getName());
 
     private static final boolean nativeAvailable;
 
     static {
-        boolean ok = false;
-        try {
-            String dllPath =
-                "G:\\WorkingDir\\YamahaMixerControl\\src\\main\\cpp\\MidiControl\\"
-              + "MeterUtils\\native_meter_tools.dll";
-
-            System.load(dllPath);
-            logger.info("Loaded meter_tools native");
-            ok = true;
-        } catch (Throwable e) {
-            logger.severe("Failed to load native meter_tools DLL: " + e.getMessage());
+        nativeAvailable = NativeLoader.loadLibrary("native_meter_tools");
+        if (nativeAvailable) {
+            logger.info("Loaded native meter_tools");
+        } else {
+            logger.warning("Falling back to Java meter tools");
         }
-        nativeAvailable = ok;
     }
 
     private MeterTools() {}
@@ -97,10 +92,6 @@ public final class MeterTools {
         }
     }
 
-    /* -------------------------------------------
-       Public wrappers (now with automatic model detection)
-       ------------------------------------------- */
-
     public static long toCentiDb(byte[] raw, int bytesPer) {
         if (nativeAvailable) {
             try {
@@ -112,7 +103,6 @@ public final class MeterTools {
         return convertSingleJava(raw, bytesPer);
     }
 
-    /** NEW: auto-select bytesPer from model */
     public static long toCentiDb(byte[] raw, byte modelByte) {
         int bytesPer = bytesPerForModel(modelByte);
         return toCentiDb(raw, bytesPer);
@@ -137,14 +127,13 @@ public final class MeterTools {
         return out;
     }
 
-    /** NEW: auto-select bytesPer for block conversion */
     public static long[] toCentiDbBlock(byte[] raw, int modelByte, boolean auto) {
         int bytesPer = bytesPerForModel(modelByte);
         return toCentiDbBlock(raw, bytesPer);
     }
 
     /* -------------------------------------------
-       Formatting (unchanged)
+       Formatting
        ------------------------------------------- */
     public static String formatCentiDb(long centi) {
         if (centi == Long.MIN_VALUE) return "-inf dB";
