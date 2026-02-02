@@ -1,4 +1,3 @@
-
 console.log(">>> Meter.js LOADED <<<");
 
 function normaliseRawValue(raw, is14Bit) {
@@ -55,8 +54,7 @@ export function createSevenSegmentMeter() {
     wrapper.appendChild(dbLabel);
 
     wrapper.update = throttle((value, dB, offset) => {
-        ch = offset+1;
-        channelLabel.textContent = `CH ${ch}`;
+        channelLabel.textContent = `CH ${offset + 1}`;
         display.textContent = value;
         dbLabel.textContent = `${dB} dB`;
 
@@ -98,7 +96,7 @@ export function createFifteenSegmentMeter() {
 
     wrapper.update = throttle((rawValue, dB, is14Bit, offset) => {
 
-        channelLabel.textContent = `CH ${offset}`;
+        channelLabel.textContent = `CH ${offset + 1}`;
         dbLabel.textContent = `${dB} dB`;
 
         const level = normaliseRawValue(rawValue, is14Bit);
@@ -128,5 +126,3 @@ export function createFifteenSegmentMeter() {
 
     return wrapper;
 }
-
- 
