@@ -1,5 +1,6 @@
 package MidiControl.UserInterface.Meter;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import MidiControl.Routing.WebSocketEndpoint;
@@ -17,7 +18,7 @@ public class MeterBroadcaster implements MeterUpdateListener{
             if (DEBUG){logger.fine("Broadcasting update");}
             WebSocketEndpoint.broadcast(json);
         } catch (Exception e) {
-            logger.severe("Exception thrown broadcasting the update");
+            logger.log(Level.SEVERE, "Exception thrown broadcasting the update: " + json, e);
         }
     }
 

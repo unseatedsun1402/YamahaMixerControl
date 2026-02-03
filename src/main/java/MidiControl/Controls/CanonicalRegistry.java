@@ -1,13 +1,5 @@
 package MidiControl.Controls;
 
-import MidiControl.ControlServer.CanonicalInputEvent;
-import MidiControl.SysexUtils.SysexMapping;
-import MidiControl.SysexUtils.SysexParser;
-import MidiControl.NrpnUtils.NrpnMapping;
-
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.ShortMessage;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,11 +8,21 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.ShortMessage;
+
+import MidiControl.ControlServer.CanonicalInputEvent;
+import MidiControl.NrpnUtils.NrpnMapping;
+import MidiControl.SysexUtils.RegistryReloadListener;
+import MidiControl.SysexUtils.SysexMapping;
+import MidiControl.SysexUtils.SysexParser;
+
 public class CanonicalRegistry implements SourceAllInstances {
 
     private final Map<String, ControlGroup> groups = new HashMap<>();
     private final Map<String, ControlInstance> controlsById = new HashMap<>();
     private SysexParser sysexParser;
+    private final List<RegistryReloadListener> reloadListeners = new ArrayList<>();
     private static final Logger logger = Logger.getLogger(CanonicalRegistry.class.getName());
     private boolean debug = false;
 
@@ -108,12 +110,10 @@ public class CanonicalRegistry implements SourceAllInstances {
     public ControlInstance resolveSysex(byte[] message) throws MidiUnavailableException {
 
         SysexMapping mapping = sysexParser.processMidiMessage(message);
-        System.out.println("DEBUG: Mapping matched = " + (mapping == null ? "null" : mapping.getControlGroup() + "." + mapping.getSubControl()));
 
-        if (mapping == null) {
-            return null;
-        }
-
+        if(mapping==null){return null;}
+        
+        if(debug){logger.info("DEBUG: Mapping matched = " + (mapping == null ? "null" : mapping.getControlGroup() + "." + mapping.getSubControl()));}
         ControlGroup cg = groups.get(mapping.getControlGroup());
 
         if (cg == null) {
@@ -154,10 +154,6 @@ public class CanonicalRegistry implements SourceAllInstances {
     /**
      * Returns all ControlInstances that belong to a given context.
      * Example contextId: "channel.1", "channel.22"
-     *
-     * This method extracts the instance index from the context ID
-     * and returns every ControlInstance whose SubControl has an
-     * instance at that index.
      */
     public List<ControlInstance> getAllInstancesForContext(String contextId) {
         List<ControlInstance> result = new ArrayList<>();
@@ -193,8 +189,6 @@ public class CanonicalRegistry implements SourceAllInstances {
      * Extracts the numeric instance index from a context ID.
      * Examples:
      *   "channel.1"   → 1
-     *   "mix.12"      → 12
-     *   "matrix.3-4"  → 3
      */
     private int extractContextIndex(String contextId) {
         int dot = contextId.lastIndexOf('.');
@@ -229,20 +223,28 @@ public class CanonicalRegistry implements SourceAllInstances {
 
 
     public void reloadMappings(List<SysexMapping> newMappings, SysexParser newParser) {
-        // Clear existing state
         this.groups.clear();
         this.controlsById.clear();
 
-        // Rebuild groups from new mappings
         Map<String, ControlGroup> built = ControlFactory.fromSysexMappings(newMappings);
         this.groups.putAll(built);
 
-        // Replace parser
-        // Note: sysexParser was final, so remove 'final' from its declaration
         this.sysexParser = newParser;
 
-        // Re-index and attach listeners
         indexControlsByCanonicalId();
         attachBroadcastListeners();
+        notifyReloadListeners();
+    }
+
+    public void addReloadListener(RegistryReloadListener l) {
+        logger.info("Adding reload listener "+l.hashCode());
+        reloadListeners.add(l);
+    }
+
+    private void notifyReloadListeners() {
+        logger.info("Registry reloaded - notifying listeners");
+        for (RegistryReloadListener l : reloadListeners) {
+            l.onRegistryReloaded(this);
+        }
     }
 }

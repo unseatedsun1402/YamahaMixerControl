@@ -1,45 +1,48 @@
 package MidiControl.unit.Routing;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.MidiDeviceManager.MidiDeviceDTO;
-import MidiControl.MidiDeviceManager.MidiInput;
-import MidiControl.MidiDeviceManager.MidiOutput;
 import MidiControl.Mocks.FakeSession;
-import MidiControl.Mocks.MockMidiDevice;
 import MidiControl.Mocks.MockMidiIOManager;
-import MidiControl.Mocks.MockMidiOut;
 import MidiControl.Mocks.MockMidiServer;
 import MidiControl.Mocks.MockSubscriptionManager;
+import MidiControl.Routing.WebSocketEndpoint;
 import MidiControl.Server.ServerRouter;
-import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
 import MidiControl.UserInterface.UiModelService;
 import MidiControl.UserInterface.DTO.UiModelDTO;
 
-import java.util.List;
-
-import javax.sound.midi.MidiDevice.Info;
-import javax.sound.midi.MidiMessage;
-import javax.sound.midi.Receiver;
-
 public class ServerRouterTest {
+    
+    public static void awaitWebSocket(FakeSession session) {
+        for (int i = 0; i < 10 && session.lastSent == null; i++) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private CanonicalRegistry makeMinimalRegistry() {
-        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
+        List<SysexMapping> mappings =
+            SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
         SysexParser parser = new SysexParser(mappings);
         return new CanonicalRegistry(mappings, parser);
     }
 
-    // Minimal UiModelService stub for tests
+    // Minimal UiModelService stub
     private static class MockUiModelService implements UiModelService {
         @Override
         public UiModelDTO buildUiModel(String contextId, String uiType) {
@@ -73,8 +76,21 @@ public class ServerRouterTest {
         );
 
         env.session = new FakeSession("1");
+
+        // CRITICAL: Register FakeSession with WebSocketEndpoint (AsyncRemote ready)
+        WebSocketEndpoint endpoint = new WebSocketEndpoint();
+        endpoint.setServerForTests(env.server);
+        endpoint.onOpen(env.session);
+
+        // Also attach FakeSession’s AsyncRemote to router implicit send path
+        env.session.setRemoteSender(text -> env.session.lastSent = text);
+
         return env;
     }
+
+    // -------------------------------------------------------------------------
+    // TESTS
+    // -------------------------------------------------------------------------
 
     @Test
     void testSetControlValue() {
@@ -83,10 +99,9 @@ public class ServerRouterTest {
         env.router.handleMessage(env.session, """
             {"type":"set-control-value","payload":{"canonicalId":"fader1","value":77}}
         """);
-
+        awaitWebSocket(env.session);
         String msg = env.session.lastSent;
-        assertNotNull(msg, "Router did not send any response for set-control-value");
-        // Depending on your real implementation, adjust these contains() checks:
+        assertNotNull(msg);
         assertTrue(msg.contains("\"type\""), msg);
         assertTrue(msg.contains("\"status\""), msg);
     }
@@ -104,13 +119,14 @@ public class ServerRouterTest {
         d2.id = "1";
         d2.name = "DeviceB";
         env.io.devices.add(d2);
-
+        
         env.router.handleMessage(env.session, """
             {"type":"list-midi-devices","payload":{}}
         """);
 
+        awaitWebSocket(env.session);
         String msg = env.session.lastSent;
-        assertNotNull(msg, "Router did not send midi-device-list response");
+        assertNotNull(msg);
         assertTrue(msg.contains("DeviceA"), msg);
         assertTrue(msg.contains("DeviceB"), msg);
         assertTrue(msg.contains("\"type\":\"midi-device-list\""), msg);
@@ -120,14 +136,14 @@ public class ServerRouterTest {
     void testSetMidiDeviceSuccess() {
         Env env = makeEnv();
         env.io.setResult = true;
-
         env.router.handleMessage(env.session, """
             {"type":"set-midi-device","payload":{"deviceId":3}}
         """);
 
         assertEquals(3, env.io.lastSetIndex);
+        awaitWebSocket(env.session);
         String msg = env.session.lastSent;
-        assertNotNull(msg, "Router did not send response for set-midi-device");
+        assertNotNull(msg);
         assertTrue(msg.contains("\"status\":\"ok\""), msg);
     }
 
@@ -138,9 +154,9 @@ public class ServerRouterTest {
         env.router.handleMessage(env.session, """
             {"type":"does-not-exist","payload":{}}
         """);
-
+        awaitWebSocket(env.session);
         String msg = env.session.lastSent;
-        assertNotNull(msg, "Router did not send error response for unknown type");
+        assertNotNull(msg);
         assertTrue(msg.contains("\"type\":\"error\""), msg);
         assertTrue(msg.contains("UNKNOWN_TYPE"), msg);
     }
@@ -163,14 +179,19 @@ public class ServerRouterTest {
 
         FakeSession session = new FakeSession("1");
 
+        // Register FakeSession with endpoint
+        WebSocketEndpoint endpoint = new WebSocketEndpoint();
+        endpoint.setServerForTests(server);
+        endpoint.onOpen(session);
+
+        session.setRemoteSender(text -> session.lastSent = text);
         router.handleMessage(session, """
             {"type":"unsubscribe-context","payload":{"contextId":"eq1"}}
         """);
-
+        awaitWebSocket(session);
         assertEquals("eq1", subs.lastUnsubscribed);
-        String msg = session.lastSent;
-        assertNotNull(msg, "Router did not send response for unsubscribe-context");
-        assertTrue(msg.contains("\"status\":\"ok\""), msg);
+        assertNotNull(session.lastSent);
+        assertTrue(session.lastSent.contains("\"status\":\"ok\""));
     }
 
     @Test
@@ -191,14 +212,19 @@ public class ServerRouterTest {
 
         FakeSession session = new FakeSession("1");
 
+        WebSocketEndpoint endpoint = new WebSocketEndpoint();
+        endpoint.setServerForTests(server);
+        endpoint.onOpen(session);
+
+        session.setRemoteSender(text -> session.lastSent = text);
+
         router.handleMessage(session, """
             {"type":"subscribe-context","payload":{"contextId":"eq1"}}
         """);
 
         assertEquals("eq1", subs.lastSubscribed);
-        String msg = session.lastSent;
-        assertNotNull(msg, "Router did not send response for subscribe-context");
-        assertTrue(msg.contains("\"status\":\"ok\""), msg);
+        assertNotNull(session.lastSent);
+        assertTrue(session.lastSent.contains("\"status\":\"ok\""));
     }
 
     @Test
@@ -217,19 +243,26 @@ public class ServerRouterTest {
 
         FakeSession session = new FakeSession("1");
 
+        WebSocketEndpoint endpoint = new WebSocketEndpoint();
+        endpoint.setServerForTests(server);
+        endpoint.onOpen(session);
+
+        session.setRemoteSender(text -> session.lastSent = text);
+        
         router.handleMessage(session, """
             {"type":"get-ui-model","payload":{"contextId":"ch1"}}
         """);
-
-        String msg = session.lastSent;
-        assertNotNull(msg, "Router did not send ui-model response");
-        assertTrue(msg.contains("\"type\":\"ui-model\""), msg);
-        assertTrue(msg.contains("\"contextId\":\"ch1\""), msg);
+        awaitWebSocket(session);
+        assertNotNull(session.lastSent);
+        assertTrue(session.lastSent.contains("\"type\":\"ui-model\""), session.lastSent);
+        assertTrue(session.lastSent.contains("\"contextId\":\"ch1\""), session.lastSent);
     }
 
     @Test
     void testUpdateSettingChangesMappings() {
-        List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
+        List<SysexMapping> mappings =
+            SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
+
         CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
         assertNotNull(registry.getGroup("kAUXToMatrix"));
         assertNull(registry.getGroup("kMixToMatrix"));
@@ -245,16 +278,19 @@ public class ServerRouterTest {
             io
         );
 
-        System.out.println("Old Size: "+server.getCanonicalRegistry().getAllInstances().size());
         FakeSession session = new FakeSession("1");
 
+        WebSocketEndpoint endpoint = new WebSocketEndpoint();
+        endpoint.setServerForTests(server);
+        endpoint.onOpen(session);
+
+        session.setRemoteSender(text -> session.lastSent = text);
+
         router.handleMessage(session, """
-            {"type": "apply-midi-settings", "requestId": "req-1", "payload": {"inputDeviceId":0,"outputDeviceId":0,"consoleType":"YAMAHA_M7CL"}}
+            {"type":"apply-midi-settings","requestId":"req-1",
+             "payload":{"inputDeviceId":0,"outputDeviceId":0,"consoleType":"YAMAHA_M7CL"}}
         """);
 
-        System.out.println("New Size: "+server.getCanonicalRegistry().getAllInstances().size());
-
-        //m7cl will have controls that 01v96 has not and vice versa
         assertNull(registry.getGroup("kAUXToMatrix"));
         assertNotNull(registry.getGroup("kMixToMatrix"));
     }

@@ -1,26 +1,23 @@
 package MidiControl.ContextModel;
 
-import MidiControl.Controls.CanonicalRegistry;
-import MidiControl.Controls.ControlInstance;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import MidiControl.Controls.CanonicalRegistry;
+import MidiControl.Controls.ControlInstance;
+
 public class MixAuxBusViewBuilder implements ViewBuilder {
 
-    private final CanonicalRegistry registry;
 
-    public MixAuxBusViewBuilder(CanonicalRegistry registry) {
-        this.registry = registry;
-    }
+    public MixAuxBusViewBuilder() {}
 
     @Override
-    public List<ViewControl> build(Context context, CanonicalRegistry registry) {
-        return buildCompact(context);
+    public List<ViewControl> build(Context context, CanonicalRegistry registry, String suffix) {
+        return buildCompact(context, registry);
     }
 
-    public List<ViewControl> buildCompact(Context context) {
+    public List<ViewControl> buildCompact(Context context,CanonicalRegistry registry) {
         List<ViewControl> result = new ArrayList<>();
 
         if (!supports(context)) {

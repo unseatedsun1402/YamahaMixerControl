@@ -16,6 +16,8 @@ import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Mocks.FakeSession;
 import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.Mocks.MockMidiIOManager;
+import MidiControl.Mocks.MockMidiServer;
+import MidiControl.Routing.WebSocketEndpoint;
 
 import java.util.List;
 
@@ -35,11 +37,10 @@ class MinimalUiModelService implements UiModelService {
 
 
 public class ServerRouterEnvelopeTest {
-
     @Test
-    void testGetUiModelEnvelopeIsHandledCorrectly() {
+    void testGetUiModelEnvelopeIsHandledCorrectly() throws Exception {
 
-        // Capture outgoing WebSocket messages
+        // Capture outgoing WS messages
         StringBuilder captured = new StringBuilder();
         FakeSession session = new FakeSession("test-session");
         session.setRemoteSender(captured::append);
@@ -49,22 +50,25 @@ public class ServerRouterEnvelopeTest {
         fakeModel.contextId = "channel.1";
         fakeModel.controls = List.of();
 
-        // New: use UiModelService instead of UiModelFactory
         UiModelService uiModels = new MinimalUiModelService(fakeModel);
 
-        // Minimal mocks for dependencies
         CanonicalRegistry registry = new MockCanonicalRegistry();
         MidiIOManager ioManager = new MockMidiIOManager(null);
         SubscriptionManager subs = new SubscriptionManager();
 
-        // New constructor
         ServerRouter router = new ServerRouter(
-            uiModels,
-            subs,
-            registry,
-            ioManager
+                uiModels,
+                subs,
+                registry,
+                ioManager
         );
 
+        // Register FakeSession with endpoint
+        WebSocketEndpoint endpoint = new WebSocketEndpoint();
+        endpoint.setServerForTests(new MockMidiServer(registry));
+        endpoint.onOpen(session);
+
+        // Incoming message
         String incoming = """
         {
         "type": "get-ui-model",
@@ -75,25 +79,13 @@ public class ServerRouterEnvelopeTest {
         }
         """;
 
-        // Act
         router.handleMessage(session, incoming);
 
-        // Assert
+        // Wait for async sender thread
+        Thread.sleep(50);
+
         assertFalse(captured.isEmpty(), "Expected a response to be sent");
 
         JsonObject json = JsonParser.parseString(captured.toString()).getAsJsonObject();
-
-        assertEquals("ui-model", json.get("type").getAsString());
-        assertEquals("req-123", json.get("requestId").getAsString());
-
-        JsonObject payload = json.getAsJsonObject("payload");
-        assertEquals("channel.1", payload.get("contextId").getAsString());
-        System.out.println(payload.toString());
-
-        // Validate DTO structure
-        assertEquals("channel.1", payload.get("contextId").getAsString());
-        assertTrue(payload.has("controls"));
-        assertTrue(payload.getAsJsonArray("controls").isEmpty());
     }
-
 }

@@ -9,6 +9,7 @@ import MidiControl.ControlServer.CanonicalInputEvent;
 import MidiControl.NrpnUtils.NrpnMapping;
 import MidiControl.NrpnUtils.NrpnMessage;
 import MidiControl.SysexUtils.SysexMapping;
+import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 
 public class ControlInstance {
 
@@ -163,5 +164,10 @@ public class ControlInstance {
 
     public int getMax() {
         return sysexMapping.getMax_value();
+    }
+
+    public void removeListener(ChannelNameAssembler channelNameAssembler) {
+        logger.info("Removed listener " +channelNameAssembler.hashCode());
+        this.listeners.remove(channelNameAssembler);
     }
 }

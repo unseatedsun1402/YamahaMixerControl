@@ -30717,7 +30717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kDCAName",
@@ -30777,7 +30777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kIconDCA",
@@ -38817,7 +38817,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kNameInputChannel",
@@ -38877,7 +38877,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kIconInputChannel",
@@ -40197,7 +40197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kNameMixModule",
@@ -40257,7 +40257,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kNameMatrixModule",
@@ -40317,7 +40317,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kNameMatrixModule",
@@ -40377,7 +40377,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kNameStereoOutModule",
@@ -40437,7 +40437,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kNameStereoOutModule",
@@ -40497,7 +40497,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kIconMixChannel",
@@ -45297,7 +45297,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupPortNameAD",
@@ -45357,7 +45357,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupPortNameSlotIn",
@@ -45417,7 +45417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupPortNameSlotIn",
@@ -45477,7 +45477,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupPortNameSlotOut",
@@ -45537,7 +45537,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupPortNameSlotOut",
@@ -45597,7 +45597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupPortNameD2TrOut",
@@ -45657,7 +45657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupPortNameD2TrOut",
@@ -45717,7 +45717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupDIOParam",

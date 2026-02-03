@@ -1,14 +1,22 @@
 package MidiControl.functional.ContextModel;
 
-import MidiControl.ContextModel.*;
-import MidiControl.Controls.*;
-import MidiControl.SysexUtils.*;
-
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import MidiControl.ContextModel.Context;
+import MidiControl.ContextModel.ContextFactory;
+import MidiControl.ContextModel.InputChannelStripViewBuilder;
+import MidiControl.ContextModel.ViewBuilder;
+import MidiControl.ContextModel.ViewControl;
+import MidiControl.Controls.CanonicalRegistry;
+import MidiControl.SysexUtils.SysexMapping;
+import MidiControl.SysexUtils.SysexMappingLoader;
+import MidiControl.SysexUtils.SysexParser;
 
 public class ContextFactoryTest {
 
@@ -28,8 +36,8 @@ public class ContextFactoryTest {
         assertEquals("channel.1", ctx.getId());
 
         // Build compact view
-        ViewBuilder builder = new InputChannelStripViewBuilder(registry);
-        List<ViewControl> controls = builder.build(ctx, registry);
+        ViewBuilder builder = new InputChannelStripViewBuilder();
+        List<ViewControl> controls = builder.build(ctx, registry, null);
 
         assertFalse(controls.isEmpty(), "Compact view should not be empty");
 
@@ -76,8 +84,8 @@ public class ContextFactoryTest {
         Context ctx = ContextFactory.buildChannelStrip(registry, 1);
         assertNotNull(ctx);
 
-        ViewBuilder builder = new InputChannelStripViewBuilder(registry);
-        List<ViewControl> controls = builder.build(ctx, registry);
+        ViewBuilder builder = new InputChannelStripViewBuilder();
+        List<ViewControl> controls = builder.build(ctx, registry, null);
 
         assertFalse(controls.isEmpty(), "Compact view should not be empty");
 

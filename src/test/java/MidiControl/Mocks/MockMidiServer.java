@@ -1,10 +1,17 @@
 package MidiControl.Mocks;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.sound.midi.MidiMessage;
+
+import MidiControl.ControlServer.CanonicalInputEvent;
 import MidiControl.Controls.CanonicalRegistry;
+import MidiControl.Controls.ControlInstance;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Server.MidiServer;
 import MidiControl.Server.RehydrationManager;
 import MidiControl.Server.ServerRouter;
+import MidiControl.SysexUtils.SysexParser;
 
 public class MockMidiServer extends MidiServer {
 
@@ -47,4 +54,30 @@ public class MockMidiServer extends MidiServer {
         this.lastSent = canonicalId;
         this.lastValue = value;
     }
+
+    @Override
+    public void processIncomingMidiForTest() {
+        ConcurrentLinkedQueue<MidiMessage> buffer = this.getInputBuffer();
+        // Drain all incoming messages
+        while (!buffer.isEmpty()) {
+
+            var message = buffer.poll();
+            if (message == null) continue;
+
+            try {
+                ControlInstance instance = registry.resolveSysex(message.getMessage());
+                if (instance != null) {
+                    System.out.println("Resolved "+instance.getCanonicalId());
+                    CanonicalInputEvent event = new CanonicalInputEvent(CanonicalInputEvent.Type.SYSEX,message.getMessage(),null,null);
+                    int value = instance.extractValue(event);
+                    System.out.println("Updating "+instance.getCanonicalId()+ "  to "+(char)value);
+                    instance.updateValue(value);
+                }
+                else{System.out.println("Could not resolve message"+SysexParser.bytesToHex(message.getMessage()));}
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
 }

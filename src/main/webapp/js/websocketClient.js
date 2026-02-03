@@ -7,11 +7,18 @@ export class WebSocketClient {
     this.url = url;
     this.ws = null;
 
+    
+    this.reconnectDelay = 1000;      // start at 1 second
+    this.maxReconnectDelay = 15000;  // cap at 15 seconds
+    this.reconnectAttempts = 0;
+    this.forcedClose = false;        // manual close flag
+
     this.handlers = {
       "ui-model": [],
       "ui-bank": [],
       "control-update": [],
       "meter-update": [],
+      "name-update": [],
       "error": [],
       "connected": [],
       "disconnected": [],
@@ -30,12 +37,20 @@ export class WebSocketClient {
     this.ws.onopen = () => {
       console.info("[WebSocketClient] Connection opened");
       this._emit("connected");
+
+      this.reconnectDelay = 1000;
+      this.reconnectAttempts = 0;
     };
 
     this.ws.onclose = () => {
-      console.info("[WebSocketClient] Connection closed");
       this._emit("disconnected");
+      console.warn("[WebSocketClient] Connection closed");
+
+      if (!this.forcedClose) {
+        this._scheduleReconnect();
+      }
     };
+
 
     this.ws.onmessage = (event) => {
       if (debugFlag) {console.debug("[WebSocketClient] Message received:", event.data);}
@@ -103,12 +118,34 @@ export class WebSocketClient {
       case "midi-device-list":
         this._emit("midi-device-list", msg.payload.devices);
         break;
+      
+      case "name-update":
+        this._emit("name-update", msg.payload);
+        break;
 
       default:
         console.warn("[WebSocketClient] Unknown message type:", msg.JSON);
         this._emit("error", msg);
         break;
     }
+  }
+
+  
+  _scheduleReconnect() {
+    this.reconnectAttempts++;
+    console.info(
+      `[WebSocketClient] Attempting reconnect #${this.reconnectAttempts} in ${this.reconnectDelay}ms`
+    );
+
+    setTimeout(() => {
+      this.connect();
+
+      // Exponential backoff
+      this.reconnectDelay = Math.min(
+        this.reconnectDelay * 1.5,
+        this.maxReconnectDelay
+      );
+    }, this.reconnectDelay);
   }
 
   // ------------------------------------------------------------
@@ -121,7 +158,7 @@ export class WebSocketClient {
       payload: { contextId, uiType }
     };
 
-    console.info(`[WebSocketClient] Requesting UI model: context=${contextId}, uiType=${uiType}`);
+    console.debug(`[WebSocketClient] Requesting UI model: context=${contextId}, uiType=${uiType}`);
     this.ws.send(JSON.stringify(message));
     return requestId;
   }
@@ -131,7 +168,7 @@ export class WebSocketClient {
         type: "get-ui-bank",
         payload: { bankId }
     };
-    console.info("[WebSocketClient] Requesting UI bank:", message);
+    console.debug("[WebSocketClient] Requesting UI bank:", message);
     this.ws.send(JSON.stringify(message));
   }
 
@@ -188,7 +225,18 @@ export class WebSocketClient {
       requestId: `req-${++this.requestCounter}`,
       payload: settings
     };
-    console.info("[WebSocketClient] Applying MIDI settings:", message);
+    console.info("[WebSocketClient] Saving MIDI settings:", message);
     this.ws.send(JSON.stringify(message));
+  }
+
+  requestChannelNames(){
+    const message = {
+      type: "request-channel-names",
+      requestId: `req-${++this.requestCounter}`,
+      payload: "{ \"empty\" : \"true\" }"
+    };
+    const json = JSON.stringify(message)
+    this.ws.send(json)
+    console.info("[WebSocketClient] Requesting Channel Names "+json)
   }
 }

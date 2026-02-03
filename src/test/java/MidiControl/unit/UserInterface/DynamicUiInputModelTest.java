@@ -1,16 +1,24 @@
 package MidiControl.unit.UserInterface;
 
-import MidiControl.ContextModel.*;
-import MidiControl.Controls.CanonicalRegistry;
-import MidiControl.SysexUtils.*;
-import MidiControl.UserInterface.*;
-import MidiControl.UserInterface.DTO.*;
-
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import MidiControl.ContextModel.ContextDiscoveryEngine;
+import MidiControl.ContextModel.InputChannelStripViewBuilder;
+import MidiControl.ContextModel.ViewRegistry;
+import MidiControl.Controls.CanonicalRegistry;
+import MidiControl.SysexUtils.SysexMapping;
+import MidiControl.SysexUtils.SysexMappingLoader;
+import MidiControl.SysexUtils.SysexParser;
+import MidiControl.UserInterface.DTO.UiModelDTO;
+import MidiControl.UserInterface.DTO.ViewControlDTO;
+import MidiControl.UserInterface.UiContextIndex;
+import MidiControl.UserInterface.UiModelFactory;
 
 public class DynamicUiInputModelTest {
 
@@ -25,7 +33,7 @@ public class DynamicUiInputModelTest {
 
         // Use the new compact builder
         ViewRegistry views = new ViewRegistry();
-        views.addView(new InputChannelStripViewBuilder(registry), "basic-input-view");
+        views.addView(new InputChannelStripViewBuilder(), "basic-input-view");
 
         UiContextIndex dummyIndex = new UiContextIndex();
 
@@ -38,7 +46,7 @@ public class DynamicUiInputModelTest {
                 dummyIndex
         );
 
-        UiModelDTO model = factory.buildUiModel("channel.1");
+        UiModelDTO model = factory.buildUiModel("channel.1", null);
 
         assertNotNull(model, "UI model must not be null");
         assertEquals("channel.1", model.contextId);

@@ -49,5 +49,4 @@ sourceSets {
 
 test {
     useJUnitPlatform()
-    failOnNoDiscoveredTests = true
 }

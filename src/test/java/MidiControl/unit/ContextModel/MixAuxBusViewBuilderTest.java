@@ -1,15 +1,20 @@
 package MidiControl.unit.ContextModel;
 
-import MidiControl.ContextModel.*;
-import MidiControl.Controls.*;
-import MidiControl.Mocks.MockCanonicalRegistry;
-import MidiControl.SysexUtils.SysexMapping;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
+import MidiControl.ContextModel.Context;
+import MidiControl.ContextModel.ContextFilter;
+import MidiControl.ContextModel.ContextType;
+import MidiControl.ContextModel.MixAuxBusViewBuilder;
+import MidiControl.ContextModel.ViewControl;
+import MidiControl.Controls.ControlGroup;
+import MidiControl.Controls.ControlInstance;
+import MidiControl.Controls.SubControl;
+import MidiControl.Mocks.MockCanonicalRegistry;
+import MidiControl.SysexUtils.SysexMapping;
 
 public class MixAuxBusViewBuilderTest {
 
@@ -85,8 +90,8 @@ public class MixAuxBusViewBuilderTest {
                 List.of(new ContextFilter("kMixFader", "*", 0))
         );
 
-        MixAuxBusViewBuilder builder = new MixAuxBusViewBuilder(registry);
-        List<ViewControl> controls = builder.build(ctx, registry);
+        MixAuxBusViewBuilder builder = new MixAuxBusViewBuilder();
+        List<ViewControl> controls = builder.build(ctx, registry, null);
 
         // Validate presence
         assertTrue(contains(controls, "FADER"));

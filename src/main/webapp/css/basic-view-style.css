@@ -4,6 +4,7 @@
 .body {
     background-color: #555;
     font-family: sans-serif;
+    height: 100vh;
 }
 
 #strip-container {
@@ -11,7 +12,7 @@
     flex-direction: row;
     gap: 12px;
     padding: 8px;
-    height: 98vh;
+    max-height: 98vh;
 }
 
 /* -------------------------------
@@ -40,8 +41,8 @@
 
 /* Fader stays fixed at the bottom */
 .strip-fader-area {
-    margin-top: 12px;
-    padding-top: 12px;
+    margin-top: 10px;
+    padding-top: 10px;
     height: max-content;
     border-top: 1px solid #333;
 }
@@ -89,7 +90,8 @@
 ---------------------------- */
 .fader {
     width: 40px;
-    min-height: 22vh;
+    min-height: 25vh;
+    height: max-content;
     margin: 0 auto;
     writing-mode: vertical-rl; /* Firefox + modern browsers */
     transform: rotate(180deg); /* Corrects direction */

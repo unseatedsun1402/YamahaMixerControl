@@ -40747,7 +40747,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputChannelName",
@@ -40797,7 +40797,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputChannelName",
@@ -40847,7 +40847,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputChannelName",
@@ -40897,7 +40897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputChannelName",
@@ -42997,7 +42997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusModuleName",
@@ -43047,7 +43047,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusModuleName",
@@ -43097,7 +43097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusModuleName",
@@ -43147,7 +43147,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusModuleName",
@@ -43997,7 +43997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXModuleName",
@@ -44047,7 +44047,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXModuleName",
@@ -44097,7 +44097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXModuleName",
@@ -44147,7 +44147,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXModuleName",
@@ -44997,7 +44997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixModuleName",
@@ -45047,7 +45047,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixModuleName",
@@ -45097,7 +45097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixModuleName",
@@ -45147,7 +45147,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixModuleName",
@@ -45997,7 +45997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoOutModuleName",
@@ -46047,7 +46047,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoOutModuleName",
@@ -46097,7 +46097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoOutModuleName",
@@ -46147,7 +46147,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoOutModuleName",
@@ -47197,7 +47197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoInChannelName",
@@ -47247,7 +47247,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoInChannelName",
@@ -47297,7 +47297,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoInChannelName",
@@ -47347,7 +47347,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoInChannelName",
@@ -66597,7 +66597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupRemoteUDFBCName",
@@ -66647,7 +66647,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupRemoteUDFBCName",
@@ -66697,7 +66697,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupRemoteUDFBCName",
@@ -66747,7 +66747,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupRemoteUDFBCName",

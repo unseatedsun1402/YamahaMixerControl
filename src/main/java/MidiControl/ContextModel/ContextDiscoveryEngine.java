@@ -10,20 +10,24 @@ public class ContextDiscoveryEngine {
     private static final Logger log = Logger.getLogger(ContextDiscoveryEngine.class.getName());
 
     private final CanonicalRegistry registry;
-    private final List<ContextDiscoverer> discoverers;
+    private List<ContextDiscoverer> discoverers = new ArrayList();
 
     public ContextDiscoveryEngine(CanonicalRegistry registry) {
         this.registry = registry;
 
         // Register all discoverers here
-        this.discoverers = List.of(
-            new ChannelContextDiscoverer(),
-            new BusContextDiscoverer()
+        this.discoverers.add(new ChannelContextDiscoverer());
+        this.discoverers.add(new NameContextDiscoverer());
+        this.discoverers.add(new BusContextDiscoverer());
             // new MatrixContextDiscoverer(),
             // new OutputContextDiscoverer()
             // later: new ProcessingContextDiscoverer()
-        );
     }
+    
+    public void addDiscoverer(ContextDiscoverer d) {
+        this.discoverers.add(d);
+    }
+
 
     public List<Context> discoverContexts() {
         log.info("=== Starting Context Discovery ===");

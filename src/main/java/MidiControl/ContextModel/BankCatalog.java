@@ -41,6 +41,11 @@ public class BankCatalog {
         BankContext dca = new BankContext();
         dca.addFilter(new BankFilter("dca", null, ContextType.DCA));
         banks.put("bank.dca", dca);
+
+        // Name Banks
+        BankContext names = new BankContext();
+        names.addFilter(new BankFilter("name", null, ContextType.NAME)); 
+        banks.put("bank.names", names);
     }
 
     public BankContext getBank(String bankId) {

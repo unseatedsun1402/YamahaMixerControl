@@ -23,7 +23,7 @@ public class MidiDebugMain {
         Logger root = Logger.getLogger("");
         root.setLevel(Level.FINE);
         for (Handler h : root.getHandlers()) {
-            h.setLevel(Level.FINE);
+            h.setLevel(Level.INFO);
         }
 
         // server.getCanonicalRegistry().enableDebug();
@@ -43,16 +43,16 @@ public class MidiDebugMain {
         server.run(); // <-- REQUIRED for input + SyncSend
         Thread.sleep(50);
 
-        // server.RehydrateSever();
-        MeterRequest request = (new MeterRequest(0, 0x1A, 0x0,0x2));
-        request.setChannelCount(5);
-        request.setStartChannel(14);
-        byte[] requestArray = request.toByteArray();
-        System.out.println("Requesting "+ SysexParser.bytesToHex(requestArray).toString());
-        server.getMidiDeviceManager().getMidiOut().sendMessage( requestArray );
+        server.RehydrateSever();
+        // MeterRequest request = (new MeterRequest(0, 0x1A, 0x0,0x2));
+        // request.setChannelCount(5);
+        // request.setStartChannel(14);
+        // byte[] requestArray = request.toByteArray();
+        // System.out.println("Requesting "+ SysexParser.bytesToHex(requestArray).toString());
+        // server.getMidiDeviceManager().getMidiOut().sendMessage( requestArray );
 
         System.out.println("Listening for MIDI input...");
-        Thread.sleep(60);
+        Thread.sleep(8000);
     }
 }
 
