@@ -1,37 +1,46 @@
 package MidiControl.Server;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
-import java.util.logging.Level; import java.util.logging.Logger;
+import java.util.logging.Level;
+ import java.util.logging.Logger;
+
 import javax.sound.midi.MidiMessage;
+
 import org.apache.commons.math3.exception.OutOfRangeException;
+
 import MidiControl.ContextModel.BankCatalog;
 import MidiControl.ContextModel.Context;
 import MidiControl.ContextModel.ContextDiscoveryEngine;
-import MidiControl.ContextModel.ViewRegistry;
+import MidiControl.ContextModel.ContextType;
 import MidiControl.ContextModel.ControlSchema;
+import MidiControl.ContextModel.InputChannelSendsOnFaderViewBuilder;
 import MidiControl.ContextModel.InputChannelStripViewBuilder;
 import MidiControl.ContextModel.MixAuxBusViewBuilder;
 import MidiControl.ContextModel.ViewBuilder;
+import MidiControl.ContextModel.ViewRegistry;
 import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.SourceAllInstances;
 import MidiControl.MidiDeviceManager.MidiIOManager;
-import MidiControl.NrpnUtils.NrpnParser;
-import MidiControl.NrpnUtils.NrpnRegistry;
 import MidiControl.NrpnUtils.NrpnMapping;
 import MidiControl.NrpnUtils.NrpnMappingLoader;
+import MidiControl.NrpnUtils.NrpnParser;
+import MidiControl.NrpnUtils.NrpnRegistry;
+import MidiControl.SysexUtils.RegistryReloadListener;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
+import MidiControl.UserInterface.DTO.UiModelDTO;
+import MidiControl.UserInterface.Frontend.GuiBroadcastListener;
+import MidiControl.UserInterface.Frontend.WebSocketGuiBroadcaster;
 import MidiControl.UserInterface.UiBankFactory;
 import MidiControl.UserInterface.UiContextIndex;
 import MidiControl.UserInterface.UiModelFactory;
 import MidiControl.UserInterface.UiModelService;
-import MidiControl.UserInterface.DTO.UiModelDTO;
-import MidiControl.UserInterface.Frontend.GuiBroadcastListener;
-import MidiControl.UserInterface.Frontend.WebSocketGuiBroadcaster;
+import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 import jakarta.annotation.PreDestroy;
 public class MidiServer implements Runnable, UiModelService{
     private volatile boolean shutdownFlag = false;
@@ -49,6 +58,7 @@ public class MidiServer implements Runnable, UiModelService{
     private final BankCatalog bankCatalog;
     private final ServerRouter serverRouter;
     private CanonicalRegistry canonicalRegistry;
+    private List<ChannelNameAssembler> nameAssemblers = new ArrayList<>();
     private GuiBroadcastListener guiBroadcastListener;
     private ContextDiscoveryEngine discoveryEngine;
     private static final GuiBroadcastListener NO_OP_LISTENER =
@@ -65,7 +75,8 @@ public class MidiServer implements Runnable, UiModelService{
                 SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
         this.canonicalRegistry =
                 new CanonicalRegistry(sysexMappings, new SysexParser(sysexMappings));
-
+        
+        this.canonicalRegistry.addReloadListener(this::onRegistryReloaded);
         List<NrpnMapping> nrpnMappings =
                 NrpnMappingLoader.loadFromResource("MidiControl/nrpn/01v96i_nrpn_mappings.json");
         // Attach NRPN mappings to ControlInstances
@@ -85,8 +96,9 @@ public class MidiServer implements Runnable, UiModelService{
         
         this.contextIndex = new UiContextIndex();
 
-        this.viewBuilders.addView(new InputChannelStripViewBuilder(canonicalRegistry), "basic-input-view");
-        this.viewBuilders.addView(new MixAuxBusViewBuilder(canonicalRegistry), "basic-master-view");
+        this.viewBuilders.addView(new InputChannelStripViewBuilder(), "basic-input-view");
+        this.viewBuilders.addView(new InputChannelSendsOnFaderViewBuilder(), "basic-sends-on-fader-view");
+        this.viewBuilders.addView(new MixAuxBusViewBuilder(), "basic-master-view");
         
         this.guiBroadcastListener = new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
         this.bankCatalog = new BankCatalog();
@@ -103,7 +115,7 @@ public class MidiServer implements Runnable, UiModelService{
     public MidiServer(CanonicalRegistry registry) {
         this.canonicalRegistry = registry;
         this.viewBuilders = new ViewRegistry();
-        this.viewBuilders.addView(new InputChannelStripViewBuilder(canonicalRegistry),"basic-input-view");
+        this.viewBuilders.addView(new InputChannelStripViewBuilder(),"basic-input-view");
         this.uiFactory = null;
         this.bankFactory = null;
         this.bankCatalog = new BankCatalog();
@@ -126,7 +138,7 @@ public class MidiServer implements Runnable, UiModelService{
         this.subscriptions = new SubscriptionManager();
         this.schema = new ControlSchema(canonicalRegistry);
         this.viewBuilders = new ViewRegistry();
-        this.viewBuilders.addView(new InputChannelStripViewBuilder(canonicalRegistry),"basic-input-view");
+        this.viewBuilders.addView(new InputChannelStripViewBuilder(),"basic-input-view");
         this.contextIndex = new UiContextIndex();
         this.guiBroadcastListener = new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
         this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
@@ -191,6 +203,29 @@ public class MidiServer implements Runnable, UiModelService{
     public void clearInputBuffer() {
         inputBuffer.clear();
     }
+    
+    private void initNameAssemblers() {
+        List<Context> nameContexts = this.contextIndex.getAllContexts().stream()
+            .filter(c -> c.getContextType() == ContextType.NAME)
+            .toList();
+
+        for(Context ctx : nameContexts){
+            nameAssemblers.add(new ChannelNameAssembler(ctx,canonicalRegistry));
+        }
+        logger.info("Name assemblers initialised");
+    }
+
+    private void recreateNameAssemblers() {
+        nameAssemblers.forEach(ChannelNameAssembler::shutdown);
+        nameAssemblers.clear();
+        List<Context> nameContexts = contextIndex.getAllContexts().stream()
+            .filter(c -> c.getContextType() == ContextType.NAME)
+            .toList();
+        for (Context ctx : nameContexts) {
+            nameAssemblers.add(new ChannelNameAssembler(ctx, canonicalRegistry));
+        }
+        logger.info("Recreated name assemblers after registry reload");
+    }
 
     @PreDestroy
     public void shutdown() {
@@ -246,13 +281,26 @@ public class MidiServer implements Runnable, UiModelService{
     private void initContextIndex(){
         List<Context> contexts = discoveryEngine.discoverContexts();
         contextIndex.addAll(contexts);
+        initNameAssemblers();
     }
 
     @Override
-    public UiModelDTO buildUiModel(String contextId, String uiType) {
+    public UiModelDTO buildUiModel(String contextId, String uiTypeRaw) {
 
-        ViewBuilder builder = viewBuilders.getView(uiType)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown uiType: " + uiType));
+        String baseTypeTmp = uiTypeRaw;
+        String suffix = null;
+
+        int colonIndex = uiTypeRaw.indexOf(':');
+        if (colonIndex >= 0) {
+            baseTypeTmp = uiTypeRaw.substring(0, colonIndex);
+            suffix = uiTypeRaw.substring(colonIndex + 1);
+        }
+
+        final String baseType = baseTypeTmp;
+
+        ViewBuilder builder = viewBuilders.getView(baseType)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Unknown uiType: " + baseType));
 
         UiModelFactory factory = new UiModelFactory(
                 canonicalRegistry,
@@ -260,6 +308,10 @@ public class MidiServer implements Runnable, UiModelService{
                 contextIndex
         );
 
-        return factory.buildUiModel(contextId);
+        return factory.buildUiModel(contextId, suffix);
+    }
+    
+    private void onRegistryReloaded(CanonicalRegistry newRegistry) {
+        recreateNameAssemblers();
     }
 }

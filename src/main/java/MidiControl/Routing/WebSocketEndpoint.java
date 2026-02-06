@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -48,16 +49,21 @@ public class WebSocketEndpoint {
 
         sessions.add(session);
         System.out.println("Client connected: " + session.getId());
-
-        // Do NOT send any UI models here.
-        // Do NOT send a bank here.
-        // The client will request the bank it wants.
     }
 
     @OnMessage
     public void onMessage(String message, Session session) {
         try {
-            JsonObject json = JsonParser.parseString(message).getAsJsonObject();
+            
+            JsonElement root = JsonParser.parseString(message);
+
+            if (!root.isJsonObject()) {
+                logger.severe("Invalid message (not an object): " + message);
+                return;
+            }
+
+            JsonObject json = root.getAsJsonObject();
+
             String type = json.get("type").getAsString();
 
             switch (type) {
@@ -72,7 +78,6 @@ public class WebSocketEndpoint {
                 }
 
                 default:
-                    // Forward all other messages to the router
                     server.getServerRouter().handleMessage(session, message);
                     break;
             }
@@ -99,8 +104,9 @@ public class WebSocketEndpoint {
     }
 
     public static void broadcast(String message) {
+        logger.info("Broadcasing message to clients "+message);
         for (Session s : sessions) {
-            send(s, message);
+            if (s.isOpen())s.getAsyncRemote().sendText(message);
         }
     }
 }

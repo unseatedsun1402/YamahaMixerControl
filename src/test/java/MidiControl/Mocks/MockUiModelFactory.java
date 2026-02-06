@@ -12,7 +12,7 @@ public class MockUiModelFactory extends UiModelFactory {
     }
 
     @Override
-    public UiModelDTO buildUiModel(String contextId) {
+    public UiModelDTO buildUiModel(String contextId, String suufix) {
         return dto;
     }
 }

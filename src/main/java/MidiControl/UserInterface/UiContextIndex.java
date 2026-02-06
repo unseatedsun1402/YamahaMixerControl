@@ -1,5 +1,6 @@
 package MidiControl.UserInterface;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,4 +46,9 @@ public class UiContextIndex implements CanonicalContextResolver {
     public void register(String canonicalId, String contextId) {
         canonicalToContext.put(canonicalId, contextId);
     }
+    
+    public Collection<Context> getAllContexts() {
+        return contextsById.values();
+    }
+
 }

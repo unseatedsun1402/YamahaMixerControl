@@ -7,6 +7,7 @@ import MidiControl.UserInterface.DTO.*;
 import java.util.List;
 import java.util.Objects;
 
+
 public class UiModelFactory {
 
     private final CanonicalRegistry registry;
@@ -23,13 +24,12 @@ public class UiModelFactory {
         this.contextIndex = contextIndex;
     }
 
-    public UiModelDTO buildUiModel(String contextId) {
+    public UiModelDTO buildUiModel(String contextId, String suffix) {
 
         Context ctx = contextIndex.getContext(contextId);
-
         if (ctx == null) return null;
 
-        List<ViewControl> controls = viewBuilder.build(ctx, registry);
+        List<ViewControl> controls = viewBuilder.build(ctx, registry, suffix);
 
         for (ViewControl vc : controls) {
             contextIndex.register(vc.getCanonicalId(), contextId);

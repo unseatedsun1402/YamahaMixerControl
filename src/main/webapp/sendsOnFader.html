@@ -1,21 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Input Mix UI</title>
+    <title>Mix Sends UI</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/basic-view-style.css"/>
-    <link rel="stylesheet" href="css/sof-panel-style.css"/>
-
 
     <script type="module">
         import { WebSocketClient } from './js/websocketClient.js';
         import { renderUiModel } from './js/new-ui-renderer.js';
         import { applyControlUpdate } from './js/partial-update.js';
-        import { buildSofPanelFromModel } from './js/sof-panel.js';
-        import { updateChannelStripName } from './js/utils/channel-name.js';
-        window.sofInitialised = false;
-        window.lastBankContexts= [];
         
         console.log(">>> MidiControl UI bootstrap running <<<");
 
@@ -31,66 +25,48 @@
             ws.requestBank("bank.inputs");
         });
 
-        function handleSofSelection(sendId) {
-            const stripContainer = document.getElementById("strip-container");
-
-            const view = sendId
-                ? `basic-sends-on-fader-view:${sendId}`
-                : "basic-input-view";
-
-            for (const ctxId of window.lastBankContexts) {
-                ws.requestUiModel(ctxId, view);
-            }
-            ws.requestChannelNames();
-        }
-        
+        // 1. Receive the bank structure
         ws.on("ui-bank", (bank) => {
             console.info("[Bootstrap] Bank received:", bank);
-            window.lastBankContexts = bank.contexts;
 
             const stripContainer = document.getElementById("strip-container");
             stripContainer.innerHTML = "";
 
+            // Request + subscribe to each context
             for (const ctxId of bank.contexts) {
                 console.info(`[Bootstrap] Requesting model for ${ctxId}`);
-                ws.requestUiModel(ctxId, "basic-input-view");
+                ws.requestUiModel(ctxId, "basic-sends-on-fader-view:mix1");
                 ws.subscribe(ctxId);
             }
         });
 
+        // 2. Receive each full UI model
         ws.on("ui-model", (model) => {
-            if (!window.sofInitialised) {
-                buildSofPanelFromModel(model, handleSofSelection);
-                window.sofInitialised = true;
-            }
+            console.debug("[Bootstrap] UI model received:", model);
             renderUiModel(model);
         });
 
+        // 3. Receive incremental updates
         ws.on("control-update", (payload) => {
             console.debug("[Bootstrap] Control update:", payload);
             applyControlUpdate(payload);
         });
 
-        ws.on("name-update", (payload) => {
-            const fromContext = payload["context-id"];   // e.g. "name.28"
-            const [, indexStr] = fromContext.split("."); // "28"
-            const channelContextId = `channel.${indexStr}`;
-
-            updateChannelStripName(channelContextId, payload.name);
-        });
-
+        // Error handler
         ws.on("error", (err) => {
             console.error("[Bootstrap] Error from server:", err);
         });
 
+        // Start connection
         ws.connect();
+
+        // Expose globally for widgets
         window.wsClient = ws;
     </script>
 </head>
 
 <body>
     <div id="ui-root">
-        <div id="sof-panel"></div>
         <div id="strip-container"></div>
     </div>
 

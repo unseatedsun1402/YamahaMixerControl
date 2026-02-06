@@ -1,10 +1,13 @@
 package MidiControl.Server;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import MidiControl.ControlServer.GuiInputHandler;
@@ -21,6 +24,8 @@ import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
 import MidiControl.UserInterface.UiModelService;
+import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
+import MidiControl.UserInterface.ChannelName.ChannelNameBroadcaster;
 import MidiControl.UserInterface.DTO.UiModelDTO;
 import jakarta.websocket.Session;
 
@@ -62,7 +67,10 @@ public class ServerRouter {
 
         String type = root.get("type").getAsString();
         String requestId = root.has("requestId") ? root.get("requestId").getAsString() : null;
-        JsonObject payload = root.getAsJsonObject("payload");
+        JsonElement payloadElement = root.get("payload");
+        JsonObject payload = payloadElement != null && payloadElement.isJsonObject()
+                ? payloadElement.getAsJsonObject()
+                : new JsonObject(); // fallback
 
         switch (type) {
             case "get-ui-model" -> handleGetUiModel(session, requestId, payload);
@@ -74,7 +82,17 @@ public class ServerRouter {
             case "apply-midi-settings" -> handleApplyMidiSettings(session, requestId, payload);
             case "save-midi-settings" -> handleSaveMidiSettings(session, requestId, payload);
             case "meter-keep-alive" -> handleMeterKeepAlive(session,requestId,payload);
+            case "request-channel-names" -> handleRequestChannelNames(session,requestId,payload);
             default -> sendError(session, requestId, "UNKNOWN_TYPE", "Unknown message type: " + type);
+        }
+    }
+
+    private void handleRequestChannelNames(Session session, String requestId, JsonObject payload) {
+        logger.info("Channel name request: " + requestId);
+        Map<String,String> knownNames = ChannelNameAssembler.getChannelNames();
+        Set<String> keys = knownNames.keySet();
+        for (String key : keys){
+            WebSocketEndpoint.send(session, ChannelNameBroadcaster.toJson(key,knownNames.get(key)));
         }
     }
 
@@ -90,19 +108,17 @@ public class ServerRouter {
                 ? payload.get("uiType").getAsString()
                 : "basic-input-view";
 
-        // Build the model (UiModelDTO must already be flattened)
-        UiModelDTO model = uiModels.buildUiModel(contextId, uiType);
+        UiModelDTO model;
+        model = uiModels.buildUiModel(contextId, uiType);
 
         JsonObject response = new JsonObject();
         response.addProperty("type", "ui-model");
         if (requestId != null) response.addProperty("requestId", requestId);
 
-        // FLATTENED PAYLOAD — matches what the client expects
         JsonObject out = new JsonObject();
         out.addProperty("contextId", model.contextId);
         out.add("controls", gson.toJsonTree(model.controls));
         out.add("metadata", gson.toJsonTree(model.metadata));
-
         response.add("payload", out);
 
         WebSocketEndpoint.send(session, response.toString());

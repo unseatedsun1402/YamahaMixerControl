@@ -8,6 +8,11 @@ import { updateToggle } from "./widgets/toggle.js";
 export function applyControlUpdate({ canonicalId, value }) {
     const el = document.querySelector(`[data-canonical-id="${canonicalId}"]`);
     if (!el) {
+        
+        if (canonicalId.startsWith("kInputChannelName.")) {
+            return;
+        }
+
         console.warn("Partial update: control not found:", canonicalId);
         return;
     }

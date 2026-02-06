@@ -1,13 +1,13 @@
 package MidiControl.ContextModel;
 
-import MidiControl.Controls.CanonicalRegistry;
-import MidiControl.Controls.ControlInstance;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import MidiControl.Controls.CanonicalRegistry;
+import MidiControl.Controls.ControlInstance;
 
 /**
  * Compact Input Channel Strip ViewBuilder
@@ -22,18 +22,14 @@ import java.util.regex.Pattern;
  */
 public class InputChannelStripViewBuilder implements ViewBuilder {
 
-    private final CanonicalRegistry registry;
-
-    public InputChannelStripViewBuilder(CanonicalRegistry registry) {
-        this.registry = registry;
-    }
+    public InputChannelStripViewBuilder() {}
 
     @Override
-    public List<ViewControl> build(Context context, CanonicalRegistry registry) {
-        return buildCompact(context);
+    public List<ViewControl> build(Context context, CanonicalRegistry registry, String suffix) {
+        return buildCompact(context, registry);
     }
 
-    public List<ViewControl> buildCompact(Context context) {
+    public List<ViewControl> buildCompact(Context context, CanonicalRegistry registry) {
         List<ViewControl> result = new ArrayList<>();
 
         int instanceIndex = extractContextIndex(context.getId());

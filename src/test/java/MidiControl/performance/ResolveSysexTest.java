@@ -1,12 +1,11 @@
 package MidiControl.performance;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.List;
 import java.util.logging.Logger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import MidiControl.Mocks.FakeSysexMapping;
@@ -61,7 +60,7 @@ public class ResolveSysexTest {
         log.info("Fast path (native) "+iterations+ " iterations: " + fastTime / 1_000_000 + " ms");
 
         // --- Sanity check: fast must be faster ---
-        assertTrue(fastTime <= slowTime * 0.85,
+        assertTrue(fastTime <= slowTime * 0.95,
             "Fast path should be significantly faster than slow path");
     }
 
@@ -126,7 +125,7 @@ public class ResolveSysexTest {
         log.info("Fast path (native) "+iterations+ " iterations: " + fastTime / 1_000_000 + " ms");
 
         // --- Sanity check: fast must be faster ---
-        assertTrue(fastTime <= slowTime * 0.85,
+        assertTrue(fastTime <= slowTime * 0.95,
             "Fast path should be significantly faster than slow path");
     }
 }

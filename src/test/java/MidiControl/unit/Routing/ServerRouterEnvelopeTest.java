@@ -33,7 +33,6 @@ class MinimalUiModelService implements UiModelService {
     }
 }
 
-
 public class ServerRouterEnvelopeTest {
 
     @Test
@@ -42,6 +41,8 @@ public class ServerRouterEnvelopeTest {
         // Capture outgoing WebSocket messages
         StringBuilder captured = new StringBuilder();
         FakeSession session = new FakeSession("test-session");
+
+        // FakeSession AsyncRemote sender
         session.setRemoteSender(captured::append);
 
         // Build a minimal UiModelDTO
@@ -49,15 +50,15 @@ public class ServerRouterEnvelopeTest {
         fakeModel.contextId = "channel.1";
         fakeModel.controls = List.of();
 
-        // New: use UiModelService instead of UiModelFactory
+        // UiModelService stub
         UiModelService uiModels = new MinimalUiModelService(fakeModel);
 
-        // Minimal mocks for dependencies
+        // Minimal mocks for router dependencies
         CanonicalRegistry registry = new MockCanonicalRegistry();
         MidiIOManager ioManager = new MockMidiIOManager(null);
         SubscriptionManager subs = new SubscriptionManager();
 
-        // New constructor
+        // Router under test
         ServerRouter router = new ServerRouter(
             uiModels,
             subs,
@@ -65,22 +66,24 @@ public class ServerRouterEnvelopeTest {
             ioManager
         );
 
+        // Incoming WebSocket message that router must handle
         String incoming = """
         {
-        "type": "get-ui-model",
-        "requestId": "req-123",
-        "payload": {
-            "contextId": "channel.1"
-        }
+          "type": "get-ui-model",
+          "requestId": "req-123",
+          "payload": {
+              "contextId": "channel.1"
+          }
         }
         """;
 
         // Act
         router.handleMessage(session, incoming);
 
-        // Assert
+        // Assert outbound envelope was captured
         assertFalse(captured.isEmpty(), "Expected a response to be sent");
 
+        // Parse JSON envelope from captured WebSocket output
         JsonObject json = JsonParser.parseString(captured.toString()).getAsJsonObject();
 
         assertEquals("ui-model", json.get("type").getAsString());
@@ -88,12 +91,11 @@ public class ServerRouterEnvelopeTest {
 
         JsonObject payload = json.getAsJsonObject("payload");
         assertEquals("channel.1", payload.get("contextId").getAsString());
-        System.out.println(payload.toString());
 
         // Validate DTO structure
-        assertEquals("channel.1", payload.get("contextId").getAsString());
         assertTrue(payload.has("controls"));
         assertTrue(payload.getAsJsonArray("controls").isEmpty());
-    }
 
+        System.out.println("Outbound Envelope: " + json);
+    }
 }

@@ -1,15 +1,20 @@
 package MidiControl.unit.ContextModel;
 
-import MidiControl.ContextModel.*;
-import MidiControl.Controls.*;
-import MidiControl.Mocks.MockCanonicalRegistry;
-import MidiControl.SysexUtils.SysexMapping;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
+import MidiControl.ContextModel.Context;
+import MidiControl.ContextModel.ContextFilter;
+import MidiControl.ContextModel.ContextType;
+import MidiControl.ContextModel.InputChannelStripViewBuilder;
+import MidiControl.ContextModel.ViewControl;
+import MidiControl.Controls.ControlGroup;
+import MidiControl.Controls.ControlInstance;
+import MidiControl.Controls.SubControl;
+import MidiControl.Mocks.MockCanonicalRegistry;
+import MidiControl.SysexUtils.SysexMapping;
 
 public class InputChannelStripViewBuilderTest {
 
@@ -80,8 +85,8 @@ public class InputChannelStripViewBuilderTest {
                 List.of(new ContextFilter("kInputFader", "*", 0))
         );
 
-        InputChannelStripViewBuilder builder = new InputChannelStripViewBuilder(registry);
-        List<ViewControl> controls = builder.build(ctx, registry);
+        InputChannelStripViewBuilder builder = new InputChannelStripViewBuilder();
+        List<ViewControl> controls = builder.build(ctx, registry, null);
 
         assertTrue(contains(controls, "CHANNEL_ON"));
         assertTrue(contains(controls, "PAN"));

@@ -1,17 +1,25 @@
 package MidiControl.unit.UserInterface;
 
-import MidiControl.ContextModel.*;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import MidiControl.ContextModel.Context;
+import MidiControl.ContextModel.ContextDiscoveryEngine;
+import MidiControl.ContextModel.MixAuxBusViewBuilder;
+import MidiControl.ContextModel.ViewRegistry;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
-import MidiControl.UserInterface.*;
-import MidiControl.UserInterface.DTO.*;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import MidiControl.UserInterface.DTO.UiModelDTO;
+import MidiControl.UserInterface.DTO.ViewControlDTO;
+import MidiControl.UserInterface.UiContextIndex;
+import MidiControl.UserInterface.UiModelFactory;
 
 public class DynamicUiModelTestForAuxMix {
 
@@ -41,7 +49,7 @@ public class DynamicUiModelTestForAuxMix {
         index.addAll(contexts);
 
         ViewRegistry views = new ViewRegistry();
-        views.addView(new MixAuxBusViewBuilder(registry), "basic-master-view");
+        views.addView(new MixAuxBusViewBuilder(), "basic-master-view");
 
         UiModelFactory factory = new UiModelFactory(
                 registry,
@@ -49,7 +57,7 @@ public class DynamicUiModelTestForAuxMix {
                 index
         );
 
-        UiModelDTO model = factory.buildUiModel("aux.3");
+        UiModelDTO model = factory.buildUiModel("aux.3", null);
 
         assertNotNull(model);
         assertEquals("aux.3", model.contextId);

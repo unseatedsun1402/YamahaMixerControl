@@ -8,5 +8,6 @@ public enum ContextType {
     MATRIX,
     DCA,
     STEREO_INPUT,
-    BANK, STEREO_OUTPUT
+    BANK, STEREO_OUTPUT,
+    NAME
 }
