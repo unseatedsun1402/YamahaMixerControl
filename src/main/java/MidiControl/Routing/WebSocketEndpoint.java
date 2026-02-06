@@ -7,193 +7,106 @@ import MidiControl.Server.SubscriptionManager;
 import MidiControl.UserInterface.UiBankFactory;
 import MidiControl.UserInterface.DTO.UiBankDTO;
 
-import jakarta.websocket.*;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.logging.Level;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonElement;
 
 @ServerEndpoint(value = "/endpoint")
 public class WebSocketEndpoint {
 
+    private static final Set<Session> sessions = ConcurrentHashMap.newKeySet();
     private static final Logger logger = Logger.getLogger(WebSocketEndpoint.class.getName());
     private static final Gson gson = new Gson();
-    private static boolean DEBUG = false;
 
-    // Active sessions
-    private static final Set<Session> sessions = ConcurrentHashMap.newKeySet();
+    private MidiServer server;
+    private SubscriptionManager subscriptions;
 
-    // NEW: Per-session sender queues
-    private static final Map<Session, BlockingQueue<String>> outboundQueues = new ConcurrentHashMap<>();
-    private static final Map<Session, Thread> senderThreads = new ConcurrentHashMap<>();
-
-    // Instance state
-    private MidiServer server = null;
-    private SubscriptionManager subscriptions = null;
-
-    // Test override flag
-    private boolean testInjectedServer = false;
-
-    // ----------------------------------------------------------
-    // Test support
-    // ----------------------------------------------------------
-
-    public void setServerForTests(MidiServer server) {
-        this.server = server;
-        this.testInjectedServer = true;
+    private static String encode(String type, Object payload) {
+        Map<String, Object> envelope = new HashMap<>();
+        envelope.put("type", type);
+        envelope.put("payload", payload);
+        return gson.toJson(envelope);
     }
-
-    public static void enableDebug() { DEBUG = true; }
-
-    // ----------------------------------------------------------
-    // Lifecycle
-    // ----------------------------------------------------------
 
     @OnOpen
     public void onOpen(Session session) {
 
-        if (testInjectedServer) {
-            // Already injected
-        } else {
-            if (MidiServerListener.CONTEXT == null) {
-                throw new IllegalStateException("ServletContext is null - tests must use setServerForTests()");
-            }
-            this.server = (MidiServer) MidiServerListener.CONTEXT.getAttribute("midiServer");
-        }
-
-        if (server == null) {
-            throw new IllegalStateException("MidiServer is null in WebSocketEndpoint.onOpen");
-        }
-
-        this.subscriptions = server.getSubscriptionManager();
+        server = (MidiServer) MidiServerListener.CONTEXT.getAttribute("midiServer");
+        subscriptions = server.getSubscriptionManager();
 
         sessions.add(session);
-
-        // Create queue
-        BlockingQueue<String> queue = new LinkedBlockingQueue<>();
-        outboundQueues.put(session, queue);
-
-        // Start sender thread
-        Thread sender = new Thread(() -> runSender(session), "WS-Sender-" + session.getId());
-        sender.setDaemon(true);
-        sender.start();
-        senderThreads.put(session, sender);
-
-        logger.info("WebSocket connected: " + session.getId());
+        System.out.println("Client connected: " + session.getId());
     }
-
-    @OnClose
-    public void onClose(Session session) {
-        sessions.remove(session);
-
-        // Stop sender thread
-        Thread t = senderThreads.remove(session);
-        if (t != null) t.interrupt();
-
-        outboundQueues.remove(session);
-
-        if (subscriptions != null) {
-            subscriptions.removeSession(session);
-        }
-
-        logger.info("WebSocket disconnected: " + session.getId());
-    }
-
-    // ----------------------------------------------------------
-    // Dedicated per-session sender thread
-    // ----------------------------------------------------------
-
-    private void runSender(Session session) {
-        BlockingQueue<String> queue = outboundQueues.get(session);
-
-        try {
-            while (session.isOpen()) {
-                String msg = queue.take();  // wait for next message
-
-                session.getAsyncRemote().sendText(msg, result -> {
-                    if (!result.isOK()) {
-                        Throwable ex = result.getException();
-                        logger.warning("Async send failed for session " + session.getId()
-                                + ": " + (ex != null ? ex.getMessage() : "unknown"));
-                    }
-                });
-            }
-        } catch (InterruptedException e) {
-            logger.info("Sender thread exiting for session " + session.getId());
-        }
-    }
-
-    // ----------------------------------------------------------
-    // Incoming message routing
-    // ----------------------------------------------------------
 
     @OnMessage
     public void onMessage(String message, Session session) {
         try {
+            
             JsonElement root = JsonParser.parseString(message);
 
             if (!root.isJsonObject()) {
-                logger.severe("Invalid JSON: " + message);
+                logger.severe("Invalid message (not an object): " + message);
                 return;
             }
 
             JsonObject json = root.getAsJsonObject();
+
             String type = json.get("type").getAsString();
 
             switch (type) {
 
-                case "get-ui-bank" -> {
-                    JsonObject payload = json.getAsJsonObject("payload");
-                    String bankId = payload.get("bankId").getAsString();
-
+                case "get-ui-bank": {
+                    String bankId = json.getAsJsonObject("payload").get("bankId").getAsString();
                     UiBankFactory bankFactory = server.getUiBankFactory();
-                    BankContext bctx = server.getBankCatalog().getBank(bankId);
-                    UiBankDTO dto = bankFactory.buildBank(bankId, bctx);
-
-                    send(session, encode("ui-bank", dto));
+                    BankContext bankCtx = server.getBankCatalog().getBank(bankId);
+                    UiBankDTO bankDto = bankFactory.buildBank(bankId, bankCtx);
+                    send(session, encode("ui-bank", bankDto));
+                    break;
                 }
 
-                default -> {
+                default:
                     server.getServerRouter().handleMessage(session, message);
-                }
+                    break;
             }
 
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to process message", e);
+            logger.severe("Failed to process message: " + e.getMessage());
         }
     }
 
-    // ----------------------------------------------------------
-    // Outbound sending (via queue)
-    // ----------------------------------------------------------
-
-    private String encode(String type, Object payload) {
-        Map<String, Object> env = new HashMap<>();
-        env.put("type", type);
-        env.put("payload", payload);
-        return gson.toJson(env);
+    @OnClose
+    public void onClose(Session session) {
+        subscriptions.removeSession(session);
+        sessions.remove(session);
     }
 
     public static void send(Session session, String message) {
-        BlockingQueue<String> q = outboundQueues.get(session);
-        if (q != null && session.isOpen()) q.offer(message);
+        try {
+            if (session.isOpen()) {
+                session.getBasicRemote().sendText(message);
+            }
+        } catch (Exception e) {
+            logger.warning("Failed to send message: " + e.getMessage());
+        }
     }
 
     public static void broadcast(String message) {
-        if (DEBUG) logger.info("Broadcasting: " + message);
-
+        logger.info("Broadcasing message to clients "+message);
         for (Session s : sessions) {
-            if (s.isOpen()) {
-                BlockingQueue<String> q = outboundQueues.get(s);
-                if (q != null) q.offer(message);
-            }
+            if (s.isOpen())s.getAsyncRemote().sendText(message);
         }
     }
 }

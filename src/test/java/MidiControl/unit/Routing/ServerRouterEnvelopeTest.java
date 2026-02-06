@@ -16,8 +16,6 @@ import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Mocks.FakeSession;
 import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.Mocks.MockMidiIOManager;
-import MidiControl.Mocks.MockMidiServer;
-import MidiControl.Routing.WebSocketEndpoint;
 
 import java.util.List;
 
@@ -35,14 +33,16 @@ class MinimalUiModelService implements UiModelService {
     }
 }
 
-
 public class ServerRouterEnvelopeTest {
-    @Test
-    void testGetUiModelEnvelopeIsHandledCorrectly() throws Exception {
 
-        // Capture outgoing WS messages
+    @Test
+    void testGetUiModelEnvelopeIsHandledCorrectly() {
+
+        // Capture outgoing WebSocket messages
         StringBuilder captured = new StringBuilder();
         FakeSession session = new FakeSession("test-session");
+
+        // FakeSession AsyncRemote sender
         session.setRemoteSender(captured::append);
 
         // Build a minimal UiModelDTO
@@ -50,42 +50,52 @@ public class ServerRouterEnvelopeTest {
         fakeModel.contextId = "channel.1";
         fakeModel.controls = List.of();
 
+        // UiModelService stub
         UiModelService uiModels = new MinimalUiModelService(fakeModel);
 
+        // Minimal mocks for router dependencies
         CanonicalRegistry registry = new MockCanonicalRegistry();
         MidiIOManager ioManager = new MockMidiIOManager(null);
         SubscriptionManager subs = new SubscriptionManager();
 
+        // Router under test
         ServerRouter router = new ServerRouter(
-                uiModels,
-                subs,
-                registry,
-                ioManager
+            uiModels,
+            subs,
+            registry,
+            ioManager
         );
 
-        // Register FakeSession with endpoint
-        WebSocketEndpoint endpoint = new WebSocketEndpoint();
-        endpoint.setServerForTests(new MockMidiServer(registry));
-        endpoint.onOpen(session);
-
-        // Incoming message
+        // Incoming WebSocket message that router must handle
         String incoming = """
         {
-        "type": "get-ui-model",
-        "requestId": "req-123",
-        "payload": {
-            "contextId": "channel.1"
-        }
+          "type": "get-ui-model",
+          "requestId": "req-123",
+          "payload": {
+              "contextId": "channel.1"
+          }
         }
         """;
 
+        // Act
         router.handleMessage(session, incoming);
 
-        // Wait for async sender thread
-        Thread.sleep(50);
-
+        // Assert outbound envelope was captured
         assertFalse(captured.isEmpty(), "Expected a response to be sent");
 
+        // Parse JSON envelope from captured WebSocket output
         JsonObject json = JsonParser.parseString(captured.toString()).getAsJsonObject();
+
+        assertEquals("ui-model", json.get("type").getAsString());
+        assertEquals("req-123", json.get("requestId").getAsString());
+
+        JsonObject payload = json.getAsJsonObject("payload");
+        assertEquals("channel.1", payload.get("contextId").getAsString());
+
+        // Validate DTO structure
+        assertTrue(payload.has("controls"));
+        assertTrue(payload.getAsJsonArray("controls").isEmpty());
+
+        System.out.println("Outbound Envelope: " + json);
     }
 }
