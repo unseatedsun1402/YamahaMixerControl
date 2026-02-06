@@ -1,11 +1,9 @@
 package MidiControl.SystemTools;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.logging.Logger;
 
 
@@ -22,6 +20,7 @@ public final class NativeLoader {
         String mappedName = mapLibraryName(os, baseName);
 
         String resourcePath = "/MidiControl/native/" + os + "/" + mappedName;
+        if(! new File(resourcePath).exists()) return false;
         try (InputStream in = NativeLoader.class.getResourceAsStream(resourcePath)) {
             if (in == null) {
                 throw new RuntimeException("Native library not found in resources: " + resourcePath);
