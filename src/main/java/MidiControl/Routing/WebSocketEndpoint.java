@@ -30,9 +30,14 @@ public class WebSocketEndpoint {
     private static final Set<Session> sessions = ConcurrentHashMap.newKeySet();
     private static final Logger logger = Logger.getLogger(WebSocketEndpoint.class.getName());
     private static final Gson gson = new Gson();
+    private static boolean DEBUG = false;
 
     private MidiServer server;
     private SubscriptionManager subscriptions;
+
+    public static void enableDebug(){
+        DEBUG = true;
+    }
 
     private static String encode(String type, Object payload) {
         Map<String, Object> envelope = new HashMap<>();
@@ -104,7 +109,7 @@ public class WebSocketEndpoint {
     }
 
     public static void broadcast(String message) {
-        logger.info("Broadcasing message to clients "+message);
+        if (DEBUG) logger.fine("Broadcasting message to clients "+message);
         for (Session s : sessions) {
             if (s.isOpen())s.getAsyncRemote().sendText(message);
         }

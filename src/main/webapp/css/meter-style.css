@@ -12,29 +12,21 @@
     color: #0f0;
 }
 
-
 .fifteen-segment-meter {
     display: flex;
     flex-direction: column-reverse; /* bottom = low, top = high */
     width: 20px;
-    gap: 2px;
+    gap: 3px;
     margin: 0 10px;
 }
 
 .fifteen-segment-meter .segment {
-    width: 20px;
-    height: 6px;
+    width: 24px;
+    height: 8px;
     background-color: #222; /* default off */
     border-radius: 2px;
 }
 
-.meter-panel {
-    min-height: 200px;
-    border: 1px solid #888;
-    background: #1a1a1a;
-    padding: 10px;
-    font-family: sans-serif;
-}
 
 .meter-panel {
     min-height: 200px;
@@ -43,11 +35,15 @@
     padding: 10px;
     font-family: sans-serif;
 
-    display: flex;
+    display: inline-flex;      /* shrink to fit content */
     flex-direction: row;
-    align-items: flex-end; /* bottom-align meters */
+    align-items: flex-end;
     gap: 20px;
+
+    min-width: 100vw;          /* but never smaller than window */
+    box-sizing: border-box;     /* include padding in width calc */
 }
+
 
 #meter-placeholder {
     color: #ccc;

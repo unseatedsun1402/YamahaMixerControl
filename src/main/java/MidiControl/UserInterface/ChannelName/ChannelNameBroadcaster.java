@@ -14,7 +14,7 @@ public class ChannelNameBroadcaster implements ChannelNameListener{
     private static Gson gsonReader = new Gson();
 
     public static void enableDebug(){
-        DEBUG = true;
+        DEBUG = false;
     }
 
     private void broadcast(String json) {

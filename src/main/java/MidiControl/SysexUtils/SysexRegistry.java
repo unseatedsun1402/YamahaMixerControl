@@ -5,10 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import MidiControl.SystemTools.NativeLoader;
+
 public class SysexRegistry {
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
-
+    private static final boolean NATIVE = NativeLoader.loadLibrary("native_sysex");
     private final List<SysexMapping> mappings;
     private final int[] addressBytes;
 
@@ -93,7 +95,7 @@ public class SysexRegistry {
 
     // Native fast resolver
     public SysexMapping resolveFast(byte[] msg) {
-        if (!NativeSysex.isNativeAvailable()) {
+        if (!NATIVE) {
             logger.fine("Native C method unavailable, falling back to Java resolver");
             return null;
         }
@@ -108,7 +110,7 @@ public class SysexRegistry {
 
     // Push metadata + lookup table to native resolver
     private void pushToNative(List<SysexMapping> mappings, int[] addressBytes) {
-        if (!NativeSysex.isNativeAvailable()) {
+        if (!NATIVE) {
             logger.warning("Native C method unavailable, cannot update lookup");
             return;
         }

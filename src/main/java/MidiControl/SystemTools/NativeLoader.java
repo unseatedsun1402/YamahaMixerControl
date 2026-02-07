@@ -10,20 +10,16 @@ import java.util.logging.Logger;
 public final class NativeLoader {
     private static Logger logger = Logger.getLogger(NativeLoader.class.getName());
 
-    public static void load() {
-        loadLibrary("native_meter_tools");
-        loadLibrary("native_sysex");
-    }
-
     public static boolean loadLibrary(String baseName) {
         String os = getOS();
         String mappedName = mapLibraryName(os, baseName);
 
         String resourcePath = "/MidiControl/native/" + os + "/" + mappedName;
-        if(! new File(resourcePath).exists()) return false;
+
         try (InputStream in = NativeLoader.class.getResourceAsStream(resourcePath)) {
             if (in == null) {
-                throw new RuntimeException("Native library not found in resources: " + resourcePath);
+                logger.warning("Native library not found in resources: " + resourcePath);
+                return false;
             }
 
             // Create unique temp file for Tomcat safe‑reloads

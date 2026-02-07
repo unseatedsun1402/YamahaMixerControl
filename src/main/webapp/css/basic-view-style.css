@@ -102,23 +102,26 @@
     background: #444;
     height: 8px;
 }
-.fader::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    background: #fff30a;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    margin-top: -5px;
-}
 
 .fader::-moz-range-track {
     background: #444;
-    height: 6px;
+    height: 8px;
 }
+
+
+.fader::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    background: #3e90bc;
+    width: 32px;     /* bigger thumb */
+    height: 32px;    /* bigger thumb */
+    border-radius: 50%;
+    margin-top: -12px; /* recenter on track */
+}
+
 .fader::-moz-range-thumb {
-    background: #e6e6e6;
-    width: 20px;
-    height: 20px;
+    background: #3e90bc;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
 }
 
@@ -277,13 +280,14 @@ select {
 /* ------------------------------
    RESPONSIVE
 --------------------------------- */
+
 @media (max-width: 600px) {
     .channel-strip {
-        width: 160px;
+        width: 25vh;
         padding: 8px;
     }
 
     .fader {
-        height: 150px;
+        min-height: 50vh;
     }
 }
