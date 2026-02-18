@@ -8,7 +8,6 @@ import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.TestUtilities.MidiTestUtils;
 import MidiControl.UserInterface.Frontend.GuiBroadcaster;
 import MidiControl.UserInterface.Meter.MeterBroadcaster;
-import MidiControl.UserInterface.Meter.MeterDTO;
 import MidiControl.UserInterface.CanonicalContextResolver;
 import MidiControl.UserInterface.Frontend.GuiBroadcastListener;
 import MidiControl.Server.MidiServer;

@@ -4,6 +4,8 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import MidiControl.ControlServer.HardwareInputHandler;
+import MidiControl.MidiDeviceManager.ReceiverWrapper;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -18,12 +20,14 @@ public class MidiServerListener implements ServletContextListener {
         public void contextInitialized(ServletContextEvent sce) {
             CONTEXT = sce.getServletContext();
             Logger root = Logger.getLogger("");
-            root.setLevel(Level.FINE);
+            root.setLevel(Level.INFO);
             for (Handler h : root.getHandlers()) {
                 h.setLevel(Level.INFO);
             }
             MidiServer server = new MidiServer();
             server.run();
+            // ReceiverWrapper.enableDebug();
+            // HardwareInputHandler.enableDebug();
             CONTEXT.setAttribute("midiServer", server);
         }
 

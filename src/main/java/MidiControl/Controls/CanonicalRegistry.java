@@ -13,6 +13,7 @@ import javax.sound.midi.ShortMessage;
 
 import MidiControl.ControlServer.CanonicalInputEvent;
 import MidiControl.NrpnUtils.NrpnMapping;
+import MidiControl.NrpnUtils.NrpnMappingLoader;
 import MidiControl.SysexUtils.RegistryReloadListener;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexParser;
@@ -23,6 +24,7 @@ public class CanonicalRegistry implements SourceAllInstances {
     private final Map<String, ControlInstance> controlsById = new HashMap<>();
     private SysexParser sysexParser;
     private final List<RegistryReloadListener> reloadListeners = new ArrayList<>();
+    private String deskType = null;
     private static final Logger logger = Logger.getLogger(CanonicalRegistry.class.getName());
     private boolean debug = false;
 
@@ -50,6 +52,10 @@ public class CanonicalRegistry implements SourceAllInstances {
 
     public ControlGroup getGroup(String name) {
         return groups.get(name);
+    }
+
+    public String getDeskType(){
+        return deskType;
     }
 
     public Map<String, ControlGroup> getGroups() {
@@ -222,7 +228,7 @@ public class CanonicalRegistry implements SourceAllInstances {
     }
 
 
-    public void reloadMappings(List<SysexMapping> newMappings, SysexParser newParser) {
+    public void reloadMappings(List<SysexMapping> newMappings, SysexParser newParser, String deskType) {
         this.groups.clear();
         this.controlsById.clear();
 
@@ -230,10 +236,13 @@ public class CanonicalRegistry implements SourceAllInstances {
         this.groups.putAll(built);
 
         this.sysexParser = newParser;
+        this.deskType = deskType;
 
         indexControlsByCanonicalId();
+        attachNrpnMappings(NrpnMappingLoader.loadFromResource(MidiControl.NrpnUtils.MappingFiles.getFilePathByKey(deskType)));
         attachBroadcastListeners();
         notifyReloadListeners();
+
     }
 
     public void addReloadListener(RegistryReloadListener l) {

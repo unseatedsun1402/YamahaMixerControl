@@ -29,10 +29,10 @@ import MidiControl.NrpnUtils.NrpnMapping;
 import MidiControl.NrpnUtils.NrpnMappingLoader;
 import MidiControl.NrpnUtils.NrpnParser;
 import MidiControl.NrpnUtils.NrpnRegistry;
-import MidiControl.SysexUtils.RegistryReloadListener;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
+import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 import MidiControl.UserInterface.DTO.UiModelDTO;
 import MidiControl.UserInterface.Frontend.GuiBroadcastListener;
 import MidiControl.UserInterface.Frontend.WebSocketGuiBroadcaster;
@@ -40,7 +40,6 @@ import MidiControl.UserInterface.UiBankFactory;
 import MidiControl.UserInterface.UiContextIndex;
 import MidiControl.UserInterface.UiModelFactory;
 import MidiControl.UserInterface.UiModelService;
-import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 import jakarta.annotation.PreDestroy;
 public class MidiServer implements Runnable, UiModelService{
     private volatile boolean shutdownFlag = false;
@@ -72,20 +71,11 @@ public class MidiServer implements Runnable, UiModelService{
 
         List<SysexMapping> sysexMappings =
                 // SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
-                SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
+                SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
         this.canonicalRegistry =
                 new CanonicalRegistry(sysexMappings, new SysexParser(sysexMappings));
         
         this.canonicalRegistry.addReloadListener(this::onRegistryReloaded);
-        List<NrpnMapping> nrpnMappings =
-                NrpnMappingLoader.loadFromResource("MidiControl/nrpn/01v96i_nrpn_mappings.json");
-        // Attach NRPN mappings to ControlInstances
-        try{
-            this.canonicalRegistry.attachNrpnMappings(nrpnMappings);
-        }
-        catch (OutOfRangeException e) {
-            logger.severe(e.toString());
-        }
         this.viewBuilders = new ViewRegistry();
         this.uiFactory = null;
         // Safe fallback listener
@@ -313,5 +303,13 @@ public class MidiServer implements Runnable, UiModelService{
     
     private void onRegistryReloaded(CanonicalRegistry newRegistry) {
         recreateNameAssemblers();
+        List<NrpnMapping> nrpnMappings =
+                NrpnMappingLoader.loadFromResource("MidiControl/nrpn/m7cl_nrpn_mappings.json");
+        try{
+            this.canonicalRegistry.attachNrpnMappings(nrpnMappings);
+        }
+        catch (OutOfRangeException e) {
+            logger.severe(e.toString());
+        }
     }
 }

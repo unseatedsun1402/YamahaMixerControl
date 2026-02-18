@@ -33,7 +33,8 @@ public class MidiInputReceiver implements Receiver {
       return;
     }
     if (open) {inputBuffer.add(message);}
-    if(DEBUG) {logger.fine("Added to inputBuffer: " + SysexParser.bytesToHex(message.getMessage()));}
+    else logger.warning("Midi device is not open: "+this.hashCode());
+    if(DEBUG) {logger.info("Added to inputBuffer: " + SysexParser.bytesToHex(message.getMessage()));}
   }
 
   public Boolean isOpen() {
