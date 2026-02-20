@@ -1,0 +1,49 @@
+.fader-role-input .fader-track {
+    background-color: #334;
+    border-color: #556;
+}
+
+.fader-role-output .fader-track {
+    background-color: #2a332a;
+    border-color: #4d664d;
+}
+
+.fader-role-dca .fader-track {
+    background-color: #332a2a;
+    border-color: #664d4d;
+}
+
+.fader-role-group .fader-track {
+    background-color: #33331d;
+    border-color: #66663a;
+}
+
+/* Mix / Aux Send (blue family) */
+.knob-role-send .knob-dial {
+    background: #2e5eff;
+    border-color: #1d3dcc;
+}
+
+/* Matrix Send (cyan/teal) */
+.knob-role-matrix .knob-dial {
+    background: #2fcccc;
+    border-color: #1fa3a3;
+}
+
+/* EQ (green) */
+.knob-role-eq .knob-dial {
+    background: #5fbf5f;
+    border-color: #3d7f3d;
+}
+
+/* Dynamics (red) */
+.knob-role-dyn .knob-dial {
+    background: #cc4d4d;
+    border-color: #8f2626;
+}
+
+/* Headamp / Trim (dark neutral) */
+.knob-role-gain .knob-dial {
+    background: #1e1e1e;
+    border-color: #555;
+}

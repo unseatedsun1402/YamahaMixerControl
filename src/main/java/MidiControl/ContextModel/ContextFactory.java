@@ -45,7 +45,6 @@ public class ContextFactory {
         addDynamicFilter(schema, filters, "kMixNameLong");
 
         // addDynamicIndexedFilters(schema, filters, "kMixSend");
-        
 
         return new Context(
             "mix." + mixIndex,

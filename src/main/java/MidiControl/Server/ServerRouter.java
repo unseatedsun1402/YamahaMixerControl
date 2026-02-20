@@ -133,7 +133,7 @@ public class ServerRouter {
         if (ci != null) {
             ci.updateValue(value);
             guiInputHandler.handleGuiChange(canonicalId, value);
-            // subscriptions.broadcastControlUpdate(canonicalId, value);
+            subscriptions.broadcastControlUpdateWithout(canonicalId, value, session);
         } else {
             logger.warning("Unknown canonicalId in set-control-value: " + canonicalId);
         }

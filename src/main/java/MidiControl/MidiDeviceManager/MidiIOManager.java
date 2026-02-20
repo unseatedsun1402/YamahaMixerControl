@@ -27,7 +27,8 @@ public class MidiIOManager {
     private final ScheduledExecutorService sendExecutor =
             Executors.newSingleThreadScheduledExecutor();
 
-    private static final long SEND_DELAY_MS = 2;
+    private static final long SEND_DELAY_MS = 1;
+    private static final int SEND_DELAY_NS = 200;
     private volatile boolean sendLoopRunning = false;
 
     public MidiIOManager(MidiServer server) {
@@ -119,7 +120,7 @@ public class MidiIOManager {
                         logger.warning("Failed to send MIDI message: " + e.getMessage());
                     }
 
-                    Thread.sleep(SEND_DELAY_MS);
+                    Thread.sleep(SEND_DELAY_MS,SEND_DELAY_NS);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

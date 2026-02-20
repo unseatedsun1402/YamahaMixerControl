@@ -27,6 +27,7 @@ public class RehydrationManager {
     private static final Logger logger = Logger.getLogger(RehydrationManager.class.getName());
     private static byte[] cachedMeterRequest = null;
     private static byte cachedModelNumber;
+    private static boolean debug = true;
 
     public RehydrationManager(OutputRequestSender outputRouter,
                               SourceAllInstances registry,
@@ -36,6 +37,10 @@ public class RehydrationManager {
         this.scheduler = scheduler;
 
         attachListeners();
+    }
+
+    public static void enableDebug(){
+        debug = true;
     }
 
     public RehydrationManager() {
@@ -60,7 +65,6 @@ public class RehydrationManager {
      * Request a single control value from the desk.
      */
     public void request(String canonicalId) {
-        // logger.fine("Rehydration request: " + canonicalId);
         pending.put(canonicalId, System.currentTimeMillis());
         outputRouter.applyRequest(canonicalId);
 
@@ -72,8 +76,8 @@ public class RehydrationManager {
      * Request all control values from the desk.
      */
     public void rehydrateAll() {
+        long rehydrationStart=System.currentTimeMillis();
         List<ControlInstance> all = new ArrayList<>(registry.getAllInstances());
-
         all.sort((a, b) -> Integer.compare(a.getPriority(), b.getPriority()));
 
         Iterator<ControlInstance> it = all.iterator();
@@ -82,33 +86,34 @@ public class RehydrationManager {
             @Override
             public void run() {
                 if (!it.hasNext()) {
-                    return; // done
+                    logger.info("Rehydration complete: all priorities processed.");
+                    all.clear();
+                    if(debug)logger.info("Rehydration finished in: "+(System.currentTimeMillis() - rehydrationStart));
+                    return;
                 }
 
                 ControlInstance next = it.next();
                 int prio = normalizePriority(next.getPriority());
 
+                request(next.getCanonicalId());
+
                 int batch = switch (prio) {
-                    case 1 -> 1;   // faders, ON, SOLO
-                    case 2 -> 2;   // level/gain/pan
-                    case 3 -> 4;   // deep EQ/dynamics
-                    default -> 8;  // very deep / rarely used
+                    case 1 -> 1;
+                    case 2 -> 2;
+                    case 3 -> 4;
+                    default -> 8;
                 };
 
                 long delay = switch (prio) {
-                    case 1 -> 10;
-                    case 2 -> 15;
-                    case 3 -> 40;
-                    default -> 50;
+                    case 1 -> 8;
+                    case 2 -> 13;
+                    case 3 -> 55;
+                    default -> 89;
                 };
-
-                request(next.getCanonicalId());
 
                 for (int i = 1; i < batch && it.hasNext(); i++) {
                     ControlInstance ci = it.next();
-                    if (normalizePriority(ci.getPriority()) != prio) {
-                        break;
-                    }
+                    if (normalizePriority(ci.getPriority()) != prio) break;
                     request(ci.getCanonicalId());
                 }
 
@@ -134,7 +139,6 @@ public class RehydrationManager {
             // Not a rehydration response — just process normally
             return;
         }
-        // logger.fine("Rehydrated "+canonicalId + " control value");
     }
 
     /**
@@ -143,7 +147,6 @@ public class RehydrationManager {
     private void checkTimeout(String canonicalId) {
         if (pending.containsKey(canonicalId)) {
             pending.remove(canonicalId);
-            // logger.fine("Rehydration timeout for " + canonicalId);
         }
     }
 
@@ -179,5 +182,4 @@ public class RehydrationManager {
         request.setStartChannel(0);
         return request.toByteArray();
     }
-
 }

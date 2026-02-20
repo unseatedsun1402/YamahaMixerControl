@@ -134,19 +134,10 @@ public class SysexMapping {
     }
 
     public int extractValue(byte[] sysex) {
-        if (valueByteIndices.length == 4) {
-            int b2 = sysex[valueByteIndices[2]] & 0x7F;
-            int b3 = sysex[valueByteIndices[3]] & 0x7F;
-            return (b2 << 7) | b3;
-        }
-
         int value = 0;
-        int shift = 0;
 
         for (int idx : valueByteIndices) {
-            int b = sysex[idx] & 0x7F;
-            value |= (b << shift);
-            shift += 7;
+            value = (value << 7) | (sysex[idx] & 0x7F);
         }
 
         return value;

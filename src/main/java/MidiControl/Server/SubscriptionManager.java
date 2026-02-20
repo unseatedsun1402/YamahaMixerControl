@@ -2,6 +2,7 @@ package MidiControl.Server;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import com.google.gson.JsonObject;
 
@@ -15,6 +16,11 @@ public class SubscriptionManager {
 
     // contextId → set of sessions
     private final Map<String, Set<Session>> contextToSessions = new ConcurrentHashMap<>();
+
+    private static final Logger logger = Logger.getLogger(SubscriptionManager.class.getName());
+    private static boolean debug = false;
+
+    public static void enableDebug(){debug = true;}
 
     public void subscribe(Session session, String contextId) {
         sessionToContexts
@@ -68,8 +74,6 @@ public class SubscriptionManager {
     }
 
     public void broadcastControlUpdate(String canonicalId, int value) {
-        // Determine contextId from canonicalId
-        // Example: "kInputFader.kFader.1" → "kInputFader"
         String contextId = canonicalId.split("\\.")[0];
 
         Set<Session> sessions = getSubscribers(contextId);
@@ -90,6 +94,40 @@ public class SubscriptionManager {
 
         for (Session s : sessions) {
             WebSocketEndpoint.send(s, json);
+            logger.info("Gui control update from "+s.getId());
+        }
+    }
+
+    public void broadcastControlUpdateWithout(String canonicalId, int value,Session session){
+        String contextId = canonicalId.split("\\.")[0];
+
+        Set<Session> sessions = getSubscribers(contextId);
+        if(sessions.isEmpty()){contextId = "channel."+canonicalId.split("\\.")[2];
+            sessions = getSubscribers(contextId);
+        }
+        
+        if (sessions.isEmpty()) {
+            logger.warning("Cannot find any subscribers to "+canonicalId);
+            return;
+        }
+
+        JsonObject msg = new JsonObject();
+        msg.addProperty("type", "control-update");
+
+        JsonObject payload = new JsonObject();
+        payload.addProperty("contextId", contextId);
+        payload.addProperty("canonicalId", canonicalId);
+        payload.addProperty("value", value);
+        msg.add("payload", payload);
+
+        String json = msg.toString();
+
+
+        for (Session s : sessions) {
+            if(s.getId() != session.getId()){
+                WebSocketEndpoint.send(s, json);
+                if(debug)logger.fine("Gui control update from "+session.getId()+" sent to "+s.getId());
+            }
         }
     }
 

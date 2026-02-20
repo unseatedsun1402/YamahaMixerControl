@@ -1,55 +1,77 @@
-/* --------------------------------
-   BODY
----------------------------------- */
-.body {
+/* ==========================================================
+   GLOBAL LAYOUT
+   ========================================================== */
+body {
     background-color: #555;
     font-family: sans-serif;
     height: 100vh;
+    margin: 0;
+    display: flex;
+    overflow-y: hidden;
+    flex-direction: column;
 }
+
 
 #strip-container {
     display: flex;
     flex-direction: row;
     gap: 12px;
     padding: 8px;
-    max-height: 98vh;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap; /* CRITICAL: allows horizontal overflow */
 }
 
-/* -------------------------------
-   CHANNEL STRIP CONTAINER
--------------------------------- */
+/* ==========================================================
+   CHANNEL STRIP
+   ========================================================== */
 .channel-strip {
     display: flex;
     flex-direction: column;
+    flex: 0 0 auto;
     width: 220px;
-    height: 98%;
+    height: calc(99vh - 65px); /* full height minus container padding */
+    min-height: 0;
+    overflow: hidden;
     background: #1b1b1b;
     border-radius: 8px;
     padding: 12px;
     color: #eee;
     box-sizing: border-box;
     box-shadow: 0 0 10px rgba(0,0,0,0.4);
-    font-family: monospace;
+}
+/* ----------------------------------------
+   TOP FIXED SECTION (labels, name, icon)
+   ---------------------------------------- */
+.strip-top {
+    flex-shrink: 0;
+    margin-bottom: 8px;
 }
 
-/* Scrollable area for everything above the fader */
+/* ----------------------------------------
+   SCROLLABLE MIDDLE SECTION (mix knobs, EQ)
+   ---------------------------------------- */
 .strip-scroll-area {
     flex: 1;
     overflow-y: auto;
-    padding-right: 4px; /* avoids scrollbar overlap */
+    padding-right: 4px;
+    min-height: 0; /* critical for flexbox scrolling */
 }
 
-/* Fader stays fixed at the bottom */
+/* ----------------------------------------
+   FADER SECTION (always visible)
+   ---------------------------------------- */
 .strip-fader-area {
+    flex-shrink: 0;
     margin-top: 10px;
     padding-top: 10px;
-    height: max-content;
     border-top: 1px solid #333;
 }
 
-/* --------------------------
-   SECTION WRAPPERS
---------------------------- */
+/* ==========================================================
+   GENERIC CONTROL STYLES
+   ========================================================== */
 .section {
     display: flex;
     flex-direction: column;
@@ -67,10 +89,6 @@
     margin-bottom: 4px;
 }
 
-/* ------------------------
-   CONTROL BASE STYLE
----------------------------- */
-
 .control {
     display: flex;
     flex-direction: column;
@@ -82,52 +100,11 @@
 .control-label {
     font-size: 0.8rem;
     color: #ccc;
-    text-align: center;
 }
 
-/* --------------------------
-   VERTICAL FADER — CROSS BROWSER
----------------------------- */
-.fader {
-    width: 40px;
-    min-height: 25vh;
-    height: max-content;
-    margin: 0 auto;
-    writing-mode: vertical-rl; /* Firefox + modern browsers */
-    transform: rotate(180deg); /* Corrects direction */
-}
-
-/* Fader track + thumb styling (optional) */
-.fader::-webkit-slider-runnable-track {
-    background: #444;
-    height: 8px;
-}
-
-.fader::-moz-range-track {
-    background: #444;
-    height: 8px;
-}
-
-
-.fader::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    background: #3e90bc;
-    width: 32px;     /* bigger thumb */
-    height: 32px;    /* bigger thumb */
-    border-radius: 50%;
-    margin-top: -12px; /* recenter on track */
-}
-
-.fader::-moz-range-thumb {
-    background: #3e90bc;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-}
-
-/* --------------------------
-   KNOBS
------------------------------ */
+/* ==========================================================
+   ROTARY KNOBS
+   ========================================================== */
 .rotary-knob {
     width: 48px;
     height: 48px;
@@ -139,9 +116,6 @@
     user-select: none;
 }
 
-/* --------------------------
-   Knob Dial (the circular base)
------------------------------ */
 .knob-dial {
     width: 100%;
     height: 100%;
@@ -153,44 +127,36 @@
     transform-origin: 50% 50%;
 }
 
-/* -------------------------
-   Knob Value Indicator (the rotating pointer)
----------------------------- */
 .knob-value {
-  width: 4px;
-  height: 18px;
-  background: #4da3ff;
-  position: absolute;
-  top: 10%;
-  left: 45%;
-  transform-origin: 50% 100%;
-  border-radius: 2px;
-  transition: transform 0.1s ease;
+    width: 4px;
+    height: 18px;
+    background: #4da3ff;
+    position: absolute;
+    top: 10%;
+    left: 45%;
+    transform-origin: 50% 100%;
+    border-radius: 2px;
+    transition: transform 0.1s ease;
 }
 
-/* --------------------------
-   Visual Feedback Pulse
------------------------------ */
 .knob-value.updated {
-    transition: transform 0.1s ease, background-color 0.1s ease;
     background-color: #7fc2ff;
 }
 
 .rotary-knob:hover {
-  background-color: #2a2a2a;
-  border-radius: 50%;
+    background-color: #2a2a2a;
+    border-radius: 50%;
 }
 
-/* ----------------------------
-   Active Drag Cursor
-------------------------------- */
 .rotary-knob:active {
     cursor: grabbing;
 }
 
-/* --------------------------
+
+/* ==========================================================
    TOGGLE BUTTONS
------------------------------ */
+   ========================================================== */
+
 .toggle-control {
     width: 100%;
     padding: 8px;
@@ -199,7 +165,7 @@
     border-radius: 4px;
     color: #eee;
     cursor: pointer;
-    text-align: center;
+    text-align: centre;
     font-size: 0.9rem;
     transition: background 0.2s, border-color 0.2s;
 }
@@ -214,9 +180,11 @@
     color: white;
 }
 
-/* -----------------------------------
-   SELECT (EQ Type)
--------------------------------------- */
+
+/* ==========================================================
+   SELECT INPUTS
+   ========================================================== */
+
 select {
     width: 100%;
     padding: 6px;
@@ -226,21 +194,25 @@ select {
     color: #eee;
 }
 
-/* ----------------------------------
+
+/* ==========================================================
    STRING DISPLAY
-------------------------------------*/
+   ========================================================== */
+
 .string-display {
     background: #222;
     border: 1px solid #444;
     padding: 6px;
     border-radius: 4px;
-    text-align: center;
+    text-align: centre;
     color: #eee;
 }
 
-/* ---------------------------------
-   EQ SECTIONS
-------------------------------------*/
+
+/* ==========================================================
+   EQ BANDS
+   ========================================================== */
+
 .eq-section {
     display: flex;
     gap: 12px;
@@ -264,30 +236,61 @@ select {
     font-size: 0.75rem;
     text-transform: uppercase;
     color: #aaa;
-    text-align: center;
+    text-align: centre;
     margin-bottom: 4px;
 }
 
-/* -----------------------------
-     MIX SECTION
---------------------------------*/
+
+/* ==========================================================
+   MIX SENDS GRID
+   ========================================================== */
+
 .group-kInputToMix {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
 }
+/* =========================================================*/
 
-/* ------------------------------
-   RESPONSIVE
---------------------------------- */
+.strip-scroll-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.strip-scroll-area::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.25);
+    border-radius: 4px;
+    transition: background 0.1s;
+}
+
+/* Hide until hover */
+.strip-scroll-area::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.strip-scroll-area:hover::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.25);
+}
+
+/* ==========================================================
+   FIREFOX AUTO-HIDE
+   ========================================================== */
+
+.strip-scroll-area {
+    scrollbar-width: none;        /* hide by default */
+}
+
+.strip-scroll-area:hover {
+    scrollbar-width: thin;        /* show on hover */
+    scrollbar-color: rgba(255,255,255,0.25) transparent;
+}
+
+/* ==========================================================
+   RESPONSIVE LAYOUT
+   ========================================================== */
 
 @media (max-width: 600px) {
     .channel-strip {
         width: 25vh;
         padding: 8px;
-    }
-
-    .fader {
-        min-height: 50vh;
     }
 }
