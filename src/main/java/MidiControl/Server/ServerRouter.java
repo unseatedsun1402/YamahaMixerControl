@@ -262,7 +262,7 @@ public class ServerRouter {
         
         List<SysexMapping> newMappings = SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(mappingString));
         if (newMappings != null ){
-            this.registry.reloadMappings(newMappings, new SysexParser(newMappings));
+            this.registry.reloadMappings(newMappings, new SysexParser(newMappings), mappingString);
             logger.info("New registry loaded "+ mappingString);
         } 
 

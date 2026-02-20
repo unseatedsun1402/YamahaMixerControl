@@ -1,4 +1,3 @@
-
 package MidiControl.SysexUtils;
 
 public enum MappingFiles {

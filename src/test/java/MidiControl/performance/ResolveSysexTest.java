@@ -13,11 +13,13 @@ import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
 import MidiControl.SysexUtils.SysexRegistry;
+import MidiControl.SystemTools.NativeLoader;
 
 public class ResolveSysexTest {
     @Test
     void testSlowVsFastPathPerformanceM7CL() {
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
+        boolean NATIVE = NativeLoader.loadLibrary("native_sysex.dll");
         SysexRegistry registry = new SysexRegistry(mappings);
         SysexParser parser = new SysexParser(mappings);
         int iterations = 50_000;
@@ -41,7 +43,7 @@ public class ResolveSysexTest {
         log.info("Slow path (Java) "+iterations+ " iterations: " + slowTime / 1_000_000 + " ms");
 
         // --- Fast path (native) ---
-        if (!MidiControl.SysexUtils.NativeSysex.isNativeAvailable()) {
+        if (!NATIVE) {
             log.warning("Native resolver unavailable — skipping fast path timing");
             return;
         }
@@ -69,6 +71,7 @@ public class ResolveSysexTest {
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
         SysexRegistry registry = new SysexRegistry(mappings);
         SysexParser parser = new SysexParser(mappings);
+        boolean NATIVE = NativeLoader.loadLibrary("native_sysex.dll");
         int iterations = 50_000;
 
         byte[] message = new byte[] {
@@ -106,7 +109,7 @@ public class ResolveSysexTest {
         log.info("Slow path (Java) "+iterations+ " iterations: " + slowTime / 1_000_000 + " ms");
 
         // --- Fast path (native) ---
-        if (!MidiControl.SysexUtils.NativeSysex.isNativeAvailable()) {
+       if (!NATIVE) {
             log.warning("Native resolver unavailable — skipping fast path timing");
             return;
         }

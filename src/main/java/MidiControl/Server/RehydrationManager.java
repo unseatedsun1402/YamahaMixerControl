@@ -60,7 +60,7 @@ public class RehydrationManager {
      * Request a single control value from the desk.
      */
     public void request(String canonicalId) {
-        logger.fine("Rehydration request: " + canonicalId);
+        // logger.fine("Rehydration request: " + canonicalId);
         pending.put(canonicalId, System.currentTimeMillis());
         outputRouter.applyRequest(canonicalId);
 
@@ -134,7 +134,7 @@ public class RehydrationManager {
             // Not a rehydration response — just process normally
             return;
         }
-        logger.fine("Rehydrated "+canonicalId + " control value");
+        // logger.fine("Rehydrated "+canonicalId + " control value");
     }
 
     /**
@@ -143,7 +143,7 @@ public class RehydrationManager {
     private void checkTimeout(String canonicalId) {
         if (pending.containsKey(canonicalId)) {
             pending.remove(canonicalId);
-            logger.fine("Rehydration timeout for " + canonicalId);
+            // logger.fine("Rehydration timeout for " + canonicalId);
         }
     }
 

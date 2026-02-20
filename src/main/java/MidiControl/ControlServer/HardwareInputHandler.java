@@ -1,17 +1,17 @@
 package MidiControl.ControlServer;
 
-import MidiControl.NrpnUtils.NrpnParser;
-import MidiControl.NrpnUtils.NrpnRegistry;
-import MidiControl.UserInterface.Meter.MeterBroadcaster;
-import MidiControl.UserInterface.Meter.MeterSimpleParser;
-import MidiControl.NrpnUtils.NrpnMessage;
+import java.util.Arrays;
+import java.util.logging.Logger;
 
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.SysexMessage;
 
-import java.util.Arrays;
-import java.util.logging.Logger;
+import MidiControl.NrpnUtils.NrpnMessage;
+import MidiControl.NrpnUtils.NrpnParser;
+import MidiControl.NrpnUtils.NrpnRegistry;
+import MidiControl.UserInterface.Meter.MeterBroadcaster;
+import MidiControl.UserInterface.Meter.MeterSimpleParser;
 
 public class HardwareInputHandler {
 
@@ -54,7 +54,7 @@ public class HardwareInputHandler {
                 return null;
             }
 
-            logger.fine("Received SysEx: " + Arrays.toString(full));
+            if (DEBUG)logger.info(() -> "Received SysEx: " + Arrays.toString(full));
             return CanonicalInputEvent.fromSysex(full);
         }
 
@@ -67,7 +67,7 @@ public class HardwareInputHandler {
                 NrpnMessage nrpn = nrpnParser.parse(sm);
 
                 if (nrpn != null) {
-                    if(DEBUG){logger.fine("Assembled NRPN: MSB=" + nrpn.msb + " LSB=" + nrpn.lsb + " value=" + nrpn.value);}
+                    if(DEBUG){logger.fine(() -> "Assembled NRPN: MSB=" + nrpn.msb + " LSB=" + nrpn.lsb + " value=" + nrpn.value);}
                     return CanonicalInputEvent.fromNrpn(nrpn);
                 }
 
