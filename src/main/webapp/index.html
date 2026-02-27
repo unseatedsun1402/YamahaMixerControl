@@ -3,32 +3,67 @@
 <head>
   <title>Scan to Access</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
+
 <body>
   <h1 style="text-align: center;">Scan to Access Mixer Pages</h1>
+
   <div class="qr-grid" style="text-align:center">
+
     <div class="qr-item">
+
       <div class="qr-row">
-        <a href="main.html"> <!-- FOH Mix View -->
-          <img src="qrcodes/main_qr.png" alt="main">
+        <a href="main.html">
+          <div id="qr-main"></div>
           <label>main.html</label>
         </a>
       </div>
-      <div class="qr-row"> <!-- mix 1 to 4 -->
+
+      <div class="qr-row">
         <a href="settings.html">
-        <img src="qrcodes/settings_qr.png" alt="settings">
-        <label>settings.html</label></a>
+          <div id="qr-settings"></div>
+          <label>settings.html</label>
+        </a>
+
         <a href="meters.html">
-        <img src="qrcodes/meters_qr.png" alt="meters">
-        <label>meters.html</label></a>
+          <div id="qr-meters"></div>
+          <label>meters.html</label>
+        </a>
+
         <a href="bus.html">
-        <img src="qrcodes/bus_qr.png" alt="buses">
-        <label>buses.html</label></a>
+          <div id="qr-bus"></div>
+          <label>buses.html</label>
+        </a>
+
         <a href="sendsOnFader.html">
-        <img src="qrcodes/sendsOnFader_qr.png" alt="sends">
-        <label>sends.html</label></a>
+          <div id="qr-sends"></div>
+          <label>sends.html</label>
+        </a>
       </div>
     </div>
+
   </div>
+
+  <script>
+    // Fetch the server base URL from your servlet
+  const contextPath = window.location.pathname.split('/')[1];
+  const serveUrl = `http://${location.host}/${contextPath}/get-server-ip`;
+  fetch(serveUrl)
+      .then(r => r.text())
+      .then(txt => {
+        const data = JSON.parse(txt);
+        const base = data.payload;
+
+        // Generate QR codes using the dynamic base
+        new QRCode(document.getElementById("qr-main"), base + "/main.html");
+        new QRCode(document.getElementById("qr-settings"), base + "/settings.html");
+        new QRCode(document.getElementById("qr-meters"), base + "/meters.html");
+        new QRCode(document.getElementById("qr-bus"), base + "/bus.html");
+        new QRCode(document.getElementById("qr-sends"), base + "/sendsOnFader.html");
+      })
+      .catch(err => console.error("QR init failed: "+ err));
+  </script>
+
 </body>
 </html>

@@ -39,12 +39,9 @@ public class NrpnMapping {
             case (byte) 0x0F:  // 7-bit
                 return build7bit(value);
 
-            case (byte) 0xF0:  // 10-bit
-                return build10bit(value);
-
-            case (byte) 0xFF:  // 14-bit
+            case (byte) 0xFF:
             default:
-                return build14bit(value);
+                return buildBits(value);
         }
     }
 
@@ -63,30 +60,13 @@ public class NrpnMapping {
     }
 
     /**
-     * 10-bit NRPN (value 0–1023)
-     * MSB = top 7 bits
-     * LSB = bottom 3 bits shifted into Yamaha's nibble format
+     * 2 byte NRPN (value 0–1023)
+     * MSB = remaining bits
+     * LSB = bottom y bits shifted into Yamaha's nibble format
      */
-    private List<byte[]> build10bit(int value) {
-        int msbVal = (value >> 3) & 0x7F;     // top 7 bits
-        int lsbVal = (value & 0x07) << 4;     // bottom 3 bits shifted left
-
-        return List.of(
-            new byte[]{ (byte)0xB0, 99, (byte) msbInt() },
-            new byte[]{ (byte)0xB0, 98, (byte) lsbInt() },
-            new byte[]{ (byte)0xB0, 6,  (byte) msbVal },
-            new byte[]{ (byte)0xB0, 38, (byte) lsbVal }
-        );
-    }
-
-    /**
-     * 14-bit NRPN (value 0–16383)
-     * MSB = top 7 bits
-     * LSB = bottom 7 bits
-     */
-    private List<byte[]> build14bit(int value) {
-        int msbVal = (value >> 7) & 0x7F;
-        int lsbVal = value & 0x7F;
+    private List<byte[]> buildBits(int value) {
+        int msbVal = (value >> 7) & 0x7F;   // top 7 bits
+        int lsbVal = value & 0x7F;          // bottom 7 bits
 
         return List.of(
             new byte[]{ (byte)0xB0, 99, (byte) msbInt() },

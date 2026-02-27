@@ -14,6 +14,7 @@
     align-items: flex-end;
     justify-content: center;
     min-width: 100vw;          /* but never smaller than window */
+    flex-shrink: 0; 
     box-sizing: border-box;     /* include padding in width calc */
 }
 

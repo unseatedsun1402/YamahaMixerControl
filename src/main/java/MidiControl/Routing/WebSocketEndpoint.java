@@ -34,6 +34,7 @@ public class WebSocketEndpoint {
 
     private MidiServer server;
     private SubscriptionManager subscriptions;
+    private static Map<Integer,Boolean> sessionLocks = new ConcurrentHashMap<>();
 
     public static void enableDebug(){
         DEBUG = true;
@@ -100,10 +101,9 @@ public class WebSocketEndpoint {
 
     public static void send(Session session, String message) {
         try {
-            if (session.isOpen()) {
-                session.getBasicRemote().sendText(message);
+            sendWithTimeout(session,message);
             }
-        } catch (Exception e) {
+        catch (Exception e) {
             logger.warning("Failed to send message: " + e.getMessage());
         }
     }
@@ -111,7 +111,29 @@ public class WebSocketEndpoint {
     public static void broadcast(String message) {
         if (DEBUG) logger.fine("Broadcasting message to clients "+message);
         for (Session s : sessions) {
-            if (s.isOpen())s.getAsyncRemote().sendText(message);
+            if (s.isOpen()){
+                sendWithTimeout(s,message);
+            }
+        }
+    }
+
+    private static void sendWithTimeout(Session session, String message){
+        try {
+            if (session.isOpen()) {
+                if(sessionLocks.containsKey(session.hashCode())){ Thread.sleep(1);
+                    if(sessionLocks.containsKey(session.hashCode())) { Thread.sleep(3);
+                    if(sessionLocks.containsKey(session.hashCode())) {Thread.sleep(6); 
+                        logger.warning("Send message "+message.hashCode()+" to "+session.getId()+" timed out");
+                        return;}
+                    }
+                }
+                sessionLocks.put(session.hashCode(), true);
+                session.getBasicRemote().sendText(message);
+                sessionLocks.remove(session.hashCode());
+                }
+            }
+        catch (Exception e) {
+            logger.warning("Failed to send message: " + e.getMessage());
         }
     }
 }

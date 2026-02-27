@@ -1,0 +1,48 @@
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="34" height="40" viewBox="0 0 34 40">
+
+  <defs>
+    <!-- Metallic body gradient -->
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#e6e6e6"/>
+      <stop offset="45%" stop-color="#bbbbbb"/>
+      <stop offset="100%" stop-color="#dcdcdc"/>
+    </linearGradient>
+
+    <!-- Right side shading -->
+    <linearGradient id="sideShade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"  stop-color="rgba(0,0,0,0.25)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main Yamaha-style shape -->
+  <path d="
+      M 8 2
+      L 26 2
+      C 29 2 31 4 31 7
+      L 31 33
+      C 31 36 29 38 26 38
+      L 8 38
+      C 5 38 3 36 3 33
+      L 3 7
+      C 3 4 5 2 8 2
+    "
+    fill="url(#body)"
+    stroke="#333"
+    stroke-width="1.5"
+    stroke-linejoin="round"/>
+
+  <!-- Left highlight -->
+  <rect x="3" y="4" width="3" height="32" 
+        fill="rgba(255,255,255,0.15)" />
+
+  <!-- Right shade -->
+  <rect x="28" y="4" width="3" height="32"
+        fill="url(#sideShade)" />
+
+  <!-- *** Horizontal Position Marker *** -->
+  <rect x="6" y="19" width="22" height="2" rx="1"
+        fill="#444" stroke="#777" stroke-width="0.5" />
+</svg>

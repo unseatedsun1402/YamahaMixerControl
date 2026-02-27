@@ -31,15 +31,10 @@ public class OutputRouter implements OutputRequestSender{
      * Apply a change to hardware using the currently selected transport mode.
      */
     public void applyChange(String canonicalId, int newValue) {
-        if (DEBUG) {
-            logger.info("OutputRouter.applyChange: " + canonicalId + " = " + newValue);
-        }
+        if (DEBUG)logger.info("OutputRouter.applyChange: " + canonicalId + " = " + newValue);
 
         ControlInstance ci = registry.resolveCanonicalId(canonicalId);
-        if (ci == null) {
-            logger.warning("Unknown canonicalId: " + canonicalId);
-            return;
-        }
+        if (ci == null) {logger.warning("Unknown canonicalId: " + canonicalId);return;}
 
         TransportMode mode = ioManager.getTransportMode();
 
@@ -49,7 +44,7 @@ public class OutputRouter implements OutputRequestSender{
                 if (ci.getNrpn().isPresent()) {
                     sendNrpn(ci, newValue);
                 } else {
-                    sendSysex(ci, newValue); // fallback
+                    sendSysex(ci, newValue);
                 }
                 break;
             case SYSEX:
@@ -77,7 +72,6 @@ public class OutputRouter implements OutputRequestSender{
         if (DEBUG) {
             logger.info("Sending SYSEX REQUEST OUT: " + bytesToHex(msg));
         }
-
         ioManager.sendAsync(msg);
     }
 

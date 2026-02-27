@@ -1,9 +1,13 @@
 import { canonicalIdFor } from "../utils/canonical.js";
 import { clamp } from "../utils/math.js";
 import { valueToAngle } from "../utils/math.js";
+import { classifyControl } from "../utils/classify.js";
 
 export function renderKnob(control) {
     const wrapper = document.createElement("div");
+    
+    const roleClass = classifyControl(control);
+    if (roleClass) wrapper.classList.add(roleClass);
     wrapper.className = "rotary-knob";
 
     const knob = document.createElement("div");

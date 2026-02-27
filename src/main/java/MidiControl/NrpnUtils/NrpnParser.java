@@ -1,5 +1,7 @@
 package MidiControl.NrpnUtils;
 
+import java.util.logging.Logger;
+
 import javax.sound.midi.ShortMessage;
 
 public class NrpnParser {
@@ -13,6 +15,8 @@ public class NrpnParser {
     private boolean hasLsb = false;
     private boolean hasValueMsb = false;
     private boolean hasValueLsb = false;
+
+    private static Logger logger = Logger.getLogger(NrpnParser.class.getName());
 
     /**
      * Parse a CC ShortMessage and return a complete NRPN event if available.
@@ -54,6 +58,7 @@ public class NrpnParser {
                 hasValueLsb = true;
 
                 // Full 14-bit NRPN complete
+                if(!hasValueMsb) {reset(); return null;}
                 NrpnMessage result = buildMessage();
                 reset();
                 return result;
