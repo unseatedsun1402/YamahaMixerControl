@@ -10,16 +10,16 @@ import MidiControl.Routing.WebSocketEndpoint;
 
 public class ChannelNameBroadcaster implements ChannelNameListener{
     private static final Logger logger = Logger.getLogger(ChannelNameBroadcaster.class.getName());
-    private static Boolean DEBUG = false;
+    private static Boolean debug = false;
     private static Gson gsonReader = new Gson();
 
     public static void enableDebug(){
-        DEBUG = false;
+        debug = false;
     }
 
     private void broadcast(String json) {
         try {
-            if (DEBUG){logger.fine("Broadcasting update "+json);}
+            if (debug){logger.info("Broadcasting update "+json);}
             WebSocketEndpoint.broadcast(json);
         } catch (Exception e) {
             logger.severe("Exception thrown broadcasting the update: "+json);
@@ -38,7 +38,7 @@ public class ChannelNameBroadcaster implements ChannelNameListener{
 
     @Override
     public void onChannelNameUpdated(String contextId, String updatedName) {
-        if (DEBUG) logger.finer("Broadcasting name update "+updatedName);
+        if (debug) logger.finer("Broadcasting name update "+updatedName);
         broadcast(toJson(contextId, updatedName));
     }
 }

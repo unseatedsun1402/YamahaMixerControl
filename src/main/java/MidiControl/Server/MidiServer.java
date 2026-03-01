@@ -51,7 +51,7 @@ public class MidiServer implements Runnable, UiModelService{
     private final SubscriptionManager subscriptions;
     private final ControlSchema schema;
     private final ViewRegistry viewBuilders;
-    private final UiContextIndex contextIndex;
+    private UiContextIndex contextIndex;
     private final UiModelFactory uiFactory;
     private final UiBankFactory bankFactory;
     private final BankCatalog bankCatalog;
@@ -200,6 +200,7 @@ public class MidiServer implements Runnable, UiModelService{
             .toList();
 
         for(Context ctx : nameContexts){
+            if(ctx.getId() == null) {logger.warning("[iniNameAssemblers] Context given is null"); return;}
             nameAssemblers.add(new ChannelNameAssembler(ctx,canonicalRegistry));
         }
         logger.info("Name assemblers initialised");
@@ -207,11 +208,16 @@ public class MidiServer implements Runnable, UiModelService{
 
     private void recreateNameAssemblers() {
         nameAssemblers.forEach(ChannelNameAssembler::shutdown);
-        nameAssemblers.clear();
+        logger.info("Shutdown stale nameAssemblers");
+        nameAssemblers = new ArrayList<>();
         List<Context> nameContexts = contextIndex.getAllContexts().stream()
             .filter(c -> c.getContextType() == ContextType.NAME)
+            .filter(c -> c.getId() != null)
             .toList();
+        logger.info("Found "+nameContexts.size() + " name contexts to attach assemblers to");
         for (Context ctx : nameContexts) {
+            if(ctx.getId() == null) {logger.warning("[RecreateNameAssemblers] Context given is null"); return;}
+            logger.info("Adding name assembeler to "+ctx.getId());
             nameAssemblers.add(new ChannelNameAssembler(ctx, canonicalRegistry));
         }
         logger.info("Recreated name assemblers after registry reload");
@@ -269,9 +275,13 @@ public class MidiServer implements Runnable, UiModelService{
     }
 
     private void initContextIndex(){
-        List<Context> contexts = discoveryEngine.discoverContexts();
-        contextIndex.addAll(contexts);
+        contextIndex.addAll(discoveryEngine.discoverContexts());
         initNameAssemblers();
+    }
+
+    private void reloadContextIndex(){
+        contextIndex = new UiContextIndex();
+        contextIndex.addAll(discoveryEngine.discoverContexts());
     }
 
     @Override
@@ -302,6 +312,9 @@ public class MidiServer implements Runnable, UiModelService{
     }
     
     private void onRegistryReloaded(CanonicalRegistry newRegistry) {
+        logger.info("Performing discovery after registry reload");
+        discoveryEngine = new ContextDiscoveryEngine(newRegistry);
+        reloadContextIndex();
         recreateNameAssemblers();
         List<NrpnMapping> nrpnMappings =
                 NrpnMappingLoader.loadFromResource("MidiControl/nrpn/m7cl_nrpn_mappings.json");

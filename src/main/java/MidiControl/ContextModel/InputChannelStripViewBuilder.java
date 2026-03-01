@@ -46,11 +46,11 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
                 .ifPresent(ci -> result.add(createChannelOn(ci)));
 
         // 2. PAN
-        all.stream()
-                .filter(ci -> "kInputPan".equals(ci.getGroup()))
-                .filter(ci -> "kChannelPan".equals(ci.getSubcontrol()))
-                .findFirst()
-                .ifPresent(ci -> result.add(createPan(ci)));
+        // all.stream()
+        //         .filter(ci -> "kInputPan".equals(ci.getGroup()))
+        //         .filter(ci -> "kChannelPan".equals(ci.getSubcontrol()))
+        //         .findFirst()
+        //         .ifPresent(ci -> result.add(createPan(ci)));
 
         // 3. SEND_MIX{n}
         all.stream()

@@ -23,7 +23,6 @@ public class ContextFactory {
         addDynamicIndexedFilters(schema, filters, "kAUX");
 
         addDynamicFilter(schema, filters, "kNameShort");
-        addDynamicFilter(schema, filters, "kNameLong");
         addDynamicFilter(schema, filters, "kChannelNameShort");
         addDynamicFilter(schema, filters, "kChannelNameLong");
 
