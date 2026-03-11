@@ -1,13 +1,14 @@
 package MidiControl.Server;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
+
+import javax.sound.midi.MidiDevice;
 
 import MidiControl.Controls.ControlInstance;
 import MidiControl.Controls.SourceAllInstances;
@@ -49,10 +50,6 @@ public class RehydrationManager {
         this.scheduler = null;
     }
 
-    /**
-     * Attach listeners to every ControlInstance in the registry.
-     * The registry owns the structure; we simply enumerate it.
-     */
     private void attachListeners() {
         for (ControlInstance ci : registry.getAllInstances()) {
             ci.addListener((instance, newValue) -> {
@@ -61,9 +58,6 @@ public class RehydrationManager {
         }
     }
 
-    /**
-     * Request a single control value from the desk.
-     */
     public void request(String canonicalId) {
         pending.put(canonicalId, System.currentTimeMillis());
         outputRouter.applyRequest(canonicalId);
@@ -72,54 +66,99 @@ public class RehydrationManager {
                 TIMEOUT_MS, TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * Request all control values from the desk.
-     */
     public void rehydrateAll() {
-        long rehydrationStart=System.currentTimeMillis();
-        List<ControlInstance> all = new ArrayList<>(registry.getAllInstances());
+        final long rehydrationStart = System.currentTimeMillis();
+
+        final List<ControlInstance> all = new ArrayList<>(registry.getAllInstances());
         all.sort((a, b) -> Integer.compare(a.getPriority(), b.getPriority()));
 
-        Iterator<ControlInstance> it = all.iterator();
+        // ---- Configuration ----
+        final long BASE_DELAY_MS = 4L;
+        final int[] WEIGHTED_PATTERN = new int[] {
+            1, 1, 1, 1,
+            2, 2, 2,
+            3, 3,
+            4
+        };
+
+        // ---- Partition into per-priority queues (normalized 1..4) ----
+        final ArrayDeque<ControlInstance> q1 = new ArrayDeque<>();
+        final ArrayDeque<ControlInstance> q2 = new ArrayDeque<>();
+        final ArrayDeque<ControlInstance> q3 = new ArrayDeque<>();
+        final ArrayDeque<ControlInstance> q4 = new ArrayDeque<>();
+
+        for (ControlInstance ci : all) {
+            switch (normalizePriority(ci.getPriority())) {
+                case 1 -> q1.add(ci);
+                case 2 -> q2.add(ci);
+                case 3 -> q3.add(ci);
+                default -> q4.add(ci);
+            }
+        }
+
+        final AtomicInteger remaining = new AtomicInteger(all.size());
+        final AtomicInteger patternIdx = new AtomicInteger(0);
 
         scheduler.schedule(new Runnable() {
             @Override
             public void run() {
-                if (!it.hasNext()) {
+                if (remaining.get() <= 0) {
                     logger.info("Rehydration complete: all priorities processed.");
                     all.clear();
-                    if(debug)logger.info("Rehydration finished in: "+(System.currentTimeMillis() - rehydrationStart));
+                    if (debug) {
+                        logger.info("Rehydration finished in: " + (int)((System.currentTimeMillis() - rehydrationStart)/1000) + " s");
+                    }
                     return;
                 }
 
-                ControlInstance next = it.next();
-                int prio = normalizePriority(next.getPriority());
+                ControlInstance selected = null;
 
-                request(next.getCanonicalId());
-
-                int batch = switch (prio) {
-                    case 1 -> 1;
-                    case 2 -> 2;
-                    case 3 -> 4;
-                    default -> 8;
-                };
-
-                long delay = switch (prio) {
-                    case 1 -> 8;
-                    case 2 -> 13;
-                    case 3 -> 55;
-                    default -> 89;
-                };
-
-                for (int i = 1; i < batch && it.hasNext(); i++) {
-                    ControlInstance ci = it.next();
-                    if (normalizePriority(ci.getPriority()) != prio) break;
-                    request(ci.getCanonicalId());
+                int probes = 0;
+                while (probes < WEIGHTED_PATTERN.length && selected == null) {
+                    int p = WEIGHTED_PATTERN[patternIdx.getAndUpdate(i -> (i + 1) % WEIGHTED_PATTERN.length)];
+                    selected = pollFromQueue(p);
+                    probes++;
                 }
 
-                scheduler.schedule(this, delay, TimeUnit.MILLISECONDS);
+                if (selected == null) {
+                    selected = pollFromQueue(1);
+                    if (selected == null) selected = pollFromQueue(2);
+                    if (selected == null) selected = pollFromQueue(3);
+                    if (selected == null) selected = pollFromQueue(4);
+                }
+
+                if (selected == null) {
+                    remaining.set(0);
+                    logger.info("Rehydration complete: all priorities processed.");
+                    all.clear();
+                    if (debug) {
+                        logger.info("Rehydration finished in: " + (int)((System.currentTimeMillis() - rehydrationStart)/1000) + " seconds");
+                    }
+                    return;
+                }
+
+                request(selected.getCanonicalId());
+                remaining.decrementAndGet();
+
+                scheduler.schedule(this, BASE_DELAY_MS, TimeUnit.MILLISECONDS);
+            }
+
+            private ControlInstance pollFromQueue(int normalizedPrio) {
+                return switch (normalizedPrio) {
+                    case 1 -> q1.pollFirst();
+                    case 2 -> q2.pollFirst();
+                    case 3 -> q3.pollFirst();
+                    default -> q4.pollFirst();
+                };
             }
         }, 0, TimeUnit.MILLISECONDS);
+    }
+
+    public void onControlUpdated(String canonicalId) {
+        Long expected = pending.remove(canonicalId);
+        if (expected == null) {
+            return;
+        }
     }
 
     private int normalizePriority(int p) {
@@ -129,21 +168,6 @@ public class RehydrationManager {
         return 4;
     }
 
-
-    /**
-     * Called when a ControlInstance receives a value from the desk.
-     */
-    public void onControlUpdated(String canonicalId) {
-        Long expected = pending.remove(canonicalId);
-        if (expected == null) {
-            // Not a rehydration response — just process normally
-            return;
-        }
-    }
-
-    /**
-     * Timeout handler.
-     */
     private void checkTimeout(String canonicalId) {
         if (pending.containsKey(canonicalId)) {
             pending.remove(canonicalId);
