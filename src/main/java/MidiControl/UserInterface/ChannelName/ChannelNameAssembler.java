@@ -25,29 +25,38 @@ public class ChannelNameAssembler implements ControlListener {
     private CanonicalRegistry registry;
     private ChannelNameListener listener;
     private static Map<String,String> nameCache = new HashMap<>();
+    private static String deskLifeName = "";
 
     // Debounce timer
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> pendingTask = null;
-    private static final long DEBOUNCE_MS = 700;
+    private static final long DEBOUNCE_MS = 800;
     private static final Logger logger = Logger.getLogger(ChannelNameAssembler.class.getName());
     private volatile boolean pendingNameUpdate = false;
     private Map<String,List<ControlInstance>> instanceMap;
     private Map<ControlInstance,String> channelMap;
+    private String CanonicalName;
     
 
     // passed listener
     public ChannelNameAssembler(Context ctx,
                                 CanonicalRegistry registry,
                                 ChannelNameListener listener) {
-
+        if (deskLifeName == "") {
+            deskLifeName = registry.getDeskType();
+            logger.info("Building assemblers for desk "+ deskLifeName+
+            " "+registry.hashCode());
+        }
         this.context = ctx;
         this.registry = registry;
         this.listener = listener;
 
-        
+        this.CanonicalName = context.getId();
+
         this.instanceMap = new HashMap<>();
         this.channelMap  = new HashMap<>();
+
+        if(CanonicalName == null) {logger.warning("Context given is null"); return;}
 
         subscribeToControls();
     }
@@ -57,17 +66,24 @@ public class ChannelNameAssembler implements ControlListener {
         this.context = ctx;
         this.registry = canonicalRegistry;
         this.listener = new ChannelNameBroadcaster();
+        if (deskLifeName == "") {
+            deskLifeName = registry.getDeskType();
+            logger.info("Building assemblers for desk "+ deskLifeName+
+            " "+registry.hashCode());
+        }
         
         this.instanceMap = new HashMap<>();
         this.channelMap  = new HashMap<>();
 
+        this.CanonicalName = context.getId();
+        if(CanonicalName == null) {logger.warning("Context given is null"); return;}
         subscribeToControls();
     }
 
 
     private void subscribeToControls() {
         List<ControlInstance> contextInstances = new ArrayList<>();
-
+        if(CanonicalName == null) {logger.warning("Context given is null"); return;}
         for (ContextFilter filter : context.getFilters()) {
 
             if (!"kInputChannelName".equals(filter.getControlGroup()))
@@ -91,14 +107,14 @@ public class ChannelNameAssembler implements ControlListener {
 
                 inst.addListener(this);
                 contextInstances.add(inst);
-                channelMap.put(inst, context.getId());
+                channelMap.put(inst, CanonicalName);
             }
         }
 
         // Store the list of instances for this context
-        instanceMap.put(context.getId(), contextInstances);
+        instanceMap.put(CanonicalName, contextInstances);
 
-        logger.info("Assembler for " + context.getId()
+        logger.info("Assembler for " + CanonicalName
             + " subscribed to " + contextInstances.size() + " controls");
     }
 
@@ -177,7 +193,7 @@ public class ChannelNameAssembler implements ControlListener {
                 ci.removeListener(this);
             }
         }
-        logger.info("Shutdown assemblers");
+        if (deskLifeName != "")deskLifeName = "";
     }
 
     static void cacheName(String channelContext, String name){

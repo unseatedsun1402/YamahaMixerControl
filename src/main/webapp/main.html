@@ -46,14 +46,13 @@
         }
         
         ws.on("ui-bank", (bank) => {
-            console.info("[Bootstrap] Bank received:", bank);
+            console.debug("[Bootstrap] Bank received:", bank);
             window.lastBankContexts = bank.contexts;
 
             const stripContainer = document.getElementById("strip-container");
             stripContainer.innerHTML = "";
 
             for (const ctxId of bank.contexts) {
-                console.info(`[Bootstrap] Requesting model for ${ctxId}`);
                 ws.requestUiModel(ctxId, "basic-input-view");
                 ws.subscribe(ctxId);
             }
@@ -76,7 +75,7 @@
             const fromContext = payload["context-id"];   // e.g. "name.28"
             const [, indexStr] = fromContext.split("."); // "28"
             const channelContextId = `channel.${indexStr}`;
-
+            console.debug("Updating Channel name "+payload);
             updateChannelStripName(channelContextId, payload.name);
         });
 

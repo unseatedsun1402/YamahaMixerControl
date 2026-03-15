@@ -13,9 +13,11 @@ import jakarta.websocket.OnClose;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -31,6 +33,7 @@ public class WebSocketEndpoint {
     private static final Logger logger = Logger.getLogger(WebSocketEndpoint.class.getName());
     private static final Gson gson = new Gson();
     private static boolean DEBUG = false;
+    private static final long TIMEOUT = 3000;
 
     private MidiServer server;
     private SubscriptionManager subscriptions;
@@ -109,31 +112,36 @@ public class WebSocketEndpoint {
     }
 
     public static void broadcast(String message) {
-        if (DEBUG) logger.fine("Broadcasting message to clients "+message);
+        if (DEBUG) logger.info("Broadcasting message to clients "+message);
         for (Session s : sessions) {
-            if (s.isOpen()){
-                sendWithTimeout(s,message);
-            }
+            sendWithTimeout(s,message);
         }
     }
 
     private static void sendWithTimeout(Session session, String message){
-        try {
+        long timeout = System.currentTimeMillis() + TIMEOUT;
+        while (System.currentTimeMillis()<timeout){
             if (session.isOpen()) {
-                if(sessionLocks.containsKey(session.hashCode())){ Thread.sleep(1);
-                    if(sessionLocks.containsKey(session.hashCode())) { Thread.sleep(3);
-                    if(sessionLocks.containsKey(session.hashCode())) {Thread.sleep(6); 
-                        logger.warning("Send message "+message.hashCode()+" to "+session.getId()+" timed out");
-                        return;}
-                    }
+                if(!lockSession(session)) continue;
+                try {
+                    session.getBasicRemote().sendText(message);
+                    Thread.sleep(0, 100);
+                    unlockSession(session);
+                    return;
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                sessionLocks.put(session.hashCode(), true);
-                session.getBasicRemote().sendText(message);
-                sessionLocks.remove(session.hashCode());
-                }
+                unlockSession(session);
             }
-        catch (Exception e) {
-            logger.warning("Failed to send message: " + e.getMessage());
         }
+        logger.warning("Could not send message before timeout "+message);
+    }
+
+    private static boolean lockSession(Session session){
+         return (sessionLocks.putIfAbsent(session.hashCode(), false) == null ? true : false);
+    }
+
+    private static boolean unlockSession(Session session){
+        return sessionLocks.remove(session.hashCode());
     }
 }
