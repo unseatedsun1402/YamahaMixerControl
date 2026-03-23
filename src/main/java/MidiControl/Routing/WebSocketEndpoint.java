@@ -57,7 +57,7 @@ public class WebSocketEndpoint {
         subscriptions = server.getSubscriptionManager();
 
         sessions.add(session);
-        System.out.println("Client connected: " + session.getId());
+        logger.info("Client connected: " + session.getId());
     }
 
     @OnMessage
