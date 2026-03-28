@@ -16,6 +16,18 @@ wsClient.on("midi-device-list", (devices) => {
   populateDeviceDropdowns(devices);
 });
 
+document.addEventListener("change", function (e) {
+    if (!e.target.classList.contains("profile-toggle")) return;
+
+    const group = e.target.getAttribute("data-group");
+    const all = document.querySelectorAll('.profile-toggle[data-group="' + group + '"]');
+
+    all.forEach(x => {
+        if (x !== e.target) x.checked = false;
+    });
+});
+
+
 document.getElementById("apply-settings").addEventListener("click", () => {
   const inputDeviceId = parseInt(document.getElementById("midi-input-device").value, 10);
   const outputDeviceId = parseInt(document.getElementById("midi-output-device").value, 10);
@@ -24,13 +36,13 @@ document.getElementById("apply-settings").addEventListener("click", () => {
   const settings = {
     inputDeviceId,
     outputDeviceId,
-    consoleType
+    consoleType,
     // Future settings:
     // inputChannel: document.getElementById("input-channel").value,
     // outputChannel: parseInt(document.getElementById("output-channel").value, 10),
-    // enableNRPN: document.getElementById("enable-nrpn").checked,
-    // enableSYSEX: document.getElementById("enable-sysex").checked,
-    // enableCC: document.getElementById("enable-cc").checked,
+    safeprofile: document.getElementById("safe-profile").checked,
+    mainprofile: document.getElementById("main-profile").checked,
+    highprofile: document.getElementById("high-profile").checked
     // debugLogging: document.getElementById("debug-logging").checked,
     // showRaw: document.getElementById("show-raw").checked,
     // showCanonical: document.getElementById("show-canonical").checked

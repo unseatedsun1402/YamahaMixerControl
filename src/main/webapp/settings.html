@@ -36,7 +36,6 @@
                 </label>
 
                 <button id="rescan-devices">Rescan Devices</button>
-                <button id="midi-speed">Fast/Standard</button>
             </section>
 
             <!-- ROUTING -->
@@ -88,11 +87,12 @@
                     </select>
                 </label>
 
-                <div class="toggle-row">
-                    <!-- <label><input type="checkbox" id="enable-nrpn"> Enable NRPN</label> -->
-                    <label><input type="checkbox" id="enable-sysex"> Enable SYSEX</label>
-                    <!-- <label><input type="checkbox" id="enable-cc"> Enable CC</label> -->
-                </div>
+            <div class="toggle-row">
+                <label><input type="checkbox" class="profile-toggle" data-group="throughput" id="safe-profile"> Set DIN MIDI / Safe</label>
+                <label><input type="checkbox" class="profile-toggle" data-group="throughput" id="main-profile"> Set USB MIDI</label>
+                <label><input type="checkbox" class="profile-toggle" data-group="throughput" id="high-profile"> Set Remote</label>
+            </div>
+
             </section>
 
     <section class="settings-card">

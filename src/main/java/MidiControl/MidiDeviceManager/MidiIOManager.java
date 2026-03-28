@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.sound.midi.*;
 
 import MidiControl.Server.MidiServer;
+import MidiControl.Server.RehydrationManager;
 import MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile;
 
 public class MidiIOManager {
@@ -137,7 +138,9 @@ public class MidiIOManager {
     }
 
     public void setThroughputProfile(ThroughputProfile profile) {
+        if (this.getThroughputProfile() == profile) return;
         this.throughput = profile;
+        RehydrationManager.changeRehydrationDelay(profile.pollDelay);
         if (sendEngine != null) sendEngine.setThroughputProfile(profile);
         logger.info("Throughput profile (pacing) set to " + profile);
     }

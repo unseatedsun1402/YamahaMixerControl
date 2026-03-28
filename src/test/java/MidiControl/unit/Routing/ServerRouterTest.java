@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import MidiControl.MidiDeviceManager.MidiDeviceDTO;
 import MidiControl.MidiDeviceManager.MidiInput;
 import MidiControl.MidiDeviceManager.MidiOutput;
+import MidiControl.MidiDeviceManager.MidiSendEngine;
 import MidiControl.Mocks.FakeSession;
 import MidiControl.Mocks.MockMidiDevice;
 import MidiControl.Mocks.MockMidiIOManager;
@@ -237,6 +238,7 @@ public class ServerRouterTest {
         MockMidiServer server = new MockMidiServer(registry);
         MockMidiIOManager io = new MockMidiIOManager(server);
         server.setMockIo(io);
+        io.sendEngine = new MidiSendEngine(io.getMidiOut(), 100);
 
         ServerRouter router = new ServerRouter(
             new MockUiModelService(),
@@ -249,7 +251,7 @@ public class ServerRouterTest {
         FakeSession session = new FakeSession("1");
 
         router.handleMessage(session, """
-            {"type": "apply-midi-settings", "requestId": "req-1", "payload": {"inputDeviceId":0,"outputDeviceId":0,"consoleType":"YAMAHA_M7CL"}}
+            {"type": "apply-midi-settings", "requestId": "req-1", "payload": {"inputDeviceId":0,"outputDeviceId":0,"consoleType":"YAMAHA_M7CL","safeprofile":"true","mainprofile":"false","highprofile":"false"}}
         """);
 
         System.out.println("New Size: "+server.getCanonicalRegistry().getAllInstances().size());

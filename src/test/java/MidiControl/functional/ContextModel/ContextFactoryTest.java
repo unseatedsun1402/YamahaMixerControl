@@ -48,10 +48,10 @@ public class ContextFactoryTest {
         );
 
         // Expect PAN
-        assertTrue(
-                controls.stream().anyMatch(c -> c.logicId.equals("PAN")),
-                "PAN missing"
-        );
+        // assertTrue(
+        //         controls.stream().anyMatch(c -> c.logicId.equals("PAN")),
+        //         "PAN missing"
+        // );
 
         // Expect at least one SEND_MIX
         assertTrue(

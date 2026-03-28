@@ -10,17 +10,19 @@ public final class MidiSendEngine {
     
     // Pacing profiles are orthogonal to your logical TransportMode.
     public enum ThroughputProfile {
-        SAFE_DIN   (3125, 256, 1_500_000L),  // bytes/s, sysexChunk, interChunkGapNs
-        FAST_USB   (40000, 512,   200_000L),
-        FAST_RTP   (80000, 1024,   50_000L);
+        SAFE_DIN   (3125, 256, 1_500_000L, 4l),  // bytes/s, sysexChunk, interChunkGapNs
+        FAST_USB   (40000, 512,   200_000L, 2l),
+        FAST_RTP   (80000, 1024,   50_000L, 2l);
 
         final int bytesPerSecond;
         final int sysexChunkBytes;
         final long interChunkNanos;
-        ThroughputProfile(int bps, int chunk, long gapNs) {
+        final long pollDelay;
+        ThroughputProfile(int bps, int chunk, long gapNs, long pollDelay) {
             this.bytesPerSecond = bps;
             this.sysexChunkBytes = chunk;
             this.interChunkNanos = gapNs;
+            this.pollDelay = pollDelay;
         }
     }
 

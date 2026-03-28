@@ -43,6 +43,7 @@ public class ServerRouter {
     private CanonicalRegistry registry;
     private App app;
     private Settings serverSettings = new ServerSettings();
+    private static boolean debug = false;
 
     public ServerRouter(UiModelService uiModels,
                         SubscriptionManager subscriptions,
@@ -60,6 +61,10 @@ public class ServerRouter {
 
     public void injectApp(App app){
         this.app = app;
+    }
+
+    public static void enableDebug(){
+        debug = true;
     }
 
     public void handleMessage(Session session, String message) {
@@ -155,6 +160,7 @@ public class ServerRouter {
         String contextId = payload.get("contextId").getAsString();
 
         subscriptions.subscribe(session, contextId);
+        if(debug)logger.info("Session: "+session.getId()+" subscribed to "+contextId);
 
         JsonObject ack = new JsonObject();
         ack.addProperty("type", "ack");
@@ -253,12 +259,17 @@ public class ServerRouter {
         int newInput = payload.get("inputDeviceId").getAsInt();
         int newOutput = payload.get("outputDeviceId").getAsInt();
         String mappingString = payload.get("consoleType").getAsString();
+        boolean safeprofile = payload.get("safeprofile").getAsBoolean();
+        boolean mainprofile = payload.get("mainprofile").getAsBoolean();
+        boolean highprofile = payload.get("highprofile").getAsBoolean();
 
-        // Apply output device
         boolean outOk = ioManager.trySetOutputDevice(newOutput);
-
-        // Apply input device
         boolean inOk = ioManager.trySetInputDevice(newInput);
+
+        if (safeprofile) ioManager.setThroughputProfile(MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile.SAFE_DIN);
+        else if (mainprofile) ioManager.setThroughputProfile(MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile.FAST_USB);
+        else if (highprofile) ioManager.setThroughputProfile(MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile.FAST_RTP);
+        else ioManager.setThroughputProfile(MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile.SAFE_DIN);
         
         List<SysexMapping> newMappings = SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(mappingString));
         if (newMappings != null ){
@@ -287,18 +298,17 @@ public class ServerRouter {
     }
 
     private void handleSaveMidiSettings(Session session, String requestId, JsonObject payload) {
-        // --- Required settings (supported now) ---
         logger.info("Saving settings "+payload.toString());
         int newInput = payload.get("inputDeviceId").getAsInt();
         int newOutput = payload.get("outputDeviceId").getAsInt();
         String consoleName = payload.get("consoleType").getAsString();
 
         if(handleApplyMidiSettings(session, requestId, payload)){
-                serverSettings.newSettings(newInput,                // in index
-                ioManager.getMidiIn().getDeviceInfo().getName(),    // in name
-                newOutput,                                          // out index
-                ioManager.getMidiOut().getDeviceInfo().getName(),   // out name
-                consoleName);                                       // console name
+                serverSettings.newSettings(newInput,
+                ioManager.getMidiIn().getDeviceInfo().getName(),
+                newOutput,
+                ioManager.getMidiOut().getDeviceInfo().getName(),
+                consoleName);
             serverSettings.saveSettings();
         }
         else{logger.warning("Failed to save settings, configuration not accepted: "+payload);}
