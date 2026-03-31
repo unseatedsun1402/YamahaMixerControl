@@ -70,14 +70,12 @@ public class ReceiverWrapperTest {
 
         @Override
         public List<Receiver> getReceivers() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'getReceivers'");
+                throw new UnsupportedOperationException("Unimplemented method 'getReceivers'");
         }
 
         @Override
         public List<Transmitter> getTransmitters() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'getTransmitters'");
+                throw new UnsupportedOperationException("Unimplemented method 'getTransmitters'");
         }
     }
 

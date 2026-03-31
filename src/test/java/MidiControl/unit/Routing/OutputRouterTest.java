@@ -36,14 +36,12 @@ public class OutputRouterTest {
 
         @Override
         public boolean isOpen() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'isOpen'");
+                throw new UnsupportedOperationException("Unimplemented method 'isOpen'");
         }
 
         @Override
         public void close() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'close'");
+                throw new UnsupportedOperationException("Unimplemented method 'close'");
         }
     }
 

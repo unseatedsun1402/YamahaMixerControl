@@ -56,13 +56,11 @@ public class FakeSession implements Session {
 
         @Override
         public OutputStream getSendStream() throws IOException {
-            // TODO Auto-generated method stub
             throw new UnsupportedOperationException("Unimplemented method 'getSendStream'");
         }
 
         @Override
         public Writer getSendWriter() throws IOException {
-            // TODO Auto-generated method stub
             throw new UnsupportedOperationException("Unimplemented method 'getSendWriter'");
         }
     };
@@ -99,49 +97,41 @@ public class FakeSession implements Session {
 
     @Override
     public <T> void addMessageHandler(Class<T> clazz, Partial<T> handler) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addMessageHandler'");
     }
 
     @Override
     public long getMaxIdleTimeout() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getMaxIdleTimeout'");
     }
 
     @Override
     public void setMaxIdleTimeout(long milliseconds) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setMaxIdleTimeout'");
     }
 
     @Override
     public void setMaxBinaryMessageBufferSize(int length) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setMaxBinaryMessageBufferSize'");
     }
 
     @Override
     public int getMaxBinaryMessageBufferSize() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getMaxBinaryMessageBufferSize'");
     }
 
     @Override
     public void setMaxTextMessageBufferSize(int length) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setMaxTextMessageBufferSize'");
     }
 
     @Override
     public int getMaxTextMessageBufferSize() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getMaxTextMessageBufferSize'");
     }
 
     @Override
     public void close(CloseReason closeReason) throws IOException {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'close'");
     }
 }
