@@ -101,7 +101,6 @@ public class MidiServer implements Runnable, UiModelService{
         logger.info("MidiServer: CanonicalRegistry initialized with SYSEX + NRPN mappings.");
     }
 
-    // 2. Test constructor (registry only)
     public MidiServer(CanonicalRegistry registry) {
         this.canonicalRegistry = registry;
         this.viewBuilders = new ViewRegistry();

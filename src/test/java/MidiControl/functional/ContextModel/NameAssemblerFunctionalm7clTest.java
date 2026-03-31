@@ -1,12 +1,8 @@
 package MidiControl.functional.ContextModel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.sound.midi.SysexMessage;
@@ -50,18 +46,15 @@ public class NameAssemblerFunctionalm7clTest {
     // @Test
     public void testShortNameEndToEnd() throws Exception {
 
-        // --------- 1. Load REAL 01V96i sysex mappings ---------
         List<SysexMapping> mappings =
             SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
 
         SysexParser parser = new SysexParser(mappings);
         CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
 
-        // --------- 2. Create MIDI server and IO mocks ---------
         MockMidiServer server = new MockMidiServer(registry);
         MockMidiIOManager io = server.getMockIo();
 
-        // --------- 3. Discover name contexts ---------
         ContextDiscoveryEngine engine = new ContextDiscoveryEngine(registry);
 
         List<Context> contexts = engine.discoverContexts();
@@ -71,12 +64,10 @@ public class NameAssemblerFunctionalm7clTest {
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("No NAME context"));
 
-        // --------- 4. Attach ChannelNameAssembler ---------
         AtomicReference<String> lastName = new AtomicReference<>();
 
         new ChannelNameAssembler(nameContext, registry, (id, name) -> lastName.set(name));
 
-        // --------- 5. Simulate long name "Kick" via SysEx ---------
         SysexMessage sysex = new SysexMessage();
         SysexMessage sysex1 = new SysexMessage();
 
@@ -87,9 +78,8 @@ public class NameAssemblerFunctionalm7clTest {
 
         sysex1.setMessage(buildNameSysex(1, 0, 'c','k'),messageLength);
         server.addtoinputqueue(sysex1);
-        // --------- 6. Verify assembled long name ---------
         server.processIncomingMidiForTest();
-        Thread.sleep(1100);   // allow assembler debounce to fire
+        Thread.sleep(1100);
         assertEquals("Kick", lastName.get());
 
     }

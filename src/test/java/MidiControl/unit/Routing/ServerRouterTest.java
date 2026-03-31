@@ -247,14 +247,11 @@ public class ServerRouterTest {
             io
         );
 
-        System.out.println("Old Size: "+server.getCanonicalRegistry().getAllInstances().size());
         FakeSession session = new FakeSession("1");
 
         router.handleMessage(session, """
             {"type": "apply-midi-settings", "requestId": "req-1", "payload": {"inputDeviceId":0,"outputDeviceId":0,"consoleType":"YAMAHA_M7CL","safeprofile":"true","mainprofile":"false","highprofile":"false"}}
         """);
-
-        System.out.println("New Size: "+server.getCanonicalRegistry().getAllInstances().size());
 
         //m7cl will have controls that 01v96 has not and vice versa
         assertNull(registry.getGroup("kAUXToMatrix"));

@@ -10,19 +10,21 @@ public final class MidiSendEngine {
     
     // Pacing profiles are orthogonal to your logical TransportMode.
     public enum ThroughputProfile {
-        SAFE_DIN   (3125, 256, 1_500_000L, 4l),  // bytes/s, sysexChunk, interChunkGapNs
-        FAST_USB   (40000, 512,   200_000L, 2l),
-        FAST_RTP   (80000, 1024,   50_000L, 2l);
+        SAFE_DIN   (3125, 128, 1_500_000L, 4l, 98),  // bytes/s, sysexChunk, interChunkGapNs
+        FAST_USB   (40000, 512,   200_000L, 2l, 512),
+        FAST_RTP   (80000, 1024,   50_000L, 2l, 1024);
 
         final int bytesPerSecond;
         final int sysexChunkBytes;
         final long interChunkNanos;
         final long pollDelay;
-        ThroughputProfile(int bps, int chunk, long gapNs, long pollDelay) {
+        final int burstBytes;
+        ThroughputProfile(int bps, int chunk, long gapNs, long pollDelay, int burstcap) {
             this.bytesPerSecond = bps;
             this.sysexChunkBytes = chunk;
             this.interChunkNanos = gapNs;
             this.pollDelay = pollDelay;
+            this.burstBytes = burstcap;
         }
     }
 
@@ -173,8 +175,7 @@ public final class MidiSendEngine {
         if (delta <= 0) return;
         double add = (delta / 1_000_000_000.0) * profile.bytesPerSecond;
         synchronized (tokenLock) {
-            // Cap burst to 1 second worth of budget
-            tokens = Math.min(profile.bytesPerSecond, tokens + add);
+            tokens = Math.min(profile.burstBytes, tokens + add);
             lastRefillNs = now;
         }
     }

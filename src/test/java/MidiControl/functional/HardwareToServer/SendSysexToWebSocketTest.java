@@ -254,6 +254,5 @@ public class SendSysexToWebSocketTest {
         assertFalse(captured.toString().isEmpty(),
             "Expected WebSocket to receive a broadcast");
 
-        System.out.println("WebSocket received: " + captured);
     }
 }
