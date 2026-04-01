@@ -6,19 +6,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
 import java.util.logging.Logger;
 
-public final class MidiSendEngine {
-    
-    // Pacing profiles are orthogonal to your logical TransportMode.
+import MidiControl.Telemetry.MidiTelemetry;
+import MidiControl.Telemetry.TelemetryListener;
+import MidiControl.Telemetry.TelemetryPublisher;
+
+public final class MidiSendEngine implements MidiIngressListener {
+
     public enum ThroughputProfile {
-        SAFE_DIN   (3125, 128, 1_500_000L, 4l, 98),  // bytes/s, sysexChunk, interChunkGapNs
-        FAST_USB   (40000, 512,   200_000L, 2l, 512),
-        FAST_RTP   (80000, 1024,   50_000L, 2l, 1024);
+        SAFE_DIN (3125, 128, 1_500_000L, 4L, 98),
+        FAST_USB (40000, 512,   200_000L, 2L, 512),
+        FAST_RTP (80000, 1024,   50_000L, 2L, 1024);
 
         final int bytesPerSecond;
         final int sysexChunkBytes;
         final long interChunkNanos;
         final long pollDelay;
         final int burstBytes;
+
         ThroughputProfile(int bps, int chunk, long gapNs, long pollDelay, int burstcap) {
             this.bytesPerSecond = bps;
             this.sysexChunkBytes = chunk;
@@ -38,23 +42,40 @@ public final class MidiSendEngine {
 
     private volatile ThroughputProfile profile = ThroughputProfile.SAFE_DIN;
 
-    // Token bucket (in bytes)
     private final Object tokenLock = new Object();
     private double tokens;
     private long lastRefillNs;
 
-    // constructor
+    private final MidiTelemetry telemetry = new MidiTelemetry();
+    private TelemetryPublisher telemetryPublisher;
+
+    private TelemetryListener telemetryListener = json -> {};
+
+    private long ingressWindowStartNs;
+    private long ingressBytesInWindow;
+    private double ingressBpsEwma;
+
+    private static final long INGRESS_WINDOW_NS = 500_000_000L;
+    private static final double INGRESS_EWMA_ALPHA = 0.25;
+
     public MidiSendEngine(MidiOutput out, int queueCapacity) {
         this.midiOut = out;
-        this.normalLane   = new ArrayBlockingQueue<>(queueCapacity);
-        this.realtimeLane = new ArrayBlockingQueue<>(128);
+        this.normalLane = new ArrayBlockingQueue<>(queueCapacity);
+        this.realtimeLane = new ArrayBlockingQueue<>(64);
         this.worker = Executors.newSingleThreadExecutor(r -> {
             Thread t = new Thread(r, "midi-send-worker");
             t.setDaemon(true);
             return t;
         });
-        this.tokens = 0.0;
-        this.lastRefillNs = System.nanoTime();
+
+        long now = System.nanoTime();
+        synchronized (tokenLock) {
+            this.tokens = 0.0;
+            this.lastRefillNs = now;
+            this.ingressWindowStartNs = now;
+            this.ingressBytesInWindow = 0;
+            this.ingressBpsEwma = 0.0;
+        }
     }
 
     public void setThroughputProfile(ThroughputProfile p) {
@@ -63,21 +84,35 @@ public final class MidiSendEngine {
     }
 
     public ThroughputProfile getThroughputProfile() {
-        return this.profile;
+        return profile;
+    }
+
+    public void setTelemetryListener(TelemetryListener listener) {
+        if (listener != null) {
+            this.telemetryListener = listener;
+        }
     }
 
     public boolean offer(byte[] msg) {
-        if (isRealtime(msg)) return realtimeLane.offer(msg);
-        return normalLane.offer(msg);
+        boolean ok;
+        if (isRealtime(msg)) {
+            ok = realtimeLane.offer(msg);
+        } else {
+            ok = normalLane.offer(msg);
+        }
+        if (!ok) telemetry.dropped(msg.length);
+        return ok;
     }
 
     public void start() {
         if (!running.compareAndSet(false, true)) return;
+        telemetryPublisher = new TelemetryPublisher(telemetry, telemetryListener, 10);
         worker.execute(this::runLoop);
     }
 
     public void stop() {
         if (!running.compareAndSet(true, false)) return;
+        if (telemetryPublisher != null) telemetryPublisher.shutdown();
         worker.shutdownNow();
     }
 
@@ -110,37 +145,33 @@ public final class MidiSendEngine {
     }
 
     private void sendWithPacing(byte[] msg) throws Exception {
-        int cost = msg.length;            // wire bytes (simple cost)
+        int cost = msg.length;
         waitForTokens(cost);
         midiOut.sendMessage(msg);
         consumeTokens(cost);
+        telemetry.sent(cost);
     }
 
     private void sendSysexChunked(byte[] full, int chunkSize, long gapNs) throws Exception {
-        if (full.length < 2 || (full[0] & 0xFF) != 0xF0 || (full[full.length-1] & 0xFF) != 0xF7) {
-            sendWithPacing(full); // non‑canonical SysEx, just pace
+        if (full.length < 2 || (full[0] & 0xFF) != 0xF0 || (full[full.length - 1] & 0xFF) != 0xF7) {
+            sendWithPacing(full);
             return;
         }
-        int pos = 1, end = full.length - 1; // exclude F0/F7
+        int pos = 1;
+        int end = full.length - 1;
         while (pos < end) {
             int take = Math.min(chunkSize, end - pos);
             boolean last = (pos + take) >= end;
             byte[] chunk;
             if (pos == 1) {
-                if (last) {
-                    chunk = new byte[take + 2];
-                    chunk[0] = (byte)0xF0;
-                    System.arraycopy(full, pos, chunk, 1, take);
-                    chunk[chunk.length - 1] = (byte)0xF7;
-                } else {
-                    chunk = new byte[take + 1];
-                    chunk[0] = (byte)0xF0;
-                    System.arraycopy(full, pos, chunk, 1, take);
-                }
+                chunk = new byte[take + (last ? 2 : 1)];
+                chunk[0] = (byte) 0xF0;
+                System.arraycopy(full, pos, chunk, 1, take);
+                if (last) chunk[chunk.length - 1] = (byte) 0xF7;
             } else if (last) {
                 chunk = new byte[take + 1];
                 System.arraycopy(full, pos, chunk, 0, take);
-                chunk[chunk.length - 1] = (byte)0xF7;
+                chunk[chunk.length - 1] = (byte) 0xF7;
             } else {
                 chunk = Arrays.copyOfRange(full, pos, pos + take);
             }
@@ -153,11 +184,18 @@ public final class MidiSendEngine {
     private void waitForTokens(int bytesNeeded) {
         for (;;) {
             refillTokens();
+            int effectiveOutBps = getEffectiveOutBps();
             synchronized (tokenLock) {
                 if (tokens >= bytesNeeded) return;
+
+                if (effectiveOutBps <= 0) {
+                    LockSupport.parkNanos(2_000_000L);
+                    continue;
+                }
+
                 double deficit = bytesNeeded - tokens;
-                long nanos = (long)((deficit / profile.bytesPerSecond) * 1_000_000_000L);
-                LockSupport.parkNanos(Math.max(100_000L, nanos)); // ≥0.1 ms
+                long nanos = (long) ((deficit / effectiveOutBps) * 1_000_000_000L);
+                LockSupport.parkNanos(Math.max(100_000L, nanos));
             }
         }
     }
@@ -171,12 +209,49 @@ public final class MidiSendEngine {
 
     private void refillTokens() {
         long now = System.nanoTime();
-        long delta = now - lastRefillNs;
-        if (delta <= 0) return;
-        double add = (delta / 1_000_000_000.0) * profile.bytesPerSecond;
+        int effectiveOutBps = getEffectiveOutBps();
+
         synchronized (tokenLock) {
-            tokens = Math.min(profile.burstBytes, tokens + add);
+            long delta = now - lastRefillNs;
+            if (delta <= 0) return;
+
+            if (effectiveOutBps > 0) {
+                double add = (delta / 1_000_000_000.0) * effectiveOutBps;
+                tokens = Math.min(profile.burstBytes, tokens + add);
+            } else {
+                tokens = Math.min(profile.burstBytes, tokens);
+            }
+
             lastRefillNs = now;
+        }
+    }
+
+    private int getEffectiveOutBps() {
+        double in;
+        ThroughputProfile p = profile;
+        synchronized (tokenLock) {
+            in = ingressBpsEwma;
+        }
+        int eff = (int) Math.floor(p.bytesPerSecond - in);
+        return Math.max(0, eff);
+    }
+
+    private void updateIngressRate(int byteCount) {
+        long now = System.nanoTime();
+        synchronized (tokenLock) {
+            ingressBytesInWindow += byteCount;
+            long elapsed = now - ingressWindowStartNs;
+            if (elapsed < INGRESS_WINDOW_NS) return;
+
+            double seconds = elapsed / 1_000_000_000.0;
+            double bps = ingressBytesInWindow / seconds;
+
+            ingressBpsEwma = (ingressBpsEwma == 0.0)
+                    ? bps
+                    : (ingressBpsEwma * (1.0 - INGRESS_EWMA_ALPHA) + bps * INGRESS_EWMA_ALPHA);
+
+            ingressBytesInWindow = 0;
+            ingressWindowStartNs = now;
         }
     }
 
@@ -185,7 +260,14 @@ public final class MidiSendEngine {
         int b = msg[0] & 0xFF;
         return b >= 0xF8 && b <= 0xFF;
     }
+
     private static boolean isSysex(byte[] msg) {
         return msg.length > 0 && (msg[0] & 0xFF) == 0xF0;
+    }
+
+    @Override
+    public void onBytesReceived(int byteCount) {
+        telemetry.received(byteCount);
+        updateIngressRate(byteCount);
     }
 }

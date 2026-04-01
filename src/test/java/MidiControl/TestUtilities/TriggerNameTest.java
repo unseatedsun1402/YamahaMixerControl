@@ -4,11 +4,11 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import MidiControl.MidiInputReceiver;
 import MidiControl.ControlServer.GuiInputHandler;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.MidiDeviceManager.MidiInput;
+import MidiControl.MidiDeviceManager.MidiInputReceiver;
 import MidiControl.MidiDeviceManager.MidiOutput;
 import MidiControl.MidiDeviceManager.TransportMode;
 import MidiControl.Routing.OutputRouter;

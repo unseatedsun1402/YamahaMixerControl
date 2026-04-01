@@ -125,9 +125,37 @@
         <section class="settings-column">
 
             <!-- LIVE MONITOR -->
-            <section class="settings-card monitor-card">
-                <h2>Live Event Monitor</h2>
-                <div id="event-log" class="monitor-log"></div>
+            <section class="settings-card telemetry-card">
+                <h2>Engine Telemetry</h2>
+
+                <div class="telemetry-grid">
+                    <div class="telemetry-item">
+                        <label>Bytes In / sec</label>
+                        <span id="telemetry-in">–</span>
+                    </div>
+
+                    <div class="telemetry-item">
+                        <label>Bytes Out / sec</label>
+                        <span id="telemetry-out">–</span>
+                    </div>
+
+                    <div class="telemetry-item">
+                        <label>Combined / sec</label>
+                        <span id="telemetry-combined">–</span>
+                    </div>
+
+                    <div class="telemetry-item">
+                        <label>In‑Flight (peak)</label>
+                        <span id="telemetry-inflight">–</span>
+                    </div>
+
+                    <div class="telemetry-item">
+                        <label>Dropped (peak)</label>
+                        <span id="telemetry-dropped">–</span>
+                    </div>
+                </div>
+
+                <div class="telemetry-log" id="telemetry-log"></div>
             </section>
 
             <!-- CONTROL MAPPING TABLE -->

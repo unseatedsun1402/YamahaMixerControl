@@ -5,10 +5,10 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import MidiControl.MidiInputReceiver;
 import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.MidiDeviceManager.MidiIOManager;
+import MidiControl.MidiDeviceManager.MidiInputReceiver;
 import MidiControl.Server.MidiProcessingLoop;
 import MidiControl.Server.MidiServer;
 import MidiControl.SysexUtils.SysexMapping;

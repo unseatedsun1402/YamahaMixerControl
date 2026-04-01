@@ -1,7 +1,7 @@
 package MidiControl.unit.MidiDeviceManager;
 
-import MidiControl.MidiDeviceManager.TransmitterWrapper;
-import MidiControl.MidiInputReceiver;
+import MidiControl.MidiDeviceManager.MidiInputReceiver;
+import MidiControl.MidiDeviceManager.InputWrapper;
 
 import org.junit.jupiter.api.Test;
 
@@ -104,7 +104,7 @@ public class TransmitterWrapperTest {
         MockMidiDevice device = new MockMidiDevice();
         ConcurrentLinkedQueue<MidiMessage> buffer = new ConcurrentLinkedQueue<>();
 
-        TransmitterWrapper wrapper = new TransmitterWrapper(device, buffer);
+        InputWrapper wrapper = new InputWrapper(device, buffer);
 
         assertTrue(device.isOpen(), "Device should be opened");
         assertNotNull(wrapper.getRawTransmitter(), "Transmitter should be created");
@@ -116,7 +116,7 @@ public class TransmitterWrapperTest {
         MockMidiDevice device = new MockMidiDevice();
         ConcurrentLinkedQueue<MidiMessage> buffer = new ConcurrentLinkedQueue<>();
 
-        TransmitterWrapper wrapper = new TransmitterWrapper(device, buffer);
+        InputWrapper wrapper = new InputWrapper(device, buffer);
 
         // Simulate incoming MIDI
         ShortMessage msg = new ShortMessage();
@@ -133,7 +133,7 @@ public class TransmitterWrapperTest {
         MockMidiDevice device = new MockMidiDevice();
         ConcurrentLinkedQueue<MidiMessage> buffer = new ConcurrentLinkedQueue<>();
 
-        TransmitterWrapper wrapper = new TransmitterWrapper(device, buffer);
+        InputWrapper wrapper = new InputWrapper(device, buffer);
 
         MockReceiver newReceiver = new MockReceiver();
         wrapper.setReceiver(newReceiver);
@@ -147,7 +147,7 @@ public class TransmitterWrapperTest {
         MockMidiDevice device = new MockMidiDevice();
         ConcurrentLinkedQueue<MidiMessage> buffer = new ConcurrentLinkedQueue<>();
 
-        TransmitterWrapper wrapper = new TransmitterWrapper(device, buffer);
+        InputWrapper wrapper = new InputWrapper(device, buffer);
 
         MockTransmitter tx = (MockTransmitter) device.getTransmitter();
         MidiInputReceiver inputReceiver = (MidiInputReceiver) tx.getReceiver();
@@ -164,7 +164,7 @@ public class TransmitterWrapperTest {
         MockMidiDevice device = new MockMidiDevice();
         ConcurrentLinkedQueue<MidiMessage> buffer = new ConcurrentLinkedQueue<>();
 
-        TransmitterWrapper wrapper = new TransmitterWrapper(device, buffer);
+        InputWrapper wrapper = new InputWrapper(device, buffer);
 
         assertEquals(device.getDeviceInfo(), wrapper.getDeviceInfo());
     }

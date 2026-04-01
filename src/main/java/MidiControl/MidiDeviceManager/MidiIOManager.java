@@ -10,6 +10,7 @@ import javax.sound.midi.*;
 import MidiControl.Server.MidiServer;
 import MidiControl.Server.RehydrationManager;
 import MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile;
+import MidiControl.Routing.WebSocketEndpoint;
 
 public class MidiIOManager {
 
@@ -49,7 +50,8 @@ public class MidiIOManager {
         device.open();
 
         if (device.getMaxTransmitters() > 0 || device.getMaxTransmitters() == -1) {
-            midiIn = new TransmitterWrapper(device, server.getInputBuffer());
+            midiIn = new InputWrapper(device, server.getInputBuffer());
+            if (sendEngine != null) midiIn.getInputReceiver().setIngressListener(sendEngine);
             inPort = index;
             logger.info("Transmitter set for input device index: " + index);
         } else {
@@ -71,6 +73,7 @@ public class MidiIOManager {
         // Start paced engine for the new device
         sendEngine = new MidiSendEngine(midiOut, 4096);
         sendEngine.setThroughputProfile(throughput);
+        sendEngine.setTelemetryListener(WebSocketEndpoint::broadcast);
         sendEngine.start();
     }
 
@@ -88,13 +91,12 @@ public class MidiIOManager {
         if (midiOut != null && midiOut.isOpen()) midiOut.close();
     }
 
-    // Producers call this (GUI and rehydration)
     public void sendAsync(byte[] data) {
         if (midiOut == null || sendEngine == null) {
             logger.warning("Attempted to send MIDI before output device was set.");
             return;
         }
-        // Optional: do producer-side coalescing before offering to engine.
+
         if (!sendEngine.offer(data)) {
             logger.warning("Send queue full; message dropped or consider coalescing.");
         }

@@ -2,7 +2,6 @@ import { WebSocketClient } from "./websocketClient.js";
 
 console.log(">>> settings.js LOADED <<<");
 
-// Create WS client using same endpoint as console UI
 const wsClient = new WebSocketClient(`ws://${location.host}/MidiControl/endpoint`);
 wsClient.connect();
 
@@ -10,6 +9,8 @@ wsClient.on("connected", () => {
   console.log("[Settings] Connected, requesting device list...");
   wsClient.requestMidiDevices();
 });
+
+wsClient.on("telemetry", updateTelemetry);
 
 wsClient.on("midi-device-list", (devices) => {
   console.log("[Settings] Received device list:", devices);
@@ -109,4 +110,39 @@ function showStatus(text) {
   el.textContent = text;
   el.style.opacity = 1;
   setTimeout(() => el.style.opacity = 0, 2000);
+}
+
+function updateTelemetry(data) {
+    document.getElementById("telemetry-in").textContent =
+        data.averagein + " B/s";
+
+    document.getElementById("telemetry-out").textContent =
+        data.averageout + " B/s";
+
+    document.getElementById("telemetry-combined").textContent =
+        data.averagecombined + " B/s";
+
+    document.getElementById("telemetry-inflight").textContent =
+        data.inflight;
+
+    document.getElementById("telemetry-dropped").textContent =
+        data.dropped;
+
+    appendTelemetryLog(data);
+}
+
+function appendTelemetryLog(data) {
+    const log = document.getElementById("telemetry-log");
+    const line = document.createElement("div");
+
+    const t = new Date(data.timestamp * 1000).toLocaleTimeString();
+    line.textContent =
+        `[${t}] in=${data.averagein} out=${data.averageout} ` +
+        `cmb=${data.averagecombined} inflight=${data.inflight}`;
+
+    log.appendChild(line);
+
+    while (log.children.length > 20) {
+        log.removeChild(log.firstChild);
+    }
 }

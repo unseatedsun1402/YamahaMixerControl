@@ -2,10 +2,11 @@ package MidiControl.unit;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import MidiControl.MidiInputReceiver;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.sound.midi.MidiMessage;
 import org.junit.jupiter.api.Tag;
+
+import MidiControl.MidiDeviceManager.MidiInputReceiver;
 
 @Tag("unit")
 public class MidiInputReceiverTest {
