@@ -33,6 +33,7 @@ public class InputChannelSendsOnFaderViewBuilderTest {
                 0,
                 1,
                 sub,
+                null,
                 0,
                 0L,
                 new int[]{0},

@@ -128,6 +128,9 @@ function updateTelemetry(data) {
     document.getElementById("telemetry-dropped").textContent =
         data.dropped;
 
+    document.getElementById("remaining-capacity").textContent =
+        data.remainingcapacity;
+
     appendTelemetryLog(data);
 }
 

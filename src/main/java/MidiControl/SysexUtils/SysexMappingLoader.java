@@ -13,24 +13,6 @@ import java.util.logging.Logger;
 public class SysexMappingLoader {
     private static Logger logger = Logger.getLogger("SysexMappingLoader");
 
-    // private static final String DEFAULT_RESOURCE = "MidiControl/01V96i_sysex_mappings.json";
-
-    // public static List<SysexMapping> loadMappings() {
-    //     try (InputStream is =
-    //              SysexMappingLoader.class.getClassLoader().getResourceAsStream(DEFAULT_RESOURCE)) {
-
-    //         InputStreamReader reader = new InputStreamReader(is);
-    //         Type listType = new TypeToken<List<SysexMapping>>() {}.getType();
-
-    //         List<SysexMapping> mappings = new Gson().fromJson(reader, listType);
-    //         initializeMappings(mappings);
-    //         return mappings;
-
-    //     } catch (Exception e) {
-    //         throw new RuntimeException("Failed to load Sysex mappings", e);
-    //     }
-    // }
-
     public static List<SysexMapping> loadMappingsFromString(String json) {
         List<SysexMapping> mappings =
             new Gson().fromJson(json, new TypeToken<List<SysexMapping>>() {}.getType());

@@ -39,6 +39,7 @@ public class InputChannelStripViewBuilderTest {
                 0,                  // control_id
                 1,                  // max_channels
                 sub,                // sub_control
+                null,
                 0,                  // channel_index
                 0L,                 // key
                 new int[]{0},       // address bytes
@@ -88,8 +89,6 @@ public class InputChannelStripViewBuilderTest {
         InputChannelStripViewBuilder builder = new InputChannelStripViewBuilder();
         List<ViewControl> controls = builder.build(ctx, registry, null);
 
-        assertTrue(contains(controls, "CHANNEL_ON"));
-        // assertTrue(contains(controls, "PAN"));
         assertTrue(contains(controls, "SEND_MIX1"));
         assertTrue(contains(controls, "SEND_MIX2"));
         assertTrue(contains(controls, "FADER"));

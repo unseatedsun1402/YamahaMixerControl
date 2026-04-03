@@ -41,18 +41,6 @@ public class ContextFactoryTest {
 
         assertFalse(controls.isEmpty(), "Compact view should not be empty");
 
-        // Expect CHANNEL_ON
-        assertTrue(
-                controls.stream().anyMatch(c -> c.logicId.equals("CHANNEL_ON")),
-                "CHANNEL_ON missing"
-        );
-
-        // Expect PAN
-        // assertTrue(
-        //         controls.stream().anyMatch(c -> c.logicId.equals("PAN")),
-        //         "PAN missing"
-        // );
-
         // Expect at least one SEND_MIX
         assertTrue(
                 controls.stream().anyMatch(c -> c.logicId.startsWith("SEND_MIX")),

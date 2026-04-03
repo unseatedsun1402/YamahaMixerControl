@@ -238,7 +238,7 @@ public class ServerRouterTest {
         MockMidiServer server = new MockMidiServer(registry);
         MockMidiIOManager io = new MockMidiIOManager(server);
         server.setMockIo(io);
-        io.sendEngine = new MidiSendEngine(io.getMidiOut(), 100);
+        io.sendEngine = new MidiSendEngine(io.getMidiOut(), 100,100);
 
         ServerRouter router = new ServerRouter(
             new MockUiModelService(),

@@ -1,6 +1,9 @@
 package MidiControl.Telemetry;
 
 import java.util.concurrent.atomic.LongAdder;
+import java.util.logging.Logger;
+
+import MidiControl.MidiDeviceManager.MidiSendEngine;
 
 public final class MidiTelemetry {
 
@@ -15,14 +18,20 @@ public final class MidiTelemetry {
     private volatile long peakDroppedSession;
 
     private volatile long periodStartEpochSec;
+    private volatile MidiSendEngine sendEngine;
+
+    private static Logger logger = Logger.getLogger(MidiTelemetry.class.getName());
 
 
-    public MidiTelemetry() {
+    public MidiTelemetry(MidiSendEngine mse) {
+        logger.info("Telemetry engine started");
         this.periodStartEpochSec = now();
+        this.sendEngine = mse;
     }
 
     public void sent(int bytes) {
         bytesOut.add(bytes);
+        inflightBytes.add(bytes);
         long v = inflightBytes.sum();
         peakInflightPeriod = Math.max(peakInflightPeriod, v);
         peakInflightSession = Math.max(peakInflightSession, v);
@@ -50,6 +59,7 @@ public final class MidiTelemetry {
         dto.setAvgCombined((int) ((bytesOut.sum() + bytesIn.sum()) / elapsed));
         dto.setInFlight((int) peakInflightPeriod);
         dto.setDroppedMessages((int) peakDroppedPeriod);
+        dto.setSysexQueueCapacity((int)sendEngine.getSysexQueueRemainingPercent());
 
         bytesOut.reset();
         bytesIn.reset();
@@ -57,7 +67,7 @@ public final class MidiTelemetry {
         peakInflightPeriod = 0;
         peakDroppedPeriod = 0;
         periodStartEpochSec = now;
-
+        logger.fine("Telemetry snapshot: "+dto.toJson());
         return dto;
     }
 

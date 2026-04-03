@@ -22,7 +22,6 @@ public class MidiIOManager {
     private final Logger logger = Logger.getLogger(MidiIOManager.class.getName());
     private TransportMode mode;
 
-    // Keep your queue if you want producer-side coalescing later; the engine has its own bounded queues.
     private final ArrayBlockingQueue<byte[]> sendQueue = new ArrayBlockingQueue<>(4096);
 
     private MidiSendEngine sendEngine;
@@ -51,7 +50,12 @@ public class MidiIOManager {
 
         if (device.getMaxTransmitters() > 0 || device.getMaxTransmitters() == -1) {
             midiIn = new InputWrapper(device, server.getInputBuffer());
-            if (sendEngine != null) midiIn.getInputReceiver().setIngressListener(sendEngine);
+            
+            if (sendEngine != null) {
+                midiIn.getInputReceiver().setIngressListener(sendEngine);
+                logger.info("Ingress telemetry attached (input set)");
+            }
+
             inPort = index;
             logger.info("Transmitter set for input device index: " + index);
         } else {
@@ -70,16 +74,22 @@ public class MidiIOManager {
         logger.info("Opening output device: " + midiOut.getDeviceInfo().getName());
         outPort = index;
 
-        // Start paced engine for the new device
-        sendEngine = new MidiSendEngine(midiOut, 4096);
+        sendEngine = new MidiSendEngine(midiOut, 2048, 4096);
         sendEngine.setThroughputProfile(throughput);
         sendEngine.setTelemetryListener(WebSocketEndpoint::broadcast);
         sendEngine.start();
+        if (midiIn != null) {
+            midiIn.getInputReceiver().setIngressListener(sendEngine);
+            logger.info("Ingress telemetry attached");
+        }
+        else {
+            logger.warning("Could not measure ingress telemetry, midiIn is null");
+        }
     }
 
     public void setMidiOutForTest(MidiOutput mock) {
         this.midiOut = mock;
-        this.sendEngine = new MidiSendEngine(midiOut, 4096);
+        this.sendEngine = new MidiSendEngine(midiOut, 2048, 4096);
         this.sendEngine.setThroughputProfile(throughput);
         this.sendEngine.start();
     }
@@ -183,6 +193,12 @@ public class MidiIOManager {
     }
 
     public MidiSendEngine.ThroughputProfile getThroughputProfile(){
-        return this.sendEngine.getThroughputProfile();
+        if (sendEngine == null) throw new IllegalStateException("MIDI output not initialised (sendEngine is null)");
+        return sendEngine.getThroughputProfile();
+    }
+
+    public CoalesceEngine getCoalesceEngine(){
+        if(sendEngine == null) return null;
+        return this.sendEngine.getCoalesceEngine();
     }
 }

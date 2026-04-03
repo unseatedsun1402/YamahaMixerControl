@@ -26,7 +26,7 @@ public class TelemetryTest {
     @Test
     public void telemtryDtoGetJson(){
         String confirmjson = "{\"type\":\"telemetry\",\"payload\":{\"timestamp\":0,\"inflight\":-1,\"dropped\":-1,"+
-            "\"averagein\":-1,\"averageout\":-1,\"averagecombined\":-1} }";
+            "\"averagein\":-1,\"averageout\":-1,\"averagecombined\":-1,\"remainingcapacity\":-1} }";
         TelemetryData dtoJson = new TelemetryData();
         dtoJson.setTimeStamp(0);
         assertEquals(confirmjson, dtoJson.toJson());
@@ -86,6 +86,7 @@ public class TelemetryTest {
         int confirmAvgCmb=3;
         int confirmInFlight=3;
         int confirmDropped=1;
+        int confirmRemainingCapacity=20;
         long confirmTime = java.time.Instant.now().getEpochSecond();
         TelemetryData dtoJson = new TelemetryData();
         dtoJson.setAvgCombined(confirmAvgCmb);
@@ -94,6 +95,7 @@ public class TelemetryTest {
         dtoJson.setDroppedMessages(confirmDropped);
         dtoJson.setTimeStamp(confirmTime);
         dtoJson.setInFlight(confirmInFlight);
+        dtoJson.setSysexQueueCapacity(confirmRemainingCapacity);
 
         assertEquals(confirmTime, dtoJson.getTimestamp());
         assertEquals(confirmDropped, dtoJson.getMessagesDropped());
@@ -101,5 +103,6 @@ public class TelemetryTest {
         assertEquals(confirmAvgIn, dtoJson.getAvgIn());
         assertEquals(confirmAvgOut, dtoJson.getAvgOut());
         assertEquals(confirmAvgCmb, dtoJson.getAvgCombined());
+        assertEquals(confirmRemainingCapacity, dtoJson.getRemainingCapacity());
     }
 }

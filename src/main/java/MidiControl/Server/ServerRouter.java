@@ -13,6 +13,7 @@ import com.google.gson.JsonObject;
 import MidiControl.ControlServer.GuiInputHandler;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
+import MidiControl.MidiDeviceManager.CoalesceEngine;
 import MidiControl.MidiDeviceManager.MidiDeviceDTO;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.MidiDeviceManager.ServerSettings;
@@ -27,6 +28,7 @@ import MidiControl.UserInterface.UiModelService;
 import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 import MidiControl.UserInterface.ChannelName.ChannelNameBroadcaster;
 import MidiControl.UserInterface.DTO.UiModelDTO;
+import jakarta.persistence.criteria.CriteriaBuilder.Coalesce;
 import jakarta.websocket.Session;
 
 public class ServerRouter {
@@ -143,7 +145,6 @@ public class ServerRouter {
             logger.warning("Unknown canonicalId in set-control-value: " + canonicalId);
         }
 
-        // 4. Ack
         JsonObject ack = new JsonObject();
         ack.addProperty("type", "ack");
         if (requestId != null) {
@@ -274,6 +275,8 @@ public class ServerRouter {
         List<SysexMapping> newMappings = SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(mappingString));
         if (newMappings != null ){
             this.registry.reloadMappings(newMappings, new SysexParser(newMappings), mappingString);
+            CoalesceEngine coalesceEngine = ioManager.getCoalesceEngine();
+            if(coalesceEngine!= null) coalesceEngine.onChange(mappingString);
             logger.info("New registry loaded "+ mappingString);
         } 
 
@@ -282,7 +285,6 @@ public class ServerRouter {
             else { app.rehydrate(); }
         }
 
-        // --- ACK ---
         JsonObject ack = new JsonObject();
         ack.addProperty("type", "ack");
         if (requestId != null) ack.addProperty("requestId", requestId);

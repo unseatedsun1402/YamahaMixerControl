@@ -100,7 +100,7 @@ public class SubscriptionManager {
 
     public void broadcastControlUpdateWithout(String canonicalId, int value,Session session){
         String contextId = canonicalId.split("\\.")[0];
-        logger.info("Boardcasting control update: "+canonicalId+"->"+contextId+" val: "+value);
+        if(debug)logger.info("Boardcasting control update: "+canonicalId+"->"+contextId+" val: "+value);
 
         Set<Session> sessions = getSubscribers(contextId);
         if(sessions.isEmpty()){contextId = "channel."+canonicalId.split("\\.")[2];
