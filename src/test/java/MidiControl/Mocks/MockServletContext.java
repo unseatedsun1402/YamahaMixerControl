@@ -70,194 +70,162 @@ public class MockServletContext implements jakarta.servlet.ServletContext {
 
     @Override
     public Dynamic addServlet(String servletName, String className) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addServlet'");
     }
 
     @Override
     public Dynamic addServlet(String servletName, Servlet servlet) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addServlet'");
     }
 
     @Override
     public Dynamic addServlet(String servletName, Class<? extends Servlet> servletClass) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addServlet'");
     }
 
     @Override
     public Dynamic addJspFile(String servletName, String jspFile) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addJspFile'");
     }
 
     @Override
     public <T extends Servlet> T createServlet(Class<T> clazz) throws ServletException {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'createServlet'");
     }
 
     @Override
     public ServletRegistration getServletRegistration(String servletName) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getServletRegistration'");
     }
 
     @Override
     public Map<String, ? extends ServletRegistration> getServletRegistrations() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getServletRegistrations'");
     }
 
     @Override
     public jakarta.servlet.FilterRegistration.Dynamic addFilter(String filterName, String className) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addFilter'");
     }
 
     @Override
     public jakarta.servlet.FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addFilter'");
     }
 
     @Override
     public jakarta.servlet.FilterRegistration.Dynamic addFilter(String filterName,
             Class<? extends Filter> filterClass) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addFilter'");
     }
 
     @Override
     public <T extends Filter> T createFilter(Class<T> clazz) throws ServletException {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'createFilter'");
     }
 
     @Override
     public FilterRegistration getFilterRegistration(String filterName) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getFilterRegistration'");
     }
 
     @Override
     public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getFilterRegistrations'");
     }
 
     @Override
     public SessionCookieConfig getSessionCookieConfig() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getSessionCookieConfig'");
     }
 
     @Override
     public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setSessionTrackingModes'");
     }
 
     @Override
     public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getDefaultSessionTrackingModes'");
     }
 
     @Override
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getEffectiveSessionTrackingModes'");
     }
 
     @Override
     public void addListener(String className) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addListener'");
     }
 
     @Override
     public <T extends EventListener> void addListener(T t) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addListener'");
     }
 
     @Override
     public void addListener(Class<? extends EventListener> listenerClass) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addListener'");
     }
 
     @Override
     public <T extends EventListener> T createListener(Class<T> clazz) throws ServletException {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'createListener'");
     }
 
     @Override
     public JspConfigDescriptor getJspConfigDescriptor() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getJspConfigDescriptor'");
     }
 
     @Override
     public ClassLoader getClassLoader() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getClassLoader'");
     }
 
     @Override
     public void declareRoles(String... roleNames) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'declareRoles'");
     }
 
     @Override
     public String getVirtualServerName() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getVirtualServerName'");
     }
 
     @Override
     public int getSessionTimeout() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getSessionTimeout'");
     }
 
     @Override
     public void setSessionTimeout(int sessionTimeout) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setSessionTimeout'");
     }
 
     @Override
     public String getRequestCharacterEncoding() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getRequestCharacterEncoding'");
     }
 
     @Override
     public void setRequestCharacterEncoding(String encoding) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setRequestCharacterEncoding'");
     }
 
     @Override
     public String getResponseCharacterEncoding() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getResponseCharacterEncoding'");
     }
 
     @Override
     public void setResponseCharacterEncoding(String encoding) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setResponseCharacterEncoding'");
     }
 
     @Override
     public Enumeration<String> getAttributeNames() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAttributeNames'");
     }
 }

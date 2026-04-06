@@ -10,7 +10,7 @@ public class ContextDiscoveryEngine {
     private static final Logger log = Logger.getLogger(ContextDiscoveryEngine.class.getName());
 
     private final CanonicalRegistry registry;
-    private List<ContextDiscoverer> discoverers = new ArrayList();
+    private List<ContextDiscoverer> discoverers = new ArrayList<>();
 
     public ContextDiscoveryEngine(CanonicalRegistry registry) {
         this.registry = registry;

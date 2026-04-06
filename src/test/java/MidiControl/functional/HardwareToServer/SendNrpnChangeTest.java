@@ -27,7 +27,6 @@ import MidiControl.SysexUtils.SysexParser;
 public class SendNrpnChangeTest {
     @Test
     public void testBuildNrpn2byte() throws Exception {
-        System.out.println("\n===== testBuildNrpnFader1 =====\n");
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
         List<NrpnMapping> nrpnMappings = NrpnMappingLoader.loadFromResource("MidiControl/nrpn/m7cl_nrpn_mappings.json");
         CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
@@ -52,9 +51,6 @@ public class SendNrpnChangeTest {
         byte[] expected2 = {(byte)0xb0,0x06,0x06};
         byte[] expected3 = {(byte)0xb0,0x26,0x02};
 
-        System.out.println("Built nrpn " + bytesToHex(built.get(0))+" " + bytesToHex(built.get(1))+
-        " " + bytesToHex(built.get(2))+" " + bytesToHex(built.get(3)));
-
         assertArrayEquals(expected0,built.get(0));
         assertArrayEquals(expected1,built.get(1));
         assertArrayEquals(expected2,built.get(2));
@@ -78,7 +74,6 @@ public class SendNrpnChangeTest {
 
     @Test
     public void testTransmissionInteruptionTrucatesValue() throws Exception {
-        System.out.println("\n===== testBuildNrpnFader1 =====\n");
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
         List<NrpnMapping> nrpnMappings = NrpnMappingLoader.loadFromResource("MidiControl/nrpn/m7cl_nrpn_mappings.json");
         CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
@@ -102,9 +97,6 @@ public class SendNrpnChangeTest {
         byte[] expected1 = {(byte)0xb0,0x62,0x01};
         byte[] expected2 = {(byte)0xb0,0x06,0x06};
         byte[] expected3 = {(byte)0xb0,0x26,0x02}; // nrpn for 770
-
-        System.out.println("Built nrpn " + bytesToHex(built.get(0))+" " + bytesToHex(built.get(1))+
-        " " + bytesToHex(built.get(2))+" " + bytesToHex(built.get(3)));
 
         assertArrayEquals(expected0,built.get(0));
         assertArrayEquals(expected1,built.get(1));
@@ -135,7 +127,6 @@ public class SendNrpnChangeTest {
 
     @Test
     public void testBuildNrpn1byte() throws Exception {
-        System.out.println("\n===== testBuildNrpnFader1 =====\n");
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
         List<NrpnMapping> nrpnMappings = NrpnMappingLoader.loadFromResource("MidiControl/nrpn/m7cl_nrpn_mappings.json");
         CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
@@ -159,9 +150,6 @@ public class SendNrpnChangeTest {
         byte[] expected1 = {(byte)0xb0,0x62,0x01};
         byte[] expected2 = {(byte)0xb0,0x06,0x0};
         byte[] expected3 = {(byte)0xb0,0x26,(byte)0x41};
-
-        System.out.println("Built nrpn " + bytesToHex(built.get(0))+" " + bytesToHex(built.get(1))+
-        " " + bytesToHex(built.get(2))+" " + bytesToHex(built.get(3)));
 
         assertArrayEquals(expected0,built.get(0));
         assertArrayEquals(expected1,built.get(1));

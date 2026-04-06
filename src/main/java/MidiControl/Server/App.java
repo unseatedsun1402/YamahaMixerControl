@@ -15,20 +15,14 @@ public class App {
         this.ioManager = io;
     }
 
-    /**
-     * Public entry point for triggering a full desk rehydration.
-     * Safe to call after device changes, reconnects, or user‑initiated sync.
-     */
     public void rehydrate() {
-        // Defensive: ensure devices are valid before attempting hydration
         if (!ioManager.hasValidDevices()) {
-            logger.info("Rehydrate skipped: no valid MIDI devices");
+            logger.warning("Rehydrate called but skipped: no valid MIDI devices");
             return;
         }
 
         logger.info("Starting rehydration");
 
-        // Delegate to the rehydration manager (which handles pacing, batching, etc.)
         rehydrationManager.rehydrateAll();
     }
 
@@ -38,9 +32,7 @@ public class App {
     }
 
     public void requestMeters() {
-        logger.info("Requesting meter update");
+        logger.info("Request to refresh meter updates");
         rehydrationManager.requestMeters();
     }
-
-    // Other façade methods…
 }

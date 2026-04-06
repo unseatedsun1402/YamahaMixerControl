@@ -13,12 +13,8 @@ import MidiControl.Controls.ControlInstance;
  * Compact Input Channel Strip ViewBuilder
  *
  * Includes ONLY:
- *  - CHANNEL_ON      (kInputOn.kChannelOn)
- *  - PAN             (kInputPan.kChannelPan)
  *  - SEND_MIX{n}     (kInputToMix.kMix{n}Level or kInputAUX.kAUX{n}Level)
  *  - FADER           (kInputFader.kFader)
- *
- * Everything else is intentionally ignored.
  */
 public class InputChannelStripViewBuilder implements ViewBuilder {
 
@@ -38,20 +34,6 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
 
         List<ControlInstance> all = registry.getAllInstancesForContext(context.getId());
 
-        // 1. CHANNEL_ON
-        all.stream()
-                .filter(ci -> "kInputOn".equals(ci.getGroup()))
-                .filter(ci -> "kChannelOn".equals(ci.getSubcontrol()))
-                .findFirst()
-                .ifPresent(ci -> result.add(createChannelOn(ci)));
-
-        // 2. PAN
-        // all.stream()
-        //         .filter(ci -> "kInputPan".equals(ci.getGroup()))
-        //         .filter(ci -> "kChannelPan".equals(ci.getSubcontrol()))
-        //         .findFirst()
-        //         .ifPresent(ci -> result.add(createPan(ci)));
-
         // 3. SEND_MIX{n}
         all.stream()
                 .filter(ci ->
@@ -70,40 +52,6 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
                 .ifPresent(ci -> result.add(createFader(ci)));
 
         return result;
-    }
-
-    private ViewControl createChannelOn(ControlInstance ci) {
-        return new ViewControl(
-                "CHANNEL_ON",
-                "kInputControl",
-                "On",
-                ControlType.TOGGLE,
-                0,
-                ci.getMin(),
-                ci.getMax(),
-                ci.getValue(),
-                ci.getSysex().getDefault_value(),
-                ci.getGroup(),
-                ci.getSubcontrol(),
-                ci.getInstanceIndex()
-        );
-    }
-
-    private ViewControl createPan(ControlInstance ci) {
-        return new ViewControl(
-                "PAN",
-                "kInputPan",
-                "Pan",
-                ControlType.SLIDER_HORIZONTAL,
-                0,
-                ci.getMin(),
-                ci.getMax(),
-                ci.getValue(),
-                ci.getSysex().getDefault_value(),
-                ci.getGroup(),
-                ci.getSubcontrol(),
-                ci.getInstanceIndex()
-        );
     }
 
     private ViewControl createSendMix(ControlInstance ci) {

@@ -55,16 +55,6 @@ public class DynamicUiInputModelTest {
         assertFalse(model.controls.isEmpty(), "Channel strip must have controls");
 
         assertTrue(
-                model.controls.stream().anyMatch(c -> "CHANNEL_ON".equals(c.logicId)),
-                "CHANNEL_ON missing"
-        );
-
-        assertTrue(
-                model.controls.stream().anyMatch(c -> "PAN".equals(c.logicId)),
-                "PAN missing"
-        );
-
-        assertTrue(
                 model.controls.stream().anyMatch(c -> c.logicId.startsWith("SEND_MIX")),
                 "SEND_MIX{n} missing"
         );

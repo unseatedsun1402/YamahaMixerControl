@@ -56,14 +56,11 @@ public class SendSysexChangeTest {
 
         SysexMessage msg = MidiTestUtils.createSysexMessage(faderMsg);
 
-        // Feed into server
         server.addtoinputqueue(msg);
         server.processIncomingMidiForTest();
 
-        // Assertions
         assertFalse(broadcasts.isEmpty(), "Expected at least one broadcast message");
 
-        System.out.println("Broadcast JSON: " + broadcasts.get(0));
         assertEquals(404, new Gson().
         fromJson(broadcasts.get(0), JsonObject.class).
         getAsJsonObject("payload").get("value").getAsInt());
@@ -72,25 +69,21 @@ public class SendSysexChangeTest {
     @Test
     void testSysExReceptionm7cl() throws Exception {
 
-        // Capture broadcast output
         List<String> broadcasts = new ArrayList<>();
         GuiBroadcaster fakeBroadcaster = (json, ctx) -> broadcasts.add(json);
 
         CanonicalContextResolver fakeResolver = canonicalId -> "test.context";
 
-        // Build registry based on 01v96i
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
         SysexParser parser = new SysexParser(mappings);
         CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
 
-        // Inject fake listener
         GuiBroadcastListener listener =
             new GuiBroadcastListener(fakeBroadcaster, fakeResolver);
 
         MidiServer server = new MidiServer(registry);
         server.setGuiBroadcastListener(listener);
 
-        // Fake incoming sysex
         byte[] faderMsg = {
             (byte) 0xF0, (byte) 0x43, (byte) 0x10, (byte) 0x3E,
             (byte) 0x11, (byte) 0x01, (byte) 0x0, (byte) 0x32,
@@ -101,14 +94,11 @@ public class SendSysexChangeTest {
 
         SysexMessage msg = MidiTestUtils.createSysexMessage(faderMsg);
 
-        // Feed into server
         server.addtoinputqueue(msg);
         server.processIncomingMidiForTest();
 
-        // Assertions
         assertFalse(broadcasts.isEmpty(), "Expected at least one broadcast message");
 
-        System.out.println("Broadcast JSON: " + broadcasts.get(0));
         assertEquals(770, new Gson().
         fromJson(broadcasts.get(0), JsonObject.class).
         getAsJsonObject("payload").get("value").getAsInt());
@@ -117,7 +107,6 @@ public class SendSysexChangeTest {
     @Test
     void testMeterBroadcast() throws Exception {
 
-        // Capture broadcast output
         List<String> broadcasts = new ArrayList<>();
         MeterBroadcaster fakeBroadcaster = new MeterBroadcaster(){
             @Override public void onMeterUpdate(MidiControl.UserInterface.Meter.MeterDTO dto) {
@@ -125,7 +114,6 @@ public class SendSysexChangeTest {
             }
         };
 
-        // Build registry based on 01v96i
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
         SysexParser parser = new SysexParser(mappings);
         CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
@@ -134,8 +122,6 @@ public class SendSysexChangeTest {
 
         HardwareInputHandler.setMeterBroadcaster(fakeBroadcaster);
 
-        // F0 43 30 3E 1A 21 00 02 0E 00 05 F7
-        // Fake incoming sysex
         byte[] faderMsg = {
             (byte) 0xF0, (byte) 0x43, (byte) 0x10, (byte) 0x3E,
             (byte) 0x1A, (byte) 0x21, (byte) 0x00, (byte) 0x0,
@@ -144,30 +130,23 @@ public class SendSysexChangeTest {
 
         SysexMessage msg = MidiTestUtils.createSysexMessage(faderMsg);
 
-        // Feed into server
         server.addtoinputqueue(msg);
         server.processIncomingMidiForTest();
 
-        // Assertions
         assertFalse(broadcasts.isEmpty(), "Expected at least one broadcast message");
-        System.out.println("Broadcast JSON: " + broadcasts.get(0));
     }
 
     @Test
     void testHeartbeat() throws Exception {
 
-        // Capture broadcast output
         List<String> broadcasts = new ArrayList<>();
 
-        // Build registry based on 01v96i
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
         SysexParser parser = new SysexParser(mappings);
         CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
 
         MidiServer server = new MidiServer(registry);
 
-        // F0 43 30 3E 1A 21 00 02 0E 00 05 F7
-        // Fake incoming sysex
         byte[] heartbeat = {
             (byte) 0xF0, (byte) 0x43, (byte) 0x10, (byte) 0x30,
             (byte) 0x7F, (byte) 0x7F, (byte) 0xF7
@@ -175,7 +154,6 @@ public class SendSysexChangeTest {
 
         SysexMessage msg = MidiTestUtils.createSysexMessage(heartbeat);
 
-        // Feed into server
         server.addtoinputqueue(msg);
         assertDoesNotThrow(() ->         server.processIncomingMidiForTest());
     }

@@ -100,6 +100,7 @@ public class SubscriptionManager {
 
     public void broadcastControlUpdateWithout(String canonicalId, int value,Session session){
         String contextId = canonicalId.split("\\.")[0];
+        if(debug)logger.info("Boardcasting control update: "+canonicalId+"->"+contextId+" val: "+value);
 
         Set<Session> sessions = getSubscribers(contextId);
         if(sessions.isEmpty()){contextId = "channel."+canonicalId.split("\\.")[2];
@@ -121,7 +122,6 @@ public class SubscriptionManager {
         msg.add("payload", payload);
 
         String json = msg.toString();
-
 
         for (Session s : sessions) {
             if(s.getId() != session.getId()){

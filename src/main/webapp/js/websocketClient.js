@@ -22,7 +22,8 @@ export class WebSocketClient {
       "error": [],
       "connected": [],
       "disconnected": [],
-      "midi-device-list": []
+      "midi-device-list": [],
+      "telemetry": []
     };
 
     this.requestCounter = 0;
@@ -122,6 +123,10 @@ export class WebSocketClient {
       case "name-update":
         this._emit("name-update", msg.payload);
         break;
+      
+      case "telemetry":
+          this._emit("telemetry", msg.payload);
+          break;
 
       default:
         console.warn("[WebSocketClient] Unknown message type:", msg.JSON);

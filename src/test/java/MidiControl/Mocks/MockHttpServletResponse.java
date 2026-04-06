@@ -77,43 +77,36 @@ public class MockHttpServletResponse implements HttpServletResponse {
 
     @Override
     public void addCookie(Cookie cookie) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addCookie'");
     }
 
     @Override
     public boolean containsHeader(String name) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'containsHeader'");
     }
 
     @Override
     public String encodeURL(String url) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'encodeURL'");
     }
 
     @Override
     public String encodeRedirectURL(String url) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'encodeRedirectURL'");
     }
 
     @Override
     public String getHeader(String name) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getHeader'");
     }
 
     @Override
     public Collection<String> getHeaders(String name) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getHeaders'");
     }
 
     @Override
     public Collection<String> getHeaderNames() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getHeaderNames'");
     }
 }

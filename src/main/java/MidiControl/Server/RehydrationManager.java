@@ -29,6 +29,7 @@ public class RehydrationManager {
     private static byte[] cachedMeterRequest = null;
     private static byte cachedModelNumber;
     private static boolean debug = true;
+    private static long BASE_DELAY_MS = 4L;
 
     public RehydrationManager(OutputRequestSender outputRouter,
                               SourceAllInstances registry,
@@ -73,7 +74,6 @@ public class RehydrationManager {
         all.sort((a, b) -> Integer.compare(a.getPriority(), b.getPriority()));
 
         // ---- Configuration ----
-        final long BASE_DELAY_MS = 4L;
         final int[] WEIGHTED_PATTERN = new int[] {
             1, 1, 1, 1,
             2, 2, 2,
@@ -205,5 +205,12 @@ public class RehydrationManager {
         request.setChannelCount(32);
         request.setStartChannel(0);
         return request.toByteArray();
+    }
+
+    public static void changeRehydrationDelay(long newDelay){
+        if(newDelay > 0 & newDelay < 10) {
+            BASE_DELAY_MS = newDelay;
+            logger.info("Rehydration poll rate set to: "+BASE_DELAY_MS+"ms");
+        }
     }
 }

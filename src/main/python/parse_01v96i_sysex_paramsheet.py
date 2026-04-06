@@ -24,6 +24,7 @@ def parse_01v96i_sysex(xls_path, output_json):
             max_channels = safe_int(row[3])
 
         sub_control = str(row[4]).strip()
+        semantic =infer_semantic(control_group,sub_control)
         if not sub_control:
             continue  # skip group header rows
 
@@ -66,6 +67,7 @@ def parse_01v96i_sysex(xls_path, output_json):
             "control_id": control_id if control_id is not None else None,
             "max_channels": (max_channels+1) if max_channels is not None else 1,
             "sub_control": sub_control,
+            "semantic":semantic,
             "value": value if value is not None else None,
             "min_value": min_value if min_value is not None else None,
             "max_value": max_value if max_value is not None else None,
@@ -84,6 +86,42 @@ def parse_01v96i_sysex(xls_path, output_json):
         json.dump(mappings, f, indent=2)
 
     print(f"Parsed {len(mappings)} mappings (including synthetic meter blocks) into {output_json}")
+
+def infer_semantic(control_group: str, sub_control: str):
+    cg = (control_group or "").lower()
+    sc = (sub_control or "").lower()
+
+    # Dynamics – compressor
+    if "comp" in cg or "compressor" in cg or sc.startswith("kcomp"):
+        return {
+            "domain": "dynamics",
+            "role": "compressor",
+            "parameter": sc.replace("kcomp", "").lower()
+        }
+
+    # Dynamics – gate
+    if "gate" in cg or sc.startswith("kgate"):
+        return {
+            "domain": "dynamics",
+            "role": "gate",
+            "parameter": sc.replace("kgate", "").lower()
+        }
+
+    # EQ
+    if "eq" in cg:
+        return {
+            "domain": "eq",
+            "parameter": sc.replace("keq", "").lower()
+        }
+
+    # PAN
+    if "pan" in sc:
+        return {
+            "domain": "pan",
+            "parameter": "position"
+        }
+
+    return None
 
 def compute_priority(sub_control: str) -> int:
     sc = sub_control.lower()

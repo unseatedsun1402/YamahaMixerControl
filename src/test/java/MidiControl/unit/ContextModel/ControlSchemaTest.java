@@ -49,15 +49,6 @@ public class ControlSchemaTest {
         assertTrue(groupsForFader.contains("kInputFader"),
                 "Prefix kFader should map back to group kInputFader");
 
-        System.out.println("---- Prefixes per Group ----");
-        registry.getGroups().forEach((group, g) -> {
-                System.out.println(group + " → " + schema.getPrefixesForGroup(group));
-        });
-
-        System.out.println("---- Groups per Prefix ----");
-        schema.getAllPrefixes().forEach(prefix -> {
-                System.out.println(prefix + " → " + schema.getGroupsForPrefix(prefix));
-        });
         }
 
         @Test
@@ -90,15 +81,5 @@ public class ControlSchemaTest {
                 Set<String> groupsForFader = schema.getGroupsForPrefix("kFader");
                 assertTrue(groupsForFader.contains("kInputFader"),
                         "Prefix kFader should map back to group kInputFader");
-                        
-                System.out.println("---- Prefixes per Group (01V96i) ----");
-                registry.getGroups().forEach((group, g) -> {
-                        System.out.println(group + " → " + schema.getPrefixesForGroup(group));
-                });
-
-                System.out.println("---- Groups per Prefix (01V96i) ----");
-                schema.getAllPrefixes().forEach(prefix -> {
-                        System.out.println(prefix + " → " + schema.getGroupsForPrefix(prefix));
-                });
         }
 }

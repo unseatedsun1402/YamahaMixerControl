@@ -17,35 +17,21 @@ public class NameDiscoveryTest {
     @Test
     public void testNameDiscovery() {
 
-        // -------------------------------------
-        // 1. Load a real registry
-        // -------------------------------------
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
         CanonicalRegistry registry = new CanonicalRegistry(mappings,new SysexParser(mappings));
 
-        // -------------------------------------
-        // 2. Build a discovery engine with the new discoverer
-        // -------------------------------------
         ContextDiscoveryEngine engine = new ContextDiscoveryEngine(registry);
 
-        // Manually add the NameContextDiscoverer into the engine
         engine.addDiscoverer(new NameContextDiscoverer());
 
-        // -------------------------------------
-        // 3. Run discovery
-        // -------------------------------------
         List<Context> contexts = engine.discoverContexts();
 
-        // Filter contexts of TYPE.NAME
         List<Context> nameContexts = contexts.stream()
             .filter(ctx -> ctx.getContextType() == ContextType.NAME)
             .collect(Collectors.toList());
 
         assertFalse(nameContexts.isEmpty(), "No name contexts discovered!");
 
-        // -------------------------------------
-        // 4. Validate Input, Mix/Aux, Matrix, DCA naming controls exist
-        // -------------------------------------
         boolean hasInputNames = nameContexts.stream()
             .anyMatch(ctx -> ctx.getId().startsWith("name.") &&
                              ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kInput")));
@@ -72,9 +58,6 @@ public class NameDiscoveryTest {
         // assertTrue(hasMatrixNames, "Matrix names not discovered!");
         // assertFalse(hasDcaNames, "DCA names not discovered!");  // no dcas on 01v96i
 
-        // -------------------------------------
-        // 5. Validate short and long naming variants are included
-        // -------------------------------------
         boolean hasShortNames = nameContexts.stream()
             .flatMap(ctx -> ctx.getFilters().stream())
             .anyMatch(f -> f.getSubControl().contains("Short"));
@@ -91,35 +74,21 @@ public class NameDiscoveryTest {
         @Test
     public void testOtherNameDiscovery() {
 
-        // -------------------------------------
-        // 1. Load a real registry
-        // -------------------------------------
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
         CanonicalRegistry registry = new CanonicalRegistry(mappings,new SysexParser(mappings));
 
-        // -------------------------------------
-        // 2. Build a discovery engine with the new discoverer
-        // -------------------------------------
         ContextDiscoveryEngine engine = new ContextDiscoveryEngine(registry);
 
-        // Manually add the NameContextDiscoverer into the engine
         engine.addDiscoverer(new NameContextDiscoverer());
 
-        // -------------------------------------
-        // 3. Run discovery
-        // -------------------------------------
         List<Context> contexts = engine.discoverContexts();
 
-        // Filter contexts of TYPE.NAME
         List<Context> nameContexts = contexts.stream()
             .filter(ctx -> ctx.getContextType() == ContextType.NAME)
             .collect(Collectors.toList());
 
         assertFalse(nameContexts.isEmpty(), "No name contexts discovered!");
 
-        // -------------------------------------
-        // 4. Validate Input, Mix/Aux, Matrix, DCA naming controls exist
-        // -------------------------------------
         boolean hasInputNames = nameContexts.stream()
             .anyMatch(ctx -> ctx.getId().startsWith("name.") &&
                              ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kNameInput")));
@@ -146,9 +115,6 @@ public class NameDiscoveryTest {
         // assertTrue(hasMatrixNames, "Matrix names not discovered!");
         // assertTrue(hasDcaNames, "DCA names not discovered!");
 
-        // -------------------------------------
-        // 5. Validate short and long naming variants are included
-        // -------------------------------------
         boolean hasShortNames = nameContexts.stream()
             .flatMap(ctx -> ctx.getFilters().stream())
             .anyMatch(f -> f.getSubControl().contains("Short"));

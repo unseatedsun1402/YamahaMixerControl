@@ -6,7 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import MidiControl.Routing.WebSocketEndpoint;
+import MidiControl.MidiDeviceManager.MidiSendEngine;
+// import MidiControl.Routing.WebSocketEndpoint;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -29,7 +30,9 @@ public class MidiServerListener implements ServletContextListener {
             }
             MidiServer server = new MidiServer();
             server.run();
-            WebSocketEndpoint.enableDebug();
+            // WebSocketEndpoint.enableDebug();
+            // MidiSendEngine.enableDebug();
+            // ServerRouter.enableDebug();
             CONTEXT.setAttribute("midiServer", server);
         }
 

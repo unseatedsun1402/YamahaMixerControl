@@ -22,6 +22,7 @@ public class SysexRegistryTest {
                 0,                  // control_id
                 maxChannels,        // max channels
                 "testSub",          // sub_control
+                null,
                 0,                  // channel_index
                 key,                // key
                 addressBytes,       // address_bytes

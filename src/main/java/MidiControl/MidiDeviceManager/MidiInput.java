@@ -11,4 +11,6 @@ public interface MidiInput {
   MidiDevice.Info getDeviceInfo();
 
   boolean isOpen();
+
+  MidiInputReceiver getInputReceiver();
 }

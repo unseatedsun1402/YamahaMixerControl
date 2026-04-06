@@ -11,6 +11,7 @@ public class SysexMapping {
     private int control_id;
     private int max_channels;
     private String sub_control;
+    private String semantics;
     private int channel_index;
     private long key;
 
@@ -40,6 +41,7 @@ public class SysexMapping {
             int control_id,
             int max_channels,
             String sub_control,
+            String semantics,
             int channel_index,
             long key,
             int[] address_bytes,
@@ -57,6 +59,7 @@ public class SysexMapping {
         this.control_id = control_id;
         this.max_channels = max_channels;
         this.sub_control = sub_control;
+        this.semantics = semantics;
         this.channel_index = channel_index;
         this.key = key;
         this.address_bytes = address_bytes;
@@ -238,6 +241,7 @@ public class SysexMapping {
     public int getControl_id() { return control_id; }
     public int getMax_Channels() { return max_channels; }
     public String getSubControl() { return sub_control; }
+    public String getSemantics() { return semantics; }
     public int getChannel_index() { return channel_index; }
     public long getKey() { return key; }
     public int[] getAddressBytes() { return address_bytes; }

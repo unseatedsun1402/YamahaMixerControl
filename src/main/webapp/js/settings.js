@@ -2,7 +2,6 @@ import { WebSocketClient } from "./websocketClient.js";
 
 console.log(">>> settings.js LOADED <<<");
 
-// Create WS client using same endpoint as console UI
 const wsClient = new WebSocketClient(`ws://${location.host}/MidiControl/endpoint`);
 wsClient.connect();
 
@@ -11,10 +10,24 @@ wsClient.on("connected", () => {
   wsClient.requestMidiDevices();
 });
 
+wsClient.on("telemetry", updateTelemetry);
+
 wsClient.on("midi-device-list", (devices) => {
   console.log("[Settings] Received device list:", devices);
   populateDeviceDropdowns(devices);
 });
+
+document.addEventListener("change", function (e) {
+    if (!e.target.classList.contains("profile-toggle")) return;
+
+    const group = e.target.getAttribute("data-group");
+    const all = document.querySelectorAll('.profile-toggle[data-group="' + group + '"]');
+
+    all.forEach(x => {
+        if (x !== e.target) x.checked = false;
+    });
+});
+
 
 document.getElementById("apply-settings").addEventListener("click", () => {
   const inputDeviceId = parseInt(document.getElementById("midi-input-device").value, 10);
@@ -24,13 +37,13 @@ document.getElementById("apply-settings").addEventListener("click", () => {
   const settings = {
     inputDeviceId,
     outputDeviceId,
-    consoleType
+    consoleType,
     // Future settings:
     // inputChannel: document.getElementById("input-channel").value,
     // outputChannel: parseInt(document.getElementById("output-channel").value, 10),
-    // enableNRPN: document.getElementById("enable-nrpn").checked,
-    // enableSYSEX: document.getElementById("enable-sysex").checked,
-    // enableCC: document.getElementById("enable-cc").checked,
+    safeprofile: document.getElementById("safe-profile").checked,
+    mainprofile: document.getElementById("main-profile").checked,
+    highprofile: document.getElementById("high-profile").checked
     // debugLogging: document.getElementById("debug-logging").checked,
     // showRaw: document.getElementById("show-raw").checked,
     // showCanonical: document.getElementById("show-canonical").checked
@@ -97,4 +110,42 @@ function showStatus(text) {
   el.textContent = text;
   el.style.opacity = 1;
   setTimeout(() => el.style.opacity = 0, 2000);
+}
+
+function updateTelemetry(data) {
+    document.getElementById("telemetry-in").textContent =
+        data.averagein + " B/s";
+
+    document.getElementById("telemetry-out").textContent =
+        data.averageout + " B/s";
+
+    document.getElementById("telemetry-combined").textContent =
+        data.averagecombined + " B/s";
+
+    document.getElementById("telemetry-inflight").textContent =
+        data.inflight;
+
+    document.getElementById("telemetry-dropped").textContent =
+        data.dropped;
+
+    document.getElementById("remaining-capacity").textContent =
+        data.remainingcapacity;
+
+    appendTelemetryLog(data);
+}
+
+function appendTelemetryLog(data) {
+    const log = document.getElementById("telemetry-log");
+    const line = document.createElement("div");
+
+    const t = new Date(data.timestamp * 1000).toLocaleTimeString();
+    line.textContent =
+        `[${t}] in=${data.averagein} out=${data.averageout} ` +
+        `cmb=${data.averagecombined} inflight=${data.inflight}`;
+
+    log.appendChild(line);
+
+    while (log.children.length > 20) {
+        log.removeChild(log.firstChild);
+    }
 }

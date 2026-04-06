@@ -3,6 +3,8 @@ package MidiControl.Mocks;
 import MidiControl.MidiDeviceManager.MidiDeviceDTO;
 import MidiControl.MidiDeviceManager.MidiInput;
 import MidiControl.MidiDeviceManager.MidiOutput;
+import MidiControl.MidiDeviceManager.MidiSendEngine;
+import MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Server.MidiServer;
 
@@ -18,6 +20,7 @@ public class MockMidiIOManager extends MidiIOManager {
     // --- State used by tests ---
     private MidiOutput out;
     private MidiInput in;
+    public MidiSendEngine sendEngine;
 
     public List<MidiDeviceDTO> devices = new ArrayList<>();
 
@@ -79,5 +82,15 @@ public class MockMidiIOManager extends MidiIOManager {
         this.devices = new ArrayList<>(other.devices);
         this.setResult = other.setResult;
         this.lastSetIndex = other.lastSetIndex;
+    }
+
+    @Override
+    public ThroughputProfile getThroughputProfile() {
+        return MidiSendEngine.ThroughputProfile.SAFE_DIN;
+    }
+
+    @Override
+    public  void setThroughputProfile(MidiSendEngine.ThroughputProfile profile){
+        return;
     }
 }

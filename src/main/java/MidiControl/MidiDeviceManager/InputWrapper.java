@@ -1,6 +1,5 @@
 package MidiControl.MidiDeviceManager;
 
-import MidiControl.MidiInputReceiver;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.*;
 import javax.sound.midi.MidiDevice;
@@ -9,13 +8,13 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Transmitter;
 
-public class TransmitterWrapper implements MidiInput {
+public class InputWrapper implements MidiInput {
   private final MidiDevice device;
   private Transmitter transmitter;
   private MidiInputReceiver inputReceiver;
   private final ConcurrentLinkedQueue<MidiMessage> inputBuffer;
 
-  public TransmitterWrapper(MidiDevice device, ConcurrentLinkedQueue<MidiMessage> inputBuffer)
+  public InputWrapper(MidiDevice device, ConcurrentLinkedQueue<MidiMessage> inputBuffer)
       throws MidiUnavailableException {
     this.device = device;
     this.inputBuffer = inputBuffer;
@@ -25,7 +24,7 @@ public class TransmitterWrapper implements MidiInput {
   private void setup() throws MidiUnavailableException {
     if (!device.isOpen()) {
       device.open();
-      Logger.getLogger(TransmitterWrapper.class.getName())
+      Logger.getLogger(InputWrapper.class.getName())
           .log(Level.INFO, "Opened MIDI device for transmitter: "+device.getDeviceInfo().getName());
     }
 
@@ -33,13 +32,13 @@ public class TransmitterWrapper implements MidiInput {
 
     if (inputReceiver != null) {
       inputReceiver.close();
-      Logger.getLogger(TransmitterWrapper.class.getName())
+      Logger.getLogger(InputWrapper.class.getName())
           .log(Level.INFO, "Restarting existing MidiInputReceiver.");
     }
 
     inputReceiver = new MidiInputReceiver(inputBuffer);
     transmitter.setReceiver(inputReceiver);
-    Logger.getLogger(TransmitterWrapper.class.getName())
+    Logger.getLogger(InputWrapper.class.getName())
         .log(Level.INFO, "Transmitter set and inputReceiver attached.");
   }
 
@@ -63,7 +62,7 @@ public class TransmitterWrapper implements MidiInput {
     if (device.isOpen()) {
       device.close();
     }
-    Logger.getLogger(TransmitterWrapper.class.getName())
+    Logger.getLogger(InputWrapper.class.getName())
         .log(Level.INFO, "Closed transmitter and device.");
   }
 
@@ -74,5 +73,10 @@ public class TransmitterWrapper implements MidiInput {
   @Override
   public MidiDevice.Info getDeviceInfo() {
     return this.device.getDeviceInfo();
+  }
+
+  @Override
+  public MidiInputReceiver getInputReceiver() {
+      return (MidiInputReceiver) inputReceiver;
   }
 }

@@ -2,7 +2,7 @@ package MidiControl.functional.MidiServer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import MidiControl.MidiInputReceiver;
+import MidiControl.MidiDeviceManager.MidiInputReceiver;
 import MidiControl.Mocks.MockMidiOut;
 import MidiControl.Server.MidiServer;
 import MidiControl.TestUtilities.MidiTestUtils;

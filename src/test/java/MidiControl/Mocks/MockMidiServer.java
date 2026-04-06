@@ -78,7 +78,6 @@ public class MockMidiServer extends MidiServer {
                 CanonicalInputEvent event = new HardwareInputHandler(nrpnParser, nrpnRegistry).handle(message);
                 ControlInstance instance = registry.resolve(event);
                 if (instance != null) {
-                    System.out.println("Resolved "+instance.getCanonicalId());
                     if(event.getCc()!=null) System.out.println("event control chg content: "+event.getCc());
                     if(event.getNrpn() != null) System.out.println("event nrpn content: "+event.getNrpn().msb+","+
                         event.getNrpn().lsb+
@@ -86,7 +85,6 @@ public class MockMidiServer extends MidiServer {
 
                     if(event.getSysexData() != null) System.out.println("event sysex content: "+event.getSysexData().toString());
                     int value = instance.extractValue(event);
-                    System.out.println("Updating "+instance.getCanonicalId()+ "  to "+value+" | "+(char)value);
                     instance.updateValue(value);
                 }
                 else{System.out.println("Could not resolve message "+SysexParser.bytesToHex(message.getMessage()));}

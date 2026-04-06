@@ -13,11 +13,9 @@ import jakarta.websocket.OnClose;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -105,6 +103,7 @@ public class WebSocketEndpoint {
     public static void send(Session session, String message) {
         try {
             sendWithTimeout(session,message);
+            // if(DEBUG){logger.info("Sent message: "+message);}
             }
         catch (Exception e) {
             logger.warning("Failed to send message: " + e.getMessage());
