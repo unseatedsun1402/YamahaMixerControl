@@ -3,6 +3,7 @@ package MidiControl.ControlServer;
 import java.util.logging.Logger;
 
 import MidiControl.Routing.OutputRouter;
+import MidiControl.Server.RehydrationManager;
 
 public class GuiInputHandler {
 
@@ -19,8 +20,12 @@ public class GuiInputHandler {
     }
 
     public void handleGuiChange(String canonicalId, int value) {
+        if (RehydrationManager.isRunning()){
+            {logger.warning("Rehydation in progress. Dropped Change from "+canonicalId+ " val: "+value);}
+            return;
+        }
         router.applyChange(canonicalId, value);
-        if(debug){logger.info("Handled Change from"+canonicalId+ " val: "+value);}
+        if(debug){logger.info("Handled Change from "+canonicalId+ " val: "+value);}
     }
 
     public void handleGuiRequest(String canonicalId) {

@@ -40,6 +40,7 @@ public class ContextFactoryTest {
         List<ViewControl> controls = builder.build(ctx, registry, null);
 
         assertFalse(controls.isEmpty(), "Compact view should not be empty");
+        
 
         // Expect at least one SEND_MIX
         assertTrue(

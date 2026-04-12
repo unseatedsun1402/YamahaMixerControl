@@ -13,18 +13,16 @@
         import { WebSocketClient } from './js/websocketClient.js';
         import { renderUiModel } from './js/new-ui-renderer.js';
         import { applyControlUpdate } from './js/partial-update.js';
-        import { buildSofPanelFromModel } from './js/sof-panel.js';
+        import { buildViewRibbonFromModel } from './js/view-ribbon.js';
         import { updateChannelStripName } from './js/utils/channel-name.js';
-        window.sofInitialised = false;
+        window.ribbonInitialised = false;
         window.lastBankContexts= [];
         
         console.log(">>> MidiControl UI bootstrap running <<<");
 
-        // Build WebSocket URL
         const contextPath = window.location.pathname.split('/')[1];
         const wsUrl = `ws://${location.host}/${contextPath}/endpoint`;
 
-        // Create WebSocket client
         const ws = new WebSocketClient(wsUrl);
 
         ws.on("connected", () => {
@@ -32,7 +30,7 @@
             ws.requestBank("bank.inputs");
         });
 
-        function handleSofSelection(sendId) {
+        function handleViewSelection(sendId) {
             const stripContainer = document.getElementById("strip-container");
 
             const view = sendId
@@ -59,9 +57,9 @@
         });
 
         ws.on("ui-model", (model) => {
-            if (!window.sofInitialised) {
-                buildSofPanelFromModel(model, handleSofSelection);
-                window.sofInitialised = true;
+            if (!window.ribbonInitialised) {
+                buildViewRibbonFromModel(model, handleViewSelection);
+                window.ribbonInitialised = true;
             }
             renderUiModel(model);
         });
@@ -90,7 +88,7 @@
 
 <body>
     <div id="ui-root">
-        <div id="sof-panel"></div>
+        <div id="view-ribbon"></div>
         <div id="strip-container"></div>
     </div>
 

@@ -1,6 +1,6 @@
-export function buildSofPanelFromModel(model, handleSelection) {
+export function buildViewRibbonFromModel(model, handleSelection) {
 
-    const panel = document.getElementById("sof-panel");
+    const panel = document.getElementById("view-ribbon");
     if (!panel) return;
 
     panel.innerHTML = ""; // clear anything currently in the panel
@@ -72,4 +72,17 @@ export function buildSofPanelFromModel(model, handleSelection) {
     });
 
     panel.appendChild(offBtn);
+
+    // -----------------------------------------------------
+    // EDIT button (normal strip view)
+    // -----------------------------------------------------
+    const editBtn = document.createElement("button");
+    editBtn.className = "edit-btn off";
+    editBtn.textContent = "EDIT";
+
+    editBtn.addEventListener("click", () => {
+        handleSelection("EDIT");
+    });
+
+    panel.appendChild(editBtn);
 }
