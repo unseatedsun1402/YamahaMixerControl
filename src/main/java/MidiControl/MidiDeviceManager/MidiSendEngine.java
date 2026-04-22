@@ -9,18 +9,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
 import java.util.logging.Logger;
 
+import MidiControl.SysexUtils.SysexParser;
 import MidiControl.Telemetry.MidiTelemetry;
 import MidiControl.Telemetry.TelemetryListener;
 import MidiControl.Telemetry.TelemetryPublisher;
 
-public final class MidiSendEngine implements MidiIngressListener {
-    private static final Logger logger = Logger.getLogger(MidiSendEngine.class.getName());
-    private static boolean debug = false;
-
+public final class MidiSendEngine implements MidiIngressListener{
+    
+    // Pacing profiles are orthogonal to your logical TransportMode.
     public enum ThroughputProfile {
-        SAFE_DIN (3125, 128, 1_500_000L, 4L, 98),
+        SAFE_DIN (3125, 128, 1_500_000L, 3L, 98),
         FAST_USB (40000, 512,   200_000L, 2L, 512),
-        FAST_RTP (80000, 1024,    50_000L, 2L, 1024);
+        FAST_RTP (80000, 1024,    50_000L, 1L, 1024);
 
         final int bytesPerSecond;
         final int sysexChunkBytes;
@@ -37,7 +37,8 @@ public final class MidiSendEngine implements MidiIngressListener {
         }
     }
 
-    private static final Logger log = Logger.getLogger(MidiSendEngine.class.getName());
+    private static final Logger logger = Logger.getLogger(MidiSendEngine.class.getName());
+    private static volatile boolean debug = false;
 
     private final MidiOutput midiOut;
 
@@ -107,7 +108,7 @@ public final class MidiSendEngine implements MidiIngressListener {
 
     public void setThroughputProfile(ThroughputProfile p) {
         this.profile = p;
-        log.info("Throughput profile set to " + p);
+        logger.info("Throughput profile set to " + p);
     }
 
     public ThroughputProfile getThroughputProfile() {
@@ -124,23 +125,11 @@ public final class MidiSendEngine implements MidiIngressListener {
      * Offer a message into the engine.
      */
     public boolean offer(byte[] msg) {
-        if (msg == null || msg.length == 0) return false;
-
         if (isRealtime(msg)) {
-            boolean ok = realtimeLane.offer(msg);
-            if (!ok) telemetry.dropped(msg.length);
-            return ok;
+            logger.info("Realtime message - skipping sysex buffer: "+SysexParser.bytesToHex(msg));
+            return realtimeLane.offer(msg);
         }
-
-        if (isSysex(msg)) {
-            if (tryCoalesceSysex(msg)) {
-                return true;
-            }
-        }
-
-        boolean ok = normalLane.offer(msg);
-        if (!ok) telemetry.dropped(msg.length);
-        return ok;
+        return normalLane.offer(msg);
     }
 
     public void start() {
@@ -176,7 +165,7 @@ public final class MidiSendEngine implements MidiIngressListener {
                 Thread.currentThread().interrupt();
                 break;
             } catch (Exception e) {
-                log.warning("Failed to send MIDI: " + e.getMessage());
+                logger.warning("Failed to send MIDI: " + e.getMessage());
             }
         }
     }
@@ -367,7 +356,6 @@ private int getEffectiveOutBps() {
                 && (msg[msg.length - 1] & 0xFF) == 0xF7;
     }
 
-    @Override
     public void onBytesReceived(int byteCount) {
         telemetry.received(byteCount);
         updateIngressRate(byteCount);

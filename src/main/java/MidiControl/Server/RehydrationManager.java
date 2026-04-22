@@ -8,8 +8,6 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-import javax.sound.midi.MidiDevice;
-
 import MidiControl.Controls.ControlInstance;
 import MidiControl.Controls.SourceAllInstances;
 import MidiControl.MidiDeviceManager.ServerSettings;
@@ -30,6 +28,7 @@ public class RehydrationManager {
     private static byte cachedModelNumber;
     private static boolean debug = true;
     private static long BASE_DELAY_MS = 4L;
+    private static boolean running = false;
 
     public RehydrationManager(OutputRequestSender outputRouter,
                               SourceAllInstances registry,
@@ -102,12 +101,14 @@ public class RehydrationManager {
         scheduler.schedule(new Runnable() {
             @Override
             public void run() {
+                if(!running)running = true;
                 if (remaining.get() <= 0) {
                     logger.info("Rehydration complete: all priorities processed.");
                     all.clear();
                     if (debug) {
                         logger.info("Rehydration finished in: " + (int)((System.currentTimeMillis() - rehydrationStart)/1000) + " s");
                     }
+                    running = false;
                     return;
                 }
 
@@ -160,6 +161,8 @@ public class RehydrationManager {
             return;
         }
     }
+
+    public static boolean isRunning(){ return running; }
 
     private int normalizePriority(int p) {
         if (p <= 1) return 1;

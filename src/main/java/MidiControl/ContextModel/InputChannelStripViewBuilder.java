@@ -33,8 +33,7 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
             return result;
 
         List<ControlInstance> all = registry.getAllInstancesForContext(context.getId());
-
-        // 3. SEND_MIX{n}
+        // 1. MIX SEND
         all.stream()
                 .filter(ci ->
                         ci.getGroup().equals("kInputToMix") ||
@@ -44,7 +43,7 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
                 .sorted(Comparator.comparingInt(ci -> extractSendIndex(ci.getSubcontrol())))
                 .forEach(ci -> result.add(createSendMix(ci)));
 
-        // 4. FADER
+        // 2. FADER
         all.stream()
                 .filter(ci -> "kInputFader".equals(ci.getGroup()))
                 .filter(ci -> "kFader".equals(ci.getSubcontrol()))

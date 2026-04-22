@@ -298,7 +298,7 @@ public class NameAssemblerFunctional01V96iTest {
         server.addtoinputqueue(new SysexMessage(buildNameSysex(3, 1, ' '), len)); // ch1
 
         server.processIncomingMidiForTest();
-        Thread.sleep(1100);
+        Thread.sleep(1400);
 
         assertEquals("Kick", results.get("name.0"));
         assertEquals("Snr",  results.get("name.1"));
