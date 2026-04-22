@@ -1,5 +1,6 @@
 package MidiControl.Server;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +21,9 @@ import MidiControl.MidiDeviceManager.ServerSettings;
 import MidiControl.MidiDeviceManager.Settings;
 import MidiControl.Routing.OutputRouter;
 import MidiControl.Routing.WebSocketEndpoint;
+import MidiControl.Server.Protocol.ServerRequest;
+import MidiControl.Server.Protocol.ServerRequestHandler;
+import MidiControl.Server.Protocol.ServerRequestParser;
 import MidiControl.SysexUtils.MappingFiles;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
@@ -28,7 +32,6 @@ import MidiControl.UserInterface.UiModelService;
 import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 import MidiControl.UserInterface.ChannelName.ChannelNameBroadcaster;
 import MidiControl.UserInterface.DTO.UiModelDTO;
-import jakarta.persistence.criteria.CriteriaBuilder.Coalesce;
 import jakarta.websocket.Session;
 
 public class ServerRouter {
@@ -38,13 +41,20 @@ public class ServerRouter {
     private final SubscriptionManager subscriptions;
     private final GuiInputHandler guiInputHandler;
     private final OutputRouter outputRouter;
-    private final int TIMEOUT_MS = 10000;
+    private final Map<String, ServerRequestHandler<Session>> handlers = new HashMap<>();
+    private final ServerRequestParser requestParser;
+
     private int lastKeepAlive = 0;
     private static final Logger logger = Logger.getLogger(ServerRouter.class.getName());
     private final MidiIOManager ioManager;
     private CanonicalRegistry registry;
     private App app;
     private Settings serverSettings = new ServerSettings();
+    
+
+
+
+    private static final long TIMEOUT_MS = 10_000;
     private static boolean debug = false;
 
     public ServerRouter(UiModelService uiModels,
@@ -59,6 +69,8 @@ public class ServerRouter {
         this.outputRouter = new OutputRouter(registry, this.ioManager);
         this.guiInputHandler = new GuiInputHandler(outputRouter);
         this.app = null;
+        this.requestParser = new ServerRequestParser(gson);
+
     }
 
     public void injectApp(App app){
@@ -69,15 +81,13 @@ public class ServerRouter {
         debug = true;
     }
 
-    public void handleMessage(Session session, String message) {
-        JsonObject root = gson.fromJson(message, JsonObject.class);
 
-        String type = root.get("type").getAsString();
-        String requestId = root.has("requestId") ? root.get("requestId").getAsString() : null;
-        JsonElement payloadElement = root.get("payload");
-        JsonObject payload = payloadElement != null && payloadElement.isJsonObject()
-                ? payloadElement.getAsJsonObject()
-                : new JsonObject(); // fallback
+    public void handleMessage(Session session, String message) {
+        ServerRequest req = requestParser.parse(message);
+
+        String type = req.type();
+        String requestId = req.requestId();
+        JsonObject payload = req.payload();
 
         switch (type) {
             case "get-ui-model" -> handleGetUiModel(session, requestId, payload);
@@ -88,9 +98,14 @@ public class ServerRouter {
             case "set-midi-device" -> handleSetMidiDevice(session, requestId, payload);
             case "apply-midi-settings" -> handleApplyMidiSettings(session, requestId, payload);
             case "save-midi-settings" -> handleSaveMidiSettings(session, requestId, payload);
-            case "meter-keep-alive" -> handleMeterKeepAlive(session,requestId,payload);
-            case "request-channel-names" -> handleRequestChannelNames(session,requestId,payload);
-            default -> sendError(session, requestId, "UNKNOWN_TYPE", "Unknown message type: " + type);
+            case "meter-keep-alive" -> handleMeterKeepAlive(session, requestId, payload);
+            case "request-channel-names" -> handleRequestChannelNames(session, requestId, payload);
+            default -> ServerResponses.error(
+                session,
+                requestId,
+                "UNKNOWN_TYPE",
+                "Unknown message type: " + type
+            );
         }
     }
 
@@ -105,8 +120,11 @@ public class ServerRouter {
 
     private void handleMeterKeepAlive(Session session, String requestId, JsonObject payload) {
         int messageTime = payload.get("timestamp").getAsInt();
-        if ((messageTime - lastKeepAlive) > TIMEOUT_MS){app.requestMeters();}
-        else{lastKeepAlive = messageTime;}
+        
+        if ((messageTime - lastKeepAlive) > TIMEOUT_MS && app != null) {
+            app.requestMeters();
+        }
+        lastKeepAlive = messageTime;
     }
 
     private void handleGetUiModel(Session session, String requestId, JsonObject payload) {
@@ -134,77 +152,35 @@ public class ServerRouter {
     private void handleSetControlValue(Session session, String requestId, JsonObject payload) {
         String canonicalId = payload.get("canonicalId").getAsString();
         int value = payload.get("value").getAsInt();
-        logger.fine("Update from "+canonicalId+" val: "+value);
+        logger.fine("Update from " + canonicalId + " val: " + value);
 
         ControlInstance ci = registry.resolveCanonicalId(canonicalId);
         if (ci != null) {
             ci.updateValue(value);
             guiInputHandler.handleGuiChange(canonicalId, value);
             subscriptions.broadcastControlUpdateWithout(canonicalId, value, session);
+            ServerResponses.ackOk(session, requestId);
         } else {
             logger.warning("Unknown canonicalId in set-control-value: " + canonicalId);
+            ServerResponses.error(session, requestId, "UNKNOWN_CANONICAL_ID",
+                    "Unknown canonicalId in set-control-value: " + canonicalId);
         }
-
-        JsonObject ack = new JsonObject();
-        ack.addProperty("type", "ack");
-        if (requestId != null) {
-            ack.addProperty("requestId", requestId);
-        }
-        JsonObject payloadObj = new JsonObject();
-        payloadObj.addProperty("status", "ok");
-        ack.add("payload", payloadObj);
-
-        WebSocketEndpoint.send(session, ack.toString());
     }
+
 
     private void handleSubscribe(Session session, String requestId, JsonObject payload) {
         String contextId = payload.get("contextId").getAsString();
-
         subscriptions.subscribe(session, contextId);
-        if(debug)logger.info("Session: "+session.getId()+" subscribed to "+contextId);
-
-        JsonObject ack = new JsonObject();
-        ack.addProperty("type", "ack");
-        if (requestId != null) ack.addProperty("requestId", requestId);
-
-        JsonObject p = new JsonObject();
-        p.addProperty("status", "ok");
-        ack.add("payload", p);
-
-        WebSocketEndpoint.send(session, ack.toString());
-        logger.fine("Received subscribe request from"+ session.getId());
+        if (debug) logger.info("Session: " + session.getId() + " subscribed to " + contextId);
+        ServerResponses.ackOk(session, requestId);
+        logger.fine("Received subscribe request from " + session.getId());
     }
 
     private void handleUnsubscribe(Session session, String requestId, JsonObject payload) {
         String contextId = payload.get("contextId").getAsString();
-
         subscriptions.unsubscribe(session, contextId);
-
-        JsonObject ack = new JsonObject();
-        ack.addProperty("type", "ack");
-        if (requestId != null) ack.addProperty("requestId", requestId);
-
-        JsonObject p = new JsonObject();
-        p.addProperty("status", "ok");
-        ack.add("payload", p);
-
-        WebSocketEndpoint.send(session, ack.toString());
-        logger.fine("Received unsubscribe request from"+ session.getId());
-    }
-
-    private void sendError(Session session, String requestId, String code, String message) {
-        JsonObject root = new JsonObject();
-        root.addProperty("type", "error");
-        if (requestId != null) root.addProperty("requestId", requestId);
-
-        JsonObject payload = new JsonObject();
-        payload.addProperty("code", code);
-        payload.addProperty("message", message);
-
-        root.add("payload", payload);
-
-        WebSocketEndpoint.send(session, root.toString());
-        logger.warning("Router error: " + code + " - " + message);
+        ServerResponses.ackOk(session, requestId);
+        logger.fine("Received unsubscribe request from " + session.getId());
     }
 
     private void handleListMidiDevices(Session session, String requestId) {
@@ -236,18 +212,9 @@ public class ServerRouter {
 
     private void handleSetMidiDevice(Session session, String requestId, JsonObject payload) {
         int index = payload.get("deviceId").getAsInt();
-
         boolean ok = ioManager.trySetOutputDevice(index);
 
-        JsonObject ack = new JsonObject();
-        ack.addProperty("type", "ack");
-        if (requestId != null) ack.addProperty("requestId", requestId);
-
-        JsonObject p = new JsonObject();
-        p.addProperty("status", ok ? "ok" : "error");
-        ack.add("payload", p);
-
-        WebSocketEndpoint.send(session, ack.toString());
+        ServerResponses.ackStatus(session, requestId, ok);
 
         if (ok)
             logger.info("Session[" + session.getId() + "] selected MIDI output device index " + index);
@@ -285,17 +252,12 @@ public class ServerRouter {
             else { app.rehydrate(); }
         }
 
-        JsonObject ack = new JsonObject();
-        ack.addProperty("type", "ack");
-        if (requestId != null) ack.addProperty("requestId", requestId);
-
         JsonObject p = new JsonObject();
         p.addProperty("type", "apply-settings");
         p.addProperty("midi_status", (inOk && outOk) ? "ok" : "error");
-        p.addProperty("mapping_status", (newMappings != null ) ? "ok" : "error");
-        ack.add("payload", p);
+        p.addProperty("mapping_status", (newMappings != null) ? "ok" : "error");
+        ServerResponses.ack(session, requestId, p);
 
-        WebSocketEndpoint.send(session, ack.toString());
         return ( inOk && outOk && (newMappings != null) );
     }
 

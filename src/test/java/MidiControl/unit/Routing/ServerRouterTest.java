@@ -1,6 +1,5 @@
 package MidiControl.unit.Routing;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,11 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
 
 import MidiControl.MidiDeviceManager.MidiDeviceDTO;
-import MidiControl.MidiDeviceManager.MidiInput;
-import MidiControl.MidiDeviceManager.MidiOutput;
 import MidiControl.MidiDeviceManager.MidiSendEngine;
 import MidiControl.Mocks.FakeSession;
-import MidiControl.Mocks.MockMidiDevice;
 import MidiControl.Mocks.MockMidiIOManager;
 import MidiControl.Mocks.MockMidiOut;
 import MidiControl.Mocks.MockMidiServer;
@@ -28,9 +24,9 @@ import MidiControl.UserInterface.DTO.UiModelDTO;
 
 import java.util.List;
 
-import javax.sound.midi.MidiDevice.Info;
-import javax.sound.midi.MidiMessage;
-import javax.sound.midi.Receiver;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 
 public class ServerRouterTest {
 
@@ -64,6 +60,7 @@ public class ServerRouterTest {
         env.registry = makeMinimalRegistry();
         env.server = new MockMidiServer(env.registry);
         env.io = new MockMidiIOManager(env.server);
+        env.io.setMidiOutForTest(new MockMidiOut());
         env.server.setMockIo(env.io);
 
         env.router = new ServerRouter(
@@ -76,21 +73,64 @@ public class ServerRouterTest {
         env.session = new FakeSession("1");
         return env;
     }
+    
+    private static JsonObject parseJson(String json) {
+        return JsonParser.parseString(json).getAsJsonObject();
+    }
+
+    private static String typeOf(String json) {
+        return parseJson(json).get("type").getAsString();
+    }
+
+    private static JsonObject payloadOf(String json) {
+        return parseJson(json).getAsJsonObject("payload");
+    }
+
+
 
     @Test
-    void testSetControlValue() {
+    void testSetControlValue_UnregisteredCanonicalId_ReturnsError() {
         Env env = makeEnv();
 
         env.router.handleMessage(env.session, """
-            {"type":"set-control-value","payload":{"canonicalId":"fader1","value":77}}
+            {"type":"set-control-value","payload":{"canonicalId":"__definitely_missing__","value":77}}
         """);
 
         String msg = env.session.lastSent;
         assertNotNull(msg, "Router did not send any response for set-control-value");
-        // Depending on your real implementation, adjust these contains() checks:
-        assertTrue(msg.contains("\"type\""), msg);
-        assertTrue(msg.contains("\"status\""), msg);
+
+        assertEquals("error", typeOf(msg), msg);
+
+        JsonObject payload = payloadOf(msg);
+        assertEquals("UNKNOWN_CANONICAL_ID", payload.get("code").getAsString(), msg);
+        assertTrue(payload.get("message").getAsString().contains("__definitely_missing__"), msg);
+
+        // Your error schema does not include "status"
+        assertTrue(!payload.has("status"), msg);
     }
+
+    @Test
+    void testSetControlValue_RegisteredCanonicalId_ReturnsAck() {
+        Env env = makeEnv();
+
+        String existingId = env.registry.getAllInstances().stream()
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Registry has no instances"))
+                .getCanonicalId();
+
+        env.router.handleMessage(env.session, """
+            {"type":"set-control-value","payload":{"canonicalId":"%s","value":77}}
+        """.formatted(existingId));
+
+        String msg = env.session.lastSent;
+        assertNotNull(msg, "Router did not send any response for set-control-value");
+
+        assertEquals("ack", typeOf(msg), msg);
+
+        JsonObject payload = payloadOf(msg);
+        assertEquals("ok", payload.get("status").getAsString(), msg);
+    }
+
 
     @Test
     void testListMidiDevices() {
