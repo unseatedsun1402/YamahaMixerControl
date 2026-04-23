@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.logging.Logger;
 
 import MidiControl.MidiDeviceManager.MidiSendEngine;
+import MidiControl.Server.Rehydration.RehydrationMetrics;
 
 public final class MidiTelemetry {
 
@@ -11,41 +12,52 @@ public final class MidiTelemetry {
     private final LongAdder bytesIn = new LongAdder();
     private final LongAdder droppedBytes = new LongAdder();
 
-    private final LongAdder inflightBytes = new LongAdder();
-    private volatile long peakInflightPeriod;
-    private volatile long peakInflightSession;
-    private volatile long peakDroppedPeriod;
-    private volatile long peakDroppedSession;
+    private final LongAdder currentInflightBytes = new LongAdder();
+
+    private volatile long periodPeakInflightBytes;
+    private volatile long sessionPeakInflightBytes;
+
+    private volatile long periodPeakDroppedBytes;
+    private volatile long sessionPeakDroppedBytes;
 
     private volatile long periodStartEpochSec;
     private volatile MidiSendEngine sendEngine;
+    private final RehydrationMetrics rehydrationMetrics;
+
 
     private static Logger logger = Logger.getLogger(MidiTelemetry.class.getName());
 
-
-    public MidiTelemetry(MidiSendEngine mse) {
+    
+    public MidiTelemetry(MidiSendEngine mse, RehydrationMetrics rehydrationMetrics) {
         logger.info("Telemetry engine started");
         this.periodStartEpochSec = now();
         this.sendEngine = mse;
+        this.rehydrationMetrics = rehydrationMetrics;
+    }
+
+
+
+    public MidiTelemetry(MidiSendEngine mse) {
+        this(mse, null);
     }
 
     public void sent(int bytes) {
         bytesOut.add(bytes);
-        inflightBytes.add(bytes);
-        long v = inflightBytes.sum();
-        peakInflightPeriod = Math.max(peakInflightPeriod, v);
-        peakInflightSession = Math.max(peakInflightSession, v);
+        currentInflightBytes.add(bytes);
+        long v = currentInflightBytes.sum();
+        periodPeakInflightBytes = Math.max(periodPeakInflightBytes, v);
+        sessionPeakInflightBytes = Math.max(sessionPeakInflightBytes, v);
     }
 
     public void received(int bytes) {
         bytesIn.add(bytes);
-        inflightBytes.add(-bytes);
+        currentInflightBytes.add(-bytes);
     }
 
     public void dropped(int bytes) {
         droppedBytes.add(bytes);
-        peakDroppedPeriod = Math.max(peakDroppedPeriod, bytes);
-        peakDroppedSession = Math.max(peakDroppedSession, bytes);
+        periodPeakDroppedBytes = Math.max(periodPeakDroppedBytes, bytes);
+        sessionPeakDroppedBytes = Math.max(sessionPeakDroppedBytes, bytes);
     }
 
     public TelemetryData snapshotAndResetPeriod() {
@@ -57,26 +69,36 @@ public final class MidiTelemetry {
         dto.setAvgOut((int) (bytesOut.sum() / elapsed));
         dto.setAvgIn((int) (bytesIn.sum() / elapsed));
         dto.setAvgCombined((int) ((bytesOut.sum() + bytesIn.sum()) / elapsed));
-        dto.setInFlight((int) peakInflightPeriod);
-        dto.setDroppedMessages((int) peakDroppedPeriod);
-        dto.setSysexQueueCapacity((int)sendEngine.getSysexQueueRemainingPercent());
+        dto.setInFlight((int) periodPeakInflightBytes);
+        dto.setDroppedMessages((int) periodPeakDroppedBytes);
+        dto.setSysexQueueCapacity(sendEngine.getSysexQueueRemainingPercent());
+
+        if (rehydrationMetrics != null) {
+            dto.setInflightTransactions(
+                    rehydrationMetrics.getInflightTransactionCount()
+            );
+            dto.setTimedOutTransactions(
+                    rehydrationMetrics.getTimedOutTransactionCount()
+            );
+        }
 
         bytesOut.reset();
         bytesIn.reset();
         droppedBytes.reset();
-        peakInflightPeriod = 0;
-        peakDroppedPeriod = 0;
+        periodPeakInflightBytes = 0;
+        periodPeakDroppedBytes = 0;
         periodStartEpochSec = now;
-        logger.fine("Telemetry snapshot: "+dto.toJson());
+
+        logger.fine("Telemetry snapshot: " + dto.toJson());
         return dto;
     }
 
     public long getPeakInflightSession() {
-        return peakInflightSession;
+        return sessionPeakInflightBytes;
     }
 
     public long getPeakDroppedSession() {
-        return peakDroppedSession;
+        return sessionPeakDroppedBytes;
     }
 
     private static long now() {

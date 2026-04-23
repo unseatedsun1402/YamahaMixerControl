@@ -25,13 +25,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 @ServerEndpoint(value = "/endpoint")
-public class WebSocketEndpoint {
+public class WebSocketEndpoint{
 
     private static final Set<Session> sessions = ConcurrentHashMap.newKeySet();
     private static final Logger logger = Logger.getLogger(WebSocketEndpoint.class.getName());
     private static final Gson gson = new Gson();
     private static boolean DEBUG = false;
     private static final long TIMEOUT = 3000;
+    public static String lastSent;
 
     private MidiServer server;
     private SubscriptionManager subscriptions;
@@ -101,9 +102,9 @@ public class WebSocketEndpoint {
     }
 
     public static void send(Session session, String message) {
+        lastSent = message;
         try {
             sendWithTimeout(session,message);
-            // if(DEBUG){logger.info("Sent message: "+message);}
             }
         catch (Exception e) {
             logger.warning("Failed to send message: " + e.getMessage());
@@ -111,7 +112,7 @@ public class WebSocketEndpoint {
     }
 
     public static void broadcast(String message) {
-        if (DEBUG) logger.info("Broadcasting message to clients "+message);
+        lastSent = message;
         for (Session s : sessions) {
             sendWithTimeout(s,message);
         }
@@ -142,5 +143,9 @@ public class WebSocketEndpoint {
 
     private static boolean unlockSession(Session session){
         return sessionLocks.remove(session.hashCode());
+    }
+
+    public static void addTestSession(Session testSession){
+        sessions.add(testSession);
     }
 }

@@ -31,6 +31,7 @@ import MidiControl.NrpnUtils.NrpnParser;
 import MidiControl.NrpnUtils.NrpnRegistry;
 import MidiControl.Routing.WebSocketEndpoint;
 import MidiControl.Server.Protocol.ServerEventSerializer;
+import MidiControl.Server.Rehydration.RehydrationManager;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;

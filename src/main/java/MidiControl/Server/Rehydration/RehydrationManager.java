@@ -1,4 +1,4 @@
-package MidiControl.Server;
+package MidiControl.Server.Rehydration;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import MidiControl.Routing.OutputRequestSender;
 import MidiControl.SysexUtils.ModelNumbers;
 import MidiControl.UserInterface.Meter.MeterRequest;
 
-public class RehydrationManager {
+public class RehydrationManager implements RehydrationMetrics{
 
     private final OutputRequestSender outputRouter;
     private final SourceAllInstances registry;
@@ -23,6 +23,12 @@ public class RehydrationManager {
 
     private final Map<String, Long> pending = new ConcurrentHashMap<>();
     private static final long TIMEOUT_MS = 350;
+    
+    private final AtomicInteger inflightTransactions = new AtomicInteger(0);
+    private final AtomicInteger timedOutTransactions = new AtomicInteger(0);
+    private static final int MAX_TIMEOUT_COUNT = 10_000;
+
+
     private static final Logger logger = Logger.getLogger(RehydrationManager.class.getName());
     private static byte[] cachedMeterRequest = null;
     private static byte cachedModelNumber;
@@ -60,6 +66,7 @@ public class RehydrationManager {
 
     public void request(String canonicalId) {
         pending.put(canonicalId, System.currentTimeMillis());
+        inflightTransactions.incrementAndGet();
         outputRouter.applyRequest(canonicalId);
 
         scheduler.schedule(() -> checkTimeout(canonicalId),
@@ -161,9 +168,14 @@ public class RehydrationManager {
         if (expected == null) {
             return;
         }
+        inflightTransactions.decrementAndGet();
     }
 
     public static boolean isRunning(){ return running; }
+
+    
+    public int getInflightTransactionCount() {return inflightTransactions.get();}
+    public int getTimedOutTransactionCount() {return timedOutTransactions.get();}
 
     private int normalizePriority(int p) {
         if (p <= 1) return 1;
@@ -172,10 +184,20 @@ public class RehydrationManager {
         return 4;
     }
 
+
     private void checkTimeout(String canonicalId) {
-        if (pending.containsKey(canonicalId)) {
-            pending.remove(canonicalId);
+        if (pending.remove(canonicalId) != null) {
+            inflightTransactions.decrementAndGet();
+            incrementRequestTimeoutCounter();
         }
+    }
+
+    private void incrementRequestTimeoutCounter() {
+        int v;
+        do {
+            v = timedOutTransactions.get();
+            if (v >= MAX_TIMEOUT_COUNT) return;
+        } while (!timedOutTransactions.compareAndSet(v, v + 1));
     }
 
     public Boolean isPending(String string) {
@@ -183,7 +205,9 @@ public class RehydrationManager {
     }
 
     public void clearPending(RehydrationListener listener){
+        int cleared = pending.size();
         pending.clear();
+        inflightTransactions.addAndGet(-cleared);
         listener.onReset();
     }
 

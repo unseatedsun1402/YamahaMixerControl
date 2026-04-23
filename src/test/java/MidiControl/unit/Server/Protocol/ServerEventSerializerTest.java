@@ -1,4 +1,4 @@
-package MidiControl.unit.Server;
+package MidiControl.unit.Server.Protocol;
 
 import static org.junit.jupiter.api.Assertions.*;
 

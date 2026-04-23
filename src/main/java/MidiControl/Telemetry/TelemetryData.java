@@ -9,6 +9,10 @@ public class TelemetryData {
     private int dropped=-1;
     private long timeStamp;
     private int remainingcapacity = -1;
+    private int usedcapacity = -1;
+    private int inflightTransactions = -1;
+    private int timedOutTransactions = -1;
+
 
     public TelemetryData(){
         timeStamp = System.currentTimeMillis();
@@ -16,7 +20,11 @@ public class TelemetryData {
 
     public String toJson(){
         return "{\"type\":\"telemetry\",\"payload\":{\"timestamp\":"+this.timeStamp+",\"inflight\":"+this.inflight+",\"dropped\":"+this.dropped+
-        ",\"averagein\":"+this.averagein+",\"averageout\":"+this.averageout+",\"averagecombined\":"+averagecombined+",\"remainingcapacity\":"+remainingcapacity+"} }";
+        ",\"averagein\":"+this.averagein+",\"averageout\":"+this.averageout+",\"averagecombined\":"+averagecombined+",\"remainingcapacity\":"
+        +remainingcapacity+",\"usedcapacity\":"+usedcapacity+
+        ",\"inflightTransactions\":" + inflightTransactions +
+        ",\"timedOutTransactions\":" + timedOutTransactions +
+        "} }";
     }
 
     public long getTimestamp(){return this.timeStamp; }
@@ -34,4 +42,8 @@ public class TelemetryData {
     public void setDroppedMessages(int value){ this.dropped = value; }
     public void setTimeStamp(long time) {this.timeStamp = time;}
     public void setSysexQueueCapacity(int sysexQueueCapacity) { this.remainingcapacity = sysexQueueCapacity; }
+    public void setSysexQueueConsumed(int sysexQueueUsed) { this.usedcapacity = sysexQueueUsed; }
+    public void setInflightTransactions(int value) {this.inflightTransactions = value;}
+    public void setTimedOutTransactions(int value) {this.timedOutTransactions = value;}
+
 }

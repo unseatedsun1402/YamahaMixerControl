@@ -1,45 +1,37 @@
-
 package MidiControl.UserInterface.Meter;
 
 import java.util.logging.Logger;
-
 import MidiControl.SystemTools.NativeLoader;
 
 public final class MeterTools {
-    private static final Logger logger = Logger.getLogger(MeterTools.class.getName());
 
-    private static final boolean nativeAvailable;
+    private static final Logger logger = Logger.getLogger(MeterTools.class.getName());
+    private static volatile boolean nativeAvailable;
+
+    private static volatile boolean nativeSingleFailed;
+    private static volatile boolean nativeBlockFailed;
 
     static {
         nativeAvailable = NativeLoader.loadLibrary("native_meter_tools");
         if (nativeAvailable) {
-            logger.info("Loaded native meter_tools");
-        } else {
-            logger.warning("Falling back to Java meter tools");
+            logger.fine("Loaded native meter_tools");
         }
     }
 
     private MeterTools() {}
 
-    /* -------------------------------------------
-       Rule: 01V96 / 01V96i = 2‑byte meters (0x1A)
-             Everything else = 1‑byte meters
-       ------------------------------------------- */
-    public static int bytesPerForModel(int modelByte) {
-        return (modelByte == 0x1A) ? 2 : 1;
+    public static void disableNativeForTests(){
+        nativeAvailable = false;
     }
 
-    /* -------------------------------------------
-       Native bindings
-       ------------------------------------------- */
+    public static int bytesPerForModel(int modelByte) {
+        return ((modelByte & 0xFF) == 0x1A) ? 2 : 1;
+    }
+
     public static native long convertSingle(byte[] raw, int bytesPer);
     public static native void convertBlock(byte[] raw, int bytesPer, long[] out);
 
-    /* -------------------------------------------
-       Java fallback (mirrors C++)
-       ------------------------------------------- */
-
-    private static final float[] YAMAHA_7BIT_DB = new float[] {
+    private static final float[] YAMAHA_7BIT_DB = {
         -95,-94,-93,-92,-91,-90,-89,-89,
         -88,-87,-86,-85,-84,-83,-82,-81,
         -80,-79,-78,-78,-77,-76,-75,-74,
@@ -57,55 +49,80 @@ public final class MeterTools {
     };
 
     private static long convertSingleJava(byte[] raw, int bytesPer) {
-        if (raw == null || bytesPer < 1 || bytesPer > 2 || raw.length < bytesPer)
+        if (raw == null || raw.length < bytesPer || bytesPer < 1 || bytesPer > 2)
             return Long.MIN_VALUE;
+
+        int v7;
+
         if (bytesPer == 1) {
-            int v7 = raw[0] & 0x7F;
-            if (v7 < 0) v7 = 0;
-            if (v7 >= 112) v7 = 111;
-            return Math.round(YAMAHA_7BIT_DB[v7] * 100.0);
+            v7 = raw[0] & 0x7F;
+        } else {
+            int hi = raw[0] & 0x7F;
+            int lo = raw[1] & 0x7F;
+            int v14 = (hi << 7) | lo;
+
+            if (v14 >= 0x1FFF) {
+                v7 = 127;
+            } else {
+                if (v14 > 4368) v14 = 4368;
+                v7 = Math.round(v14 * (127.0f / 4368.0f));
+            }
         }
 
-        // 2-byte "14-bit" Yamaha meter value (01V96i etc.)
-        int hi = raw[0] & 0x7F;
-        int lo = raw[1] & 0x7F;
-        int v14 = (hi << 7) | lo;
-        int v7  = (v14 *127) / 4096;
         if (v7 < 0) v7 = 0;
         if (v7 >= 112) v7 = 111;
+
         return Math.round(YAMAHA_7BIT_DB[v7] * 100.0);
     }
 
     private static void convertBlockJava(byte[] raw, int bytesPer, long[] out) {
-        if (raw == null || out == null || bytesPer < 1 || bytesPer > 2) return;
-
         int count = Math.min(out.length, raw.length / bytesPer);
         int idx = 0;
 
         for (int i = 0; i < count; i++) {
+            int v7;
+
             if (bytesPer == 1) {
-                out[i] = convertSingleJava(new byte[]{ raw[idx] }, 1);
+                v7 = raw[idx] & 0x7F;
             } else {
-                out[i] = convertSingleJava(new byte[]{ raw[idx], raw[idx+1] }, 2);
+                int hi = raw[idx] & 0x7F;
+                int lo = raw[idx + 1] & 0x7F;
+                int v14 = (hi << 7) | lo;
+
+                if (v14 >= 0x1FFF) {
+                    v7 = 127;
+                } else {
+                    if (v14 > 4368) v14 = 4368;
+                    v7 = Math.round(v14 * (127.0f / 4368.0f));
+                }
             }
+
+            if (v7 < 0) v7 = 0;
+            if (v7 >= 112) v7 = 111;
+
+            out[i] = Math.round(YAMAHA_7BIT_DB[v7] * 100.0);
             idx += bytesPer;
         }
     }
 
     public static long toCentiDb(byte[] raw, int bytesPer) {
-        if (nativeAvailable) {
+        if (raw == null || raw.length < bytesPer || bytesPer < 1 || bytesPer > 2)
+            return Long.MIN_VALUE;
+
+        if (nativeAvailable && !nativeSingleFailed) {
             try {
                 return convertSingle(raw, bytesPer);
             } catch (Throwable t) {
-                logger.severe("Native convertSingle failed: " + t);
+                nativeSingleFailed = true;
+                logger.warning("Native convertSingle failed, using Java path: " + t);
             }
         }
+
         return convertSingleJava(raw, bytesPer);
     }
 
     public static long toCentiDb(byte[] raw, byte modelByte) {
-        int bytesPer = bytesPerForModel(modelByte);
-        return toCentiDb(raw, bytesPer);
+        return toCentiDb(raw, bytesPerForModel(modelByte));
     }
 
     public static long[] toCentiDbBlock(byte[] raw, int bytesPer) {
@@ -114,12 +131,13 @@ public final class MeterTools {
 
         long[] out = new long[raw.length / bytesPer];
 
-        if (nativeAvailable) {
+        if (nativeAvailable && !nativeBlockFailed) {
             try {
                 convertBlock(raw, bytesPer, out);
                 return out;
             } catch (Throwable t) {
-                logger.severe("Native convertBlock failed: " + t);
+                nativeBlockFailed = true;
+                logger.warning("Native convertBlock failed, using Java path: " + t);
             }
         }
 
@@ -128,13 +146,9 @@ public final class MeterTools {
     }
 
     public static long[] toCentiDbBlock(byte[] raw, int modelByte, boolean auto) {
-        int bytesPer = bytesPerForModel(modelByte);
-        return toCentiDbBlock(raw, bytesPer);
+        return toCentiDbBlock(raw, bytesPerForModel(modelByte));
     }
 
-    /* -------------------------------------------
-       Formatting
-       ------------------------------------------- */
     public static String formatCentiDb(long centi) {
         if (centi == Long.MIN_VALUE) return "-inf dB";
         long abs = Math.abs(centi);

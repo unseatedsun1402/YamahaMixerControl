@@ -3,7 +3,6 @@ package MidiControl.unit.Routing;
 import MidiControl.Routing.OutputRouter;
 import MidiControl.Controls.*;
 import MidiControl.MidiDeviceManager.*;
-import MidiControl.Server.MidiServer;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.NrpnUtils.NrpnMapping;
 
@@ -85,27 +84,6 @@ public class OutputRouterTest {
         @Override
         public ControlInstance resolveCanonicalId(String id) {
             return map.get(id);
-        }
-    }
-
-    private static class MockServer extends MidiServer {
-        private final MockRegistry registry;
-        private final MidiIOManager io;
-
-        public MockServer(MockRegistry registry, MidiIOManager io) {
-            super(null, null);
-            this.registry = registry;
-            this.io = io;
-        }
-
-        @Override
-        public CanonicalRegistry getCanonicalRegistry() {
-            return registry;
-        }
-
-        @Override
-        public MidiIOManager getMidiDeviceManager() {
-            return io;
         }
     }
 

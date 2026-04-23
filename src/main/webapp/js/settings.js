@@ -146,8 +146,9 @@ function appendTelemetryLog(data) {
 
     const t = new Date(data.timestamp * 1000).toLocaleTimeString();
     line.textContent =
-        `[${t}] in=${data.averagein} out=${data.averageout} ` +
-        `cmb=${data.averagecombined} inflight=${data.inflight}`;
+        `[${t}] Bin=${data.averagein} Bout=${data.averageout} ` +
+        `Bcmb=${data.averagecombined} Binflight=${data.inflight} ` +
+        `Qused=${data.usedcapacity}`;
 
     log.appendChild(line);
 

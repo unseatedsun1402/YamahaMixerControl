@@ -5,6 +5,8 @@ import java.util.logging.*;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Server.Protocol.NotifyClients;
 import MidiControl.Server.Protocol.ServerEvent;
+import MidiControl.Server.Rehydration.RehydrationListener;
+import MidiControl.Server.Rehydration.RehydrationManager;
 
 public class StateRehydrationService implements RehydrationListener{
 

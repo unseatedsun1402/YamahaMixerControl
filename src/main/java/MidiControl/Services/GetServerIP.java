@@ -14,7 +14,7 @@ import java.util.Enumeration;
 public class GetServerIP extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
 
         String base = req.getScheme() + "://" +

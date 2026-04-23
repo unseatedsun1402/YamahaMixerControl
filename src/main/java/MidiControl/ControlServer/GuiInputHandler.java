@@ -3,7 +3,7 @@ package MidiControl.ControlServer;
 import java.util.logging.Logger;
 
 import MidiControl.Routing.OutputRouter;
-import MidiControl.Server.RehydrationManager;
+import MidiControl.Server.Rehydration.RehydrationManager;
 
 public class GuiInputHandler {
 
