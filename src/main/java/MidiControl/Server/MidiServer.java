@@ -29,6 +29,8 @@ import MidiControl.NrpnUtils.NrpnMapping;
 import MidiControl.NrpnUtils.NrpnMappingLoader;
 import MidiControl.NrpnUtils.NrpnParser;
 import MidiControl.NrpnUtils.NrpnRegistry;
+import MidiControl.Routing.WebSocketEndpoint;
+import MidiControl.Server.Protocol.ServerEventSerializer;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
@@ -97,7 +99,7 @@ public class MidiServer implements Runnable, UiModelService{
         this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
         this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(), (SourceAllInstances) this.canonicalRegistry, Executors.newSingleThreadScheduledExecutor());
         initContextIndex();
-        serverRouter.injectApp(new App(rehydrationManager, deviceManager));
+        serverRouter.injectApp(new StateRehydrationService(rehydrationManager, deviceManager));
         logger.info("MidiServer: CanonicalRegistry initialized with SYSEX + NRPN mappings.");
     }
 
@@ -151,10 +153,6 @@ public class MidiServer implements Runnable, UiModelService{
 
     public CanonicalRegistry getCanonicalRegistry() {
         return this.canonicalRegistry;
-    }
-
-    public void RehydrateSever(){
-        this.rehydrationManager.rehydrateAll();
     }
 
     public void setCanonicalRegistry(CanonicalRegistry registry) {
@@ -246,15 +244,32 @@ public class MidiServer implements Runnable, UiModelService{
                         "MidiProcessingThread");
 
             processingThread.setPriority(Thread.NORM_PRIORITY + 1);
-            processingThread.setUncaughtExceptionHandler((t, e) ->
-                logger.log(Level.SEVERE, "Processing thread crashed: " + t.getName(), e)
+            processingThread.setUncaughtExceptionHandler((t, e) -> {
+                logger.log(Level.SEVERE, "Processing thread crashed: " + t.getName(), e);
+
+                String json = ServerEventSerializer.fatal(
+                        e,
+                        "PROCESSING",
+                        "Midi processing thread crashed: " + t.getName()
+                );
+
+                WebSocketEndpoint.broadcast(json);
+            });
+            processingThread.start();
+        }
+
+        catch (Exception e) {
+            logger.log(Level.SEVERE, "MidiServer thread crashed", e);
+
+            String json = ServerEventSerializer.fatal(
+                    e,
+                    "SERVER",
+                    "MidiServer main thread crashed"
             );
 
-            processingThread.start();
-
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "MidiServer thread crashed", e);
+            WebSocketEndpoint.broadcast(json);
         }
+
     }
 
     public ServerRouter getServerRouter() {

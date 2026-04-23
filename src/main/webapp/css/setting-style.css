@@ -158,6 +158,35 @@ button:hover {
     padding-top: 4px;
 }
 
+/* ====== LOGGING ====== */
+.server-log {
+    height: 180px;
+    overflow-y: auto;
+    background: #111;
+    color: #e0e0e0;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 6px;
+    border: 1px solid #333;
+}
+
+.server-log-line {
+    padding: 2px 4px;
+    border-bottom: 1px solid #222;
+}
+
+.server-log-line.INFO {
+    color: #9cdcfe;
+}
+
+.server-log-line.WARNING {
+    color: #ffcc00;
+}
+
+.server-log-line.ERROR {
+    color: #ff6666;
+}
+
 /* ====== TABLE ====== */
 
 .mapping-table {

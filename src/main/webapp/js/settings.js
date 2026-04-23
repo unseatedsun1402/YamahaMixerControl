@@ -3,6 +3,11 @@ import { WebSocketClient } from "./websocketClient.js";
 console.log(">>> settings.js LOADED <<<");
 
 const wsClient = new WebSocketClient(`ws://${location.host}/MidiControl/endpoint`);
+const SERVER_LOG_LIMIT = 50;
+const serverLogBuffer = [];
+
+const serverLog = document.getElementById("server-log");
+
 wsClient.connect();
 
 wsClient.on("connected", () => {
@@ -11,6 +16,7 @@ wsClient.on("connected", () => {
 });
 
 wsClient.on("telemetry", updateTelemetry);
+wsClient.on("server-event", handleServerEvent)
 
 wsClient.on("midi-device-list", (devices) => {
   console.log("[Settings] Received device list:", devices);
@@ -148,4 +154,50 @@ function appendTelemetryLog(data) {
     while (log.children.length > 20) {
         log.removeChild(log.firstChild);
     }
+}
+
+
+function handleServerEvent(event) {
+  const time = new Date(event.timestamp).toLocaleTimeString();
+
+  const line = {
+    level: event.level,
+    text: `[${time}] [${event.category}] ${event.message}`
+  };
+
+  serverLogBuffer.push(line);
+  if (serverLogBuffer.length > SERVER_LOG_LIMIT) {
+    serverLogBuffer.shift();
+  }
+
+  renderServerLog();
+
+  // Escalate critical events
+  if (event.level === "ERROR") {
+    showGlobalAlert(line.text);
+  }
+}
+
+function renderServerLog() {
+  serverLog.innerHTML = "";
+
+  for (const entry of serverLogBuffer) {
+    const div = document.createElement("div");
+    div.className = `server-log-line ${entry.level}`;
+    div.textContent = entry.text;
+    serverLog.appendChild(div);
+  }
+
+  serverLog.scrollTop = serverLog.scrollHeight;
+}
+
+
+function showGlobalAlert(message) {
+  const el = document.createElement("div");
+  el.className = "global-alert";
+  el.textContent = message;
+
+  document.body.appendChild(el);
+
+  setTimeout(() => el.remove(), 6000);
 }
