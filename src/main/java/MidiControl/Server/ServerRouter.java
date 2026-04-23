@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import MidiControl.ControlServer.GuiInputHandler;
@@ -21,6 +20,8 @@ import MidiControl.MidiDeviceManager.ServerSettings;
 import MidiControl.MidiDeviceManager.Settings;
 import MidiControl.Routing.OutputRouter;
 import MidiControl.Routing.WebSocketEndpoint;
+import MidiControl.Server.Protocol.NotifyClients;
+import MidiControl.Server.Protocol.ServerEvent;
 import MidiControl.Server.Protocol.ServerRequest;
 import MidiControl.Server.Protocol.ServerRequestHandler;
 import MidiControl.Server.Protocol.ServerRequestParser;
@@ -48,11 +49,8 @@ public class ServerRouter {
     private static final Logger logger = Logger.getLogger(ServerRouter.class.getName());
     private final MidiIOManager ioManager;
     private CanonicalRegistry registry;
-    private App app;
+    private StateRehydrationService rehydrationService;
     private Settings serverSettings = new ServerSettings();
-    
-
-
 
     private static final long TIMEOUT_MS = 10_000;
     private static boolean debug = false;
@@ -68,13 +66,12 @@ public class ServerRouter {
         this.ioManager = ioManager;
         this.outputRouter = new OutputRouter(registry, this.ioManager);
         this.guiInputHandler = new GuiInputHandler(outputRouter);
-        this.app = null;
+        this.rehydrationService = null;
         this.requestParser = new ServerRequestParser(gson);
-
     }
 
-    public void injectApp(App app){
-        this.app = app;
+    public void injectApp(StateRehydrationService serv){
+        this.rehydrationService = serv;
     }
 
     public static void enableDebug(){
@@ -121,10 +118,14 @@ public class ServerRouter {
     private void handleMeterKeepAlive(Session session, String requestId, JsonObject payload) {
         int messageTime = payload.get("timestamp").getAsInt();
         
-        if ((messageTime - lastKeepAlive) > TIMEOUT_MS && app != null) {
-            app.requestMeters();
+        if ((messageTime - lastKeepAlive) > TIMEOUT_MS && rehydrationService != null) {
+            NotifyClients.publish(
+                ServerEvent.warning("KEEP_ALIVE",
+                    "Meter keep-alive timeout – forcing meter refresh")
+            );
+            rehydrationService.requestMeters();
         }
-        lastKeepAlive = messageTime;
+
     }
 
     private void handleGetUiModel(Session session, String requestId, JsonObject payload) {
@@ -162,11 +163,19 @@ public class ServerRouter {
             ServerResponses.ackOk(session, requestId);
         } else {
             logger.warning("Unknown canonicalId in set-control-value: " + canonicalId);
+            
+            NotifyClients.publish(
+                ServerEvent.error(
+                    "PROTOCOL",
+                    "Unknown canonicalId received: " + canonicalId,
+                    payload
+                )
+            );
+
             ServerResponses.error(session, requestId, "UNKNOWN_CANONICAL_ID",
                     "Unknown canonicalId in set-control-value: " + canonicalId);
         }
     }
-
 
     private void handleSubscribe(Session session, String requestId, JsonObject payload) {
         String contextId = payload.get("contextId").getAsString();
@@ -216,10 +225,26 @@ public class ServerRouter {
 
         ServerResponses.ackStatus(session, requestId, ok);
 
-        if (ok)
+        if (ok) {
             logger.info("Session[" + session.getId() + "] selected MIDI output device index " + index);
-        else
+
+            NotifyClients.publish(
+                ServerEvent.info(
+                    "MIDI",
+                    "MIDI output device switched to index " + index
+                )
+            );
+        } else {
             logger.warning("Session[" + session.getId() + "] failed to select MIDI output device index " + index);
+
+            NotifyClients.publish(
+                ServerEvent.error(
+                    "MIDI",
+                    "Failed to select MIDI output device index " + index,
+                    payload
+                )
+            );
+        }
     }
 
     private boolean handleApplyMidiSettings(Session session, String requestId, JsonObject payload) {
@@ -245,11 +270,28 @@ public class ServerRouter {
             CoalesceEngine coalesceEngine = ioManager.getCoalesceEngine();
             if(coalesceEngine!= null) coalesceEngine.onChange(mappingString);
             logger.info("New registry loaded "+ mappingString);
-        } 
+        }
+        else{
+            NotifyClients.publish(
+                ServerEvent.error(
+                    "MAPPING",
+                    "Failed to load SYSEX mappings for console type " + mappingString
+                )
+            );
+        }
 
         if (ioManager.hasValidDevices()) {
-            if(app == null){logger.severe("App for rehydration is null - cannot rehydrate");}
-            else { app.rehydrate(); }
+            if(rehydrationService == null){
+                logger.severe("App for rehydration is null - cannot rehydrate");
+                
+                NotifyClients.publish(
+                    ServerEvent.error(
+                        "STATE",
+                        "Rehydration service unavailable – system state not re-applied"
+                    )
+                );
+            }
+            else { rehydrationService.rehydrate(); }
         }
 
         JsonObject p = new JsonObject();

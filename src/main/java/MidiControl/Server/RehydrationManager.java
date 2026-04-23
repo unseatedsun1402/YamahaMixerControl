@@ -66,7 +66,7 @@ public class RehydrationManager {
                 TIMEOUT_MS, TimeUnit.MILLISECONDS);
     }
 
-    public void rehydrateAll() {
+    public void rehydrateAll(RehydrationListener listener) {
         final long rehydrationStart = System.currentTimeMillis();
 
         final List<ControlInstance> all = new ArrayList<>(registry.getAllInstances());
@@ -106,8 +106,9 @@ public class RehydrationManager {
                     logger.info("Rehydration complete: all priorities processed.");
                     all.clear();
                     if (debug) {
-                        logger.info("Rehydration finished in: " + (int)((System.currentTimeMillis() - rehydrationStart)/1000) + " s");
+                        logger.info("Rehydration finished in: " + (int)((System.currentTimeMillis() - rehydrationStart)/1000) + " s"); 
                     }
+                    listener.onFinished();
                     running = false;
                     return;
                 }
@@ -181,8 +182,9 @@ public class RehydrationManager {
         return this.pending.containsKey(string);
     }
 
-    public void clearPending() {
+    public void clearPending(RehydrationListener listener){
         pending.clear();
+        listener.onReset();
     }
 
     public synchronized void requestMeters() {

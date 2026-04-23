@@ -1,0 +1,77 @@
+package MidiControl.Server.Protocol;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import java.time.Instant;
+
+/**
+ * Serialises ServerEvent into the standard envelope:
+ * { "type": "server-event", "payload": { ... } }
+ */
+public final class ServerEventSerializer {
+
+    private ServerEventSerializer() {}
+
+    public static JsonObject toJson(ServerEvent event) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("timestamp", event.timestamp().toEpochMilli()); // consistent numeric time
+        payload.addProperty("level", event.level().name());
+        payload.addProperty("category", event.category());
+        payload.addProperty("message", event.message());
+
+        if (event.details() != null) {
+            payload.add("details", event.details());
+        }
+
+        JsonObject root = new JsonObject();
+        root.addProperty("type", "server-event");
+        root.add("payload", payload);
+        return root;
+    }
+
+    public static String toJsonString(ServerEvent event) {
+        return toJson(event).toString();
+    }
+
+    public static ServerEvent simple(ServerEventLevel level, String category, String message) {
+        return new ServerEvent(Instant.now(), level, category, message, null);
+    }
+
+    
+    public static ServerEvent fromThrowable(
+            Throwable t,
+            ServerEventLevel level,
+            String category,
+            String message
+    ) {
+        JsonObject details = new JsonObject();
+        details.addProperty("exceptionType", t.getClass().getName());
+        details.addProperty("exceptionMessage", t.getMessage());
+
+        JsonArray stack = new JsonArray();
+        for (StackTraceElement el : t.getStackTrace()) {
+            stack.add(el.toString());
+        }
+        details.add("stackTrace", stack);
+
+        return new ServerEvent(
+                Instant.now(),
+                level,
+                category,
+                message,
+                details
+        );
+    }
+
+    
+    public static String fatal(Throwable t, String category, String message) {
+        ServerEvent ev = fromThrowable(
+                t,
+                ServerEventLevel.ERROR,
+                category,
+                message
+        );
+        return toJsonString(ev);
+    }
+}
