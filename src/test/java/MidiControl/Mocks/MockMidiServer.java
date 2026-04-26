@@ -13,8 +13,8 @@ import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.NrpnUtils.NrpnParser;
 import MidiControl.NrpnUtils.NrpnRegistry;
 import MidiControl.Server.MidiServer;
-import MidiControl.Server.RehydrationManager;
 import MidiControl.Server.ServerRouter;
+import MidiControl.Server.Rehydration.RehydrationManager;
 import MidiControl.SysexUtils.SysexParser;
 import jakarta.annotation.Nullable;
 
@@ -83,7 +83,6 @@ public class MockMidiServer extends MidiServer {
                         event.getNrpn().lsb+
                         ","+event.getNrpn().value);
 
-                    if(event.getSysexData() != null) System.out.println("event sysex content: "+event.getSysexData().toString());
                     int value = instance.extractValue(event);
                     instance.updateValue(value);
                 }

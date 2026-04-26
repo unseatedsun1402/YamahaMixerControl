@@ -1,27 +1,33 @@
 package MidiControl.unit.Server;
 
+import MidiControl.Controls.ControlGroup;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.Controls.SourceAllInstances;
+import MidiControl.Controls.SubControl;
 import MidiControl.Routing.OutputRequestSender;
-import MidiControl.Server.RehydrationManager;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static org.junit.jupiter.api.Assertions.*;
+import MidiControl.Server.Rehydration.RehydrationListener;
+import MidiControl.Server.Rehydration.RehydrationManager;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 class RehydrationManagerTest {
+
+    // ---------------- Fakes ----------------
 
     static class FakeOutputRouter implements OutputRequestSender {
         String lastRequestedId = null;
         int callCount = 0;
+
+        byte[] lastSent = null;
+        int sendCount = 0;
 
         @Override
         public void applyRequest(String canonicalId) {
@@ -31,38 +37,88 @@ class RehydrationManagerTest {
 
         @Override
         public void send(byte[] message) {
-            return;
+            this.lastSent = message;
+            this.sendCount++;
         }
     }
 
-    static class FakeRegistry implements SourceAllInstances{
+    static class FakeRegistry implements SourceAllInstances {
+        @Override
         public Collection<ControlInstance> getAllInstances() {
             return List.of();
         }
     }
 
-    static class FakeScheduler extends java.util.concurrent.ScheduledThreadPoolExecutor {
-        FakeScheduler() { super(1); }
+    /**
+     * Scheduler that does nothing (so TIMEOUT won't run).
+     * This matches your existing approach for tests that only want to observe request() behaviour.
+     */
+    static class NoOpScheduler extends ScheduledThreadPoolExecutor {
+        NoOpScheduler() { super(1); }
+
         @Override
-        public java.util.concurrent.ScheduledFuture<?> schedule(Runnable r, long delay, java.util.concurrent.TimeUnit unit) {
-            // Do nothing for now — timeout tests come later
+        public ScheduledFuture<?> schedule(Runnable r, long delay, TimeUnit unit) {
+            // intentionally do nothing
             return null;
         }
     }
 
+    /**
+     * Scheduler that runs scheduled tasks immediately, but only up to a cap.
+     * Used to drive rehydrateAll() without real timing.
+     */
+    static class CappedImmediateScheduler extends ScheduledThreadPoolExecutor {
+        private int runs = 0;
+        private final int cap;
+
+        CappedImmediateScheduler(int cap) {
+            super(1);
+            this.cap = cap;
+        }
+
+        @Override
+        public ScheduledFuture<?> schedule(Runnable r, long delay, TimeUnit unit) {
+            if (runs++ < cap) {
+                r.run();
+            }
+            return null;
+        }
+    }
+
+    static class FakeListener implements RehydrationListener {
+        int finished = 0;
+        int reset = 0;
+
+        @Override public void onFinished() { finished++; }
+        @Override public void onReset() { reset++; }
+    }
+
+    // ---------------- Helpers ----------------
+
+    /**
+     * Build a *real* composite: ControlGroup -> SubControl -> ControlInstance.
+     * This ensures ControlInstance constructs its canonical ID correctly.
+     */
+    private ControlInstance makeInstance(String groupName, String subName, int index, int priority) {
+        ControlGroup g = new ControlGroup(groupName);
+        SubControl sc = new SubControl(g, subName);
+        ControlInstance ci = new ControlInstance(sc, index, null, null);
+        ci.setPriority(priority);
+        return ci;
+    }
+
+    // ---------------- Tests ----------------
+
     @Test
     void request_callsOutputRouterApplyRequest() {
-        // Arrange
         FakeOutputRouter fakeRouter = new FakeOutputRouter();
         FakeRegistry fakeRegistry = new FakeRegistry();
-        FakeScheduler fakeScheduler = new FakeScheduler();
+        NoOpScheduler fakeScheduler = new NoOpScheduler();
 
         RehydrationManager mgr = new RehydrationManager(fakeRouter, fakeRegistry, fakeScheduler);
 
-        // Act
         mgr.request("kInputAUX.kAUX1Level.0");
 
-        // Assert
         assertEquals("kInputAUX.kAUX1Level.0", fakeRouter.lastRequestedId);
         assertEquals(1, fakeRouter.callCount);
     }
@@ -71,7 +127,7 @@ class RehydrationManagerTest {
     void request_addsCanonicalIdToPending() {
         FakeOutputRouter fakeRouter = new FakeOutputRouter();
         FakeRegistry fakeRegistry = new FakeRegistry();
-        FakeScheduler fakeScheduler = new FakeScheduler();
+        NoOpScheduler fakeScheduler = new NoOpScheduler();
 
         RehydrationManager mgr = new RehydrationManager(fakeRouter, fakeRegistry, fakeScheduler);
 
@@ -84,7 +140,7 @@ class RehydrationManagerTest {
     void onControlUpdated_clearsPending() {
         FakeOutputRouter fakeRouter = new FakeOutputRouter();
         FakeRegistry fakeRegistry = new FakeRegistry();
-        FakeScheduler fakeScheduler = new FakeScheduler();
+        NoOpScheduler fakeScheduler = new NoOpScheduler();
 
         RehydrationManager mgr = new RehydrationManager(fakeRouter, fakeRegistry, fakeScheduler);
 
@@ -94,69 +150,13 @@ class RehydrationManagerTest {
         assertFalse(mgr.isPending("foo.bar.0"));
     }
 
-    static class ImmediateScheduler implements ScheduledExecutorService {
-        @Override
-        public ScheduledFuture<?> schedule(Runnable r, long delay, TimeUnit unit) {
-            r.run();
-            return null;}
-        @Override
-        public void shutdown() {
-            throw new UnsupportedOperationException("Unimplemented method 'shutdown'");}
-        @Override
-        public List<Runnable> shutdownNow() {
-            throw new UnsupportedOperationException("Unimplemented method 'shutdownNow'");}
-        @Override
-        public boolean isShutdown() {
-            throw new UnsupportedOperationException("Unimplemented method 'isShutdown'");}
-        @Override
-        public boolean isTerminated() {
-            throw new UnsupportedOperationException("Unimplemented method 'isTerminated'");}
-        @Override
-        public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-            throw new UnsupportedOperationException("Unimplemented method 'awaitTermination'");}
-        @Override
-        public <T> Future<T> submit(Callable<T> task) {
-            throw new UnsupportedOperationException("Unimplemented method 'submit'");}
-        @Override
-        public <T> Future<T> submit(Runnable task, T result) {
-            throw new UnsupportedOperationException("Unimplemented method 'submit'");}
-        @Override
-        public Future<?> submit(Runnable task) {
-            throw new UnsupportedOperationException("Unimplemented method 'submit'");}
-        @Override
-        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
-            throw new UnsupportedOperationException("Unimplemented method 'invokeAll'"); }
-        @Override
-        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
-                throws InterruptedException {
-            throw new UnsupportedOperationException("Unimplemented method 'invokeAll'");}
-        @Override
-        public <T> T invokeAny(Collection<? extends Callable<T>> tasks)
-                throws InterruptedException, ExecutionException {
-            throw new UnsupportedOperationException("Unimplemented method 'invokeAny'");}
-        @Override
-        public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
-                throws InterruptedException, ExecutionException, TimeoutException {
-            throw new UnsupportedOperationException("Unimplemented method 'invokeAny'");}
-        @Override
-        public void execute(Runnable command) {
-            throw new UnsupportedOperationException("Unimplemented method 'execute'");}
-        @Override
-        public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
-            throw new UnsupportedOperationException("Unimplemented method 'schedule'");}
-        @Override
-        public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-            throw new UnsupportedOperationException("Unimplemented method 'scheduleAtFixedRate'");}
-        @Override
-        public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay,
-                TimeUnit unit) {throw new UnsupportedOperationException("Unimplemented method 'scheduleWithFixedDelay'");}
-    }
-
     @Test
     void timeout_removesPending() {
         FakeOutputRouter fakeRouter = new FakeOutputRouter();
         FakeRegistry fakeRegistry = new FakeRegistry();
-        ImmediateScheduler scheduler = new ImmediateScheduler();
+
+        // Immediate schedule => timeout check runs immediately and removes pending
+        CappedImmediateScheduler scheduler = new CappedImmediateScheduler(5);
 
         RehydrationManager mgr = new RehydrationManager(fakeRouter, fakeRegistry, scheduler);
 
@@ -165,6 +165,55 @@ class RehydrationManagerTest {
         assertFalse(mgr.isPending("foo.bar.0"));
     }
 
+    @Test
+    void rehydrateAll_requestsEachControlInstance() {
+        FakeOutputRouter router = new FakeOutputRouter();
 
+        // Build real composite instances so canonical IDs are valid:
+        // "kTestGroupA.kTestSub.0" etc.
+        ControlInstance c1 = makeInstance("kTestGroupA", "kTestSub", 0, 1);
+        ControlInstance c2 = makeInstance("kTestGroupB", "kTestSub", 0, 4);
+
+        SourceAllInstances reg = new SourceAllInstances() {
+            @Override
+            public Collection<ControlInstance> getAllInstances() {
+                return List.of(c1, c2);
+            }
+        };
+
+        // Cap high enough to allow the initial run + reschedules to drain 2 items and finish
+        CappedImmediateScheduler scheduler = new CappedImmediateScheduler(50);
+
+        RehydrationManager mgr = new RehydrationManager(router, reg, scheduler);
+
+        FakeListener listener = new FakeListener();
+
+        mgr.rehydrateAll(listener);
+
+        assertEquals(2, router.callCount);
+        assertEquals(1, listener.finished);
+
+        // The weighted pattern should select priority-1 first when available
+        // so the first request should be c1's canonicalId.
+        // Because FakeOutputRouter only keeps the lastRequestedId, we can at least assert it ends on c2.
+        assertEquals("kTestGroupB.kTestSub.0", router.lastRequestedId);
+    }
+
+    @Test
+    void clearPending_clearsAndNotifiesListener() {
+        FakeOutputRouter fakeRouter = new FakeOutputRouter();
+        FakeRegistry fakeRegistry = new FakeRegistry();
+        NoOpScheduler fakeScheduler = new NoOpScheduler();
+
+        RehydrationManager mgr = new RehydrationManager(fakeRouter, fakeRegistry, fakeScheduler);
+
+        mgr.request("foo.bar.0");
+        assertTrue(mgr.isPending("foo.bar.0"));
+
+        FakeListener listener = new FakeListener();
+        mgr.clearPending(listener);
+
+        assertFalse(mgr.isPending("foo.bar.0"));
+        assertEquals(1, listener.reset);
+    }
 }
-

@@ -14,7 +14,7 @@ import MidiControl.Telemetry.MidiTelemetry;
 import MidiControl.Telemetry.TelemetryListener;
 import MidiControl.Telemetry.TelemetryPublisher;
 
-public final class MidiSendEngine implements MidiIngressListener{
+public class MidiSendEngine implements MidiIngressListener{
     
     // Pacing profiles are orthogonal to your logical TransportMode.
     public enum ThroughputProfile {

@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import javax.sound.midi.*;
 
 import MidiControl.Server.MidiServer;
-import MidiControl.Server.RehydrationManager;
+import MidiControl.Server.Rehydration.RehydrationManager;
 import MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile;
 import MidiControl.Routing.WebSocketEndpoint;
 

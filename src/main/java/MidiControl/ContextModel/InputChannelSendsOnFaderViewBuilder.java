@@ -44,15 +44,9 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
 
         List<ControlInstance> all = registry.getAllInstancesForContext(context.getId());
 
-        // --------------------------------------------------------------------
-        // Detect what the console actually has (Mix buses, Aux buses, or both)
-        // --------------------------------------------------------------------
         hasMixBuses = all.stream().anyMatch(ci -> ci.getSubcontrol().startsWith("kMix"));
         hasAuxBuses = all.stream().anyMatch(ci -> ci.getSubcontrol().startsWith("kAUX"));
 
-        // --------------------------------------------------------------------
-        // Interpret suffix: "mix1", "aux3", "MIX01", etc.
-        // --------------------------------------------------------------------
         if (suffix != null && !suffix.isBlank()) {
             targetBusId = suffix.toUpperCase(); // "MIX1", "AUX2"
         }
@@ -65,7 +59,6 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
             targetBusId = targetBusId.replace("MIX", "AUX");
         }
 
-        // Optionally, AUX→MIX fallback
         if (targetBusId.startsWith("AUX") && !hasAuxBuses && hasMixBuses) {
             targetBusId = targetBusId.replace("AUX", "MIX");
         }

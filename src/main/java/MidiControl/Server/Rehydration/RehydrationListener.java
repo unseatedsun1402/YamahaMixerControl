@@ -1,4 +1,4 @@
-package MidiControl.Server;
+package MidiControl.Server.Rehydration;
 
 public interface RehydrationListener {
     void onFinished();

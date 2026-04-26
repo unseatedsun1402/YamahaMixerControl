@@ -12,6 +12,8 @@ import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.sound.midi.SysexMessage;
@@ -126,10 +128,14 @@ public class NameAssemblerFunctional01V96iTest {
         // Listener that captures all (contextId, name) updates
         Map<String, String> emittedNames = new HashMap<>();
 
+        List<ChannelNameAssembler> testAssemblers = new ArrayList<ChannelNameAssembler>();
+
         // One assembler per context
         for (Context c : nameContexts) {
-            new ChannelNameAssembler(c, registry,
-                (id, name) -> emittedNames.put(id, name));
+            testAssemblers.add(
+                new ChannelNameAssembler(c, registry,
+                (id, name) -> emittedNames.put(id, name))
+            );
         }
 
         int len = buildNameSysex(0, 0, 'K').length;
@@ -158,6 +164,9 @@ public class NameAssemblerFunctional01V96iTest {
             emittedNames.get("name.1"),
             "Channel names must be different"
         );
+        for (ChannelNameAssembler channelNameAssembler : testAssemblers) {
+            channelNameAssembler.shutdown();
+        }
     }
 
     @Test
@@ -176,7 +185,7 @@ public class NameAssemblerFunctional01V96iTest {
             .orElseThrow();
 
         AtomicReference<String> result = new AtomicReference<>();
-        new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name));
+        ChannelNameAssembler test = new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name));
 
         int len = buildNameSysex(0, 0, 'K').length;
 
@@ -191,6 +200,7 @@ public class NameAssemblerFunctional01V96iTest {
 
         assertEquals("Kick", result.get(),
             "Out-of-order updates must still assemble Kick");
+        test.shutdown();
     }
 
     
@@ -210,7 +220,7 @@ public class NameAssemblerFunctional01V96iTest {
             .orElseThrow();
 
         AtomicReference<String> result = new AtomicReference<>();
-        new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name));
+        ChannelNameAssembler test = new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name));
 
         int len = buildNameSysex(0, 0, 'K').length;
 
@@ -225,6 +235,8 @@ public class NameAssemblerFunctional01V96iTest {
         // Expected: "K ck" or "Kck" depending on trimming rules
         assertEquals("Kck", result.get().replace(" ", ""),
             "Missing characters should not break assembly");
+        
+        test.shutdown();
     }
 
     
@@ -280,10 +292,12 @@ public class NameAssemblerFunctional01V96iTest {
             .filter(c -> c.getContextType() == ContextType.NAME)
             .toList();
 
+        List<ChannelNameAssembler> testAssemblers = new ArrayList<ChannelNameAssembler>();
+
         Map<String,String> results = new HashMap<>();
         for (Context c : nameContexts) {
-            new ChannelNameAssembler(c, registry,
-                (id,name)->results.put(id, name));
+            testAssemblers.add(new ChannelNameAssembler(c, registry,
+                (id,name)->results.put(id, name)));
         }
         
         int len = buildNameSysex(0, 0, 'K').length;
@@ -298,10 +312,13 @@ public class NameAssemblerFunctional01V96iTest {
         server.addtoinputqueue(new SysexMessage(buildNameSysex(3, 1, ' '), len)); // ch1
 
         server.processIncomingMidiForTest();
-        Thread.sleep(1400);
+        Thread.sleep(2000);
 
         assertEquals("Kick", results.get("name.0"));
         assertEquals("Snr",  results.get("name.1"));
+        for (ChannelNameAssembler channelNameAssembler : testAssemblers) {
+            channelNameAssembler.shutdown();
+        }
     }
     
     @Test

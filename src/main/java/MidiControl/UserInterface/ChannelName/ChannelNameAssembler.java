@@ -208,4 +208,8 @@ public class ChannelNameAssembler implements ControlListener {
     public static Map<String,String> getChannelNames(){
         return Map.copyOf(nameCache);
     }
+
+    public void shutdownScheduler(){
+        this.scheduler.shutdownNow();
+    }
 }

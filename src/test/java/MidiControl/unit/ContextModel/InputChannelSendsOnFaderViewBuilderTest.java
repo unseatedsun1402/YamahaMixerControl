@@ -1,4 +1,3 @@
-
 package MidiControl.unit.ContextModel;
 
 import MidiControl.ContextModel.*;
@@ -7,9 +6,11 @@ import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.SysexUtils.SysexMapping;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InputChannelSendsOnFaderViewBuilderTest {
 
@@ -24,6 +25,18 @@ public class InputChannelSendsOnFaderViewBuilderTest {
         }
 
         g.getSubcontrols().put(sub, sc);
+        return g;
+    }
+
+    private ControlGroup makeGroupMulti(String group, String... subcontrols) {
+        ControlGroup g = new ControlGroup(group);
+        for (String sub : subcontrols) {
+            SubControl sc = new SubControl(g, sub);
+            SysexMapping map = dummyMapping(group, sub, 0, 127);
+            ControlInstance ci = new ControlInstance(sc, 0, map, null);
+            sc.addInstance(ci);
+            g.getSubcontrols().put(sub, sc);
+        }
         return g;
     }
 
@@ -49,13 +62,17 @@ public class InputChannelSendsOnFaderViewBuilderTest {
         );
     }
 
+    private Context channel0() {
+        return new Context("channel.0", "Channel 1", ContextType.CHANNEL, List.of(), List.of());
+    }
+
     @Test
     public void testSendsOnFaderMix1() {
-
         MockCanonicalRegistry registry = new MockCanonicalRegistry();
 
         ControlGroup on = makeGroup("kInputOn", "kChannelOn", 1);
         ControlGroup pan = makeGroup("kInputPan", "kChannelPan", 1);
+
         ControlGroup send1 = makeGroup("kInputToMix", "kMix1Level", 1);
         ControlGroup send2 = makeGroup("kInputToMix", "kMix2Level", 1);
 
@@ -66,20 +83,103 @@ public class InputChannelSendsOnFaderViewBuilderTest {
 
         registry.mapContext("channel.0", on, pan, send1, send2);
 
-        Context ctx = new Context(
-                "channel.0",
-                "Channel 1",
-                ContextType.CHANNEL,
-                List.of(),
-                List.of()
-        );
-
         InputChannelSendsOnFaderViewBuilder builder = new InputChannelSendsOnFaderViewBuilder();
-        List<ViewControl> controls = builder.build(ctx, registry, "mix1");
+        List<ViewControl> controls = builder.build(channel0(), registry, "mix1");
 
         assertTrue(contains(controls, "CHANNEL_ON"));
         assertTrue(contains(controls, "PAN"));
         assertTrue(contains(controls, "SEND_MIX1"), "Missing SOF fader for MIX1");
+    }
+
+
+    @Test
+    public void testFallbackMixToAuxWhenOnlyAuxExists() {
+        MockCanonicalRegistry registry = new MockCanonicalRegistry();
+
+        ControlGroup on = makeGroup("kInputOn", "kChannelOn", 1);
+        ControlGroup pan = makeGroup("kInputPan", "kChannelPan", 1);
+
+        ControlGroup auxSends = makeGroupMulti("kInputAUX", "kAUX1Level");
+
+        registry.mapContext("channel.0", on, pan, auxSends);
+
+        InputChannelSendsOnFaderViewBuilder builder = new InputChannelSendsOnFaderViewBuilder();
+        List<ViewControl> controls = builder.build(channel0(), registry, "mix1");
+
+        assertTrue(contains(controls, "SEND_AUX1"), "Expected MIX→AUX fallback to produce SEND_AUX1");
+        assertFalse(contains(controls, "SEND_MIX1"), "Should not produce SEND_MIX1 when only AUX exists");
+    }
+
+    @Test
+    public void testFallbackAuxToMixWhenOnlyMixExists() {
+        MockCanonicalRegistry registry = new MockCanonicalRegistry();
+
+        ControlGroup on = makeGroup("kInputOn", "kChannelOn", 1);
+        ControlGroup pan = makeGroup("kInputPan", "kChannelPan", 1);
+
+        ControlGroup mixSends = makeGroupMulti("kInputToMix", "kMix1Level");
+
+        registry.mapContext("channel.0", on, pan, mixSends);
+
+        InputChannelSendsOnFaderViewBuilder builder = new InputChannelSendsOnFaderViewBuilder();
+        List<ViewControl> controls = builder.build(channel0(), registry, "aux1");
+
+        assertTrue(contains(controls, "SEND_MIX1"), "Expected AUX→MIX fallback to produce SEND_MIX1");
+        assertFalse(contains(controls, "SEND_AUX1"), "Should not produce SEND_AUX1 when only MIX exists");
+    }
+
+    @Test
+    public void testBlankSuffixUsesDefaultAndStillFallsBack() {
+        MockCanonicalRegistry registry = new MockCanonicalRegistry();
+
+        ControlGroup on = makeGroup("kInputOn", "kChannelOn", 1);
+        ControlGroup pan = makeGroup("kInputPan", "kChannelPan", 1);
+
+        ControlGroup auxSends = makeGroupMulti("kInputAUX", "kAUX1Level");
+
+        registry.mapContext("channel.0", on, pan, auxSends);
+
+        InputChannelSendsOnFaderViewBuilder builder = new InputChannelSendsOnFaderViewBuilder();
+
+        List<ViewControl> controls = builder.build(channel0(), registry, "   ");
+
+        assertTrue(contains(controls, "SEND_AUX1"), "Expected default MIX1 to fall back to AUX1 when suffix blank");
+    }
+
+    @Test
+    public void testZeroPaddedSendIndexMatchesMix1() {
+        MockCanonicalRegistry registry = new MockCanonicalRegistry();
+
+        ControlGroup on = makeGroup("kInputOn", "kChannelOn", 1);
+        ControlGroup pan = makeGroup("kInputPan", "kChannelPan", 1);
+
+        ControlGroup mixSends = makeGroupMulti("kInputToMix", "kMix01Level");
+
+        registry.mapContext("channel.0", on, pan, mixSends);
+
+        InputChannelSendsOnFaderViewBuilder builder = new InputChannelSendsOnFaderViewBuilder();
+        List<ViewControl> controls = builder.build(channel0(), registry, "mix1");
+
+        assertTrue(contains(controls, "SEND_MIX1"), "kMix01Level should match target mix1 (MIX1)");
+    }
+
+    @Test
+    public void testNoMatchingSendFoundTriggersElseBranch() {
+        MockCanonicalRegistry registry = new MockCanonicalRegistry();
+
+        ControlGroup on = makeGroup("kInputOn", "kChannelOn", 1);
+        ControlGroup pan = makeGroup("kInputPan", "kChannelPan", 1);
+
+        ControlGroup mixSends = makeGroupMulti("kInputToMix", "kMix2Level");
+
+        registry.mapContext("channel.0", on, pan, mixSends);
+
+        InputChannelSendsOnFaderViewBuilder builder = new InputChannelSendsOnFaderViewBuilder();
+        List<ViewControl> controls = builder.build(channel0(), registry, "mix1");
+
+        assertFalse(contains(controls, "SEND_MIX1"), "No matching send exists, so SEND_MIX1 should not be present");
+        assertTrue(contains(controls, "CHANNEL_ON"));
+        assertTrue(contains(controls, "PAN"));
     }
 
     private boolean contains(List<ViewControl> list, String logicalId) {

@@ -67,6 +67,11 @@ public class ContextFactoryTest {
     }
 
     @Test
+    public void testSafeInitOfContextFactory(){
+        assertDoesNotThrow(() -> new ContextFactory()  );
+    }
+
+    @Test
     public void testBuildChannelStrip_Unit() {
 
         ControlGroup fader = makeGroup("kFader", "kFader");
