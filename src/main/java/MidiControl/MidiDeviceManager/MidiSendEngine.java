@@ -11,12 +11,9 @@ import java.util.logging.Logger;
 
 import MidiControl.SysexUtils.SysexParser;
 import MidiControl.Telemetry.MidiTelemetry;
-import MidiControl.Telemetry.TelemetryListener;
-import MidiControl.Telemetry.TelemetryPublisher;
 
-public class MidiSendEngine implements MidiIngressListener{
-    
-    // Pacing profiles are orthogonal to your logical TransportMode.
+public class MidiSendEngine implements MidiIngressListener {
+
     public enum ThroughputProfile {
         SAFE_DIN (3125, 128, 1_500_000L, 3L, 98),
         FAST_USB (40000, 512,   200_000L, 2L, 512),
@@ -43,7 +40,6 @@ public class MidiSendEngine implements MidiIngressListener{
     private final MidiOutput midiOut;
 
     private final ArrayBlockingQueue<byte[]> normalLane;
-
     private final ArrayBlockingQueue<byte[]> realtimeLane;
 
     private final Object sysexLock = new Object();
@@ -62,8 +58,6 @@ public class MidiSendEngine implements MidiIngressListener{
     private long lastRefillNs;
 
     private final MidiTelemetry telemetry;
-    private TelemetryPublisher telemetryPublisher;
-    private TelemetryListener telemetryListener = json -> {};
 
     private long ingressWindowStartNs;
     private long ingressBytesInWindow;
@@ -72,12 +66,6 @@ public class MidiSendEngine implements MidiIngressListener{
     private static final long INGRESS_WINDOW_NS = 500_000_000L;
     private static final double INGRESS_EWMA_ALPHA = 0.25;
 
-    /**
-     * @param out             MIDI output abstraction
-     * @param queueCapacity   capacity for normal lane
-     * @param sysexCapacity   max number of distinct coalesced SysEx controls pending
-     * @param coalesceEngine  keying engine (returns -1 for non-coalescable/unkeyable)
-     */
     public MidiSendEngine(MidiOutput out, int queueCapacity, int sysexCapacity) {
         this.midiOut = out;
         this.normalLane = new ArrayBlockingQueue<>(queueCapacity);
@@ -104,7 +92,7 @@ public class MidiSendEngine implements MidiIngressListener{
         }
     }
 
-    public static void enableDebug(){debug = true;}
+    public static void enableDebug() { debug = true; }
 
     public void setThroughputProfile(ThroughputProfile p) {
         this.profile = p;
@@ -115,18 +103,13 @@ public class MidiSendEngine implements MidiIngressListener{
         return profile;
     }
 
-    public void setTelemetryListener(TelemetryListener listener) {
-        if (listener != null) {
-            this.telemetryListener = listener;
-        }
+    public MidiTelemetry getTelemetry() {
+        return telemetry;
     }
 
-    /**
-     * Offer a message into the engine.
-     */
     public boolean offer(byte[] msg) {
         if (isRealtime(msg)) {
-            logger.info("Realtime message - skipping sysex buffer: "+SysexParser.bytesToHex(msg));
+            logger.info("Realtime message - skipping sysex buffer: " + SysexParser.bytesToHex(msg));
             return realtimeLane.offer(msg);
         }
         return normalLane.offer(msg);
@@ -134,13 +117,11 @@ public class MidiSendEngine implements MidiIngressListener{
 
     public void start() {
         if (!running.compareAndSet(false, true)) return;
-        telemetryPublisher = new TelemetryPublisher(telemetry, telemetryListener, 5);
         worker.execute(this::runLoop);
     }
 
     public void stop() {
         if (!running.compareAndSet(true, false)) return;
-        if (telemetryPublisher != null) telemetryPublisher.shutdown();
         worker.shutdownNow();
 
         realtimeLane.clear();
@@ -170,9 +151,6 @@ public class MidiSendEngine implements MidiIngressListener{
         }
     }
 
-    /**
-     * Poll priority:
-     */
     private byte[] pollNext() throws InterruptedException {
         byte[] rt = realtimeLane.poll();
         if (rt != null) return rt;
@@ -194,10 +172,6 @@ public class MidiSendEngine implements MidiIngressListener{
         }
     }
 
-    /**
-     * Try to insert into the coalesced map.
-     * Returns true if accepted into coalesced lane, false if it should go to normal lane.
-     */
     private boolean tryCoalesceSysex(byte[] msg) {
         if (!isSysexFramed(msg)) return false;
 
@@ -214,8 +188,8 @@ public class MidiSendEngine implements MidiIngressListener{
                     if (dropped != null) telemetry.dropped(dropped.length);
                 }
             }
-            if(debug){
-                if (pendingSysex.containsKey(key)) logger.info("Coalescing key:" +key);
+            if (debug) {
+                if (pendingSysex.containsKey(key)) logger.info("Coalescing key:" + key);
             }
             pendingSysex.put(key, msg);
         }
@@ -304,22 +278,20 @@ public class MidiSendEngine implements MidiIngressListener{
         }
     }
 
+    private int getEffectiveOutBps() {
+        ThroughputProfile p = profile;
+        if (p == ThroughputProfile.SAFE_DIN) {
+            return p.bytesPerSecond;
+        }
 
-private int getEffectiveOutBps() {
-    ThroughputProfile p = profile;
-    if (p == ThroughputProfile.SAFE_DIN) {
-        return p.bytesPerSecond;
+        double in;
+        synchronized (tokenLock) {
+            in = ingressBpsEwma;
+        }
+
+        int eff = (int) Math.floor(p.bytesPerSecond - in);
+        return Math.max(0, eff);
     }
-
-    double in;
-    synchronized (tokenLock) {
-        in = ingressBpsEwma;
-    }
-
-    int eff = (int) Math.floor(p.bytesPerSecond - in);
-    return Math.max(0, eff);
-}
-
 
     private void updateIngressRate(int byteCount) {
         long now = System.nanoTime();
@@ -361,32 +333,8 @@ private int getEffectiveOutBps() {
         updateIngressRate(byteCount);
     }
 
-    public CoalesceEngine getCoalesceEngine(){
+    public CoalesceEngine getCoalesceEngine() {
         return this.coalesceEngine;
-    }
-
-    public int getSysexQueueCapacityTotal() {
-        return pendingSysexCapacity;
-    }
-
-    public int getSysexQueueDepth() {
-        synchronized (sysexLock) {
-            return pendingSysex.size();
-        }
-    }
-
-    public int getSysexQueueRemaining() {
-        synchronized (sysexLock) {
-            int remaining = pendingSysexCapacity - pendingSysex.size();
-            return Math.max(0, remaining);
-        }
-    }
-
-    public int getSysexQueueFullPercent() {
-        synchronized (sysexLock) {
-            int used = pendingSysex.size();
-            return (int) ((used * 100L) / pendingSysexCapacity);
-        }
     }
 
     public int getSysexQueueRemainingPercent() {
@@ -396,5 +344,4 @@ private int getEffectiveOutBps() {
             return (int) ((remaining * 100L) / pendingSysexCapacity);
         }
     }
-
 }

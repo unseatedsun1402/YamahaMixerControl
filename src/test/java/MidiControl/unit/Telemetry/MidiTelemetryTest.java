@@ -2,7 +2,11 @@ package MidiControl.unit.Telemetry;
 
 import MidiControl.Telemetry.MidiTelemetry;
 import MidiControl.Telemetry.TelemetryData;
+import MidiControl.Telemetry.TelemetryListener;
+
 import org.junit.jupiter.api.Test;
+
+import com.google.gson.JsonObject;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,7 +45,7 @@ public class MidiTelemetryTest {
 
         TelemetryData s1 = t.snapshotAndResetPeriod();
 
-        assertEquals(100, s1.getInFlight());
+        assertEquals(100, s1.getInFlightBytes());
         assertEquals(12, s1.getMessagesDropped());
         assertEquals(42, s1.getRemainingCapacity());
 
@@ -50,7 +54,7 @@ public class MidiTelemetryTest {
 
         TelemetryData s2 = t.snapshotAndResetPeriod();
 
-        assertEquals(65, s2.getInFlight());
+        assertEquals(65, s2.getInFlightBytes());
         assertEquals(2, s2.getMessagesDropped());
 
         assertEquals(100, t.getPeakInflightSession());
@@ -77,7 +81,7 @@ public class MidiTelemetryTest {
     public void snapshotReadsSysexRemainingPercentEachTime() {
         FakeSendEngine engine = new FakeSendEngine(33);
         MidiTelemetry t = new MidiTelemetry(engine);
-
+        
         TelemetryData s1 = t.snapshotAndResetPeriod();
         assertEquals(33, s1.getRemainingCapacity());
 

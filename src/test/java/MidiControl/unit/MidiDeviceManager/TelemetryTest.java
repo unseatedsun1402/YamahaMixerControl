@@ -26,11 +26,11 @@ public class TelemetryTest {
     @Test
     public void telemtryDtoGetJson(){
         String confirmjson = "{\"type\":\"telemetry\",\"payload\":{\"timestamp\":0,\"inflight\":-1,\"dropped\":-1,"+
-            "\"averagein\":-1,\"averageout\":-1,\"averagecombined\":-1,\"remainingcapacity\":-1} }";
+            "\"averagein\":-1,\"averageout\":-1,\"averagecombined\":-1,\"remainingcapacity\":-1,\"usedcapacity\":-1,\"inflightTransactions\":-1,\"timedOutTransactions\":-1} }";
         TelemetryData dtoJson = new TelemetryData();
         dtoJson.setTimeStamp(0);
-        assertEquals(confirmjson, dtoJson.toJson());
-        assertDoesNotThrow(() -> new Gson().toJson(dtoJson.toJson()));
+        assertEquals(confirmjson, dtoJson.toJsonString());
+        assertDoesNotThrow(() -> new Gson().toJson(dtoJson.toJsonString()));
     }
 
     @Test
@@ -68,9 +68,9 @@ public class TelemetryTest {
         dtoJson.setAvgOut(confirmAvgOut);
         dtoJson.setDroppedMessages(confirmDropped);
         dtoJson.setTimeStamp(confirmTime);
-        dtoJson.setInFlight(confirmInFlight);
+        dtoJson.setInFlightBytes(confirmInFlight);
 
-        JsonObject json = (new Gson().fromJson(dtoJson.toJson(), JsonObject.class).get("payload").getAsJsonObject());
+        JsonObject json = (new Gson().fromJson(dtoJson.toJsonString(), JsonObject.class).get("payload").getAsJsonObject());
         assertEquals(confirmTime, json.get("timestamp").getAsLong());
         assertEquals(confirmDropped, json.get("dropped").getAsInt());
         assertEquals(confirmInFlight, json.get("inflight").getAsInt());
@@ -94,12 +94,12 @@ public class TelemetryTest {
         dtoJson.setAvgOut(confirmAvgOut);
         dtoJson.setDroppedMessages(confirmDropped);
         dtoJson.setTimeStamp(confirmTime);
-        dtoJson.setInFlight(confirmInFlight);
+        dtoJson.setInFlightBytes(confirmInFlight);
         dtoJson.setSysexQueueCapacity(confirmRemainingCapacity);
 
         assertEquals(confirmTime, dtoJson.getTimestamp());
         assertEquals(confirmDropped, dtoJson.getMessagesDropped());
-        assertEquals(confirmInFlight, dtoJson.getInFlight());
+        assertEquals(confirmInFlight, dtoJson.getInFlightBytes());
         assertEquals(confirmAvgIn, dtoJson.getAvgIn());
         assertEquals(confirmAvgOut, dtoJson.getAvgOut());
         assertEquals(confirmAvgCmb, dtoJson.getAvgCombined());
