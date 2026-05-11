@@ -1,6 +1,5 @@
 package MidiControl.MidiDeviceManager;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,22 +14,20 @@ import MidiControl.Telemetry.MidiTelemetry;
 public class MidiSendEngine implements MidiIngressListener {
 
     public enum ThroughputProfile {
-        SAFE_DIN (3125, 128, 1_500_000L, 3L, 98),
-        FAST_USB (40000, 512,   200_000L, 2L, 512),
-        FAST_RTP (80000, 1024,    50_000L, 1L, 1024);
+        SAFE_DIN (3125, 2L, 98, 4),
+        FAST_USB (40000, 2L, 512, 1),
+        FAST_RTP (80000, 1L, 1024, 0);
 
         final int bytesPerSecond;
-        final int sysexChunkBytes;
-        final long interChunkNanos;
         final long pollDelay;
         final int burstBytes;
+        final int interMessageSilence;
 
-        ThroughputProfile(int bps, int chunk, long gapNs, long pollDelay, int burstcap) {
+        ThroughputProfile(int bps, long pollDelay, int burstcap, int interMessageSilence) {
             this.bytesPerSecond = bps;
-            this.sysexChunkBytes = chunk;
-            this.interChunkNanos = gapNs;
             this.pollDelay = pollDelay;
             this.burstBytes = burstcap;
+            this.interMessageSilence = interMessageSilence;
         }
     }
 
@@ -52,6 +49,7 @@ public class MidiSendEngine implements MidiIngressListener {
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     private volatile ThroughputProfile profile = ThroughputProfile.SAFE_DIN;
+    private volatile long lastNonRealtimeSendNs = 0L;
 
     private final Object tokenLock = new Object();
     private double tokens;
@@ -123,7 +121,7 @@ public class MidiSendEngine implements MidiIngressListener {
     public void stop() {
         if (!running.compareAndSet(true, false)) return;
         worker.shutdownNow();
-
+        lastNonRealtimeSendNs = 0L;
         realtimeLane.clear();
         normalLane.clear();
         synchronized (sysexLock) {
@@ -137,12 +135,9 @@ public class MidiSendEngine implements MidiIngressListener {
                 byte[] msg = pollNext();
                 if (msg == null) continue;
 
-                if (isSysex(msg) && profile != ThroughputProfile.FAST_RTP) {
-                    sendSysexChunked(msg, profile.sysexChunkBytes, profile.interChunkNanos);
-                } else {
-                    sendWithPacing(msg);
-                }
-            } catch (InterruptedException ie) {
+                sendWithPacing(msg);
+                } 
+            catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
                 break;
             } catch (Exception e) {
@@ -199,37 +194,31 @@ public class MidiSendEngine implements MidiIngressListener {
     private void sendWithPacing(byte[] msg) throws Exception {
         int cost = msg.length;
         waitForTokens(cost);
+        enforceInterMessageSilence(msg);
         midiOut.sendMessage(msg);
         consumeTokens(cost);
         telemetry.sent(cost);
     }
 
-    private void sendSysexChunked(byte[] full, int chunkSize, long gapNs) throws Exception {
-        if (!isSysexFramed(full)) {
-            sendWithPacing(full);
-            return;
-        }
-        int pos = 1;
-        int end = full.length - 1;
-        while (pos < end) {
-            int take = Math.min(chunkSize, end - pos);
-            boolean last = (pos + take) >= end;
-            byte[] chunk;
-            if (pos == 1) {
-                chunk = new byte[take + (last ? 2 : 1)];
-                chunk[0] = (byte) 0xF0;
-                System.arraycopy(full, pos, chunk, 1, take);
-                if (last) chunk[chunk.length - 1] = (byte) 0xF7;
-            } else if (last) {
-                chunk = new byte[take + 1];
-                System.arraycopy(full, pos, chunk, 0, take);
-                chunk[chunk.length - 1] = (byte) 0xF7;
-            } else {
-                chunk = Arrays.copyOfRange(full, pos, pos + take);
+    private void enforceInterMessageSilence(byte[] msg) throws InterruptedException {
+        // Don't delay MIDI realtime messages (0xF8..0xFF); they are allowed to interleave.
+        if (isRealtime(msg)) return;
+
+        int gapMs = profile.interMessageSilence;
+        if (gapMs <= 0) return;
+
+        long gapNs = gapMs * 1_000_000L;
+
+        long now = System.nanoTime();
+        long since = now - lastNonRealtimeSendNs;
+
+        if (lastNonRealtimeSendNs != 0L && since < gapNs) {
+            long remaining = gapNs - since;
+
+            LockSupport.parkNanos(remaining);
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException("Interrupted during inter-message silence");
             }
-            sendWithPacing(chunk);
-            pos += take;
-            if (!last) LockSupport.parkNanos(gapNs);
         }
     }
 
@@ -316,10 +305,6 @@ public class MidiSendEngine implements MidiIngressListener {
         if (msg.length == 0) return false;
         int b = msg[0] & 0xFF;
         return b >= 0xF8 && b <= 0xFF;
-    }
-
-    private static boolean isSysex(byte[] msg) {
-        return msg.length > 0 && (msg[0] & 0xFF) == 0xF0;
     }
 
     private static boolean isSysexFramed(byte[] msg) {
