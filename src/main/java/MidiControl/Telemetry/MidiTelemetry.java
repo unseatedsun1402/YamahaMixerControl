@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import MidiControl.MidiDeviceManager.MidiSendEngine;
-import MidiControl.Server.Rehydration.RehydrationMetrics;
 
 public final class MidiTelemetry {
 
@@ -26,23 +25,15 @@ public final class MidiTelemetry {
     private volatile long periodStartEpochSec;
     private volatile MidiSendEngine sendEngine;
     private volatile TelemetryListener telemetryListener = TelemetryListener.NO_OP;
-    private final RehydrationMetrics rehydrationMetrics;
 
 
     private static Logger logger = Logger.getLogger(MidiTelemetry.class.getName());
 
     
-    public MidiTelemetry(MidiSendEngine mse, RehydrationMetrics rehydrationMetrics) {
+    public MidiTelemetry(MidiSendEngine mse) {
         logger.info("Telemetry engine started");
         this.periodStartEpochSec = now();
         this.sendEngine = mse;
-        this.rehydrationMetrics = rehydrationMetrics;
-    }
-
-
-
-    public MidiTelemetry(MidiSendEngine mse) {
-        this(mse, null);
     }
 
     public void sent(int bytes) {
@@ -76,15 +67,6 @@ public final class MidiTelemetry {
         dto.setInFlightBytes((int) periodPeakInflightBytes);
         dto.setDroppedMessages((int) periodPeakDroppedBytes);
         dto.setSysexQueueCapacity(sendEngine.getSysexQueueRemainingPercent());
-
-        if (rehydrationMetrics != null) {
-            dto.setInflightTransactions(
-                    rehydrationMetrics.getInflightTransactionCount()
-            );
-            dto.setTimedOutTransactions(
-                    rehydrationMetrics.getTimedOutTransactionCount()
-            );
-        }
 
         bytesOut.reset();
         bytesIn.reset();

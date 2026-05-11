@@ -26,7 +26,8 @@ public class TelemetryTest {
     @Test
     public void telemtryDtoGetJson(){
         String confirmjson = "{\"type\":\"telemetry\",\"payload\":{\"timestamp\":0,\"inflight\":-1,\"dropped\":-1,"+
-            "\"averagein\":-1,\"averageout\":-1,\"averagecombined\":-1,\"remainingcapacity\":-1,\"usedcapacity\":-1,\"inflightTransactions\":-1,\"timedOutTransactions\":-1} }";
+            "\"averagein\":-1,\"averageout\":-1,\"averagecombined\":-1,\"remainingcapacity\":-1,\"usedcapacity\":-1,"+
+            "\"inflightTransactions\":-1,\"timedOutTransactions\":-1,\"rehydrationRttMs\":-1} }";
         TelemetryData dtoJson = new TelemetryData();
         dtoJson.setTimeStamp(0);
         assertEquals(confirmjson, dtoJson.toJsonString());

@@ -104,6 +104,7 @@ public class MidiServer implements Runnable, UiModelService{
         this.bankFactory = new UiBankFactory(discoveryEngine, this);
         this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
         this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(), (SourceAllInstances) this.canonicalRegistry, Executors.newSingleThreadScheduledExecutor());
+        systemTelemetry.registerRehydrationTelemetry(rehydrationManager.getRehydrationTelemetry());
         initContextIndex();
         serverRouter.injectApp(new StateRehydrationService(rehydrationManager, deviceManager));
         logger.info("MidiServer: CanonicalRegistry initialized with SYSEX + NRPN mappings.");
@@ -320,6 +321,7 @@ public class MidiServer implements Runnable, UiModelService{
         discoveryEngine = new ContextDiscoveryEngine(newRegistry);
         reloadContextIndex();
         recreateNameAssemblers();
+        rehydrationManager.injectNewRegistry(newRegistry);
         List<NrpnMapping> nrpnMappings =
                 NrpnMappingLoader.loadFromResource("MidiControl/nrpn/m7cl_nrpn_mappings.json");
         try{

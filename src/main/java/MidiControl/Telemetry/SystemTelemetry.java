@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import com.google.gson.JsonObject;
 import MidiControl.Routing.WebSocketEndpoint;
+import MidiControl.Server.Rehydration.RehydrationTelemetry;
 
 public final class SystemTelemetry {
 
@@ -17,12 +18,19 @@ public final class SystemTelemetry {
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     private volatile MidiTelemetry midiTelemetry;
+    private volatile RehydrationTelemetry rehydrationTelemetry;
     private volatile ScheduledExecutorService scheduler;
 
     public SystemTelemetry() {}
 
     public void registerMidiTelemetry(MidiTelemetry telemetry) {
         this.midiTelemetry = telemetry;
+        logger.info("Registered Midi Telemetry Engine");
+    }
+
+    public void registerRehydrationTelemetry(RehydrationTelemetry telemetry) {
+        this.rehydrationTelemetry = telemetry;
+        logger.info("Registered Rehydration Telemetry Engine");
     }
 
     public void start() {
@@ -51,10 +59,22 @@ public final class SystemTelemetry {
     }
 
     private void tick() {
-        MidiTelemetry t = midiTelemetry;
-        if (t == null) return;
+        MidiTelemetry mt = midiTelemetry;
+        if (mt == null) return;
 
-        TelemetryData dto = t.snapshotAndResetPeriod();
+        TelemetryData dto = mt.snapshotAndResetPeriod();
+
+        RehydrationTelemetry rt = rehydrationTelemetry;
+        if (rt != null) {
+            dto.setInflightTransactions(rt.getOutstandingRequests());
+            dto.setTimedOutTransactions(rt.getPeriodTimedOutRequests());
+
+            long rtt = rt.getAvgRequestRttMs();
+            if (rtt > 0) {
+                dto.setAvgRehydrationRttMs(rtt);
+            }
+        }
+
         publish(dto.toJsonString());
     }
 
