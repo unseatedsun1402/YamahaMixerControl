@@ -33,6 +33,7 @@ public class ChannelNameAssembler implements ControlListener {
     private static final long DEBOUNCE_MS = 800;
     private static final Logger logger = Logger.getLogger(ChannelNameAssembler.class.getName());
     private volatile boolean pendingNameUpdate = false;
+    private volatile static boolean debug = false;
     private Map<String,List<ControlInstance>> instanceMap;
     private Map<ControlInstance,String> channelMap;
     private String CanonicalName;
@@ -80,6 +81,10 @@ public class ChannelNameAssembler implements ControlListener {
         subscribeToControls();
     }
 
+    public static void enableDebug(){
+        debug = true;
+    }
+
 
     private void subscribeToControls() {
         List<ControlInstance> contextInstances = new ArrayList<>();
@@ -95,10 +100,9 @@ public class ChannelNameAssembler implements ControlListener {
             SubControl sc = cg.getSubcontrol(filter.getSubControl());
             if (sc == null) continue;
 
-            // Skip long names if you only handle short ones for now
             if (sc.getName().contains("Long")) continue;
 
-            int channelIndex = filter.getIndex();   // IMPORTANT
+            int channelIndex = filter.getIndex();
 
             for (ControlInstance inst : sc.getInstances()) {
 
@@ -114,8 +118,8 @@ public class ChannelNameAssembler implements ControlListener {
         // Store the list of instances for this context
         instanceMap.put(CanonicalName, contextInstances);
 
-        logger.info("Assembler for " + CanonicalName
-            + " subscribed to " + contextInstances.size() + " controls");
+        if(debug){logger.fine("Assembler for " + CanonicalName
+            + " subscribed to " + contextInstances.size() + " controls");}
     }
 
     @Override
@@ -156,7 +160,7 @@ public class ChannelNameAssembler implements ControlListener {
         TreeMap<Integer, Character> chars = new TreeMap<>();
 
         for (ControlInstance ci : NameInstances){
-            String subName = ci.getSubcontrol(); // e.g. "kChannelNameShort3"
+            String subName = ci.getSubcontrol();
 
             String digits = subName.replaceAll("\\D+", "");
             if (digits.isEmpty()) continue;
@@ -168,9 +172,8 @@ public class ChannelNameAssembler implements ControlListener {
         StringBuilder sb = new StringBuilder();
         for (char c : chars.values()) sb.append(c);
 
-        // Trim trailing blanks
         int last = sb.length() - 1;
-        while (last >= 0 && sb.charAt(last) == ' ') last--;
+        while (last >= 0 && sb.charAt(last) == ' ') last--; //trim trailing whitespace
 
         if (last < 0) return "";
         return sb.substring(0, last + 1);

@@ -18,7 +18,7 @@ public class TelemetryData {
         timeStamp = System.currentTimeMillis();
     }
 
-    public String toJson(){
+    public String toJsonString(){
         return "{\"type\":\"telemetry\",\"payload\":{\"timestamp\":"+this.timeStamp+",\"inflight\":"+this.inflight+",\"dropped\":"+this.dropped+
         ",\"averagein\":"+this.averagein+",\"averageout\":"+this.averageout+",\"averagecombined\":"+averagecombined+",\"remainingcapacity\":"
         +remainingcapacity+",\"usedcapacity\":"+usedcapacity+
@@ -28,14 +28,14 @@ public class TelemetryData {
     }
 
     public long getTimestamp(){return this.timeStamp; }
-    public int getInFlight(){return ( this.inflight > -1 ) ? this.inflight : -1; }
+    public int getInFlightBytes(){return ( this.inflight > -1 ) ? this.inflight : -1; }
     public int getAvgIn(){return ( this.averagein > -1 ) ? this.averagein : -1;}
     public int getAvgOut(){return ( this.averageout > -1 ) ? this.averageout : -1;}
     public int getAvgCombined(){return ( this.averagecombined > -1 ) ? this.averagecombined : -1;}
     public int getMessagesDropped(){return ( this.dropped > -1 ) ? this.dropped : -1;}
     public int getRemainingCapacity(){return ( this.remainingcapacity > -1 ) ? this.remainingcapacity : -1;}
 
-    public void setInFlight(int value){ this.inflight = value; }
+    public void setInFlightBytes(int value){ this.inflight = value; }
     public void setAvgIn(int value){ this.averagein = value; }
     public void setAvgOut(int value){ this.averageout = value; }
     public void setAvgCombined(int value){ this.averagecombined = value; }

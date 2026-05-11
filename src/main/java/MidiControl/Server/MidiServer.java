@@ -1,4 +1,5 @@
 package MidiControl.Server;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +44,7 @@ import MidiControl.UserInterface.UiBankFactory;
 import MidiControl.UserInterface.UiContextIndex;
 import MidiControl.UserInterface.UiModelFactory;
 import MidiControl.UserInterface.UiModelService;
+import MidiControl.Telemetry.SystemTelemetry;
 import jakarta.annotation.PreDestroy;
 public class MidiServer implements Runnable, UiModelService{
     private volatile boolean shutdownFlag = false;
@@ -50,6 +52,7 @@ public class MidiServer implements Runnable, UiModelService{
     private final NrpnRegistry nrpnRegistry = new NrpnRegistry();
     private final NrpnParser nrpnParser = new NrpnParser();
     private final HardwareInputHandler inputHandler = new HardwareInputHandler(nrpnParser, nrpnRegistry);
+    private final SystemTelemetry systemTelemetry;
     private final MidiIOManager deviceManager = new MidiIOManager(this);
     private final SubscriptionManager subscriptions;
     private final ControlSchema schema;
@@ -92,6 +95,8 @@ public class MidiServer implements Runnable, UiModelService{
         this.viewBuilders.addView(new InputChannelStripViewBuilder(), "basic-input-view");
         this.viewBuilders.addView(new InputChannelSendsOnFaderViewBuilder(), "basic-sends-on-fader-view");
         this.viewBuilders.addView(new MixAuxBusViewBuilder(), "basic-master-view");
+
+        this.systemTelemetry = new SystemTelemetry();
         
         this.guiBroadcastListener = new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
         this.bankCatalog = new BankCatalog();
@@ -115,6 +120,9 @@ public class MidiServer implements Runnable, UiModelService{
         this.subscriptions = new SubscriptionManager();
         this.schema = new ControlSchema(canonicalRegistry);
         this.contextIndex = new UiContextIndex();
+
+        this.systemTelemetry = new SystemTelemetry();
+
         this.guiBroadcastListener = new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
         this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
         this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(),
@@ -137,60 +145,41 @@ public class MidiServer implements Runnable, UiModelService{
         this.uiFactory = null;
         this.bankFactory = null;
         this.bankCatalog = new BankCatalog();
+
+        this.systemTelemetry = new SystemTelemetry();
+
         this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(),
             (SourceAllInstances) this.canonicalRegistry,
             Executors.newSingleThreadScheduledExecutor());
     }
 
     // Optional: setter for late injection
-    public void setGuiBroadcastListener(GuiBroadcastListener listener) {
-        this.guiBroadcastListener = listener;
-    }
+    public void setGuiBroadcastListener(GuiBroadcastListener listener) {this.guiBroadcastListener = listener;}
 
 
-    public MidiIOManager getMidiDeviceManager() {
-        return this.deviceManager;
-    }
+    public MidiIOManager getMidiDeviceManager() {return this.deviceManager;}
 
-    public CanonicalRegistry getCanonicalRegistry() {
-        return this.canonicalRegistry;
-    }
+    public CanonicalRegistry getCanonicalRegistry() {return this.canonicalRegistry;}
 
-    public void setCanonicalRegistry(CanonicalRegistry registry) {
-        this.canonicalRegistry = registry;
-    }
+    public void setCanonicalRegistry(CanonicalRegistry registry) {this.canonicalRegistry = registry;}
 
-    public ConcurrentLinkedQueue<MidiMessage> getInputBuffer(){
-        return this.inputBuffer;
-    }
+    public ConcurrentLinkedQueue<MidiMessage> getInputBuffer(){return this.inputBuffer;}
 
-    public void addtoinputqueue(MidiMessage msg) {
-        inputBuffer.add(msg);
-    }
+    public void addtoinputqueue(MidiMessage msg) {inputBuffer.add(msg);}
 
-    public int getInputBufferSize() {
-        return inputBuffer.size();
-    }
+    public int getInputBufferSize() {return inputBuffer.size();}
 
-    public ControlSchema getControlSchema() {
-        return this.schema;
-    }
+    public ControlSchema getControlSchema() {return this.schema;}
 
-    public Optional<ViewBuilder> getViewBuilder(String key) {
-        return this.viewBuilders.getView(key);
-    }
+    public Optional<ViewBuilder> getViewBuilder(String key) {return this.viewBuilders.getView(key);}
 
-    public UiContextIndex getContextIndex() {
-        return this.contextIndex;
-    }
+    public UiContextIndex getContextIndex() {return this.contextIndex;}
 
-    public SubscriptionManager getSubscriptionManager() {
-        return this.subscriptions;
-    }
+    public SubscriptionManager getSubscriptionManager() {return this.subscriptions;}
 
-    public void clearInputBuffer() {
-        inputBuffer.clear();
-    }
+    public void clearInputBuffer() {inputBuffer.clear();}
+
+    public SystemTelemetry getSystemTelemetry() {return this.systemTelemetry;}
     
     private void initNameAssemblers() {
         List<Context> nameContexts = this.contextIndex.getAllContexts().stream()

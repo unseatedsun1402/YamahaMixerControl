@@ -167,7 +167,6 @@ public class ControlInstance {
     }
 
     public void removeListener(ChannelNameAssembler channelNameAssembler) {
-        logger.info("Removed listener " +channelNameAssembler.hashCode());
         this.listeners.remove(channelNameAssembler);
     }
 }

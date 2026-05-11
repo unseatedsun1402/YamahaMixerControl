@@ -23,7 +23,6 @@ import MidiControl.Routing.WebSocketEndpoint;
 import MidiControl.Server.Protocol.NotifyClients;
 import MidiControl.Server.Protocol.ServerEvent;
 import MidiControl.Server.Protocol.ServerRequest;
-import MidiControl.Server.Protocol.ServerRequestHandler;
 import MidiControl.Server.Protocol.ServerRequestParser;
 import MidiControl.SysexUtils.MappingFiles;
 import MidiControl.SysexUtils.SysexMapping;
@@ -42,7 +41,6 @@ public class ServerRouter {
     private final SubscriptionManager subscriptions;
     private final GuiInputHandler guiInputHandler;
     private final OutputRouter outputRouter;
-    private final Map<String, ServerRequestHandler<Session>> handlers = new HashMap<>();
     private final ServerRequestParser requestParser;
 
     private int lastKeepAlive = 0;

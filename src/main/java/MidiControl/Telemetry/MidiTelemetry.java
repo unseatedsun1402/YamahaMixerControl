@@ -3,6 +3,9 @@ package MidiControl.Telemetry;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.logging.Logger;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import MidiControl.MidiDeviceManager.MidiSendEngine;
 import MidiControl.Server.Rehydration.RehydrationMetrics;
 
@@ -22,6 +25,7 @@ public final class MidiTelemetry {
 
     private volatile long periodStartEpochSec;
     private volatile MidiSendEngine sendEngine;
+    private volatile TelemetryListener telemetryListener = TelemetryListener.NO_OP;
     private final RehydrationMetrics rehydrationMetrics;
 
 
@@ -69,7 +73,7 @@ public final class MidiTelemetry {
         dto.setAvgOut((int) (bytesOut.sum() / elapsed));
         dto.setAvgIn((int) (bytesIn.sum() / elapsed));
         dto.setAvgCombined((int) ((bytesOut.sum() + bytesIn.sum()) / elapsed));
-        dto.setInFlight((int) periodPeakInflightBytes);
+        dto.setInFlightBytes((int) periodPeakInflightBytes);
         dto.setDroppedMessages((int) periodPeakDroppedBytes);
         dto.setSysexQueueCapacity(sendEngine.getSysexQueueRemainingPercent());
 
@@ -88,8 +92,7 @@ public final class MidiTelemetry {
         periodPeakInflightBytes = 0;
         periodPeakDroppedBytes = 0;
         periodStartEpochSec = now;
-
-        logger.fine("Telemetry snapshot: " + dto.toJson());
+        telemetryListener.onJson(new Gson().fromJson(dto.toJsonString(),JsonObject.class) );
         return dto;
     }
 
@@ -103,5 +106,10 @@ public final class MidiTelemetry {
 
     private static long now() {
         return java.time.Instant.now().getEpochSecond();
+    }
+
+    public void setTelemetryListener(TelemetryListener listener){
+        this.telemetryListener = listener;
+        logger.info("Set Midi Telemetry listener");
     }
 }

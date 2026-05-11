@@ -9,8 +9,8 @@ import javax.sound.midi.*;
 
 import MidiControl.Server.MidiServer;
 import MidiControl.Server.Rehydration.RehydrationManager;
+import MidiControl.Telemetry.SystemTelemetry;
 import MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile;
-import MidiControl.Routing.WebSocketEndpoint;
 
 public class MidiIOManager {
 
@@ -37,7 +37,7 @@ public class MidiIOManager {
         logger.info("MidiIOManger available");
     }
 
-    public MidiIOManager() { logger.info("MidiIOManger available for tests"); }
+    public MidiIOManager() { logger.info("MidiIOManger available for tests");  }
 
     public void setInputDevice(int index) throws MidiUnavailableException {
         if (midiIn != null) {
@@ -64,7 +64,16 @@ public class MidiIOManager {
     }
 
     public void setOutputDevice(int index) throws MidiUnavailableException {
+        SystemTelemetry systemTelemetry = null;
+        boolean telemetryAvailable = false;
+
+        if (server != null) {
+            systemTelemetry = server.getSystemTelemetry();
+            telemetryAvailable = (systemTelemetry != null);
+        }
+
         if (sendEngine != null) {
+            if (telemetryAvailable) systemTelemetry.stop();
             sendEngine.stop();
             sendEngine = null;
         }
@@ -76,13 +85,19 @@ public class MidiIOManager {
 
         sendEngine = new MidiSendEngine(midiOut, 2048, 4096);
         sendEngine.setThroughputProfile(throughput);
-        sendEngine.setTelemetryListener(WebSocketEndpoint::broadcast);
+
+        if (telemetryAvailable){
+            systemTelemetry.registerMidiTelemetry(sendEngine.getTelemetry());
+            systemTelemetry.start();
+            logger.warning("Failed to register and start telemetry process - server SystemTelemetry engine is null");
+        }
+
         sendEngine.start();
+
         if (midiIn != null) {
             midiIn.getInputReceiver().setIngressListener(sendEngine);
             logger.info("Ingress telemetry attached");
-        }
-        else {
+        } else {
             logger.warning("Could not measure ingress telemetry, midiIn is null");
         }
     }
