@@ -128,14 +128,33 @@ function updateTelemetry(data) {
     document.getElementById("telemetry-combined").textContent =
         data.averagecombined + " B/s";
 
+    // Transport pressure (bytes outstanding)
     document.getElementById("telemetry-inflight").textContent =
-        data.inflight;
+        data.inflight + " bytes";
 
+    // Damage / loss indicator
     document.getElementById("telemetry-dropped").textContent =
         data.dropped;
 
+    // Internal queue headroom
     document.getElementById("remaining-capacity").textContent =
         data.remainingcapacity;
+
+    // Rehydration pressure (if present)
+    const inflightReqEl = document.getElementById("telemetry-inflight-requests");
+    if (inflightReqEl && data.inflightTransactions !== undefined) {
+        inflightReqEl.textContent = data.inflightTransactions;
+    }
+
+    const timeoutReqEl = document.getElementById("telemetry-timeout-requests");
+    if (timeoutReqEl && data.timedOutTransactions !== undefined) {
+        timeoutReqEl.textContent = data.timedOutTransactions;
+    }
+
+    const rttEl = document.getElementById("telemetry-rehydration-rtt");
+    if (rttEl && data.rehydrationRttMs !== undefined && data.rehydrationRttMs >= 0) {
+        rttEl.textContent = data.rehydrationRttMs + " ms";
+    }
 
     appendTelemetryLog(data);
 }
@@ -145,10 +164,28 @@ function appendTelemetryLog(data) {
     const line = document.createElement("div");
 
     const t = new Date(data.timestamp * 1000).toLocaleTimeString();
+
     line.textContent =
-        `[${t}] Bin=${data.averagein} Bout=${data.averageout} ` +
-        `Bcmb=${data.averagecombined} Binflight=${data.inflight} ` +
-        `Qused=${data.usedcapacity}`;
+        `[${t}] ` +
+        `In=${data.averagein}B/s ` +
+        `Out=${data.averageout}B/s ` +
+        `Total=${data.averagecombined}B/s ` +
+        `BufPressure=${data.inflight}B ` +
+        `QueueFree=${data.remainingcapacity}`;
+
+    // Optional rehydration signals (only if present)
+    if (data.inflightTransactions !== undefined) {
+        line.textContent += ` ReqPressure=${data.inflightTransactions}`;
+    }
+
+    if (data.timedOutTransactions !== undefined && data.timedOutTransactions > 0) {
+        line.textContent += ` Timeouts=${data.timedOutTransactions}`;
+    }
+
+    if (data.rehydrationRttMs !== undefined && data.rehydrationRttMs > 0) {
+        line.textContent += ` RTT=${data.rehydrationRttMs}ms`;
+    }
+    else { line.textContent += ` RTT=${data.rehydrationRttMs}ms`; }
 
     log.appendChild(line);
 
@@ -156,7 +193,6 @@ function appendTelemetryLog(data) {
         log.removeChild(log.firstChild);
     }
 }
-
 
 function handleServerEvent(event) {
   const time = new Date(event.timestamp).toLocaleTimeString();

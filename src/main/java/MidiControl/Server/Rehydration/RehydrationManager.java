@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.logging.Logger;
 
+import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.Controls.SourceAllInstances;
 import MidiControl.MidiDeviceManager.ServerSettings;
@@ -15,18 +17,23 @@ import MidiControl.Routing.OutputRequestSender;
 import MidiControl.SysexUtils.ModelNumbers;
 import MidiControl.UserInterface.Meter.MeterRequest;
 
-public class RehydrationManager implements RehydrationMetrics{
+public class RehydrationManager{
 
     private final OutputRequestSender outputRouter;
-    private final SourceAllInstances registry;
+    private SourceAllInstances registry;
     private final ScheduledExecutorService scheduler;
 
     private final Map<String, Long> pending = new ConcurrentHashMap<>();
-    private static final long TIMEOUT_MS = 350;
-    
-    private final AtomicInteger inflightTransactions = new AtomicInteger(0);
+    private static final long TIMEOUT_MS = 200;
+
+    // Metrics counters and configuration values
+    private final AtomicInteger outstandingTransactions = new AtomicInteger(0);
     private final AtomicInteger timedOutTransactions = new AtomicInteger(0);
+    private final AtomicInteger periodTimedOutTransactions = new AtomicInteger(0);
+    private final LongAdder totalRttMs = new LongAdder();
+    private final AtomicInteger completedRequests = new AtomicInteger(0);
     private static final int MAX_TIMEOUT_COUNT = 10_000;
+    private final RehydrationTelemetry telemetry = new RehydrationTelemetry(this);
 
 
     private static final Logger logger = Logger.getLogger(RehydrationManager.class.getName());
@@ -45,15 +52,15 @@ public class RehydrationManager implements RehydrationMetrics{
 
         attachListeners();
     }
-
-    public static void enableDebug(){
-        debug = true;
-    }
-
+    
     public RehydrationManager() {
         this.outputRouter = null;
         this.registry = null;
         this.scheduler = null;
+    }
+
+    public static void enableDebug(){
+        debug = true;
     }
 
     private void attachListeners() {
@@ -66,7 +73,7 @@ public class RehydrationManager implements RehydrationMetrics{
 
     public void request(String canonicalId) {
         pending.put(canonicalId, System.currentTimeMillis());
-        inflightTransactions.incrementAndGet();
+        outstandingTransactions.incrementAndGet();
         outputRouter.applyRequest(canonicalId);
 
         scheduler.schedule(() -> checkTimeout(canonicalId),
@@ -79,7 +86,7 @@ public class RehydrationManager implements RehydrationMetrics{
         final List<ControlInstance> all = new ArrayList<>(registry.getAllInstances());
         all.sort((a, b) -> Integer.compare(a.getPriority(), b.getPriority()));
 
-        // ---- Configuration ----
+        // ---- Weighted Rnd Rbn Configuration ----
         final int[] WEIGHTED_PATTERN = new int[] {
             1, 1, 1, 1,
             2, 2, 2,
@@ -87,7 +94,6 @@ public class RehydrationManager implements RehydrationMetrics{
             4
         };
 
-        // ---- Partition into per-priority queues (normalized 1..4) ----
         final ArrayDeque<ControlInstance> q1 = new ArrayDeque<>();
         final ArrayDeque<ControlInstance> q2 = new ArrayDeque<>();
         final ArrayDeque<ControlInstance> q3 = new ArrayDeque<>();
@@ -166,16 +172,21 @@ public class RehydrationManager implements RehydrationMetrics{
     public void onControlUpdated(String canonicalId) {
         Long expected = pending.remove(canonicalId);
         if (expected == null) {
+            logger.warning(canonicalId + " was not expected or no longer pending i.e. already recieved or timedout and removed");
             return;
         }
-        inflightTransactions.decrementAndGet();
+
+        long rtt = System.currentTimeMillis() - expected;
+        totalRttMs.add(rtt);
+        completedRequests.incrementAndGet();
+        outstandingTransactions.decrementAndGet();
     }
 
     public static boolean isRunning(){ return running; }
 
     
-    public int getInflightTransactionCount() {return inflightTransactions.get();}
-    public int getTimedOutTransactionCount() {return timedOutTransactions.get();}
+    public int getOutstandingRequests() {return outstandingTransactions.get();}
+    public int getTimedOutRequestsTotal() {return timedOutTransactions.get();}
 
     private int normalizePriority(int p) {
         if (p <= 1) return 1;
@@ -187,7 +198,7 @@ public class RehydrationManager implements RehydrationMetrics{
 
     private void checkTimeout(String canonicalId) {
         if (pending.remove(canonicalId) != null) {
-            inflightTransactions.decrementAndGet();
+            outstandingTransactions.decrementAndGet();
             incrementRequestTimeoutCounter();
         }
     }
@@ -198,6 +209,8 @@ public class RehydrationManager implements RehydrationMetrics{
             v = timedOutTransactions.get();
             if (v >= MAX_TIMEOUT_COUNT) return;
         } while (!timedOutTransactions.compareAndSet(v, v + 1));
+
+        periodTimedOutTransactions.incrementAndGet();
     }
 
     public Boolean isPending(String string) {
@@ -207,7 +220,7 @@ public class RehydrationManager implements RehydrationMetrics{
     public void clearPending(RehydrationListener listener){
         int cleared = pending.size();
         pending.clear();
-        inflightTransactions.addAndGet(-cleared);
+        outstandingTransactions.addAndGet(-cleared);
         listener.onReset();
     }
 
@@ -241,5 +254,26 @@ public class RehydrationManager implements RehydrationMetrics{
             BASE_DELAY_MS = newDelay;
             logger.info("Rehydration poll rate set to: "+BASE_DELAY_MS+"ms");
         }
+    }
+
+    public int getPeriodTimedOutRequestsTotal() {return periodTimedOutTransactions.getAndSet(0);}
+
+    public long getAvgRequestRttMsAndReset() {
+        int count = completedRequests.getAndSet(0);
+        if (count == 0) {
+            totalRttMs.reset();
+            return 0;
+        }
+        long total = totalRttMs.sumThenReset();
+        return total / count;
+    }
+
+    public RehydrationTelemetry getRehydrationTelemetry(){
+        return telemetry;
+    }
+
+    public void injectNewRegistry(CanonicalRegistry newRegistry) {
+        this.registry = newRegistry;
+        attachListeners();
     }
 }

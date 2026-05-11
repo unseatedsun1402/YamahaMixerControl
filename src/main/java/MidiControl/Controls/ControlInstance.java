@@ -91,7 +91,6 @@ public class ControlInstance {
         for (ControlListener l : listeners) {
             l.onControlChanged(this, value);
         }
-        logger.fine("New value for "+this.canonicalId + " is: "+ this.value);
         return this.value;
     }
 

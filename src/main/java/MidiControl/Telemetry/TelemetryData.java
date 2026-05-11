@@ -12,6 +12,7 @@ public class TelemetryData {
     private int usedcapacity = -1;
     private int inflightTransactions = -1;
     private int timedOutTransactions = -1;
+    private long avgRehydrationRttMs = -1;
 
 
     public TelemetryData(){
@@ -24,6 +25,7 @@ public class TelemetryData {
         +remainingcapacity+",\"usedcapacity\":"+usedcapacity+
         ",\"inflightTransactions\":" + inflightTransactions +
         ",\"timedOutTransactions\":" + timedOutTransactions +
+        ",\"rehydrationRttMs\":" + avgRehydrationRttMs +
         "} }";
     }
 
@@ -34,6 +36,7 @@ public class TelemetryData {
     public int getAvgCombined(){return ( this.averagecombined > -1 ) ? this.averagecombined : -1;}
     public int getMessagesDropped(){return ( this.dropped > -1 ) ? this.dropped : -1;}
     public int getRemainingCapacity(){return ( this.remainingcapacity > -1 ) ? this.remainingcapacity : -1;}
+    public long getAvgRehydrationRttMs() {return (this.avgRehydrationRttMs >= 0) ? this.avgRehydrationRttMs : -1;}
 
     public void setInFlightBytes(int value){ this.inflight = value; }
     public void setAvgIn(int value){ this.averagein = value; }
@@ -45,5 +48,5 @@ public class TelemetryData {
     public void setSysexQueueConsumed(int sysexQueueUsed) { this.usedcapacity = sysexQueueUsed; }
     public void setInflightTransactions(int value) {this.inflightTransactions = value;}
     public void setTimedOutTransactions(int value) {this.timedOutTransactions = value;}
-
+    public void setAvgRehydrationRttMs(long value) {this.avgRehydrationRttMs = value;}
 }
