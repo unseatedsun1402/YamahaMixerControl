@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import com.google.gson.JsonObject;
+
+import MidiControl.MidiDeviceManager.MidiTelemetry;
 import MidiControl.Routing.WebSocketEndpoint;
 import MidiControl.Server.Rehydration.RehydrationTelemetry;
 

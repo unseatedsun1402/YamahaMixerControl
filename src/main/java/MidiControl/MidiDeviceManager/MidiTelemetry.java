@@ -1,4 +1,4 @@
-package MidiControl.Telemetry;
+package MidiControl.MidiDeviceManager;
 
 import java.util.concurrent.atomic.LongAdder;
 import java.util.logging.Logger;
@@ -6,7 +6,8 @@ import java.util.logging.Logger;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import MidiControl.MidiDeviceManager.MidiSendEngine;
+import MidiControl.Telemetry.TelemetryData;
+import MidiControl.Telemetry.TelemetryListener;
 
 public final class MidiTelemetry {
 

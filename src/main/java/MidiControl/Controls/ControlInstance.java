@@ -44,6 +44,15 @@ public class ControlInstance {
             index;
         if(sysex != null){this.priority= sysex.priority;}
     }
+
+    public ControlInstance(String canonicalID, int index,SysexMapping sysex,NrpnMapping nrpn) {
+        this.parent = null;
+        this.index = index;
+        this.sysexMapping = sysex;
+        this.nrpnMapping = nrpn;
+        this.canonicalId = canonicalID;
+        if(sysex != null){this.priority= sysex.priority;}
+    }
     
     public byte getResolution() {
             int range = getMax() - getMin();

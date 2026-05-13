@@ -20,10 +20,10 @@ public class GuiInputHandler {
     }
 
     public void handleGuiChange(String canonicalId, int value) {
-        if (RehydrationManager.isRunning()){
-            {logger.warning("Rehydation in progress. Dropped Change from "+canonicalId+ " val: "+value);}
-            return;
-        }
+        // if (RehydrationManager.isRunning()){
+        //     {logger.warning("Rehydation in progress. Dropped Change from "+canonicalId+ " val: "+value);}
+        //     return;
+        // }
         router.applyChange(canonicalId, value);
         if(debug){logger.info("Handled Change from "+canonicalId+ " val: "+value);}
     }

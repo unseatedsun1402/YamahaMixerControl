@@ -1,6 +1,6 @@
 package MidiControl.unit.Telemetry;
 
-import MidiControl.Telemetry.MidiTelemetry;
+import MidiControl.MidiDeviceManager.MidiTelemetry;
 import MidiControl.Telemetry.TelemetryData;
 import MidiControl.Telemetry.TelemetryListener;
 
