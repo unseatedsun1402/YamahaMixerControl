@@ -117,9 +117,9 @@ public class OutputRouterTest {
     }
 
     private NrpnMapping fakeNrpn() {
-        return new NrpnMapping("0", "0", "test.canonical.1") {
+        return new NrpnMapping("0", "0", "test.canonical.1","CC6_ONLY") {
             @Override
-            public List<byte[]> buildNrpnBytes(Optional<ControlInstance> ci, int value) {
+            public List<byte[]> buildNrpnBytes(int value) {
                 return List.of(
                         new byte[]{(byte) 0xB0, 0x63, 0x01},
                         new byte[]{(byte) 0xB0, 0x62, 0x02},

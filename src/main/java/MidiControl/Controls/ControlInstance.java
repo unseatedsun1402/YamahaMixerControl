@@ -128,14 +128,14 @@ public class ControlInstance {
         return List.of(msg);
     }
 
-    public List<byte[]> buildSysexChange(int build) {
-        byte[] msg = sysexMapping.buildChangeMessage(build, this.index);
+    public List<byte[]> buildSysexChange(int val) {
+        byte[] msg = sysexMapping.buildChangeMessage(val, this.index);
         return List.of(msg);
     }
 
-    public List<byte[]> buildNrpnChange(int build){
+    public List<byte[]> buildNrpnChange(int val){
         if (getNrpn().isPresent()) {
-            return getNrpn().get().buildNrpnBytes(Optional.of(this),build);
+            return getNrpn().get().buildNrpnBytes(val);
         }
         return null;
     }

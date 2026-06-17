@@ -90,7 +90,8 @@ public class GuiToHardwareChangeTest {
         NrpnMapping nrpn = new NrpnMapping(
             "12",   // arbitrary MSB
             "34",   // arbitrary LSB
-            ci.getCanonicalId()
+            ci.getCanonicalId(),
+            "CC6_ONLY"
         );
 
         // Attach NRPN to this control
@@ -103,7 +104,7 @@ public class GuiToHardwareChangeTest {
 
         // --- assert ---
         List<byte[]> sent = out.getSentMessages();
-        List<byte[]> expected = nrpn.buildNrpnBytes(Optional.empty(), newValue);
+        List<byte[]> expected = nrpn.buildNrpnBytes(newValue);
 
         assertEquals(expected.size(), sent.size());
         for (int i = 0; i < expected.size(); i++) {

@@ -37,7 +37,7 @@ public class ControlInstanceTest {
     @Test
     void testGetCanonicalId(){
         String testID = "Group.Test.1";
-        ControlInstance testInstance = new ControlInstance(testID, 0, new SysexMapping(), new NrpnMapping("1","2",testID));
+        ControlInstance testInstance = new ControlInstance(testID, 0, new SysexMapping(), new NrpnMapping("1","2",testID,"CC6_ONLY"));
         List<byte[]> message = testInstance.buildNrpnChange(0);
         
         byte[] messagepart1 = {-80,99,0x01}; // status, cc ch, val

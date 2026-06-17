@@ -12,10 +12,10 @@ import MidiControl.Controls.CanonicalRegistry;;
 public class OutputRouter implements OutputRequestSender{
 
     private static final Logger logger = Logger.getLogger(OutputRouter.class.getName());
-    private static boolean DEBUG = false;
+    private static boolean debug = false;
 
     public static void enableDebug() {
-        DEBUG = true;
+        debug = true;
         logger.info("OutputRouter debug enabled");
     }
 
@@ -31,7 +31,7 @@ public class OutputRouter implements OutputRequestSender{
      * Apply a change to hardware using the currently selected transport mode.
      */
     public void applyChange(String canonicalId, int newValue) {
-        if (DEBUG)logger.info("OutputRouter.applyChange: " + canonicalId + " = " + newValue);
+        if (debug)logger.info("OutputRouter.applyChange: " + canonicalId + " = " + newValue);
 
         ControlInstance ci = registry.resolveCanonicalId(canonicalId);
         if (ci == null) {logger.warning("Unknown canonicalId: " + canonicalId);return;}
@@ -48,9 +48,12 @@ public class OutputRouter implements OutputRequestSender{
                 }
                 break;
             case SYSEX:
+                if (ci.getNrpn().isPresent()){
+                    sendNrpn(ci, newValue);
+                    break;
+                }
             default:
                 sendSysex(ci, newValue);
-                break;
         }
     }
 
@@ -58,7 +61,7 @@ public class OutputRouter implements OutputRequestSender{
      * Request a value from hardware (always SYSEX for Yamaha desks).
      */
     public void applyRequest(String canonicalId) {
-        if (DEBUG) {
+        if (debug) {
             logger.info("OutputRouter.applyRequest: " + canonicalId);
         }
 
@@ -69,24 +72,25 @@ public class OutputRouter implements OutputRequestSender{
 
         byte[] msg = ci.getSysex().buildRequestMessage(ci.getIndex());
 
-        if (DEBUG) {
-            logger.info("Sending SYSEX REQUEST OUT: " + bytesToHex(msg));
+        if (debug)
+        {
+            logger.fine(String.format("Sending SYSEX REQUEST OUT: %s",bytesToHex(msg)));
         }
+        
         ioManager.sendAsync(msg);
     }
 
 
     private void sendNrpn(ControlInstance ci, int newValue) {
-        List<byte[]> msgs = ci.getNrpn().get().buildNrpnBytes(Optional.of(ci), newValue);
+        List<byte[]> msgs = ci.getNrpn().get().buildNrpnBytes(newValue);
 
-        if (DEBUG) {
-            logger.info("NRPN mapping used for " + ci.getCanonicalId());
-            for (byte[] msg : msgs) {
-                logger.info("Sending NRPN OUT: " + bytesToHex(msg));
-            }
-        }
 
         for (byte[] msg : msgs) {
+            if (debug) 
+            {
+                logger.fine(String.format("Sending %s NRPN mapping used for %s", bytesToHex(msg), ci.getCanonicalId()));
+            }
+
             ioManager.sendAsync(msg);
         }
     }
@@ -94,10 +98,10 @@ public class OutputRouter implements OutputRequestSender{
     private void sendSysex(ControlInstance ci, int newValue) {
         byte[] msg = ci.getSysex().buildChangeMessage(newValue, ci.getIndex());
 
-        if (DEBUG) {
-            logger.info("SYSEX mapping used for " + ci.getCanonicalId());
-            logger.info("Sending SYSEX OUT: " + bytesToHex(msg));
-        }
+            if (debug) 
+            {
+                logger.fine(String.format("Sending %s NRPN mapping used for %s", bytesToHex(msg), ci.getCanonicalId()));
+            }
 
         ioManager.sendAsync(msg);
     }

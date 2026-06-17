@@ -48,7 +48,7 @@ public class NrpnParserTest {
 
         // MSB=1, LSB=0 → canonical ID must match what buildTestRegistry creates
         // control_group = "test", sub_control = "group", index 0 → "test.group.0"
-        NrpnMapping mapping = new NrpnMapping("1", "0", "kInputHA.kHAPhantom.0");
+        NrpnMapping mapping = new NrpnMapping("1", "0", "kInputHA.kHAPhantom.0","CC6_ONLY");
 
         reg.replace(List.of(mapping));
         return reg;
