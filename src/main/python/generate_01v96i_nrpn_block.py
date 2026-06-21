@@ -1,6 +1,6 @@
 import json
 
-def generate_block(start_hex, canonical_prefix, instances=56, value_mode="NRPN_14BIT"):
+def generate_block(start_hex, canonical_prefix, instances=32, value_mode="NRPN_14BIT"):
     """
     start_hex: e.g. '0x28EA'
     canonical_prefix: e.g. 'kInputToMix.kMix1Level'
@@ -44,10 +44,19 @@ all_blocks += generate_block("0x031E", "kInputToAux.kAux8Level", instances=40, v
 # INPUT FADER (01V96i = 14-bit NRPN)
 all_blocks += generate_block("0x00", "kInputFader.kFader", instances=40, value_mode="NRPN_14BIT")
 
+# INPUT PAN
+all_blocks += generate_block("0x4116", "kInputPan.kChannelPan")
+
+# INPUT COMPRESSOR THRESHOLD (corrected direction)
+all_blocks += generate_block("0x3C30", "kInputDynamics1.kThreshold")
+
+# INPUT ON / MUTE
+all_blocks += generate_block("0x0B36", "kInputOn.kChannelOn")
+
 
 # OUTPUT FADERS
-all_blocks += generate_block("0x0060", "kBusFader.kFader", instances=8, value_mode="NRPN_14BIT")
-all_blocks += generate_block("0x0068", "kAuxFader.kFader", instances=8, value_mode="NRPN_14BIT")
+all_blocks += generate_block("0x0060", "kAuxFader.kFader", instances=8, value_mode="NRPN_14BIT")
+all_blocks += generate_block("0x0068", "kBusFader.kFader", instances=8, value_mode="NRPN_14BIT")
 all_blocks += generate_block("0x0079", "kStereoFader.kFader", instances=5, value_mode="NRPN_14BIT")
 
 

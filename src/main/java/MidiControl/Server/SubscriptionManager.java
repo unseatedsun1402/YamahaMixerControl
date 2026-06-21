@@ -11,10 +11,10 @@ import jakarta.websocket.Session;
 
 public class SubscriptionManager {
 
-    // session → set of contextIds
+    // session -> set of contextIds
     private final Map<Session, Set<String>> sessionToContexts = new ConcurrentHashMap<>();
 
-    // contextId → set of sessions
+    // contextId -> set of sessions
     private final Map<String, Set<Session>> contextToSessions = new ConcurrentHashMap<>();
 
     private static final Logger logger = Logger.getLogger(SubscriptionManager.class.getName());

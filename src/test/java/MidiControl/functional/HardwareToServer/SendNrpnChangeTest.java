@@ -28,14 +28,15 @@ public class SendNrpnChangeTest {
         );
 
         int testValue = 770;
-        List<byte[]> built = ctx.nrpn.buildNrpnBytes(testValue);
+        int scaled14 = scale1023To7Bit(testValue);
+        List<byte[]> built = ctx.nrpn.buildNrpnBytes(scaled14);
 
         assertNotNull(built);
         assertTrue(built.size() == 3);
 
         assertArrayEquals(new byte[]{(byte) 0xB0, 0x63, 0x00}, built.get(0));
         assertArrayEquals(new byte[]{(byte) 0xB0, 0x62, 0x01}, built.get(1));
-        assertArrayEquals(new byte[]{(byte) 0xB0, 0x06, (byte) scale1023To7Bit(testValue)}, built.get(2));
+        assertArrayEquals(new byte[]{(byte) 0xB0, 0x06, (byte) scaled14}, built.get(2));
     }
 
     @Test
@@ -47,14 +48,15 @@ public class SendNrpnChangeTest {
         );
 
         int testValue = 65;
-        List<byte[]> built = ctx.nrpn.buildNrpnBytes(testValue);
+        int scaled14 = scale1023To7Bit(testValue);
+        List<byte[]> built = ctx.nrpn.buildNrpnBytes(scaled14);
 
         assertNotNull(built);
         assertTrue(built.size() == 3);
 
         assertArrayEquals(new byte[]{(byte) 0xB0, 0x63, 0x00}, built.get(0));
         assertArrayEquals(new byte[]{(byte) 0xB0, 0x62, 0x01}, built.get(1));
-        assertArrayEquals(new byte[]{(byte) 0xB0, 0x06, (byte) scale1023To7Bit(testValue)}, built.get(2));
+        assertArrayEquals(new byte[]{(byte) 0xB0, 0x06, (byte) scaled14}, built.get(2));
     }
 
     @Test
@@ -106,7 +108,7 @@ public class SendNrpnChangeTest {
         int testValue = 770;
         int scaled14 = scale1023To14Bit(testValue);
 
-        List<byte[]> built = ctx.nrpn.buildNrpnBytes(testValue);
+        List<byte[]> built = ctx.nrpn.buildNrpnBytes(scaled14);
 
         assertNotNull(built);
         assertTrue(built.size() == 4);
@@ -128,7 +130,7 @@ public class SendNrpnChangeTest {
         int testValue = 65;
         int scaled14 = scale1023To14Bit(testValue);
 
-        List<byte[]> built = ctx.nrpn.buildNrpnBytes(testValue);
+        List<byte[]> built = ctx.nrpn.buildNrpnBytes(scaled14);
 
         assertNotNull(built);
         assertTrue(built.size() == 4);
@@ -148,7 +150,8 @@ public class SendNrpnChangeTest {
         );
 
         int testValue = 1023;
-        List<byte[]> built = ctx.nrpn.buildNrpnBytes(testValue);
+        int scaled14 = scale1023To14Bit(testValue);
+        List<byte[]> built = ctx.nrpn.buildNrpnBytes(scaled14);
 
         assertNotNull(built);
         assertTrue(built.size() == 4);

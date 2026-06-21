@@ -71,8 +71,6 @@ public class CanonicalRegistry implements SourceAllInstances {
             for (SubControl sc : cg.getSubcontrols().values()) {
                 for (ControlInstance ci : sc.getInstances()) {
                     ci.addListener((instance, newValue) -> {
-                        // String json = buildDualFormatJson(instance, newValue);
-                        // WebSocketEndpoint.broadcast(json);
                     });
                 }
             }

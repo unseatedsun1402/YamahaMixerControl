@@ -46,7 +46,8 @@ public class GuiBroadcastListenerTest {
 
         // Assert
         assertEquals(
-            "{\"type\":\"control-update\",\"payload\":{\"canonicalId\":\"kInputHA.kHAPhantom.0\",\"value\":77}}",
+            "{\"type\":\"control-update\",\"payload\":{\"canonicalId\":" +
+                "\"kInputHA.kHAPhantom.0\",\"value\":77,\"min\":0,\"max\":1}}",
             captured.toString()
         );
     }

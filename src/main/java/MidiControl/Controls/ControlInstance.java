@@ -25,6 +25,8 @@ public class ControlInstance {
     private SysexMapping sysexMapping;
     private static Logger logger = Logger.getLogger(ControlInstance.class.getName());
     private int priority = 3;
+    private int canonMax = 1;
+    private int canonMin = 0;
 
     public static void enableDebug(){
         debug = true;
@@ -42,7 +44,11 @@ public class ControlInstance {
             parent.getParentGroup().getName() + "." +
             parent.getName() + "." +
             index;
-        if(sysex != null){this.priority= sysex.priority;}
+        if(sysex != null){
+            this.priority= sysex.priority;
+            this.canonMax=this.getMax();
+            this.canonMin=this.getMin();
+        }
     }
 
     public ControlInstance(String canonicalID, int index,SysexMapping sysex,NrpnMapping nrpn) {
@@ -51,7 +57,11 @@ public class ControlInstance {
         this.sysexMapping = sysex;
         this.nrpnMapping = nrpn;
         this.canonicalId = canonicalID;
-        if(sysex != null){this.priority= sysex.priority;}
+        if (sysexMapping !=null){
+            this.priority= sysex.priority;
+            this.canonMax=this.getMax();
+            this.canonMin=this.getMin();
+        }
     }
     
     public byte getResolution() {
@@ -80,10 +90,39 @@ public class ControlInstance {
             case SYSEX -> sysexMapping.extractValue(event.getSysexData());
             case NRPN  -> {
                 NrpnMessage eventnrpn = event.getNrpn();
-                yield eventnrpn.value;
+                yield toCanonicalValue(eventnrpn.value);
             }
             case CC    -> event.getCc().getData2();
         };
+    }
+
+    private int toCanonicalValue(int rawValue) {
+        NrpnMapping mapping = this.getNrpn().get();
+        int min = 0;
+        int max = mapping.getMax();
+        if (max == min) return canonMin;
+
+        double normalized = (double)(rawValue - min) / (max - min);
+        double result = canonMin + normalized * (canonMax - canonMin);
+
+        if(debug)logger.fine(String.format("%s scaling NRPN -> canonical: raw=%d -> %.2f",
+            canonicalId, rawValue, result
+        ));
+
+        return (int)Math.round(result);
+    }
+
+    public int toNrpnValue(int canonicalValue, int min, int max) {
+        if (canonMax == canonMin) return min;
+
+        double normalized = (double)(canonicalValue - canonMin) / (double)(canonMax - canonMin);
+        double result = min + normalized * (max - min);
+
+        if(debug)logger.fine(String.format("%s scaling canonical -> NRPN: canonical %d -> %.2f",
+            canonicalId, canonicalValue, result
+        ));
+
+        return (int)Math.round(result);
     }
 
     public int getIndex() {
@@ -135,7 +174,8 @@ public class ControlInstance {
 
     public List<byte[]> buildNrpnChange(int val){
         if (getNrpn().isPresent()) {
-            return getNrpn().get().buildNrpnBytes(val);
+            NrpnMapping mapping = getNrpn().get();
+            return getNrpn().get().buildNrpnBytes(toNrpnValue(val, mapping.getMin(), mapping.getMax()));
         }
         return null;
     }

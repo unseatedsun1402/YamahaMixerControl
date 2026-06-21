@@ -37,7 +37,7 @@ public class NrpnMappingLoaderTest {
         Path tempDir = Files.createTempDirectory("nrpn-test");
 
         // Valid file
-        String validJson = "[{\"msb\":\"1\",\"lsb\":\"0\",\"canonical_id\":\"ok\"}]";
+        String validJson = "[{\"msb\":\"1\",\"lsb\":\"0\",\"canonical_id\":\"ok\",\"value_mode\":0}]";
         Files.writeString(tempDir.resolve("good.json"), validJson);
 
         // Invalid file

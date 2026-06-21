@@ -10,7 +10,7 @@ import MidiControl.Controls.ControlInstance;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.MidiDeviceManager.ReceiverWrapper;
 import MidiControl.MidiDeviceManager.TransportMode;
-import MidiControl.Routing.OutputRouter;
+import MidiControl.Routing.HardwareOutputRouter;
 import MidiControl.Server.MidiServer;
 
 public class MidiOutboundTestMain {
@@ -38,7 +38,7 @@ public class MidiOutboundTestMain {
 
         server.run(); // REQUIRED for input + SyncSend
 
-        OutputRouter outputRouter = new OutputRouter(server.getCanonicalRegistry(),io);
+        HardwareOutputRouter outputRouter = new HardwareOutputRouter(server.getCanonicalRegistry(),io);
         GuiInputHandler gui = new GuiInputHandler(outputRouter);
 
         // Resolve the faders

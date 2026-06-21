@@ -11,7 +11,7 @@ import MidiControl.MidiDeviceManager.MidiInput;
 import MidiControl.MidiDeviceManager.MidiInputReceiver;
 import MidiControl.MidiDeviceManager.MidiOutput;
 import MidiControl.MidiDeviceManager.TransportMode;
-import MidiControl.Routing.OutputRouter;
+import MidiControl.Routing.HardwareOutputRouter;
 import MidiControl.Server.MidiServer;
 
 public class TriggerNameTest {
@@ -39,7 +39,7 @@ public class TriggerNameTest {
 
         server.run(); // REQUIRED for input + SyncSend
 
-        OutputRouter outputRouter = new OutputRouter(server.getCanonicalRegistry(),io);
+        HardwareOutputRouter outputRouter = new HardwareOutputRouter(server.getCanonicalRegistry(),io);
         GuiInputHandler gui = new GuiInputHandler(outputRouter);
 
         // Resolve the faders

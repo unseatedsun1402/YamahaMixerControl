@@ -20,7 +20,7 @@ public class NrpnRegistryTest {
         List<NrpnMapping> mappings = registry.getMappings();
         NrpnMapping firstMapping = mappings.get(0);
         System.out.println("First mapping: " + firstMapping.getCanonicalId() );
-        assertEquals("kInputToAux.kAux1Level.0",firstMapping.getCanonicalId());
+        assertEquals("kInputFader.kFader.0",firstMapping.getCanonicalId());
     }
 
     @Test

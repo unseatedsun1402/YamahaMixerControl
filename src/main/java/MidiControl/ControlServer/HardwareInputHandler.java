@@ -17,6 +17,7 @@ public class HardwareInputHandler {
 
     private final Logger logger = Logger.getLogger(HardwareInputHandler.class.getName());
     private final NrpnParser nrpnParser;
+    @SuppressWarnings("unused")
     private final NrpnRegistry nrpnRegistry;
     private static Boolean DEBUG = false;
     private static MeterBroadcaster meterBroadcaster = new MeterBroadcaster();

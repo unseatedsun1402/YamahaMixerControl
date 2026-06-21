@@ -11,7 +11,6 @@ import MidiControl.NrpnUtils.NrpnMapping;
 import MidiControl.NrpnUtils.NrpnParser;
 import MidiControl.NrpnUtils.NrpnRegistry;
 import MidiControl.SysexUtils.SysexMapping;
-import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
 import MidiControl.TestUtilities.MidiTestUtils;
 import MidiControl.TestUtilities.NrpnMocker;
@@ -27,17 +26,11 @@ import org.junit.jupiter.api.Test;
 @Tag("unit")
 public class NrpnParserTest {
 
-    /**
-     * Build a minimal CanonicalRegistry from an inline Sysex mapping
-     * so we don't manually mutate internal collections.
-     */
     private CanonicalRegistry buildTestRegistry(NrpnRegistry nrpnRegistry) {
         List<SysexMapping> mappings = FakeSysexMapping.fakeSysexMapping();
 
-        // CanonicalRegistry builds groups/subcontrols/instances from Sysex mappings
         CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
 
-        // Attach NRPN mappings so resolveNrpn(msb, lsb) works
         registry.attachNrpnMappings(nrpnRegistry.getMappings());
 
         return registry;
@@ -46,8 +39,6 @@ public class NrpnParserTest {
     private NrpnRegistry buildTestNrpnRegistry() {
         NrpnRegistry reg = new NrpnRegistry();
 
-        // MSB=1, LSB=0 → canonical ID must match what buildTestRegistry creates
-        // control_group = "test", sub_control = "group", index 0 → "test.group.0"
         NrpnMapping mapping = new NrpnMapping("1", "0", "kInputHA.kHAPhantom.0","CC6_ONLY");
 
         reg.replace(List.of(mapping));
@@ -94,7 +85,7 @@ public class NrpnParserTest {
         int value = instance.extractValue(event);
         instance.updateValue(value);
 
-        assertEquals(8192, listener.lastValue);
+        assertEquals(65, listener.lastValue);
         assertEquals(instance, listener.lastInstance);
     }
 
