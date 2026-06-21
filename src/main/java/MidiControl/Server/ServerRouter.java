@@ -268,6 +268,7 @@ public class ServerRouter {
             CoalesceEngine coalesceEngine = ioManager.getCoalesceEngine();
             if(coalesceEngine!= null) coalesceEngine.onChange(mappingString);
             logger.info("New registry loaded "+ mappingString);
+            ServerEvents.registryChanged(mappingString,Long.toString(System.currentTimeMillis()));
         }
         else{
             NotifyClients.publish(

@@ -24,7 +24,8 @@ export class WebSocketClient {
       "disconnected": [],
       "midi-device-list": [],
       "telemetry": [],
-      "server-event": []
+      "server-event": [],
+      "REGISTRY_CHANGED": []
     };
 
     this.requestCounter = 0;
@@ -132,10 +133,13 @@ export class WebSocketClient {
       case "server-event":
         this._emit("server-event", msg.payload);
         break;
+      
+      case "REGISTRY_CHANGED":
+        this._emit("REGISTRY_CHANGED", msg.payload);
+        break;
 
       default:
-        console.warn("[WebSocketClient] Unknown message type:", msg.JSON);
-        this._emit("error", msg);
+        console.warn("[WebSocketClient] Unknown message type:", msg.type, msg);
         break;
     }
   }

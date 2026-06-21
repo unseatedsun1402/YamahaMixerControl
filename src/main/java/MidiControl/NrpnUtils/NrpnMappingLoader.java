@@ -16,10 +16,15 @@ import java.util.logging.Logger;
 public class NrpnMappingLoader {
 
     private static final Logger logger = Logger.getLogger(NrpnMappingLoader.class.getName());
+    private static volatile boolean debug =false;
 
     private static final Type LIST_TYPE =
             new TypeToken<List<NrpnMapping>>() {}.getType();
 
+    public static void enableDebug(){
+        debug = true;
+    }
+    
     public static List<NrpnMapping> loadFromResource(String resourceName) {
         try (InputStream is =
                      NrpnMappingLoader.class.getClassLoader().getResourceAsStream(resourceName)) {
@@ -74,7 +79,7 @@ public class NrpnMappingLoader {
 
         for (NrpnMapping m : parsed) {
             if (isValid(m)) {
-                logger.warning(String.format(
+                if(debug)logger.warning(String.format(
                     "Loaded NRPN mapping from %s: canonical=%s msb=%s lsb=%s mode=%s min=%d max=%d",
                     source,
                     m.getCanonicalId(),

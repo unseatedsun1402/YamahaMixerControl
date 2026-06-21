@@ -546,10 +546,10 @@ public class NrpnLearnMain {
                 "first_address=" + hex16(firstAddress),
                 "last_address=" + hex16(lastAddress),
                 "address_stride=" + addressStride,
-                "nrpn_mode=" + nrpnMode,
+                "value_mode=" + nrpnMode,
                 "first=" + first.shortSummary(),
                 "last=" + last.shortSummary(),
-                "generator_hint=generate_block(\"" + hex16(firstAddress) + "\", \"" + canonicalPrefix + "\", instances=" + instances + ", nrpn_mode=\"" + nrpnMode + "\")"
+                "generator_hint=generate_block(\"" + hex16(firstAddress) + "\", \"" + canonicalPrefix + "\", instances=" + instances + ", value_mode=\"" + nrpnMode + "\")"
             );
         }
 
@@ -566,7 +566,7 @@ public class NrpnLearnMain {
                 "last_send_last_input=" + lastSendLastInput.shortSummary(),
                 "input_stride=" + inputStride,
                 "send_stride=" + sendStride,
-                "nrpn_mode=" + nrpnMode
+                "value_mode=" + nrpnMode
             );
         }
     }

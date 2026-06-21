@@ -31,14 +31,14 @@ all_blocks = []
 
 
 # AUX1–8 LEVEL (01V96i = 14-bit NRPN)
-all_blocks += generate_block("0x007E", "kInputToAux.kAux1Level", instances=40, value_mode="NRPN_14BIT")
-all_blocks += generate_block("0x00DE", "kInputToAux.kAux2Level", instances=40, value_mode="NRPN_14BIT")
-all_blocks += generate_block("0x013E", "kInputToAux.kAux3Level", instances=40, value_mode="NRPN_14BIT")
-all_blocks += generate_block("0x019E", "kInputToAux.kAux4Level", instances=40, value_mode="NRPN_14BIT")
-all_blocks += generate_block("0x01FE", "kInputToAux.kAux5Level", instances=40, value_mode="NRPN_14BIT")
-all_blocks += generate_block("0x025E", "kInputToAux.kAux6Level", instances=40, value_mode="NRPN_14BIT")
-all_blocks += generate_block("0x02BE", "kInputToAux.kAux7Level", instances=40, value_mode="NRPN_14BIT")
-all_blocks += generate_block("0x031E", "kInputToAux.kAux8Level", instances=40, value_mode="NRPN_14BIT")
+all_blocks += generate_block("0x007E", "kInputAUX.kAUX1Level", instances=40, value_mode="NRPN_14BIT")
+all_blocks += generate_block("0x00DE", "kInputAUX.kAUX2Level", instances=40, value_mode="NRPN_14BIT")
+all_blocks += generate_block("0x013E", "kInputAUX.kAUX3Level", instances=40, value_mode="NRPN_14BIT")
+all_blocks += generate_block("0x019E", "kInputAUX.kAUX4Level", instances=40, value_mode="NRPN_14BIT")
+all_blocks += generate_block("0x01FE", "kInputAUX.kAUX5Level", instances=40, value_mode="NRPN_14BIT")
+all_blocks += generate_block("0x025E", "kInputAUX.kAUX6Level", instances=40, value_mode="NRPN_14BIT")
+all_blocks += generate_block("0x02BE", "kInputAUX.kAUX7Level", instances=40, value_mode="NRPN_14BIT")
+all_blocks += generate_block("0x031E", "kInputAUX.kAUX8Level", instances=40, value_mode="NRPN_14BIT")
 
 
 # INPUT FADER (01V96i = 14-bit NRPN)
@@ -55,7 +55,7 @@ all_blocks += generate_block("0x0B36", "kInputOn.kChannelOn")
 
 
 # OUTPUT FADERS
-all_blocks += generate_block("0x0060", "kAuxFader.kFader", instances=8, value_mode="NRPN_14BIT")
+all_blocks += generate_block("0x0060", "kAUXFader.kFader", instances=8, value_mode="NRPN_14BIT")
 all_blocks += generate_block("0x0068", "kBusFader.kFader", instances=8, value_mode="NRPN_14BIT")
 all_blocks += generate_block("0x0079", "kStereoFader.kFader", instances=5, value_mode="NRPN_14BIT")
 

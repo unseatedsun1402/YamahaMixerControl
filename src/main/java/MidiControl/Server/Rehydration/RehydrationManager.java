@@ -180,7 +180,7 @@ public class RehydrationManager{
     public void onControlUpdated(String canonicalId) {
         Long expected = pending.remove(canonicalId);
         if (expected == null) {
-            logger.warning(canonicalId + " was not expected or no longer pending i.e. already recieved or timedout and removed");
+            if(debug)logger.warning(canonicalId + " was not expected or no longer pending i.e. already recieved or timedout and removed");
             return;
         }
 
