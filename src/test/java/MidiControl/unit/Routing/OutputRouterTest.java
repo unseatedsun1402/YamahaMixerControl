@@ -1,6 +1,6 @@
 package MidiControl.unit.Routing;
 
-import MidiControl.Routing.OutputRouter;
+import MidiControl.Routing.HardwareOutputRouter;
 import MidiControl.Controls.*;
 import MidiControl.MidiDeviceManager.*;
 import MidiControl.SysexUtils.SysexMapping;
@@ -152,7 +152,7 @@ public class OutputRouterTest {
         ControlInstance ci = fakeInstance(false);
         reg.add("fader.1", ci);
 
-        OutputRouter router = new OutputRouter(reg,io);
+        HardwareOutputRouter router = new HardwareOutputRouter(reg,io);
 
         router.applyChange("fader.1", 55);
 
@@ -169,7 +169,7 @@ public class OutputRouterTest {
         ControlInstance ci = fakeInstance(true);
         reg.add("pan.2", ci);
 
-        OutputRouter router = new OutputRouter(reg,io);
+        HardwareOutputRouter router = new HardwareOutputRouter(reg,io);
 
         router.applyChange("pan.2", 99);
 
@@ -188,7 +188,7 @@ public class OutputRouterTest {
         ControlInstance ci = fakeInstance(false);
         reg.add("gain.3", ci);
 
-        OutputRouter router = new OutputRouter(reg,io);
+        HardwareOutputRouter router = new HardwareOutputRouter(reg,io);
 
         router.applyChange("gain.3", 12);
 
@@ -205,7 +205,7 @@ public class OutputRouterTest {
         ControlInstance ci = fakeInstance(false);
         reg.add("fader.1", ci);
 
-        OutputRouter router = new OutputRouter(reg,io);
+        HardwareOutputRouter router = new HardwareOutputRouter(reg,io);
 
         router.applyRequest("fader.1");
 
@@ -219,7 +219,7 @@ public class OutputRouterTest {
         MockIOManager io = new MockIOManager(TransportMode.SYSEX, out);
         MockRegistry reg = new MockRegistry();
 
-        OutputRouter router = new OutputRouter(reg,io);
+        HardwareOutputRouter router = new HardwareOutputRouter(reg,io);
 
         router.applyChange("does.not.exist", 10);
 
@@ -232,7 +232,7 @@ public class OutputRouterTest {
         MockIOManager io = new MockIOManager(TransportMode.SYSEX, out);
         MockRegistry reg = new MockRegistry();
 
-        OutputRouter router = new OutputRouter(reg,io);
+        HardwareOutputRouter router = new HardwareOutputRouter(reg,io);
 
         assertThrows(IllegalArgumentException.class, () ->
                 router.applyRequest("does.not.exist")

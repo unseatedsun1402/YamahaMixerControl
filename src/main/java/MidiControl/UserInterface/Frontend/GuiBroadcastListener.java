@@ -41,6 +41,8 @@ public class GuiBroadcastListener {
             ControlUpdateDTO dto = new ControlUpdateDTO();
             dto.canonicalId = canonicalId;
             dto.value = value;
+            dto.min = instance.getMin();
+            dto.max = instance.getMax();
 
             String json = dto.toJson();
             if (json == null) {

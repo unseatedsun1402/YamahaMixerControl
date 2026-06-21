@@ -49,7 +49,7 @@ public class RehydrationManager{
     private static volatile long effectiveDelayMs = BASE_DELAY_MS;
 
     private static boolean running = false;
-    private static boolean debug = true;
+    private static boolean debug = false;
     private static final Logger logger = Logger.getLogger(RehydrationManager.class.getName());
 
     public RehydrationManager(OutputRequestSender outputRouter,
@@ -180,7 +180,7 @@ public class RehydrationManager{
     public void onControlUpdated(String canonicalId) {
         Long expected = pending.remove(canonicalId);
         if (expected == null) {
-            logger.warning(canonicalId + " was not expected or no longer pending i.e. already recieved or timedout and removed");
+            if(debug)logger.warning(canonicalId + " was not expected or no longer pending i.e. already recieved or timedout and removed");
             return;
         }
 
@@ -261,7 +261,7 @@ public class RehydrationManager{
     public static void changeRehydrationDelay(long newDelay){
         if(newDelay > 0 & newDelay < 10) {
             BASE_DELAY_MS = newDelay;
-            logger.info("Rehydration poll rate set to: "+BASE_DELAY_MS+"ms");
+            if(debug)logger.fine("Rehydration poll rate set to: "+BASE_DELAY_MS+"ms");
         }
     }
 

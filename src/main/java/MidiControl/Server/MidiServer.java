@@ -322,8 +322,15 @@ public class MidiServer implements Runnable, UiModelService{
         reloadContextIndex();
         recreateNameAssemblers();
         rehydrationManager.injectNewRegistry(newRegistry);
+        String deskType = canonicalRegistry.getDeskType();
+        String resource = switch (deskType) {
+            case "YAMAHA_01V96I" -> "MidiControl/nrpn/01v96i_nrpn_mappings.json";
+            case "YAMAHA_M7CL"   -> "MidiControl/nrpn/m7cl_nrpn_mappings.json";
+            default -> throw new IllegalStateException(String.format("Unsupported desk profile: %s",deskType));
+        };
+
         List<NrpnMapping> nrpnMappings =
-                NrpnMappingLoader.loadFromResource("MidiControl/nrpn/m7cl_nrpn_mappings.json");
+            NrpnMappingLoader.loadFromResource(resource);
         try{
             this.canonicalRegistry.attachNrpnMappings(nrpnMappings);
         }

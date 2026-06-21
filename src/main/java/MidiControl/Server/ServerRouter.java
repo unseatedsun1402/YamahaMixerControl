@@ -18,7 +18,7 @@ import MidiControl.MidiDeviceManager.MidiDeviceDTO;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.MidiDeviceManager.ServerSettings;
 import MidiControl.MidiDeviceManager.Settings;
-import MidiControl.Routing.OutputRouter;
+import MidiControl.Routing.HardwareOutputRouter;
 import MidiControl.Routing.WebSocketEndpoint;
 import MidiControl.Server.Protocol.NotifyClients;
 import MidiControl.Server.Protocol.ServerEvent;
@@ -40,7 +40,7 @@ public class ServerRouter {
     private final Gson gson = new Gson();
     private final SubscriptionManager subscriptions;
     private final GuiInputHandler guiInputHandler;
-    private final OutputRouter outputRouter;
+    private final HardwareOutputRouter outputRouter;
     private final ServerRequestParser requestParser;
 
     private int lastKeepAlive = 0;
@@ -62,7 +62,7 @@ public class ServerRouter {
         this.subscriptions = subscriptions;
         this.registry = registry;
         this.ioManager = ioManager;
-        this.outputRouter = new OutputRouter(registry, this.ioManager);
+        this.outputRouter = new HardwareOutputRouter(registry, this.ioManager);
         this.guiInputHandler = new GuiInputHandler(outputRouter);
         this.rehydrationService = null;
         this.requestParser = new ServerRequestParser(gson);
@@ -318,7 +318,7 @@ public class ServerRouter {
         else{logger.warning("Failed to save settings, configuration not accepted: "+payload);}
     }
 
-    public OutputRouter getOutputRouter() {
+    public HardwareOutputRouter getOutputRouter() {
         return outputRouter;
     }
 }
