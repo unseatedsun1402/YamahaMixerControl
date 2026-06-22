@@ -31,15 +31,18 @@
         });
 
         function handleViewSelection(sendId) {
-            const stripContainer = document.getElementById("strip-container");
+            console.info("[Bootstrap] View selection sendId:", sendId);
 
             const view = sendId
                 ? `basic-sends-on-fader-view:${sendId}`
                 : "basic-input-view";
 
+            console.info("[Bootstrap] Requesting view:", view);
+
             for (const ctxId of window.lastBankContexts) {
                 ws.requestUiModel(ctxId, view);
             }
+
             ws.requestChannelNames();
         }
         

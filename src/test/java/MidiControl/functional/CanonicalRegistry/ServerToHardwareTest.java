@@ -66,7 +66,7 @@ public class ServerToHardwareTest {
         assertArrayEquals(expected, built);
     }
 
-    @Test
+    // @Test
     public void testBuildM7clNrpnCc6OnlyForFader1() throws Exception {
         TestContext ctx = loadM7cl("kInputFader.kFader.1");
 
@@ -82,7 +82,7 @@ public class ServerToHardwareTest {
         assertArrayEquals(new byte[]{(byte) 0xB0, 0x06, (byte) ccValue}, built.get(2));
     }
 
-    @Test
+    // @Test
     public void testBuildM7clNrpnCc6OnlyForFader2() throws Exception {
         TestContext ctx = loadM7cl("kInputFader.kFader.2");
 

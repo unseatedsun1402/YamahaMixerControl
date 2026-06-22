@@ -12,39 +12,51 @@ public class EditChannelStripViewBuilder implements ViewBuilder {
 
     @Override
     public List<ViewControl> build(Context context, CanonicalRegistry registry, String suffix) {
-        return buildCompact(context, registry);
+        return buildCompact(context, registry, suffix);
     }
 
-    public List<ViewControl> buildCompact(Context context, CanonicalRegistry registry) {
+    public List<ViewControl> buildCompact(Context context, CanonicalRegistry registry, String suffix) {
+
         List<ViewControl> result = new ArrayList<>();
 
-        int instanceIndex = extractContextIndex(context.getId());
-        if (instanceIndex < 0)
+        int channelIndex = extractContextIndex(context.getId());
+        if (channelIndex < 0) {
             return result;
+        }
 
-        List<ControlInstance> all = registry.getAllInstancesForContext(context.getId());
+        String viewType = "edit-channel-view";
+        String viewSuffix = suffix != null ? suffix : context.getId();
 
-        // 1. CHANNEL_ON
+        List<ControlInstance> all =
+                registry.getAllInstancesForContext(context.getId());
+
         all.stream()
                 .filter(ci -> "kInputOn".equals(ci.getGroup()))
                 .filter(ci -> "kChannelOn".equals(ci.getSubcontrol()))
                 .findFirst()
-                .ifPresent(ci -> result.add(createChannelOn(ci)));
+                .ifPresent(ci ->
+                        result.add(createChannelOn(ci, viewType, viewSuffix, channelIndex))
+                );
 
-        // 2. PAN
         all.stream()
                 .filter(ci -> "kInputPan".equals(ci.getGroup()))
                 .filter(ci -> "kChannelPan".equals(ci.getSubcontrol()))
                 .findFirst()
-                .ifPresent(ci -> result.add(createPan(ci)));
+                .ifPresent(ci ->
+                        result.add(createPan(ci, viewType, viewSuffix, channelIndex))
+                );
 
         return result;
     }
 
-    private ViewControl createChannelOn(ControlInstance ci) {
+    private ViewControl createChannelOn(ControlInstance ci,
+                                        String viewType,
+                                        String viewSuffix,
+                                        int channelIndex) {
+
         return new ViewControl(
                 "CHANNEL_ON",
-                "kInputControl",
+                "input.control",
                 "On",
                 ControlType.TOGGLE,
                 0,
@@ -54,15 +66,23 @@ public class EditChannelStripViewBuilder implements ViewBuilder {
                 ci.getSysex().getDefault_value(),
                 ci.getGroup(),
                 ci.getSubcontrol(),
-                ci.getInstanceIndex()
+                ci.getInstanceIndex(),
+                viewType,
+                viewSuffix,
+                "INPUT_CHANNEL_ON",
+                null,
+                channelIndex
         );
     }
-        
 
-    private ViewControl createPan(ControlInstance ci) {
+    private ViewControl createPan(ControlInstance ci,
+                                  String viewType,
+                                  String viewSuffix,
+                                  int channelIndex) {
+
         return new ViewControl(
                 "PAN",
-                "kInputPan",
+                "input.pan",
                 "Pan",
                 ControlType.SLIDER_HORIZONTAL,
                 0,
@@ -72,15 +92,20 @@ public class EditChannelStripViewBuilder implements ViewBuilder {
                 ci.getSysex().getDefault_value(),
                 ci.getGroup(),
                 ci.getSubcontrol(),
-                ci.getInstanceIndex()
+                ci.getInstanceIndex(),
+                viewType,
+                viewSuffix,
+                "INPUT_PAN",
+                null,
+                channelIndex
         );
     }
 
-
     private int extractContextIndex(String contextId) {
         int dot = contextId.lastIndexOf('.');
-        if (dot == -1)
+        if (dot == -1) {
             return -1;
+        }
 
         try {
             return Integer.parseInt(contextId.substring(dot + 1));
@@ -88,5 +113,4 @@ public class EditChannelStripViewBuilder implements ViewBuilder {
             return -1;
         }
     }
-        
 }

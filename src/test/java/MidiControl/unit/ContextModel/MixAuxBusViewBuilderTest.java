@@ -112,16 +112,16 @@ public class MixAuxBusViewBuilderTest {
     }
 
     private boolean contains(List<ViewControl> list, String logicalId) {
-        return list.stream().anyMatch(c -> logicalId.equals(c.getLogicalId()));
+        return list.stream().anyMatch(c -> logicalId.equals(c.logicId));
     }
 
     private boolean containsPrefix(List<ViewControl> list, String prefix) {
-        return list.stream().anyMatch(c -> c.getLogicalId().startsWith(prefix));
+        return list.stream().anyMatch(c -> c.logicId.startsWith(prefix));
     }
 
     private int indexOf(List<ViewControl> list, String logicalId) {
         for (int i = 0; i < list.size(); i++) {
-            if (logicalId.equals(list.get(i).getLogicalId())) {
+            if (logicalId.equals(list.get(i).logicId)) {
                 return i;
             }
         }
@@ -130,7 +130,7 @@ public class MixAuxBusViewBuilderTest {
 
     private int firstIndexStartingWith(List<ViewControl> list, String prefix) {
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getLogicalId().startsWith(prefix)) {
+            if (list.get(i).logicId.startsWith(prefix)) {
                 return i;
             }
         }

@@ -21,66 +21,53 @@ public class NrpnLearnMain {
     public static void main(String[] args) throws Exception {
         try (Scanner scanner = new Scanner(System.in)) {
             MidiDevice input = selectInputDevice(scanner);
-
             input.open();
 
             Transmitter transmitter = input.getTransmitter();
             CaptureReceiver receiver = new CaptureReceiver();
             transmitter.setReceiver(receiver);
 
-            int inputCount = askInt(scanner, "How many input channels?");
-            int sendCount = askInt(scanner, "How many sends/mixes/auxes?");
-
             List<LearnResult> results = new ArrayList<>();
 
-            results.add(learnLinearControl(
-                scanner,
-                receiver,
-                "Input fader",
-                "kInputFader.kFader",
-                inputCount,
-                "Move input fader 1 through its full useful range.",
-                "Move the final input fader through its full useful range."
-            ));
+            while (true) {
+                System.out.println();
+                System.out.print("Learn a control range? Enter label, or 'c' to finish: ");
+                String label = scanner.nextLine().trim();
 
-            results.add(learnLinearControl(
-                scanner,
-                receiver,
-                "Input pan",
-                "kInputPan.kChannelPan",
-                inputCount,
-                "Move input pan 1 through its full useful range.",
-                "Move the final input pan through its full useful range."
-            ));
+                if (label.equalsIgnoreCase("c")) {
+                    break;
+                }
 
-            results.add(learnLinearControl(
-                scanner,
-                receiver,
-                "Input compressor threshold",
-                "kInputDynamics1.kThreshold",
-                inputCount,
-                "Move input compressor threshold for channel 1 through its full useful range.",
-                "Move input compressor threshold for the final channel through its full useful range."
-            ));
+                if (label.isBlank()) {
+                    continue;
+                }
 
-            results.add(learnLinearControl(
-                scanner,
-                receiver,
-                "Input on/mute",
-                "kInputOn.kChannelOn",
-                inputCount,
-                "Toggle input on/mute for channel 1 several times.",
-                "Toggle input on/mute for the final channel several times."
-            ));
+                System.out.print("Canonical prefix, e.g. kInputFader.kFader: ");
+                String canonicalPrefix = scanner.nextLine().trim();
 
-            results.add(learnSendControl(
-                scanner,
-                receiver,
-                "Input send level",
-                "kInputToSend.kSendLevel",
-                inputCount,
-                sendCount
-            ));
+                if (canonicalPrefix.isBlank()) {
+                    System.out.println("Canonical prefix cannot be blank.");
+                    continue;
+                }
+
+                int instances = askInt(scanner, "How many instances?");
+
+                LearnOutcome outcome = learnWithRetry(
+                    scanner,
+                    receiver,
+                    label,
+                    canonicalPrefix,
+                    instances
+                );
+
+                if (outcome.finish) {
+                    break;
+                }
+
+                if (outcome.result != null) {
+                    results.add(outcome.result);
+                }
+            }
 
             transmitter.close();
             input.close();
@@ -93,100 +80,74 @@ public class NrpnLearnMain {
         }
     }
 
+    private static LearnOutcome learnWithRetry(
+        Scanner scanner,
+        CaptureReceiver receiver,
+        String label,
+        String canonicalPrefix,
+        int instances
+    ) {
+        while (true) {
+            LearnResult result = learnLinearControl(
+                scanner,
+                receiver,
+                label,
+                canonicalPrefix,
+                instances
+            );
+
+            System.out.println();
+            System.out.println(result.toReport());
+            System.out.println();
+            System.out.print("Press ENTER to accept, 'r' to retry, or 'c' to finish: ");
+
+            String action = scanner.nextLine().trim();
+
+            if (action.equalsIgnoreCase("r")) {
+                continue;
+            }
+
+            if (action.equalsIgnoreCase("c")) {
+                return new LearnOutcome(null, true);
+            }
+
+            return new LearnOutcome(result, false);
+        }
+    }
+
     private static LearnResult learnLinearControl(
         Scanner scanner,
         CaptureReceiver receiver,
         String label,
         String canonicalPrefix,
-        int instances,
-        String firstPrompt,
-        String lastPrompt
+        int instances
     ) {
         System.out.println();
         System.out.println(label);
 
-        CaptureStats first = captureStats(scanner, receiver, firstPrompt);
-        CaptureStats last = captureStats(scanner, receiver, lastPrompt);
+        CaptureStats first = captureStats(
+            scanner,
+            receiver,
+            "Move the starting control through its full useful range."
+        );
 
-        int firstAddress = first.bestAddress;
-        int lastAddress = last.bestAddress;
+        CaptureStats last = captureStats(
+            scanner,
+            receiver,
+            "Move the final control through its full useful range."
+        );
 
-        int stride = instances > 1 && firstAddress >= 0 && lastAddress >= 0
-            ? Math.round((lastAddress - firstAddress) / (float) (instances - 1))
-            : 0;
+        int stride = calculateStride(first.bestPair, last.bestPair, instances);
+        String mode = inferMode(first, last);
 
-        return LearnResult.linear(
+        return new LearnResult(
             label,
             canonicalPrefix,
             instances,
             first,
             last,
-            firstAddress,
-            lastAddress,
             stride,
-            inferMode(first, last)
-        );
-    }
-
-    private static LearnResult learnSendControl(
-        Scanner scanner,
-        CaptureReceiver receiver,
-        String label,
-        String canonicalPrefix,
-        int inputCount,
-        int sendCount
-    ) {
-        System.out.println();
-        System.out.println(label);
-
-        CaptureStats send1Input1 = captureStats(
-            scanner,
-            receiver,
-            "Move send 1 level for input 1 through its full useful range."
-        );
-
-        CaptureStats send1LastInput = captureStats(
-            scanner,
-            receiver,
-            "Move send 1 level for the final input through its full useful range."
-        );
-
-        CaptureStats lastSendInput1 = captureStats(
-            scanner,
-            receiver,
-            "Move final send level for input 1 through its full useful range."
-        );
-
-        CaptureStats lastSendLastInput = captureStats(
-            scanner,
-            receiver,
-            "Move final send level for the final input through its full useful range."
-        );
-
-        int inputStride = inputCount > 1 &&
-            send1Input1.bestAddress >= 0 &&
-            send1LastInput.bestAddress >= 0
-                ? Math.round((send1LastInput.bestAddress - send1Input1.bestAddress) / (float) (inputCount - 1))
-                : 0;
-
-        int sendStride = sendCount > 1 &&
-            send1Input1.bestAddress >= 0 &&
-            lastSendInput1.bestAddress >= 0
-                ? Math.round((lastSendInput1.bestAddress - send1Input1.bestAddress) / (float) (sendCount - 1))
-                : 0;
-
-        return LearnResult.send(
-            label,
-            canonicalPrefix,
-            inputCount,
-            sendCount,
-            send1Input1,
-            send1LastInput,
-            lastSendInput1,
-            lastSendLastInput,
-            inputStride,
-            sendStride,
-            inferMode(send1Input1, send1LastInput, lastSendInput1, lastSendLastInput)
+            mode
         );
     }
 
@@ -204,7 +165,6 @@ public class NrpnLearnMain {
 
         List<Cc> captured = receiver.snapshot();
         List<NrpnEvent> events = parseNrpnEvents(captured);
-
         CaptureStats stats = analyse(events);
 
         System.out.println("Captured CC messages: " + captured.size());
@@ -232,13 +192,19 @@ public class NrpnLearnMain {
         }
 
         int selected = askInt(scanner, "Select MIDI IN device index:");
-
         return MidiSystem.getMidiDevice(infos[selected]);
     }
 
     private static int askInt(Scanner scanner, String prompt) {
-        System.out.print(prompt + " ");
-        return Integer.parseInt(scanner.nextLine().trim());
+        while (true) {
+            System.out.print(prompt + " ");
+
+            try {
+                return Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid integer.");
+            }
+        }
     }
 
     private static List<NrpnEvent> parseNrpnEvents(List<Cc> ccs) {
@@ -273,10 +239,8 @@ public class NrpnLearnMain {
             return CaptureStats.empty();
         }
 
-        Map<Integer, Integer> counts = new HashMap<>();
+        Map<NrpnPair, Integer> counts = new HashMap<>();
 
-        int minAddress = Integer.MAX_VALUE;
-        int maxAddress = Integer.MIN_VALUE;
         int minCc6 = Integer.MAX_VALUE;
         int maxCc6 = Integer.MIN_VALUE;
         int min14 = Integer.MAX_VALUE;
@@ -284,12 +248,10 @@ public class NrpnLearnMain {
         boolean hasCc38 = false;
 
         for (NrpnEvent event : events) {
-            int address = event.address();
+            NrpnPair pair = new NrpnPair(event.msb, event.lsb);
 
-            counts.put(address, counts.getOrDefault(address, 0) + 1);
+            counts.put(pair, counts.getOrDefault(pair, 0) + 1);
 
-            minAddress = Math.min(minAddress, address);
-            maxAddress = Math.max(maxAddress, address);
             minCc6 = Math.min(minCc6, event.dataMsb);
             maxCc6 = Math.max(maxCc6, event.dataMsb);
 
@@ -301,22 +263,32 @@ public class NrpnLearnMain {
             }
         }
 
-        int bestAddress = counts.entrySet()
+        NrpnPair bestPair = counts.entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
             .map(Map.Entry::getKey)
-            .orElse(-1);
+            .orElse(NrpnPair.missing());
 
         return new CaptureStats(
-            bestAddress,
-            minAddress,
-            maxAddress,
+            bestPair,
+            counts.size(),
             minCc6,
             maxCc6,
             hasCc38 ? min14 : -1,
             hasCc38 ? max14 : -1,
             hasCc38
         );
+    }
+
+    private static int calculateStride(NrpnPair first, NrpnPair last, int instances) {
+        if (instances <= 1 || first.isMissing() || last.isMissing()) {
+            return 0;
+        }
+
+        int firstOrdinal = first.ordinal();
+        int lastOrdinal = last.ordinal();
+
+        return Math.round((lastOrdinal - firstOrdinal) / (float) (instances - 1));
     }
 
     private static String inferMode(CaptureStats... stats) {
@@ -357,8 +329,8 @@ public class NrpnLearnMain {
         }
     }
 
-    private static String hex16(int value) {
-        return value < 0 ? "<missing>" : String.format("0x%04X", value & 0xFFFF);
+    private static String hexByte(int value) {
+        return value < 0 ? "<missing>" : String.format("0x%02X", value & 0x7F);
     }
 
     private static final class CaptureReceiver implements Receiver {
@@ -410,10 +382,6 @@ public class NrpnLearnMain {
     }
 
     private record NrpnEvent(int msb, int lsb, int dataMsb, Integer dataLsb) {
-        int address() {
-            return ((msb & 0x7F) << 8) | (lsb & 0x7F);
-        }
-
         int value14() {
             return dataLsb == null
                 ? -1
@@ -421,10 +389,39 @@ public class NrpnLearnMain {
         }
     }
 
+    private record NrpnPair(int msb, int lsb) {
+        static NrpnPair missing() {
+            return new NrpnPair(-1, -1);
+        }
+
+        boolean isMissing() {
+            return msb < 0 || lsb < 0;
+        }
+
+        int ordinal() {
+            if (isMissing()) {
+                return -1;
+            }
+
+            return ((msb & 0x7F) << 7) | (lsb & 0x7F);
+        }
+
+        String msbHex() {
+            return hexByte(msb);
+        }
+
+        String lsbHex() {
+            return hexByte(lsb);
+        }
+
+        String summary() {
+            return "msb=" + msbHex() + " lsb=" + lsbHex();
+        }
+    }
+
     private record CaptureStats(
-        int bestAddress,
-        int minAddress,
-        int maxAddress,
+        NrpnPair bestPair,
+        int uniquePairs,
         int minCc6,
         int maxCc6,
         int min14,
@@ -432,141 +429,59 @@ public class NrpnLearnMain {
         boolean hasCc38
     ) {
         static CaptureStats empty() {
-            return new CaptureStats(-1, -1, -1, -1, -1, -1, -1, false);
+            return new CaptureStats(
+                NrpnPair.missing(),
+                0,
+                -1,
+                -1,
+                -1,
+                -1,
+                false
+            );
         }
 
         String shortSummary() {
-            return "bestAddress=" + hex16(bestAddress) +
-                " addressRange=" + hex16(minAddress) + ".." + hex16(maxAddress) +
+            return "bestPair=" + bestPair.summary() +
+                " uniquePairs=" + uniquePairs +
                 " cc6Range=" + minCc6 + ".." + maxCc6 +
                 " cc38=" + hasCc38 +
                 " value14Range=" + min14 + ".." + max14;
         }
     }
 
+    private record LearnOutcome(LearnResult result, boolean finish) {}
+
     private record LearnResult(
-        String kind,
         String label,
         String canonicalPrefix,
         int instances,
-        int sendCount,
         CaptureStats first,
         CaptureStats last,
-        CaptureStats send1Input1,
-        CaptureStats send1LastInput,
-        CaptureStats lastSendInput1,
-        CaptureStats lastSendLastInput,
-        int firstAddress,
-        int lastAddress,
-        int addressStride,
-        int inputStride,
-        int sendStride,
+        int stride,
         String nrpnMode
     ) {
-        static LearnResult linear(
-            String label,
-            String canonicalPrefix,
-            int instances,
-            CaptureStats first,
-            CaptureStats last,
-            int firstAddress,
-            int lastAddress,
-            int stride,
-            String mode
-        ) {
-            return new LearnResult(
-                "linear",
-                label,
-                canonicalPrefix,
-                instances,
-                0,
-                first,
-                last,
-                null,
-                null,
-                null,
-                null,
-                firstAddress,
-                lastAddress,
-                stride,
-                0,
-                0,
-                mode
-            );
-        }
-
-        static LearnResult send(
-            String label,
-            String canonicalPrefix,
-            int inputCount,
-            int sendCount,
-            CaptureStats send1Input1,
-            CaptureStats send1LastInput,
-            CaptureStats lastSendInput1,
-            CaptureStats lastSendLastInput,
-            int inputStride,
-            int sendStride,
-            String mode
-        ) {
-            return new LearnResult(
-                "send",
-                label,
-                canonicalPrefix,
-                inputCount,
-                sendCount,
-                null,
-                null,
-                send1Input1,
-                send1LastInput,
-                lastSendInput1,
-                lastSendLastInput,
-                send1Input1.bestAddress,
-                send1LastInput.bestAddress,
-                inputStride,
-                inputStride,
-                sendStride,
-                mode
-            );
-        }
-
         String toReport() {
-            if ("send".equals(kind)) {
-                return sendReport();
-            }
-
-            return linearReport();
-        }
-
-        private String linearReport() {
             return String.join(
                 System.lineSeparator(),
                 label,
                 "canonical_prefix=" + canonicalPrefix,
                 "instances=" + instances,
-                "first_address=" + hex16(firstAddress),
-                "last_address=" + hex16(lastAddress),
-                "address_stride=" + addressStride,
+                "start_nrpn_msb=" + first.bestPair.msbHex(),
+                "start_nrpn_lsb=" + first.bestPair.lsbHex(),
+                "last_nrpn_msb=" + last.bestPair.msbHex(),
+                "last_nrpn_lsb=" + last.bestPair.lsbHex(),
+                "nrpn_stride=" + stride,
                 "value_mode=" + nrpnMode,
                 "first=" + first.shortSummary(),
                 "last=" + last.shortSummary(),
-                "generator_hint=generate_block(\"" + hex16(firstAddress) + "\", \"" + canonicalPrefix + "\", instances=" + instances + ", value_mode=\"" + nrpnMode + "\")"
-            );
-        }
-
-        private String sendReport() {
-            return String.join(
-                System.lineSeparator(),
-                label,
-                "canonical_prefix=" + canonicalPrefix,
-                "input_count=" + instances,
-                "send_count=" + sendCount,
-                "send1_input1=" + send1Input1.shortSummary(),
-                "send1_last_input=" + send1LastInput.shortSummary(),
-                "last_send_input1=" + lastSendInput1.shortSummary(),
-                "last_send_last_input=" + lastSendLastInput.shortSummary(),
-                "input_stride=" + inputStride,
-                "send_stride=" + sendStride,
-                "value_mode=" + nrpnMode
+                "generator_hint=generate_block(" +
+                    "start_msb=" + first.bestPair.msbHex() +
+                    ", start_lsb=" + first.bestPair.lsbHex() +
+                    ", canonical_prefix=\"" + canonicalPrefix + "\"" +
+                    ", instances=" + instances +
+                    ", stride=" + stride +
+                    ", value_mode=\"" + nrpnMode + "\"" +
+                    ")"
             );
         }
     }

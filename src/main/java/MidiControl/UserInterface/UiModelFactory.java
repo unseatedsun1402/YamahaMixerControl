@@ -6,7 +6,7 @@ import MidiControl.UserInterface.DTO.*;
 
 import java.util.List;
 import java.util.Objects;
-
+import java.util.logging.Logger;
 
 public class UiModelFactory {
 
@@ -14,6 +14,7 @@ public class UiModelFactory {
     private final UiContextIndex contextIndex;
     private final DTOMapper mapper = new DTOMapper();
     private final ViewBuilder viewBuilder;
+    private static final Logger logger = Logger.getLogger(UiModelFactory.class.getName());
 
     public UiModelFactory(CanonicalRegistry registry,
                           ViewBuilder viewBuilder,
@@ -32,7 +33,12 @@ public class UiModelFactory {
         List<ViewControl> controls = viewBuilder.build(ctx, registry, suffix);
 
         for (ViewControl vc : controls) {
-            contextIndex.register(vc.getCanonicalId(), contextId);
+            if (vc.canonicalId != null && !vc.canonicalId.isBlank()) {
+                contextIndex.register(vc.canonicalId, contextId);
+            }
+            else{
+                logger.warning(String.format("View control %s canonical id is blank and is dropped",vc.logicId));
+            }
         }
 
         return mapper.toDto(ctx, controls);
