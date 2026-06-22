@@ -1,6 +1,5 @@
 package MidiControl.Server;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -151,7 +150,7 @@ public class ServerRouter {
     private void handleSetControlValue(Session session, String requestId, JsonObject payload) {
         String canonicalId = payload.get("canonicalId").getAsString();
         int value = payload.get("value").getAsInt();
-        logger.fine("Update from " + canonicalId + " val: " + value);
+        if(debug)logger.fine("Update from " + canonicalId + " val: " + value);
 
         ControlInstance ci = registry.resolveCanonicalId(canonicalId);
         if (ci != null) {
@@ -265,6 +264,7 @@ public class ServerRouter {
         List<SysexMapping> newMappings = SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(mappingString));
         if (newMappings != null ){
             this.registry.reloadMappings(newMappings, new SysexParser(newMappings), mappingString);
+            outputRouter.setRegistry(registry);
             CoalesceEngine coalesceEngine = ioManager.getCoalesceEngine();
             if(coalesceEngine!= null) coalesceEngine.onChange(mappingString);
             logger.info("New registry loaded "+ mappingString);

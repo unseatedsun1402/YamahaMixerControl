@@ -26,16 +26,17 @@ public class DTOMapper {
     private ViewControlDTO toDto(ViewControl vc) {
         ViewControlDTO dto = new ViewControlDTO();
 
-        dto.logicId = vc.logicId;        // e.g. "PAN", "SEND_MIX1"
-        dto.uiGroup = vc.uiGroup;        // e.g. "kInputPan"
-        dto.label = vc.label;            // e.g. "Pan"
-        dto.type = vc.type.name();       // e.g. "SLIDER_HORIZONTAL"
-        dto.index = vc.index;            // ordering within group
+        dto.logicId = vc.logicId;
+        dto.uiGroup = vc.uiGroup;
+        dto.label = vc.label;
+        dto.type = vc.type.name();
+        dto.index = vc.index;
 
-        dto.hwGroup = vc.hwGroup;            // e.g. "kInputPan"
-        dto.hwSubcontrol = vc.hwSubcontrol;  // e.g. "kChannelPan"
-        dto.hwInstance = vc.hwInstance;      // e.g. 1
-        dto.canonicalId = (vc.hwGroup+"."+vc.hwSubcontrol+"."+vc.hwInstance);
+        dto.hwGroup = vc.hwGroup;
+        dto.hwSubcontrol = vc.hwSubcontrol;
+        dto.hwInstance = vc.hwInstance;
+
+        dto.canonicalId = vc.canonicalId;
 
         dto.value = vc.value;
         dto.min = vc.min;
@@ -45,6 +46,12 @@ public class DTOMapper {
         dto.stepped = vc.stepped;
         dto.readOnly = vc.readOnly;
         dto.unit = vc.unit;
+        
+        dto.controlRole = vc.controlRole;
+        dto.sendIndex = vc.sendIndex;
+        dto.channelIndex = vc.channelIndex;
+        dto.viewType = vc.viewType;
+        dto.viewSuffix = vc.viewSuffix;
 
         return dto;
     }

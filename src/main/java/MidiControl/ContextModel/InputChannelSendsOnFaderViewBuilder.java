@@ -9,29 +9,15 @@ import java.util.regex.Pattern;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
 
-
 public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
 
     private static final Logger logger =
             Logger.getLogger(InputChannelSendsOnFaderViewBuilder.class.getName());
 
-    /**
-     * Universal Yamaha-safe send-level matcher.
-     *
-     * Matches:
-     *   kMix1Level
-     *   kMix01Level
-     *   kAUX2Level
-     *   kAUX12Level
-     *
-     * Groups:
-     *   (1) Mix | AUX
-     *   (2) numeric bus index (zero-padded allowed)
-     */
     private static final Pattern SEND_PATTERN =
             Pattern.compile("^k(Mix|AUX)(0*[0-9]+)Level$", Pattern.CASE_INSENSITIVE);
 
-    private String targetBusId = "MIX1";   // default
+    private String targetBusId = "MIX1";
     private boolean hasMixBuses = false;
     private boolean hasAuxBuses = false;
 
@@ -39,8 +25,8 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
 
     @Override
     public List<ViewControl> build(Context context,
-                                   CanonicalRegistry registry,
-                                   String suffix) {
+                                  CanonicalRegistry registry,
+                                  String suffix) {
 
         List<ControlInstance> all = registry.getAllInstancesForContext(context.getId());
 
@@ -48,13 +34,9 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         hasAuxBuses = all.stream().anyMatch(ci -> ci.getSubcontrol().startsWith("kAUX"));
 
         if (suffix != null && !suffix.isBlank()) {
-            targetBusId = suffix.toUpperCase(); // "MIX1", "AUX2"
+            targetBusId = suffix.toUpperCase();
         }
 
-        // --------------------------------------------------------------------
-        // Automatic fallback:
-        // If user asks for MIXn but console has only AUXn, convert MIX→AUX
-        // --------------------------------------------------------------------
         if (targetBusId.startsWith("MIX") && !hasMixBuses && hasAuxBuses) {
             targetBusId = targetBusId.replace("MIX", "AUX");
         }
@@ -63,36 +45,32 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
             targetBusId = targetBusId.replace("AUX", "MIX");
         }
 
-        // --------------------------------------------------------------------
-        // Build final UI control list
-        // --------------------------------------------------------------------
+        String viewType = "input-sof-view";
+        String viewSuffix = suffix != null ? suffix : targetBusId;
+
         List<ViewControl> result = new ArrayList<>();
 
-        // CHANNEL ON (optional)
         all.stream()
                 .filter(ci -> "kInputOn".equals(ci.getGroup()))
                 .filter(ci -> "kChannelOn".equals(ci.getSubcontrol()))
                 .findFirst()
-                .ifPresent(ci -> result.add(createToggle(ci)));
+                .ifPresent(ci -> result.add(createToggle(ci, viewType, viewSuffix)));
 
-        // PAN (optional)
         all.stream()
                 .filter(ci -> "kInputPan".equals(ci.getGroup()))
                 .filter(ci -> "kChannelPan".equals(ci.getSubcontrol()))
                 .findFirst()
-                .ifPresent(ci -> result.add(createPan(ci)));
+                .ifPresent(ci -> result.add(createPan(ci, viewType, viewSuffix)));
 
-        // SEND that matches the target MIX/AUX bus
         all.stream()
                 .filter(ci ->
                         "kInputToMix".equals(ci.getGroup()) ||
                         "kInputAUX".equals(ci.getGroup()))
-                .peek(ci -> logger.fine("SEND CANDIDATE: " + ci.getSubcontrol()))
                 .filter(ci -> isSendLevel(ci.getSubcontrol()))
                 .filter(ci -> sendMatchesTargetBus(ci.getSubcontrol()))
                 .findFirst()
                 .ifPresentOrElse(
-                        ci -> result.add(createSendAsFader(ci)),
+                        ci -> result.add(createSendAsFader(ci, viewType, viewSuffix)),
                         () -> logger.warning("SOF: No matching send found for " + targetBusId)
                 );
 
@@ -116,10 +94,16 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         return busId.equalsIgnoreCase(targetBusId);
     }
 
-    private ViewControl createToggle(ControlInstance ci) {
+    private int extractSendIndex(String subcontrol) {
+        Matcher m = SEND_PATTERN.matcher(subcontrol);
+        if (!m.matches()) return -1;
+        return Integer.parseInt(m.group(2));
+    }
+
+    private ViewControl createToggle(ControlInstance ci, String viewType, String viewSuffix) {
         return new ViewControl(
                 "CHANNEL_ON",
-                "kInputControl",
+                "input.control",
                 "On",
                 ControlType.TOGGLE,
                 0,
@@ -129,14 +113,19 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
                 ci.getSysex().getDefault_value(),
                 ci.getGroup(),
                 ci.getSubcontrol(),
+                ci.getInstanceIndex(),
+                viewType,
+                viewSuffix,
+                "INPUT_CHANNEL_ON",
+                null,
                 ci.getInstanceIndex()
         );
     }
 
-    private ViewControl createPan(ControlInstance ci) {
+    private ViewControl createPan(ControlInstance ci, String viewType, String viewSuffix) {
         return new ViewControl(
                 "PAN",
-                "kInputPan",
+                "input.pan",
                 "Pan",
                 ControlType.SLIDER_HORIZONTAL,
                 0,
@@ -146,16 +135,23 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
                 ci.getSysex().getDefault_value(),
                 ci.getGroup(),
                 ci.getSubcontrol(),
+                ci.getInstanceIndex(),
+                viewType,
+                viewSuffix,
+                "INPUT_PAN",
+                null,
                 ci.getInstanceIndex()
         );
     }
 
-    private ViewControl createSendAsFader(ControlInstance ci) {
+    private ViewControl createSendAsFader(ControlInstance ci, String viewType, String viewSuffix) {
+
+        int sendIndex = extractSendIndex(ci.getSubcontrol());
         String logicId = "SEND_" + targetBusId;
 
         return new ViewControl(
                 logicId,
-                "kInputToMix-SOF",
+                "input.send.sof",
                 targetBusId,
                 ControlType.FADER,
                 0,
@@ -165,6 +161,11 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
                 ci.getSysex().getDefault_value(),
                 ci.getGroup(),
                 ci.getSubcontrol(),
+                ci.getInstanceIndex(),
+                viewType,
+                viewSuffix,
+                "INPUT_SEND_LEVEL",
+                sendIndex,
                 ci.getInstanceIndex()
         );
     }

@@ -24,7 +24,7 @@ export function applyControlUpdate({ canonicalId, value }) {
             updateKnob(el, value);
             break;
 
-        case "HORIZONTAL_SLIZDER":
+        case "HORIZONTAL_SLIDER":
             updateHorizontalSlider(el,value);
             break;
         

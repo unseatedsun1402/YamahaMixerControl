@@ -183,6 +183,6 @@ public class InputChannelSendsOnFaderViewBuilderTest {
     }
 
     private boolean contains(List<ViewControl> list, String logicalId) {
-        return list.stream().anyMatch(c -> logicalId.equals(c.getLogicalId()));
+        return list.stream().anyMatch(c -> logicalId.equals(c.logicId));
     }
 }

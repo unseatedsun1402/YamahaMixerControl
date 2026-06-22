@@ -1,36 +1,32 @@
 package MidiControl.ContextModel;
 
-import MidiControl.Controls.ControlInstance;
 import java.util.List;
 
-/**
- * Canonical UI ViewControl
- *
- * Represents a single UI control in a channel strip.
- * Contains:
- *  - logic_id      (UI identity, e.g. "PAN", "SEND_MIX1")
- *  - uiGroup       (UI grouping, e.g. "kInputPan")
- *  - label         (UI label)
- *  - type          (UI control type)
- *  - index         (ordering within group)
- *
- *  - canonical_id  (hardware identity: group, subcontrol, instance)
- *  - min/max/value (raw hardware values)
- *
- *  - optional UI hints (bipolar, stepped, readOnly, unit)
- *  - optional composite controls (multi)
- */
+import MidiControl.Controls.ControlInstance;
+
 public class ViewControl {
 
-    public String logicId;     // e.g. "PAN", "CHANNEL_ON", "SEND_MIX1"
-    public String uiGroup;     // e.g. "kInputPan", "kInputToMix"
-    public String label;       // e.g. "Pan", "On", "Mix 1"
-    public ControlType type;   // KNOB, FADER, TOGGLE, SLIDER_HORIZONTAL
-    public int index;          // ordering within uiGroup
+    // --- UI ---
+    public String logicId;
+    public String uiGroup;
+    public String label;
+    public ControlType type;
+    public int index;
 
-    public String hwGroup;       // e.g. "kInputPan"
-    public String hwSubcontrol;  // e.g. "kChannelPan"
-    public int hwInstance;       // e.g. 1 (channel index)
+    // --- Semantic (lightweight) ---
+    public String controlRole;    // e.g. INPUT_SEND_LEVEL
+    public Integer sendIndex;     // e.g. 4
+    public Integer channelIndex;  // e.g. 4
+
+    // --- View context ---
+    public String viewType;       // e.g. basic-input-view
+    public String viewSuffix;     // e.g. mix4
+
+    // --- Hardware ---
+    public String canonicalId;
+    public String hwGroup;
+    public String hwSubcontrol;
+    public int hwInstance;
 
     public int min;
     public int max;
@@ -44,14 +40,6 @@ public class ViewControl {
 
     public List<ControlInstance> multi = null;
 
-    public String getCanonicalId() {
-        return hwGroup + "." + hwSubcontrol + "." + hwInstance;
-    }
-
-    public String getLogicalId(){
-        return this.logicId;
-    }
-
     public ViewControl(
             String logicId,
             String uiGroup,
@@ -64,7 +52,12 @@ public class ViewControl {
             int defaultValue,
             String hwGroup,
             String hwSubcontrol,
-            int hwInstance
+            int hwInstance,
+            String viewType,
+            String viewSuffix,
+            String controlRole,
+            Integer sendIndex,
+            Integer channelIndex
     ) {
         this.logicId = logicId;
         this.uiGroup = uiGroup;
@@ -80,5 +73,14 @@ public class ViewControl {
         this.hwGroup = hwGroup;
         this.hwSubcontrol = hwSubcontrol;
         this.hwInstance = hwInstance;
+
+        this.canonicalId = hwGroup + "." + hwSubcontrol + "." + hwInstance;
+
+        this.viewType = viewType;
+        this.viewSuffix = viewSuffix;
+
+        this.controlRole = controlRole;
+        this.sendIndex = sendIndex;
+        this.channelIndex = channelIndex;
     }
 }

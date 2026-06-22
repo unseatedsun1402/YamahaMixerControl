@@ -100,7 +100,7 @@ class EditChannelStripViewBuilderTest {
         EditChannelStripViewBuilder builder = new EditChannelStripViewBuilder();
 
         List<ViewControl> controls =
-                builder.buildCompact(channelContext(0), registry);
+                builder.buildCompact(channelContext(0), registry, null);
 
         assertEquals(1, controls.size());
         assertEquals("CHANNEL_ON", controls.get(0).logicId);
@@ -121,7 +121,7 @@ class EditChannelStripViewBuilderTest {
         EditChannelStripViewBuilder builder = new EditChannelStripViewBuilder();
 
         List<ViewControl> controls =
-                builder.buildCompact(invalid, registry);
+                builder.buildCompact(invalid, registry, null);
 
         assertTrue(controls.isEmpty());
     }
@@ -141,7 +141,7 @@ class EditChannelStripViewBuilderTest {
         EditChannelStripViewBuilder builder = new EditChannelStripViewBuilder();
 
         List<ViewControl> controls =
-                builder.buildCompact(invalid, registry);
+                builder.buildCompact(invalid, registry,null);
 
         assertTrue(controls.isEmpty());
     }

@@ -16,7 +16,7 @@ export function renderControl(control) {
         `index-${control.index}`
     );
 
-    // Add canonical ID + type for partial updates
+
     wrapper.dataset.canonicalId = control.canonicalId;
     wrapper.dataset.type = control.type;
     wrapper.controlMeta = control;
@@ -28,6 +28,26 @@ export function renderControl(control) {
     wrapper.dataset.needsNormalization =
         (control.max - control.min) > 127 ? "1" : "0";
 
+    if (control.controlRole) {
+        wrapper.dataset.role = control.controlRole;
+    }
+
+    if (control.sendIndex != null) {
+        wrapper.dataset.send = control.sendIndex;
+    }
+
+    if (control.channelIndex != null) {
+        wrapper.dataset.channel = control.channelIndex;
+    }
+
+    if (control.viewType) {
+        wrapper.dataset.view = control.viewType;
+    }
+
+    if (control.viewSuffix) {
+        wrapper.dataset.suffix = control.viewSuffix;
+    }
+    
     const label = document.createElement("div");
     label.className = "control-label";
     label.textContent = control.label;

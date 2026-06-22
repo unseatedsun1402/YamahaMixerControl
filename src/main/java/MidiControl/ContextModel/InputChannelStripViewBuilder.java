@@ -22,45 +22,64 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
 
     @Override
     public List<ViewControl> build(Context context, CanonicalRegistry registry, String suffix) {
-        return buildCompact(context, registry);
+        return buildCompact(context, registry, suffix);
     }
 
-    public List<ViewControl> buildCompact(Context context, CanonicalRegistry registry) {
+    public List<ViewControl> buildCompact(Context context, CanonicalRegistry registry, String suffix) {
+
         List<ViewControl> result = new ArrayList<>();
 
-        int instanceIndex = extractContextIndex(context.getId());
-        if (instanceIndex < 0)
-            return result;
+        int channelIndex = extractContextIndex(context.getId());
+        if (channelIndex < 0) return result;
 
-        List<ControlInstance> all = registry.getAllInstancesForContext(context.getId());
-        // 1. MIX SEND
-        all.stream()
-                .filter(ci ->
-                        ci.getGroup().equals("kInputToMix") ||
-                        ci.getGroup().equals("kInputAUX")      // 01V96i AUX sends
-                )
-                .filter(ci -> isSendLevel(ci.getSubcontrol()))
-                .sorted(Comparator.comparingInt(ci -> extractSendIndex(ci.getSubcontrol())))
-                .forEach(ci -> result.add(createSendMix(ci)));
+        String viewType = "input-channel-view";
+        String viewSuffix = suffix != null ? suffix : context.getId();
 
-        // 2. FADER
+        List<ControlInstance> all =
+                registry.getAllInstancesForContext(context.getId());
+
+        // ------------------------------------------------------------
+        // SEND LEVELS (kMixNLevel / kAUXNLevel)
+        // ------------------------------------------------------------
         all.stream()
-                .filter(ci -> "kInputFader".equals(ci.getGroup()))
-                .filter(ci -> "kFader".equals(ci.getSubcontrol()))
-                .findFirst()
-                .ifPresent(ci -> result.add(createFader(ci)));
+            .filter(ci ->
+                ci.getGroup().equals("kInputToMix") ||
+                ci.getGroup().equals("kInputAUX")
+            )
+            .filter(ci -> isSendLevel(ci.getSubcontrol()))
+            .sorted(Comparator.comparingInt(ci -> extractSendIndex(ci.getSubcontrol())))
+            .forEach(ci ->
+                result.add(createSendMix(ci, viewType, viewSuffix, channelIndex))
+            );
+
+        // ------------------------------------------------------------
+        // INPUT FADER
+        // ------------------------------------------------------------
+        all.stream()
+            .filter(ci -> ci.getGroup().equals("kInputFader"))
+            .filter(ci -> ci.getSubcontrol().equals("kFader"))
+            .findFirst()
+            .ifPresent(ci ->
+                result.add(createFader(ci, viewType, viewSuffix, channelIndex))
+            );
 
         return result;
     }
 
-    private ViewControl createSendMix(ControlInstance ci) {
+    private ViewControl createSendMix(
+            ControlInstance ci,
+            String viewType,
+            String viewSuffix,
+            int channelIndex
+    ) {
         int mixIndex = extractSendIndex(ci.getSubcontrol());
+
         String logicId = "SEND_MIX" + mixIndex;
         String label = "Mix " + mixIndex;
 
         return new ViewControl(
                 logicId,
-                "kInputToMix",   // canonical UI group
+                "input.send",
                 label,
                 ControlType.KNOB,
                 mixIndex - 1,
@@ -70,14 +89,24 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
                 ci.getSysex().getDefault_value(),
                 ci.getGroup(),
                 ci.getSubcontrol(),
-                ci.getInstanceIndex()
+                ci.getInstanceIndex(),
+                viewType,
+                viewSuffix,
+                "INPUT_SEND_LEVEL",
+                mixIndex,
+                channelIndex
         );
     }
 
-    private ViewControl createFader(ControlInstance ci) {
+    private ViewControl createFader(
+            ControlInstance ci,
+            String viewType,
+            String viewSuffix,
+            int channelIndex
+    ) {
         return new ViewControl(
                 "FADER",
-                "kInputFader",
+                "input.fader",
                 "Fader",
                 ControlType.FADER,
                 0,
@@ -87,7 +116,12 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
                 ci.getSysex().getDefault_value(),
                 ci.getGroup(),
                 ci.getSubcontrol(),
-                ci.getInstanceIndex()
+                ci.getInstanceIndex(),
+                viewType,
+                viewSuffix,
+                "INPUT_FADER",
+                null,
+                channelIndex
         );
     }
 

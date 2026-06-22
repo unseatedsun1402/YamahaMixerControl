@@ -18,7 +18,7 @@ public class HardwareOutputRouter implements OutputRequestSender{
         logger.info("OutputRouter debug enabled");
     }
 
-    private final CanonicalRegistry registry;
+    private CanonicalRegistry registry;
     private final MidiIOManager ioManager;
 
     public HardwareOutputRouter(CanonicalRegistry registry, MidiIOManager ioManager) {
@@ -94,6 +94,11 @@ public class HardwareOutputRouter implements OutputRequestSender{
             sb.append(String.format("%02X ", b));
         }
         return sb.toString().trim();
+    }
+
+    public void setRegistry(CanonicalRegistry newRegistry){
+        this.registry = newRegistry;
+        logger.info("Registry reloaded for hardware output router");
     }
 
     @Override
