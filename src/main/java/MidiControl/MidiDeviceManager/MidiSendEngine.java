@@ -9,7 +9,6 @@ import java.util.concurrent.locks.LockSupport;
 import java.util.logging.Logger;
 
 import MidiControl.SysexUtils.SysexParser;
-import MidiControl.Telemetry.MidiTelemetry;
 
 public class MidiSendEngine implements MidiIngressListener {
 
@@ -193,9 +192,16 @@ public class MidiSendEngine implements MidiIngressListener {
 
     private void sendWithPacing(byte[] msg) throws Exception {
         int cost = msg.length;
+
         waitForTokens(cost);
         enforceInterMessageSilence(msg);
+
         midiOut.sendMessage(msg);
+
+        if (!isRealtime(msg)) {
+            lastNonRealtimeSendNs = System.nanoTime();
+        }
+
         consumeTokens(cost);
         telemetry.sent(cost);
     }

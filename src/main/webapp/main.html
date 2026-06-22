@@ -81,6 +81,10 @@
             console.error("[Bootstrap] Error from server:", err);
         });
 
+        ws.on("REGISTRY_CHANGED", (payload) => {
+            console.info("[Bootstrap] Registry changed:", payload);
+        });
+
         ws.connect();
         window.wsClient = ws;
     </script>

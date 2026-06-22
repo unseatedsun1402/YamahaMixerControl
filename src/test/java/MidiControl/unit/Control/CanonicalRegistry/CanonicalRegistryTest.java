@@ -1,4 +1,4 @@
-package MidiControl.unit.CanonicalRegistry;
+package MidiControl.unit.Control.CanonicalRegistry;
 
 import static org.junit.jupiter.api.Assertions.*;
 

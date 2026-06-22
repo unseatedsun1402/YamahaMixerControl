@@ -20,7 +20,7 @@ public class NrpnRegistryTest {
         List<NrpnMapping> mappings = registry.getMappings();
         NrpnMapping firstMapping = mappings.get(0);
         System.out.println("First mapping: " + firstMapping.getCanonicalId() );
-        assertEquals("kInputToAux.kAux1Level.0",firstMapping.getCanonicalId());
+        assertEquals("kInputFader.kFader.0",firstMapping.getCanonicalId());
     }
 
     @Test
@@ -47,8 +47,8 @@ public class NrpnRegistryTest {
         assertEquals(0, registry.getMappings().size());
 
         // Create minimal synthetic mappings
-        NrpnMapping m1 = new NrpnMapping("kGroup.kSub.1", "10", "20");
-        NrpnMapping m2 = new NrpnMapping("kGroup.kSub.2", "11", "21");
+        NrpnMapping m1 = new NrpnMapping("kGroup.kSub.1", "10", "20","CC6_ONLY");
+        NrpnMapping m2 = new NrpnMapping("kGroup.kSub.2", "11", "21","CC6_ONLY");
 
         registry.merge(List.of(m1, m2));
 
@@ -64,8 +64,8 @@ public class NrpnRegistryTest {
         NrpnRegistry registry = new NrpnRegistry();
 
         // Pre-populate registry
-        NrpnMapping m1 = new NrpnMapping("kGroup.kSub.1", "10", "20");
-        NrpnMapping m2 = new NrpnMapping("kGroup.kSub.2", "11", "21");
+        NrpnMapping m1 = new NrpnMapping("kGroup.kSub.1", "10", "20","CC6_ONLY");
+        NrpnMapping m2 = new NrpnMapping("kGroup.kSub.2", "11", "21","CC6_ONLY");
 
         registry.merge(List.of(m1, m2));
         assertEquals(2, registry.getMappings().size());

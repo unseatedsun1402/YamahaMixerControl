@@ -17,6 +17,7 @@ wsClient.on("connected", () => {
 
 wsClient.on("telemetry", updateTelemetry);
 wsClient.on("server-event", handleServerEvent)
+wsClient.on("REGISTRY_CHANGED", handleRegistryChanged);
 
 wsClient.on("midi-device-list", (devices) => {
   console.log("[Settings] Received device list:", devices);
@@ -214,6 +215,50 @@ function handleServerEvent(event) {
     showGlobalAlert(line.text);
   }
 }
+
+function handleRegistryChanged(payload) {
+    console.info("[Settings] Registry changed:", payload);
+    resetTelemetryDisplay();
+
+    const telemetryLog = document.getElementById("telemetry-log");
+    if (telemetryLog) telemetryLog.innerHTML = "";
+
+    serverLogBuffer.length = 0;
+    renderServerLog();
+
+    const tableBody = document.getElementById("mapping-table-body");
+    if (tableBody) tableBody.innerHTML = "";
+
+    showStatus(`Switched to ${payload.profile}`);
+}
+
+function resetTelemetryDisplay() {
+    const ids = [
+        "telemetry-in",
+        "telemetry-out",
+        "telemetry-combined",
+        "telemetry-inflight",
+        "telemetry-dropped",
+        "remaining-capacity"
+    ];
+
+    for (const id of ids) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = "–";
+    }
+
+    const extra = [
+        "telemetry-inflight-requests",
+        "telemetry-timeout-requests",
+        "telemetry-rehydration-rtt"
+    ];
+
+    for (const id of extra) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = "–";
+    }
+}
+
 
 function renderServerLog() {
   serverLog.innerHTML = "";

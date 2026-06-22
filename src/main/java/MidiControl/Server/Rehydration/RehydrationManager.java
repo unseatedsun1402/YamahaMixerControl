@@ -35,13 +35,22 @@ public class RehydrationManager{
     private static final int MAX_TIMEOUT_COUNT = 10_000;
     private final RehydrationTelemetry telemetry = new RehydrationTelemetry(this);
 
-
-    private static final Logger logger = Logger.getLogger(RehydrationManager.class.getName());
     private static byte[] cachedMeterRequest = null;
     private static byte cachedModelNumber;
-    private static boolean debug = true;
+
+    private static final long CONTROL_PERIOD_MS = 200;
+    private ScheduledFuture<?> controlLoopFuture;
+
     private static long BASE_DELAY_MS = 4L;
+    private static final long SAFE_DELAY_MS = 20;
+    private static final long WARNING_RTT_MS = 60;
+    private static final long CRITICAL_RTT_MS = 100;
+
+    private static volatile long effectiveDelayMs = BASE_DELAY_MS;
+
     private static boolean running = false;
+    private static boolean debug = false;
+    private static final Logger logger = Logger.getLogger(RehydrationManager.class.getName());
 
     public RehydrationManager(OutputRequestSender outputRouter,
                               SourceAllInstances registry,
@@ -82,6 +91,7 @@ public class RehydrationManager{
 
     public void rehydrateAll(RehydrationListener listener) {
         final long rehydrationStart = System.currentTimeMillis();
+        startControlLoop();
 
         final List<ControlInstance> all = new ArrayList<>(registry.getAllInstances());
         all.sort((a, b) -> Integer.compare(a.getPriority(), b.getPriority()));
@@ -146,16 +156,14 @@ public class RehydrationManager{
                     remaining.set(0);
                     logger.info("Rehydration complete: all priorities processed.");
                     all.clear();
-                    if (debug) {
-                        logger.info("Rehydration finished in: " + (int)((System.currentTimeMillis() - rehydrationStart)/1000) + " seconds");
-                    }
+                    stopControlLoop();
                     return;
                 }
 
                 request(selected.getCanonicalId());
                 remaining.decrementAndGet();
 
-                scheduler.schedule(this, BASE_DELAY_MS, TimeUnit.MILLISECONDS);
+                scheduler.schedule(this, effectiveDelayMs, TimeUnit.MILLISECONDS);
             }
 
             private ControlInstance pollFromQueue(int normalizedPrio) {
@@ -172,7 +180,7 @@ public class RehydrationManager{
     public void onControlUpdated(String canonicalId) {
         Long expected = pending.remove(canonicalId);
         if (expected == null) {
-            logger.warning(canonicalId + " was not expected or no longer pending i.e. already recieved or timedout and removed");
+            if(debug)logger.warning(canonicalId + " was not expected or no longer pending i.e. already recieved or timedout and removed");
             return;
         }
 
@@ -221,6 +229,7 @@ public class RehydrationManager{
         int cleared = pending.size();
         pending.clear();
         outstandingTransactions.addAndGet(-cleared);
+        stopControlLoop();
         listener.onReset();
     }
 
@@ -252,7 +261,7 @@ public class RehydrationManager{
     public static void changeRehydrationDelay(long newDelay){
         if(newDelay > 0 & newDelay < 10) {
             BASE_DELAY_MS = newDelay;
-            logger.info("Rehydration poll rate set to: "+BASE_DELAY_MS+"ms");
+            if(debug)logger.fine("Rehydration poll rate set to: "+BASE_DELAY_MS+"ms");
         }
     }
 
@@ -275,5 +284,57 @@ public class RehydrationManager{
     public void injectNewRegistry(CanonicalRegistry newRegistry) {
         this.registry = newRegistry;
         attachListeners();
+    }
+
+    public static void updatePacingFromRtt(long rttMs) {
+        if (rttMs == 0 || rttMs > CRITICAL_RTT_MS) { // saturated
+            effectiveDelayMs = SAFE_DELAY_MS;
+            return;
+        }
+
+        if (rttMs > WARNING_RTT_MS) { // near to saturation
+            effectiveDelayMs = Math.min(SAFE_DELAY_MS, effectiveDelayMs + 2);
+            return;
+        }
+
+        if (effectiveDelayMs > BASE_DELAY_MS) { // slow recovery
+            effectiveDelayMs--;
+        }
+    }
+
+    private void controlTick() {
+        long avgRtt = getAvgRequestRttMsAndReset();
+        updatePacingFromRtt(avgRtt);
+
+        if (debug) {
+            logger.info(
+                "[RehydrationControl] RTT=" + avgRtt +
+                "ms, effectiveDelay=" + effectiveDelayMs +
+                "ms, outstanding=" + outstandingTransactions.get()
+            );
+        }
+    }
+    
+    private synchronized void startControlLoop() {
+        if (controlLoopFuture != null && !controlLoopFuture.isCancelled()) {
+            return; // already running
+        }
+
+        controlLoopFuture = scheduler.scheduleAtFixedRate(
+            this::controlTick,
+            CONTROL_PERIOD_MS,
+            CONTROL_PERIOD_MS,
+            TimeUnit.MILLISECONDS
+        );
+    }
+
+    private synchronized void stopControlLoop() {
+        if (controlLoopFuture != null) {
+            controlLoopFuture.cancel(false);
+            controlLoopFuture = null;
+        }
+
+        // Reset pacing back to default for next run
+        effectiveDelayMs = BASE_DELAY_MS;
     }
 }

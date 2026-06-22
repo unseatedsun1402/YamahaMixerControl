@@ -2,12 +2,11 @@ package MidiControl.ControlServer;
 
 import java.util.logging.Logger;
 
-import MidiControl.Routing.OutputRouter;
-import MidiControl.Server.Rehydration.RehydrationManager;
+import MidiControl.Routing.HardwareOutputRouter;
 
 public class GuiInputHandler {
 
-    private final OutputRouter router;
+    private final HardwareOutputRouter router;
     private final Logger logger = Logger.getLogger("GuiInputHandler");
     private static boolean debug = false;
 
@@ -15,15 +14,11 @@ public class GuiInputHandler {
         debug = true;
     }
 
-    public GuiInputHandler(OutputRouter router) {
+    public GuiInputHandler(HardwareOutputRouter router) {
         this.router = router;
     }
 
     public void handleGuiChange(String canonicalId, int value) {
-        if (RehydrationManager.isRunning()){
-            {logger.warning("Rehydation in progress. Dropped Change from "+canonicalId+ " val: "+value);}
-            return;
-        }
         router.applyChange(canonicalId, value);
         if(debug){logger.info("Handled Change from "+canonicalId+ " val: "+value);}
     }
