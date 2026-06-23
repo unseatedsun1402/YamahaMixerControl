@@ -24,9 +24,9 @@ public class SysexRegistry {
     private final int[] addressBytes;
 
     private final List<SysexMapping> mappings;
-    private static boolean DEBUG = false;
+    private static boolean debug = false;
 
-    public static void enableDebug() { DEBUG = true; }
+    public static void enabledebug() { debug = true; }
 
     public SysexRegistry(List<SysexMapping> mappings) {
         if (mappings == null || mappings.isEmpty()) {
@@ -69,7 +69,7 @@ public class SysexRegistry {
 
         long key = computeKey(msg);
 
-        if (DEBUG) logger.fine("Computed key=" + key);
+        if (debug) logger.fine("Computed key=" + key);
 
         for (SysexMapping m : mappings) {
             if (key == m.getKey()) {

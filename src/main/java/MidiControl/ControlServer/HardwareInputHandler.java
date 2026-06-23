@@ -19,15 +19,15 @@ public class HardwareInputHandler {
     private final NrpnParser nrpnParser;
     @SuppressWarnings("unused")
     private final NrpnRegistry nrpnRegistry;
-    private static Boolean DEBUG = false;
+    private static Boolean debug = false;
     private static MeterBroadcaster meterBroadcaster = new MeterBroadcaster();
     
     static {
         MeterSimpleParser.addListener(meterBroadcaster);
     }
 
-    public static void enableDebug(){
-        DEBUG = true;
+    public static void enabledebug(){
+        debug = true;
     }
 
     public static MeterBroadcaster setMeterBroadcaster(MeterBroadcaster testHook){
@@ -51,11 +51,11 @@ public class HardwareInputHandler {
             }
 
             if (isYamahaHeartbeat(full)) {
-                if(DEBUG){logger.fine("Ignoring Yamaha heartbeat SysEx.");}
+                if(debug){logger.fine("Ignoring Yamaha heartbeat SysEx.");}
                 return null;
             }
 
-            if (DEBUG)logger.info(() -> "Received SysEx: " + Arrays.toString(full));
+            if (debug)logger.info(() -> "Received SysEx: " + Arrays.toString(full));
             return CanonicalInputEvent.fromSysex(full);
         }
 
@@ -68,14 +68,14 @@ public class HardwareInputHandler {
                 NrpnMessage nrpn = nrpnParser.parse(sm);
 
                 if (nrpn != null) {
-                    if(DEBUG){logger.fine(() -> "Assembled NRPN: MSB=" + nrpn.msb + " LSB=" + nrpn.lsb + " value=" + nrpn.value);}
+                    if(debug){logger.fine(() -> "Assembled NRPN: MSB=" + nrpn.msb + " LSB=" + nrpn.lsb + " value=" + nrpn.value);}
                     return CanonicalInputEvent.fromNrpn(nrpn);
                 }
 
                 return CanonicalInputEvent.fromCc(sm);
             }
 
-            if(DEBUG){logger.warning("Unhandled ShortMessage: " + sm.getCommand());}
+            if(debug){logger.warning("Unhandled ShortMessage: " + sm.getCommand());}
             return CanonicalInputEvent.fromCc(sm);
         }
 

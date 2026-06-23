@@ -12,7 +12,7 @@ public class MidiInputReceiver implements Receiver {
     private final ConcurrentLinkedQueue<MidiMessage> inputBuffer;
     private volatile MidiIngressListener ingressListener = bytes -> {};
 
-    private static boolean DEBUG = false;
+    private static boolean debug = false;
     private volatile boolean open = true;
 
     private static final Logger logger =
@@ -28,8 +28,8 @@ public class MidiInputReceiver implements Receiver {
         }
     }
 
-    public static void enableDebug() {
-        DEBUG = true;
+    public static void enabledebug() {
+        debug = true;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class MidiInputReceiver implements Receiver {
         ingressListener.onBytesReceived(bytes.length);
         inputBuffer.add(message);
 
-        if (DEBUG) {
+        if (debug) {
             logger.info("Added to inputBuffer: " +
                 SysexParser.bytesToHex(bytes));
         }

@@ -20,10 +20,10 @@ public class ReceiverWrapper implements MidiOutput {
     private static final Logger logger =
             Logger.getLogger(HardwareInputHandler.class.getName());
 
-    private static boolean DEBUG = false;
+    private static boolean debug = false;
 
-    public static void enableDebug() {
-        DEBUG = true;
+    public static void enabledebug() {
+        debug = true;
         logger.info("ReceiverWrapper debug enabled");
     }
 
@@ -58,7 +58,7 @@ public class ReceiverWrapper implements MidiOutput {
 
         try {
             if ((data[0] & 0xFF) == 0xF0) {
-                if (DEBUG) {
+                if (debug) {
                     logger.info("ReceiverWrapper SEND SysEx: " + SysexParser.bytesToHex(data));
                 }
 
@@ -66,14 +66,14 @@ public class ReceiverWrapper implements MidiOutput {
                 sysex.setMessage(data, data.length);
                 receiver.send(sysex, -1);
 
-                if (DEBUG) {
+                if (debug) {
                     logger.fine("Sent SysEx: " + SysexParser.bytesToHex(data));
                 }
                 return;
             }
 
             if (data.length >= 3) {
-                if (DEBUG) {
+                if (debug) {
                     logger.info(String.format(
                         "ReceiverWrapper SEND ShortMessage: cmd=%02X data1=%02X data2=%02X",
                         data[0] & 0xFF, data[1] & 0xFF, data[2] & 0xFF
@@ -88,7 +88,7 @@ public class ReceiverWrapper implements MidiOutput {
                 );
                 receiver.send(sm, -1);
 
-                if (DEBUG) {
+                if (debug) {
                     logger.fine(String.format(
                         "Sent ShortMessage: cmd=%02X data1=%02X data2=%02X",
                         data[0] & 0xFF, data[1] & 0xFF, data[2] & 0xFF
@@ -108,14 +108,14 @@ public class ReceiverWrapper implements MidiOutput {
     public void sendMessage(MidiMessage message) {
         if (receiver != null) {
 
-            if (DEBUG) {
+            if (debug) {
                 logger.info("ReceiverWrapper SEND (legacy): "
                         + SysexParser.bytesToHex(message.getMessage()));
             }
 
             receiver.send(message, -1);
 
-            if (DEBUG) {
+            if (debug) {
                 logger.fine("Sent MIDI (legacy): "
                         + SysexParser.bytesToHex(message.getMessage()));
             }
