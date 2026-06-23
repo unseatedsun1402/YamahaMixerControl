@@ -28,7 +28,7 @@ public class MidiInputReceiver implements Receiver {
         }
     }
 
-    public static void enabledebug() {
+    public static void enableDebug() {
         debug = true;
     }
 

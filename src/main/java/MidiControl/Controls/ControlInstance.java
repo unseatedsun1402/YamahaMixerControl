@@ -96,7 +96,7 @@ public class ControlInstance {
         };
     }
 
-    private int toCanonicalValue(int rawValue) {
+    public int toCanonicalValue(int rawValue) {
         NrpnMapping mapping = this.getNrpn().get();
         int min = 0;
         int max = mapping.getMax();

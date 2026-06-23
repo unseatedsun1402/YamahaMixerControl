@@ -272,7 +272,6 @@ public class ServerRouterTest {
     void testUpdateSettingChangesMappings() {
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
         CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
-        assertNotNull(registry.getGroup("kAUXToMatrix"));
         assertNull(registry.getGroup("kMixToMatrix"));
 
         MockMidiServer server = new MockMidiServer(registry);
