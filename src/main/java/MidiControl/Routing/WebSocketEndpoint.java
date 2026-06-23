@@ -30,7 +30,7 @@ public class WebSocketEndpoint{
     private static final Set<Session> sessions = ConcurrentHashMap.newKeySet();
     private static final Logger logger = Logger.getLogger(WebSocketEndpoint.class.getName());
     private static final Gson gson = new Gson();
-    private static boolean DEBUG = false;
+    private static boolean debug = false;
     private static final long TIMEOUT = 3000;
     public static String lastSent;
 
@@ -38,8 +38,8 @@ public class WebSocketEndpoint{
     private SubscriptionManager subscriptions;
     private static Map<Integer,Boolean> sessionLocks = new ConcurrentHashMap<>();
 
-    public static void enableDebug(){
-        DEBUG = true;
+    public static void enabledebug(){
+        debug = true;
     }
 
     private static String encode(String type, Object payload) {

@@ -7,15 +7,15 @@ import MidiControl.Routing.WebSocketEndpoint;
 
 public class MeterBroadcaster implements MeterUpdateListener{
     private static final Logger logger = Logger.getLogger(MeterBroadcaster.class.getName());
-    private static Boolean DEBUG = false;
+    private static Boolean debug = false;
 
-    public static void enableDebug(){
-        DEBUG = true;
+    public static void enabledebug(){
+        debug = true;
     }
 
     private void broadcast(String json) {
         try {
-            if (DEBUG){logger.fine("Broadcasting update");}
+            if (debug){logger.fine("Broadcasting update");}
             WebSocketEndpoint.broadcast(json);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Exception thrown broadcasting the update: " + json, e);
@@ -24,7 +24,7 @@ public class MeterBroadcaster implements MeterUpdateListener{
 
     @Override
     public void onMeterUpdate(MeterDTO dto) {
-        if (DEBUG){logger.fine("Meter update: " + dto.toJson());}
+        if (debug){logger.fine("Meter update: " + dto.toJson());}
         broadcast(dto.toJson());
     }
     
