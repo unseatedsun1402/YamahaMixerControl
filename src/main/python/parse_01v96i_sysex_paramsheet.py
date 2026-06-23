@@ -1,5 +1,5 @@
 import json
-
+import re
 import xlrd
 
 
@@ -28,11 +28,22 @@ def parse_01v96i_sysex(xls_path, output_json):
         if not sub_control:
             continue  # skip group header rows
 
+        # --- GHOST FILTER ---
+        is_ghost, reason = is_ghost_mapping(control_group, sub_control)
+        if is_ghost:
+            print(f"[DROP] {sub_control} ({control_group}) -> {reason}")
+            continue
+
         value = safe_int(row[5])
         min_value = safe_int(row[6])
         max_value = safe_int(row[7])
         default_value = safe_int(row[8])
         comment = str(row[9]).strip() or "N/A"
+
+        is_used = re.search(r"not used",comment.lower(),)
+        if is_used:
+            print ("[DROP] "+control_group+"."+sub_control+": not used")
+            continue
 
         change_fmt = parse_bytes(row[10:23])  # K–AE
         request_fmt = parse_bytes(row[24:34])  # AF–AH
@@ -137,6 +148,39 @@ def compute_priority(sub_control: str) -> int:
     # Default: priority 3
     return 3
 
+def is_ghost_mapping(control_group: str, sub_control: str):
+    cg = (control_group or "").lower()
+    sc = (sub_control or "").lower()
+
+    # --- 1. Matrix (not present on 01v96i) ---
+    if "matrix" in cg or "matrix" in sc:
+        return True, "matrix control"
+
+    # --- 2. AUX overflow ---
+    
+    aux_nums = extract_aux_numbers(sc)
+    for n in aux_nums:
+        if n > 8:
+            return True, f"aux>{8}"
+
+    # --- 3. BUS overflow ---
+    bus_match = re.search(r"(bus|mix)(\d+)", sc)
+    if bus_match:
+        bus_num = int(bus_match.group(2))
+        if bus_num > 8:
+            return True, f"bus>{8}"
+
+    return False, None
+
+def extract_aux_numbers(sc: str):
+    nums = re.findall(r"aux(\d{1,2})", sc)
+    
+    # Also catch paired forms like AUX0102
+    pair_match = re.search(r"aux(\d{2})(\d{2})", sc)
+    if pair_match:
+        return [int(pair_match.group(1)), int(pair_match.group(2))]
+
+    return [int(n) for n in nums]
 
 def parse_bytes(cells):
     tokens = {"1n", "3n", "cc", "dd"}

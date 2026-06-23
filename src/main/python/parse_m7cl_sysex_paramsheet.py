@@ -1,6 +1,6 @@
 import xlrd
+import re
 import json
-
 
 def parse_sysex_table(xls_path, output_json):
     workbook = xlrd.open_workbook(xls_path)
@@ -31,11 +31,22 @@ def parse_sysex_table(xls_path, output_json):
         if not sub_control:
             continue  # skip group header rows
 
+        # --- GHOST FILTER ---
+        is_ghost, reason = is_ghost_mapping(control_group, sub_control)
+        if is_ghost:
+            print(f"[DROP] {sub_control} ({control_group}) -> {reason}")
+            continue
+
         value = safe_int(row[5])
         min_value = safe_int(row[6])
         max_value_val = safe_int(row[7])
         default_value = safe_int(row[8])
         comment = str(row[9]).strip() or "N/A"
+
+        is_used = re.search(r"not used",comment.lower(),)
+        if is_used:
+            print ("[DROP] "+control_group+"."+sub_control)
+            continue
 
         # Parse formats
         change_fmt = parse_bytes(row[10:28])
@@ -95,7 +106,6 @@ def parse_sysex_table(xls_path, output_json):
             "parameter_request_format": request_fmt,
             "priority": priority,
         }
-
         mappings.append(mapping)
 
     with open(output_json, "w") as f:
@@ -117,6 +127,48 @@ def compute_priority(sub_control: str) -> int:
     # Default: priority 3
     return 3
 
+
+DROP_IF_CONTAINS = [
+    "aux",          # nukes entire AUX domain
+    "surr",     # no surround engine
+]
+
+DROP_IF_REGEX = [
+    r"mix(1[7-9]|[2-9][0-9])",   # MIX > 16
+    r"matrix(9|1[0-6])",         # Matrix > 8
+    r"fx([5-9]|1[0-6])",         # FX > 4
+]
+
+CONDITIONAL_DROP = [
+    ("automix", "aux"),
+    ("cascade", "aux"),
+    ("monitor", "aux"),
+    ("hui", "aux"),
+    ("nuendo", "aux"),
+]
+
+
+def is_ghost_mapping(control_group: str, sub_control: str):
+    cg = (control_group or "").lower()
+    sc = (sub_control or "").lower()
+
+    # --- 1. HARD substring kills ---
+    for token in DROP_IF_CONTAINS:
+        if token in cg or token in sc:
+            return True, f"contains '{token}'"
+
+    # --- 2. REGEX-based limits (mix/matrix/fx bounds) ---
+    for pattern in DROP_IF_REGEX:
+        if re.search(pattern, sc):
+            return True, f"regex '{pattern}'"
+
+    # --- 3. CONDITIONAL rules (scope-aware) ---
+    for domain, trigger in CONDITIONAL_DROP:
+        if domain in cg or domain in sc:
+            if trigger in cg or trigger in sc:
+                return True, f"{domain} with {trigger}"
+
+    return False, None
 
 def parse_bytes(cells):
     tokens = {"1n", "3n", "cc", "dd"}
