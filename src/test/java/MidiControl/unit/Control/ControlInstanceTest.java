@@ -48,4 +48,9 @@ public class ControlInstanceTest {
         assertArrayEquals(message.get(1), messagepart2);
         assertArrayEquals(message.get(2), messagepart3);
     }
+
+    @Test
+    void testEnableDebug(){
+        assertDoesNotThrow(() -> ControlInstance.enableDebug());
+    }
 }

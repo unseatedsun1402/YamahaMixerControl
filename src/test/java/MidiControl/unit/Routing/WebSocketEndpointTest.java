@@ -318,6 +318,6 @@ class WebSocketEndpointTest {
 
     @Test
     void enableDebug_doesNotThrow() {
-        assertDoesNotThrow(WebSocketEndpoint::enableDebug);
+        assertDoesNotThrow(WebSocketEndpoint::enabledebug);
     }
 }

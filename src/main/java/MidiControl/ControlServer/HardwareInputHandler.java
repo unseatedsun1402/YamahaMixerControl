@@ -26,7 +26,7 @@ public class HardwareInputHandler {
         MeterSimpleParser.addListener(meterBroadcaster);
     }
 
-    public static void enabledebug(){
+    public static void enableDebug(){
         debug = true;
     }
 
