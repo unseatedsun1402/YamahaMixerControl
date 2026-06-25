@@ -18,6 +18,9 @@ import MidiControl.Controls.ControlGroup;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.Controls.ControlListener;
 import MidiControl.Controls.SubControl;
+import MidiControl.UserInterface.ChannelName.Codecs.ChannelNameCodec;
+import MidiControl.UserInterface.ChannelName.Codecs.Packed32Codec;
+import MidiControl.UserInterface.ChannelName.Codecs.PerByteCodec;
 
 public class ChannelNameAssembler implements ControlListener {
 
@@ -26,6 +29,7 @@ public class ChannelNameAssembler implements ControlListener {
     private ChannelNameListener listener;
     private static Map<String,String> nameCache = new HashMap<>();
     private static String deskLifeName = "";
+    private volatile ChannelNameCodec codec;
 
     // Debounce timer
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -48,6 +52,7 @@ public class ChannelNameAssembler implements ControlListener {
             logger.info("Building assemblers for desk "+ deskLifeName+
             " "+registry.hashCode());
         }
+        this.codec = selectCodec(registry.getDeskType());
         this.context = ctx;
         this.registry = registry;
         this.listener = listener;
@@ -72,6 +77,7 @@ public class ChannelNameAssembler implements ControlListener {
             logger.info("Building assemblers for desk "+ deskLifeName+
             " "+registry.hashCode());
         }
+        this.codec = selectCodec(registry.getDeskType());
         
         this.instanceMap = new HashMap<>();
         this.channelMap  = new HashMap<>();
@@ -81,6 +87,15 @@ public class ChannelNameAssembler implements ControlListener {
         subscribeToControls();
     }
 
+    public ChannelNameAssembler(Context ctx,
+                                CanonicalRegistry registry,
+                                ChannelNameListener listener,
+                                ChannelNameCodec codec) {
+
+        this(ctx, registry, listener);
+        this.codec = codec;
+    }
+
     public static void enableDebug(){
         debug = true;
     }
@@ -88,26 +103,39 @@ public class ChannelNameAssembler implements ControlListener {
 
     private void subscribeToControls() {
         List<ControlInstance> contextInstances = new ArrayList<>();
-        if(CanonicalName == null) {logger.warning("Context given is null"); return;}
+
+        if (CanonicalName == null) {
+            logger.warning("Context given is null");
+            return;
+        }
+
         for (ContextFilter filter : context.getFilters()) {
 
-            if (!"kInputChannelName".equals(filter.getControlGroup()))
-                continue;
-
             ControlGroup cg = registry.getGroup(filter.getControlGroup());
-            if (cg == null) continue;
+            if (cg == null) {
+                continue;
+            }
 
             SubControl sc = cg.getSubcontrol(filter.getSubControl());
-            if (sc == null) continue;
+            if (sc == null) {
+                continue;
+            }
 
-            if (sc.getName().contains("Long")) continue;
+            if (sc.getName().contains("Long")) {
+                continue;
+            }
 
             int channelIndex = filter.getIndex();
 
             for (ControlInstance inst : sc.getInstances()) {
 
-                if (inst.getIndex() != channelIndex)
+                if (inst == null) {
                     continue;
+                }
+
+                if (inst.getIndex() != channelIndex) {
+                    continue;
+                }
 
                 inst.addListener(this);
                 contextInstances.add(inst);
@@ -115,11 +143,17 @@ public class ChannelNameAssembler implements ControlListener {
             }
         }
 
-        // Store the list of instances for this context
         instanceMap.put(CanonicalName, contextInstances);
 
-        if(debug){logger.fine("Assembler for " + CanonicalName
-            + " subscribed to " + contextInstances.size() + " controls");}
+        if (debug) {
+            logger.fine("Assembler for " + CanonicalName
+                + " subscribed to " + contextInstances.size() + " controls");
+        }
+
+        if (contextInstances.isEmpty()) {
+            logger.warning("Assembler for " + CanonicalName
+                + " subscribed to zero controls. Context filters may not match registry.");
+        }
     }
 
     @Override
@@ -136,6 +170,10 @@ public class ChannelNameAssembler implements ControlListener {
                 String assembled = assembleName(instance);
                 String contextId = channelMap.get(instance);
 
+                if (assembled == null || assembled.isBlank()) {
+                    return;
+                }
+
                 cacheName(contextId, assembled);
 
                 listener.onChannelNameUpdated(contextId, assembled);
@@ -144,45 +182,44 @@ public class ChannelNameAssembler implements ControlListener {
     }
 
     private String assembleName(ControlInstance instance) {
-        
+
         String context_key = channelMap.get(instance);
-        if (context_key == null) {
-            logger.warning("No context mapping for instance: " + instance.getCanonicalId());
-            return "";
-        }
+        if (context_key == null) return "";
 
-        List<ControlInstance> NameInstances = instanceMap.get(context_key);
-        if (NameInstances == null || NameInstances.isEmpty()) {
-            logger.warning("No instance list for context: " + context_key);
-            return "";
-        }
+        List<ControlInstance> instances = instanceMap.get(context_key);
+        if (instances == null || instances.isEmpty()) return "";
 
-        TreeMap<Integer, Character> chars = new TreeMap<>();
+        List<Integer> values = extractValues(instances);
 
-        for (ControlInstance ci : NameInstances){
-            String subName = ci.getSubcontrol();
+        return codec.decode(values);
+    }
 
-            String digits = subName.replaceAll("\\D+", "");
+    private List<Integer> extractValues(List<ControlInstance> instances) {
+
+        TreeMap<Integer, Integer> ordered = new TreeMap<>();
+
+        for (ControlInstance ci : instances) {
+
+            String digits = ci.getSubcontrol().replaceAll("\\D+", "");
             if (digits.isEmpty()) continue;
 
             int pos = Integer.parseInt(digits);
-            chars.put(pos, decodeAscii(ci.getValue()));
+
+            ordered.put(pos, ci.getValue());
         }
 
-        StringBuilder sb = new StringBuilder();
-        for (char c : chars.values()) sb.append(c);
-
-        int last = sb.length() - 1;
-        while (last >= 0 && sb.charAt(last) == ' ') last--; //trim trailing whitespace
-
-        if (last < 0) return "";
-        return sb.substring(0, last + 1);
+        return new ArrayList<>(ordered.values());
     }
 
-    private char decodeAscii(int v) {
-        if (v < 32 || v > 126)
-            return ' ';
-        return (char)v;
+    
+    private ChannelNameCodec selectCodec(String deskType) {
+
+        if ("YAMAHA_M7CL".equals(deskType)) {
+            logger.info(String.format("Desk type %s Decoding with YAMAHA_M7CL Desk type codec",deskType));
+            return new Packed32Codec();
+        }
+        logger.info(String.format("Desk type %s Decoding with YAMAHA_01V96I Desk type codec",deskType));
+        return new PerByteCodec();
     }
 
     public void shutdown() {

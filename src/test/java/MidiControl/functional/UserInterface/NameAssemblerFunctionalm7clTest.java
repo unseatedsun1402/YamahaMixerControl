@@ -46,8 +46,9 @@ public class NameAssemblerFunctionalm7clTest {
             SysexMappingLoader.loadMappingsFromResource(RESOURCE);
 
         SysexParser parser = new SysexParser(mappings);
-
-        return new CanonicalRegistry(mappings, parser);
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
+        registry.setDeskType("YAMAHA_M7CL");
+        return registry;
     }
 
     private Context findM7clInputNameContext(CanonicalRegistry registry, int channel) {

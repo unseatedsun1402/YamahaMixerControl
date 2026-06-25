@@ -254,4 +254,8 @@ public class CanonicalRegistry implements SourceAllInstances {
             l.onRegistryReloaded(this);
         }
     }
+
+    public void setDeskType(String deskString) {
+        this.deskType = deskString;
+    }
 }

@@ -3,7 +3,6 @@ package MidiControl.functional.UserInterface;
 import MidiControl.ContextModel.*;
 import MidiControl.Controls.*;
 import MidiControl.Mocks.MockMidiServer;
-import MidiControl.Mocks.MockMidiIOManager;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
@@ -47,18 +46,18 @@ public class NameAssemblerFunctional01V96iTest {
 
         SysexParser parser = new SysexParser(mappings);
         CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
+        registry.setDeskType("YAMAHA_01V96I");
 
         MockMidiServer server = new MockMidiServer(registry);
-        MockMidiIOManager io = server.getMockIo();
 
         ContextDiscoveryEngine engine = new ContextDiscoveryEngine(registry);
 
         List<Context> contexts = engine.discoverContexts();
 
         Context nameContext = contexts.stream()
-            .filter(c -> c.getContextType() == ContextType.NAME)
+            .filter(c -> c.getId().equals("name.input.0"))
             .findFirst()
-            .orElseThrow(() -> new IllegalStateException("No NAME context"));
+            .orElseThrow();
 
         AtomicReference<String> lastName = new AtomicReference<>();
 
