@@ -15,14 +15,12 @@ import java.util.stream.Collectors;
 public class NameDiscoveryTest {
 
     @Test
-    public void testNameDiscovery() {
+    public void test01V96INameDiscovery() {
 
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
         CanonicalRegistry registry = new CanonicalRegistry(mappings,new SysexParser(mappings));
 
         ContextDiscoveryEngine engine = new ContextDiscoveryEngine(registry);
-
-        engine.addDiscoverer(new NameContextDiscoverer());
 
         List<Context> contexts = engine.discoverContexts();
 
@@ -53,6 +51,18 @@ public class NameDiscoveryTest {
                              ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kDCA")));
 
         assertTrue(hasInputNames, "Input channel names not discovered!");
+
+        
+        assertEquals(32, nameContexts.stream()
+            .filter(ctx -> ctx.getFilters().stream()
+                .anyMatch(f ->
+                    f.getControlGroup().equals("kInputChannelName") &&
+                    f.getSubControl().equals("kChannelNameShort1")
+                )
+            )
+            .count(),
+            "Expected 40 01V96i input channel name contexts");
+
         // assertFalse(hasMixNames, "Mix bus names not discovered!"); // auxes on 01v96i not mixes
         // assertTrue(hasAuxNames, "Aux bus names not discovered!");
         // assertTrue(hasMatrixNames, "Matrix names not discovered!");
@@ -71,15 +81,13 @@ public class NameDiscoveryTest {
         // assertTrue(hasLongNames, "Long (8–16 char) names not detected!");
     }
 
-        @Test
-    public void testOtherNameDiscovery() {
+    @Test
+    public void testM7CLNameDiscovery() {
 
         List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
         CanonicalRegistry registry = new CanonicalRegistry(mappings,new SysexParser(mappings));
 
         ContextDiscoveryEngine engine = new ContextDiscoveryEngine(registry);
-
-        engine.addDiscoverer(new NameContextDiscoverer());
 
         List<Context> contexts = engine.discoverContexts();
 
@@ -110,21 +118,20 @@ public class NameDiscoveryTest {
                              ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kDCA")));
 
         assertTrue(hasInputNames, "Input channel names not discovered!");
-        // assertTrue(hasMixNames, "Mix bus names not discovered!");
-        // assertFalse(hasAuxNames, "Aux bus names not discovered!"); // no auxwes on m7cl
-        // assertTrue(hasMatrixNames, "Matrix names not discovered!");
-        // assertTrue(hasDcaNames, "DCA names not discovered!");
+
+        assertEquals(56, nameContexts.stream()
+            .filter(ctx -> ctx.getFilters().stream()
+                .anyMatch(f ->
+                    f.getControlGroup().equals("kNameInputChannel") &&
+                    f.getSubControl().equals("kNameShort1")
+                )
+            )
+            .count(),
+            "Expected 56 M7CL input channel name contexts");
 
         boolean hasShortNames = nameContexts.stream()
             .flatMap(ctx -> ctx.getFilters().stream())
             .anyMatch(f -> f.getSubControl().contains("Short"));
-
-        boolean hasLongNames = nameContexts.stream()
-            .flatMap(ctx -> ctx.getFilters().stream())
-            .anyMatch(f -> f.getSubControl().contains("Long") ||
-                           f.getControlGroup().contains("NameMixModule"));
-
         assertTrue(hasShortNames, "Short (4 char) names not detected!");
-        // assertTrue(hasLongNames, "Long (8–16 char) names not detected!");
     }
 }

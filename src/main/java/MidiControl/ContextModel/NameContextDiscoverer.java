@@ -1,8 +1,11 @@
 package MidiControl.ContextModel;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlGroup;
@@ -10,99 +13,145 @@ import MidiControl.Controls.SubControl;
 
 public class NameContextDiscoverer implements ContextDiscoverer {
 
-    private static final Logger logger = Logger.getLogger(NameContextDiscoverer.class.getName());
+    private static final Logger logger =
+        Logger.getLogger(NameContextDiscoverer.class.getName());
+
+    private static final Pattern TRAILING_NUMBER = Pattern.compile("(\\d+)$");
 
     @Override
     public void discover(List<Context> out, CanonicalRegistry registry) {
 
         logger.info("--- Discovering Name Contexts ---");
 
-        List<ControlGroup> groups = new ArrayList<>();
-        int maxChannels = 0;
+        int groupsDetected = 0;
+        int contextsCreated = 0;
 
-        // --------------------------------------------
-        // 1. Find groups that have Name subcontrols
-        // --------------------------------------------
         for (ControlGroup group : registry.getGroups().values()) {
 
-            if (!isNameCapableGroup(group.getName()))
+            List<SubControl> nameSubcontrols = getNameSubcontrols(group);
+
+            if (nameSubcontrols.isEmpty()) {
                 continue;
+            }
 
-            boolean ok = group.getSubcontrols().values().stream()
-                .anyMatch(sc -> sc.getName().contains("Name"));
+            groupsDetected++;
 
-            if (!ok)
-                continue;
-
-            groups.add(group);
-
-            // Find maximum instance count among its name subcontrols
-            int max = group.getSubcontrols().values().stream()
-                .filter(sc -> sc.getName().contains("Name"))
+            int maxChannels = nameSubcontrols.stream()
                 .mapToInt(sc -> sc.getInstances().size())
-                .max().orElse(0);
-
-            maxChannels = Math.max(maxChannels, max);
+                .max()
+                .orElse(0);
 
             logger.info("Detected name-capable group: " + group.getName()
-                + " with max " + max + " instances");
-        }
+                + " with " + nameSubcontrols.size()
+                + " name subcontrols and max "
+                + maxChannels
+                + " instances");
 
-        logger.info("Detected " + groups.size() + " name contexts ");
+            String groupKey = normaliseNameGroup(group.getName());
 
-        if (groups.isEmpty()) {
-            logger.info("No name-capable groups detected.");
-            return;
-        }
+            for (int ch = 0; ch < maxChannels; ch++) {
 
-        logger.info("Max name channels = " + maxChannels);
+                List<ContextFilter> filters = new ArrayList<>();
 
-        // --------------------------------------------
-        // 2. Create one NAME context per channel index
-        // --------------------------------------------
-        for (int ch = 0; ch < maxChannels; ch++) {
-
-            List<ContextFilter> filters = new ArrayList<>();
-
-            for (ControlGroup group : groups) {
-                for (SubControl sc : group.getSubcontrols().values()) {
-
-                    if (!sc.getName().contains("Name"))
-                        continue;
-
+                for (SubControl sc : nameSubcontrols) {
                     if (ch < sc.getInstances().size()) {
                         filters.add(new ContextFilter(
                             group.getName(),
-                            sc.getName(),   // the single SubControl for all characters
-                            ch              // instance index = char slot
+                            sc.getName(),
+                            ch
                         ));
                     }
                 }
-            }
 
-            if (!filters.isEmpty()) {
+                if (filters.isEmpty()) {
+                    continue;
+                }
+
                 Context ctx = new Context(
-                    "name." + ch,
-                    "Name " + (ch + 1),
+                    "name." + groupKey + "." + ch,
+                    displayNameFor(group.getName(), ch),
                     ContextType.NAME,
                     List.of("FOH", "Monitor"),
                     filters
                 );
 
                 out.add(ctx);
-                logger.fine("Created NAME context: " + ctx.getId());
+                contextsCreated++;
+
+                logger.fine("Created NAME context: " + ctx.getId()
+                    + " with " + filters.size() + " filters");
             }
         }
 
+        logger.info("Detected " + groupsDetected + " name-capable groups");
+        logger.info("Created " + contextsCreated + " NAME contexts");
         logger.info("--- Finished ---");
     }
 
+    private List<SubControl> getNameSubcontrols(ControlGroup group) {
+        String groupName = group.getName();
+
+        if (!isNameCapableGroup(groupName)) {
+            return List.of();
+        }
+
+        return group.getSubcontrols().values().stream()
+            .filter(sc -> isNameSubcontrol(groupName, sc.getName()))
+            .sorted(Comparator.comparingInt(sc -> namePartOrder(sc.getName())))
+            .toList();
+    }
+
     private boolean isNameCapableGroup(String groupName) {
-        return groupName.contains("Input");
-            // || groupName.contains("Mix")
-            // || groupName.contains("AUX")
-            // || groupName.contains("Matrix")
-            // || groupName.contains("DCA")
-            // || groupName.contains("Name");
+        return groupName.contains("Name")
+            || groupName.contains("Input")
+            || groupName.contains("Mix")
+            || groupName.contains("AUX")
+            || groupName.contains("Aux")
+            || groupName.contains("Matrix")
+            || groupName.contains("DCA");
+    }
+
+    private boolean isNameSubcontrol(String groupName, String subControlName) {
+        return subControlName.contains("Name")
+            || groupName.contains("Name") && (
+                subControlName.contains("Short")
+                    || subControlName.contains("Long")
+            );
+    }
+
+    private int namePartOrder(String subControlName) {
+        Matcher matcher = TRAILING_NUMBER.matcher(subControlName);
+
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group(1));
+        }
+
+        return Integer.MAX_VALUE;
+    }
+
+    private String normaliseNameGroup(String groupName) {
+        String key = groupName;
+
+        key = key.replaceFirst("^k", "");
+        key = key.replace("Name", "");
+        key = key.replace("Channel", "");
+        key = key.replace("Input", "input");
+        key = key.replace("Mix", "mix");
+        key = key.replace("AUX", "aux");
+        key = key.replace("Aux", "aux");
+        key = key.replace("Matrix", "matrix");
+        key = key.replace("DCA", "dca");
+
+        key = key.replaceAll("[^A-Za-z0-9]+", "").toLowerCase();
+
+        if (key.isBlank()) {
+            return groupName.toLowerCase();
+        }
+
+        return key;
+    }
+
+    private String displayNameFor(String groupName, int channelIndex) {
+        return groupName + " Name " + (channelIndex + 1);
     }
 }

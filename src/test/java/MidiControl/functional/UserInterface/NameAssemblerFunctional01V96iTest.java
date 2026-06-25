@@ -1,4 +1,4 @@
-package MidiControl.functional.ContextModel;
+package MidiControl.functional.UserInterface;
 
 import MidiControl.ContextModel.*;
 import MidiControl.Controls.*;
@@ -12,8 +12,6 @@ import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.sound.midi.SysexMessage;
@@ -44,35 +42,28 @@ public class NameAssemblerFunctional01V96iTest {
     @Test
     public void testShortNameEndToEnd() throws Exception {
 
-        // --------- 1. Load REAL 01V96i sysex mappings ---------
         List<SysexMapping> mappings =
             SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
 
         SysexParser parser = new SysexParser(mappings);
         CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
 
-        // --------- 2. Create MIDI server and IO mocks ---------
         MockMidiServer server = new MockMidiServer(registry);
         MockMidiIOManager io = server.getMockIo();
 
-        // --------- 3. Discover name contexts ---------
         ContextDiscoveryEngine engine = new ContextDiscoveryEngine(registry);
-        // engine.addDiscoverer(new NameContextDiscoverer());
 
         List<Context> contexts = engine.discoverContexts();
 
-        // Find channel name context
         Context nameContext = contexts.stream()
             .filter(c -> c.getContextType() == ContextType.NAME)
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("No NAME context"));
 
-        // --------- 4. Attach ChannelNameAssembler ---------
         AtomicReference<String> lastName = new AtomicReference<>();
 
         new ChannelNameAssembler(nameContext, registry, (id, name) -> lastName.set(name));
 
-        // --------- 5. Simulate long name "Kick" via SysEx ---------
         SysexMessage sysex = new SysexMessage();
         SysexMessage sysex1 = new SysexMessage();
         SysexMessage sysex2 = new SysexMessage();
@@ -106,31 +97,25 @@ public class NameAssemblerFunctional01V96iTest {
     @Test
     public void testAssemblers_doNotMixChannelNames() throws Exception {
 
-        // Load mappings
         List<SysexMapping> mappings =
             SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
 
         SysexParser parser = new SysexParser(mappings);
         CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
 
-        // Server must come BEFORE assemblers
         MockMidiServer server = new MockMidiServer(registry);
 
-        // Discover contexts
         ContextDiscoveryEngine engine = new ContextDiscoveryEngine(registry);
         List<Context> contexts = engine.discoverContexts();
 
-        // We need ALL name contexts
         List<Context> nameContexts = contexts.stream()
             .filter(c -> c.getContextType() == ContextType.NAME)
             .toList();
 
-        // Listener that captures all (contextId, name) updates
         Map<String, String> emittedNames = new HashMap<>();
 
         List<ChannelNameAssembler> testAssemblers = new ArrayList<ChannelNameAssembler>();
 
-        // One assembler per context
         for (Context c : nameContexts) {
             testAssemblers.add(
                 new ChannelNameAssembler(c, registry,
@@ -140,7 +125,6 @@ public class NameAssemblerFunctional01V96iTest {
 
         int len = buildNameSysex(0, 0, 'K').length;
 
-        // Channel 0 → Kick
         server.addtoinputqueue(new SysexMessage(buildNameSysex(0, 0, 'K'), len));
         server.addtoinputqueue(new SysexMessage(buildNameSysex(1, 0, 'i'), len));
         server.addtoinputqueue(new SysexMessage(buildNameSysex(2, 0, 'c'), len));
@@ -155,13 +139,12 @@ public class NameAssemblerFunctional01V96iTest {
         server.processIncomingMidiForTest();
         Thread.sleep(900);
 
-        // Now assert routed values
-        assertEquals("Kick", emittedNames.get("name.0"), "Channel 0 should assemble Kick");
-        assertEquals("Snr",  emittedNames.get("name.1"), "Channel 1 should assemble Snr");
+        assertEquals("Kick", emittedNames.get("name.input.0"), "Channel 0 should assemble Kick");
+        assertEquals("Snr",  emittedNames.get("name.input.1"), "Channel 1 should assemble Snr");
 
         assertNotEquals(
-            emittedNames.get("name.0"),
-            emittedNames.get("name.1"),
+            emittedNames.get("name.input.0"),
+            emittedNames.get("name.input.1"),
             "Channel names must be different"
         );
         for (ChannelNameAssembler channelNameAssembler : testAssemblers) {
@@ -180,7 +163,7 @@ public class NameAssemblerFunctional01V96iTest {
 
         ContextDiscoveryEngine engine = new ContextDiscoveryEngine(registry);
         Context ctx0 = engine.discoverContexts().stream()
-            .filter(c -> c.getId().equals("name.0"))
+            .filter(c -> c.getId().equals("name.input.0"))
             .findFirst()
             .orElseThrow();
 
@@ -215,7 +198,7 @@ public class NameAssemblerFunctional01V96iTest {
 
         Context ctx0 = new ContextDiscoveryEngine(registry)
             .discoverContexts().stream()
-            .filter(c -> c.getId().equals("name.0"))
+            .filter(c -> c.getId().equals("name.input.0"))
             .findFirst()
             .orElseThrow();
 
@@ -251,7 +234,7 @@ public class NameAssemblerFunctional01V96iTest {
 
         Context ctx0 = new ContextDiscoveryEngine(registry)
             .discoverContexts().stream()
-            .filter(c -> c.getId().equals("name.0"))
+            .filter(c -> c.getId().equals("name.input.0"))
             .findFirst()
             .orElseThrow();
 
@@ -314,8 +297,8 @@ public class NameAssemblerFunctional01V96iTest {
         server.processIncomingMidiForTest();
         Thread.sleep(2000);
 
-        assertEquals("Kick", results.get("name.0"));
-        assertEquals("Snr",  results.get("name.1"));
+        assertEquals("Kick", results.get("name.input.0"));
+        assertEquals("Snr",  results.get("name.input.1"));
         for (ChannelNameAssembler channelNameAssembler : testAssemblers) {
             channelNameAssembler.shutdown();
         }
@@ -332,7 +315,7 @@ public class NameAssemblerFunctional01V96iTest {
 
         Context ctx0 = new ContextDiscoveryEngine(registry)
             .discoverContexts().stream()
-            .filter(c -> c.getId().equals("name.0"))
+            .filter(c -> c.getId().equals("name.input.0"))
             .findFirst()
             .orElseThrow();
 
@@ -363,7 +346,7 @@ public class NameAssemblerFunctional01V96iTest {
 
         Context ctx0 = new ContextDiscoveryEngine(registry)
             .discoverContexts().stream()
-            .filter(c -> c.getId().equals("name.0"))
+            .filter(c -> c.getId().equals("name.input.0"))
             .findFirst()
             .orElseThrow();
 
