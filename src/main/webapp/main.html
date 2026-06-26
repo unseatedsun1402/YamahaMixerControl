@@ -73,11 +73,16 @@
         });
 
         ws.on("name-update", (payload) => {
-            const fromContext = payload["context-id"];   // e.g. "name.28"
-            const [, indexStr] = fromContext.split("."); // "28"
-            const channelContextId = `channel.${indexStr}`;
-            console.debug("Updating Channel name "+payload);
-            updateChannelStripName(channelContextId, payload.name);
+            const fromContext = payload["context-id"];
+
+            const parts = fromContext.split(".");
+            const index = parts[2];
+
+            const uiContextId = `channel.${index}`;
+
+            console.debug("[NAME MAP]", fromContext, "→", uiContextId);
+
+            updateChannelStripName(uiContextId, payload.name);
         });
 
         ws.on("error", (err) => {

@@ -205,7 +205,6 @@ public class MidiServer implements Runnable, UiModelService{
         logger.info("Found "+nameContexts.size() + " name contexts to attach assemblers to");
         for (Context ctx : nameContexts) {
             if(ctx.getId() == null) {logger.warning("[RecreateNameAssemblers] Context given is null"); return;}
-            logger.info("Adding name assembeler to "+ctx.getId());
             nameAssemblers.add(new ChannelNameAssembler(ctx, canonicalRegistry));
         }
         logger.info("Recreated name assemblers after registry reload");
@@ -318,24 +317,35 @@ public class MidiServer implements Runnable, UiModelService{
     
     private void onRegistryReloaded(CanonicalRegistry newRegistry) {
         logger.info("Performing discovery after registry reload");
+
         discoveryEngine = new ContextDiscoveryEngine(newRegistry);
         reloadContextIndex();
-        recreateNameAssemblers();
+
         rehydrationManager.injectNewRegistry(newRegistry);
+
+        recreateNameAssemblers();
+
         String deskType = canonicalRegistry.getDeskType();
+
         String resource = switch (deskType) {
             case "YAMAHA_01V96I":
                 logger.info("Reloading nrpn mapping for Yamaha 01v96i");
                 yield "MidiControl/nrpn/01v96i_nrpn_mappings.json";
+
             case "YAMAHA_M7CL":
-                logger.info("Reloading nrpn mapping for Yamaha 01v96i");
-                yield"MidiControl/nrpn/m7cl_nrpn_mappings.json";
-            default: throw new IllegalStateException(String.format("Unsupported desk profile: %s",deskType));
+                logger.info("Reloading nrpn mapping for Yamaha M7CL");
+                yield "MidiControl/nrpn/m7cl_nrpn_mappings.json";
+
+            default:
+                throw new IllegalStateException(
+                    String.format("Unsupported desk profile: %s", deskType)
+                );
         };
 
         List<NrpnMapping> nrpnMappings =
             NrpnMappingLoader.loadFromResource(resource);
-        try{
+
+        try {
             this.canonicalRegistry.attachNrpnMappings(nrpnMappings);
         }
         catch (OutOfRangeException e) {
