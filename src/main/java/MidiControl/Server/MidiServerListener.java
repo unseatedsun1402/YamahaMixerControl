@@ -1,12 +1,12 @@
 package MidiControl.Server;
 
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import MidiControl.MidiDeviceManager.MidiSendEngine;
 // import MidiControl.Routing.WebSocketEndpoint;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
@@ -30,9 +30,6 @@ public class MidiServerListener implements ServletContextListener {
             }
             MidiServer server = new MidiServer();
             server.run();
-            // WebSocketEndpoint.enableDebug();
-            // MidiSendEngine.enableDebug();
-            // ServerRouter.enableDebug();
             CONTEXT.setAttribute("midiServer", server);
         }
 
@@ -55,7 +52,7 @@ public class MidiServerListener implements ServletContextListener {
             case "FINER"  -> "\u001B[45m";  // Bckgrnd Magenta
             default -> "\u001B[0m"; // Reset
             };
-        return getContextFinal(record.getLoggerName()) + "\t" +color+record.getLevel() +
+        return getContextFinal(record.getLoggerName()) + "\t"+ java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS")) +"\t"+color+record.getLevel() +
             ": " + record.getMessage() + "\u001B[0m\n";
         }
     }

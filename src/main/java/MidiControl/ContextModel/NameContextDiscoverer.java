@@ -112,11 +112,8 @@ public class NameContextDiscoverer implements ContextDiscoverer {
     }
 
     private boolean isNameSubcontrol(String groupName, String subControlName) {
-        return subControlName.contains("Name")
-            || groupName.contains("Name") && (
-                subControlName.contains("Short")
-                    || subControlName.contains("Long")
-            );
+        return groupName.contains("Name")
+            && (subControlName.contains("Short") || subControlName.contains("Long"));
     }
 
     private int namePartOrder(String subControlName) {
