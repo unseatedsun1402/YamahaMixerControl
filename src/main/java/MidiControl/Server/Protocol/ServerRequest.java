@@ -10,7 +10,7 @@ public record ServerRequest(String type, String requestId, JsonObject payload) {
 
     public static ServerRequest of(String type, String requestId, JsonObject payload) {
         return new ServerRequest(type != null ? type : "",
-                requestId,
+                requestId != null ? requestId : "",
                 payload != null ? payload : new JsonObject());
     }
 

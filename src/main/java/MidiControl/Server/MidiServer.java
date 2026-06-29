@@ -31,6 +31,7 @@ import MidiControl.NrpnUtils.NrpnMappingLoader;
 import MidiControl.NrpnUtils.NrpnParser;
 import MidiControl.NrpnUtils.NrpnRegistry;
 import MidiControl.Routing.WebSocketEndpoint;
+import MidiControl.Server.EventStream.EventObject;
 import MidiControl.Server.Protocol.ServerEventSerializer;
 import MidiControl.Server.Rehydration.RehydrationManager;
 import MidiControl.SysexUtils.SysexMapping;
@@ -237,27 +238,30 @@ public class MidiServer implements Runnable, UiModelService{
             processingThread.setUncaughtExceptionHandler((t, e) -> {
                 logger.log(Level.SEVERE, "Processing thread crashed: " + t.getName(), e);
 
-                String json = ServerEventSerializer.fatal(
-                        e,
-                        "PROCESSING",
-                        "Midi processing thread crashed: " + t.getName()
+                WebSocketEndpoint.broadcast(
+                    EventObject.fromServerEvent(
+                        ServerEventSerializer.fatal(
+                            e,
+                            "PROCESSING",
+                            "Midi processing thread crashed: " + t.getName()
+                    )).getAsString()
                 );
-
-                WebSocketEndpoint.broadcast(json);
             });
-            processingThread.start();
+        processingThread.start();
         }
 
         catch (Exception e) {
             logger.log(Level.SEVERE, "MidiServer thread crashed", e);
 
-            String json = ServerEventSerializer.fatal(
+            
+
+            WebSocketEndpoint.broadcast(
+                ServerEventSerializer.fatal(
                     e,
                     "SERVER",
                     "MidiServer main thread crashed"
+                ).getAsString()
             );
-
-            WebSocketEndpoint.broadcast(json);
         }
 
     }

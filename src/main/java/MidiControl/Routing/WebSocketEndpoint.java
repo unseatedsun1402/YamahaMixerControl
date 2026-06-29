@@ -76,7 +76,7 @@ public class WebSocketEndpoint{
 
             switch (type) {
 
-                case "get-ui-bank": {
+                case "get-ui-bank": {       // mixing responsabilities, must move
                     String bankId = json.getAsJsonObject("payload").get("bankId").getAsString();
                     UiBankFactory bankFactory = server.getUiBankFactory();
                     BankContext bankCtx = server.getBankCatalog().getBank(bankId);
@@ -86,7 +86,7 @@ public class WebSocketEndpoint{
                 }
 
                 default:
-                    server.getServerRouter().handleMessage(session, message);
+                    server.getServerRouter().handleMessage(session, message); // inefficent to get the serverrouter each message, swap to a dynamic reference
                     break;
             }
 

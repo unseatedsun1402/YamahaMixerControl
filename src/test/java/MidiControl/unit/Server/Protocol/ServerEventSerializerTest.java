@@ -3,14 +3,13 @@ package MidiControl.unit.Server.Protocol;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
+import MidiControl.Server.EventStream.EventObject;
 import MidiControl.Server.Protocol.ServerEvent;
 import MidiControl.Server.Protocol.ServerEventLevel;
-import MidiControl.Server.Protocol.ServerEventSerializer;
 
 public class ServerEventSerializerTest {
 
@@ -24,12 +23,11 @@ public class ServerEventSerializerTest {
                 null
         );
 
-        String json = ServerEventSerializer.toJsonString(ev);
+        JsonObject json = EventObject.fromServerEvent(ev);
 
-        JsonObject root = JsonParser.parseString(json).getAsJsonObject();
-        assertEquals("server-event", root.get("type").getAsString());
+        assertEquals("server-event", json.get("type").getAsString());
 
-        JsonObject payload = root.getAsJsonObject("payload");
+        JsonObject payload = json.getAsJsonObject("payload");
         assertEquals(0, payload.get("timestamp").getAsLong());
         assertEquals("ERROR", payload.get("level").getAsString());
         assertEquals("PROTOCOL", payload.get("category").getAsString());

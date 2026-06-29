@@ -16,7 +16,6 @@
         const meterWidgets = new Map();
         const debugFlag = false;
 
-        // Build WebSocket URL
         const contextPath = window.location.pathname.split('/')[1];
         const wsUrl = `ws://${location.host}/${contextPath}/endpoint`;
         const ws = new WebSocketClient(wsUrl);
@@ -24,10 +23,8 @@
         ws.on("connected", () => {
             console.info("[Meter Panel] Connected to server");
 
-            // Always send a keep-alive right away
             ws.sendMeterKeepAlive();
 
-            // Start periodic keep-alives
             if (!ws.keepAliveInterval) {
                 ws.keepAliveInterval = setInterval(() => {
                     ws.sendMeterKeepAlive();

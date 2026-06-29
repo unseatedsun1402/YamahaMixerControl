@@ -1,31 +1,23 @@
-package MidiControl.Server;
+package MidiControl.Server.EventStream;
 
 import com.google.gson.JsonObject;
 import jakarta.websocket.Session;
 import MidiControl.Routing.WebSocketEndpoint;
 
-import java.util.Collection;
+import java.util.Optional;
 
 public final class ServerEvents {
 
     private ServerEvents() {}
 
-    /** Basic event envelope: { type, payload } */
-    public static JsonObject envelope(String type, JsonObject payload) {
-        JsonObject root = new JsonObject();
-        root.addProperty("type", type);
-        if (payload != null) root.add("payload", payload);
-        return root;
-    }
-
     /** Send to a single session */
     public static void send(Session session, String type, JsonObject payload) {
-        WebSocketEndpoint.send(session, envelope(type, payload).toString());
+        WebSocketEndpoint.send(session, EventObject.envelope(EventObject.Classification.EVENT,type,Optional.empty(), payload).toString());
     }
 
     /** Broadcast to all sessions */
     public static void broadcast(String type, JsonObject payload) {
-        String msg = envelope(type, payload).toString();
+        String msg = EventObject.envelope(EventObject.Classification.EVENT,type,Optional.empty(), payload).toString();
         WebSocketEndpoint.broadcast(msg);
     }
 

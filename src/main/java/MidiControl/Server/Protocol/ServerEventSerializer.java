@@ -13,31 +13,9 @@ public final class ServerEventSerializer {
 
     private ServerEventSerializer() {}
 
-    public static JsonObject toJson(ServerEvent event) {
-        JsonObject payload = new JsonObject();
-        payload.addProperty("timestamp", event.timestamp().toEpochMilli()); // consistent numeric time
-        payload.addProperty("level", event.level().name());
-        payload.addProperty("category", event.category());
-        payload.addProperty("message", event.message());
-
-        if (event.details() != null) {
-            payload.add("details", event.details());
-        }
-
-        JsonObject root = new JsonObject();
-        root.addProperty("type", "server-event");
-        root.add("payload", payload);
-        return root;
-    }
-
-    public static String toJsonString(ServerEvent event) {
-        return toJson(event).toString();
-    }
-
     public static ServerEvent simple(ServerEventLevel level, String category, String message) {
         return new ServerEvent(Instant.now(), level, category, message, null);
     }
-
     
     public static ServerEvent fromThrowable(
             Throwable t,
@@ -64,14 +42,12 @@ public final class ServerEventSerializer {
         );
     }
 
-    
-    public static String fatal(Throwable t, String category, String message) {
-        ServerEvent ev = fromThrowable(
+    public static ServerEvent fatal(Throwable t, String category, String message) {
+        return fromThrowable(
                 t,
                 ServerEventLevel.ERROR,
                 category,
                 message
         );
-        return toJsonString(ev);
     }
 }
