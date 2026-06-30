@@ -93,7 +93,7 @@ public class ServerRouterTest {
         Env env = makeEnv();
 
         env.router.handleMessage(env.session, """
-            {"type":"set-control-value","payload":{"canonicalId":"__definitely_missing__","value":77}}
+            {"requestId": 1,"type":"set-control-value","payload":{"canonicalId":"__definitely_missing__","value":77}}
         """);
 
         String msg = env.session.lastSent;
@@ -119,7 +119,7 @@ public class ServerRouterTest {
                 .getCanonicalId();
 
         env.router.handleMessage(env.session, """
-            {"type":"set-control-value","payload":{"canonicalId":"%s","value":77}}
+            {"requestId": 1,"type":"set-control-value","payload":{"canonicalId":"%s","value":77}}
         """.formatted(existingId));
 
         String msg = env.session.lastSent;
@@ -147,7 +147,7 @@ public class ServerRouterTest {
         env.io.devices.add(d2);
 
         env.router.handleMessage(env.session, """
-            {"type":"list-midi-devices","payload":{}}
+            {"requestId": 1,"type":"list-midi-devices","payload":{}}
         """);
 
         String msg = env.session.lastSent;
@@ -163,7 +163,7 @@ public class ServerRouterTest {
         env.io.setResult = true;
 
         env.router.handleMessage(env.session, """
-            {"type":"set-midi-device","payload":{"deviceId":3}}
+            {"requestId": 1,"type":"set-midi-device","payload":{"deviceId":3}}
         """);
 
         assertEquals(3, env.io.lastSetIndex);
@@ -177,7 +177,7 @@ public class ServerRouterTest {
         Env env = makeEnv();
 
         env.router.handleMessage(env.session, """
-            {"type":"does-not-exist","payload":{}}
+            {"requestId": 1,"type":"does-not-exist","payload":{}}
         """);
 
         String msg = env.session.lastSent;
@@ -205,7 +205,7 @@ public class ServerRouterTest {
         FakeSession session = new FakeSession("1");
 
         router.handleMessage(session, """
-            {"type":"unsubscribe-context","payload":{"contextId":"eq1"}}
+            {"requestId": 1,"type":"unsubscribe-context","payload":{"contextId":"eq1"}}
         """);
 
         assertEquals("eq1", subs.lastUnsubscribed);
@@ -233,7 +233,7 @@ public class ServerRouterTest {
         FakeSession session = new FakeSession("1");
 
         router.handleMessage(session, """
-            {"type":"subscribe-context","payload":{"contextId":"eq1"}}
+            {"requestId": 1,"type":"subscribe-context","payload":{"contextId":"eq1"}}
         """);
 
         assertEquals("eq1", subs.lastSubscribed);

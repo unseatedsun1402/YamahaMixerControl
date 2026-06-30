@@ -75,4 +75,8 @@ public record ServerEvent(
                 details
         );
     }
+
+    public String getAsString(){
+        return this.getAsString();
+    }
 }

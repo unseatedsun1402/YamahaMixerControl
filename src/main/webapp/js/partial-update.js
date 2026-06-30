@@ -7,7 +7,7 @@ import { updateToggle } from "./widgets/toggle.js";
 
 export function applyControlUpdate({ canonicalId, value }) {
     const el = document.querySelector(`[data-canonical-id="${canonicalId}"]`);
-    console.info("Update for "+canonicalId+" val:"+value);
+    console.debug("Update for "+canonicalId+" val:"+value);
     if (!el) {
         console.warn("Partial update: control not found:", canonicalId);
         return;

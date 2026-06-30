@@ -7,11 +7,10 @@ export class WebSocketClient {
     this.url = url;
     this.ws = null;
 
-    
-    this.reconnectDelay = 1000;      // start at 1 second
-    this.maxReconnectDelay = 15000;  // cap at 15 seconds
+    this.reconnectDelay = 1000;
+    this.maxReconnectDelay = 15000;
     this.reconnectAttempts = 0;
-    this.forcedClose = false;        // manual close flag
+    this.forcedClose = false;
 
     this.handlers = {
       "ui-model": [],
@@ -29,8 +28,14 @@ export class WebSocketClient {
     };
 
     this.requestCounter = 0;
+    this.sessionType = null;
+    this._lastSequence = undefined;
 
     console.info("[WebSocketClient] Initialized with URL:", url);
+  }
+
+  setSessionType(type) {
+    this.sessionType = type;
   }
 
   connect() {
@@ -54,14 +59,19 @@ export class WebSocketClient {
       }
     };
 
-
     this.ws.onmessage = (event) => {
-      if (debugFlag) {console.debug("[WebSocketClient] Message received:", event.data);}
+      if (debugFlag) {
+        console.debug("[WebSocketClient] Message received:", event.data);
+      }
+
       try {
         const msg = JSON.parse(event.data);
         this._routeMessage(msg);
       } catch (e) {
-        console.warn("[WebSocketClient] Failed to parse message:", e);
+        console.warn("[WebSocketClient] Failed to parse message:", {
+          error: e,
+          raw: event.data
+        });
       }
     };
 
@@ -89,64 +99,183 @@ export class WebSocketClient {
 
   // ------------------------------------------------------------
 
-  _routeMessage(msg) {
-    // console.debug("[WebSocketClient] Routing message:", msg);
+  _shouldHandle(type) {
+    if (!this.sessionType) return true;
 
-    switch (msg.type) {
+    if (this.sessionType === "settings") {
+      if (type === "control-update" || type === "meter-update") return false;
+    }
+
+    if (this.sessionType === "control") {
+      if (type === "telemetry") return false;
+    }
+
+    if (this.sessionType === "mix") {
+      if (type === "telemetry") return false;
+    }
+
+    return true;
+  }
+
+  _routeMessage(msg) {
+    const {
+      classification = "UNKNOWN",
+      type,
+      sequence,
+      timestamp,
+      requestId
+    } = msg;
+
+    const normalizedClassification = classification.toUpperCase();
+
+    if (!type) {
+      console.error("[WebSocketClient] Missing type", msg);
+      return;
+    }
+
+    // sequence tracking
+    if (this._lastSequence !== undefined && sequence !== undefined) {
+      if (sequence !== this._lastSequence + 1) {
+        console.warn("[WebSocketClient] Sequence gap", {
+          expected: this._lastSequence + 1,
+          received: sequence,
+          type,
+          classification
+        });
+      }
+    }
+
+    this._lastSequence = sequence;
+
+    const enrichedPayload = {
+      ...(msg.payload || {}),
+      __meta: {
+        classification: normalizedClassification,
+        type,
+        sequence,
+        timestamp,
+        requestId
+      }
+    };
+
+    // classification-based logging
+    if (normalizedClassification === "ERROR") {
+      console.error("[WebSocketClient] Server ERROR", {
+        type,
+        sequence,
+        payload: msg.payload
+      });
+    }
+
+    if (!this._shouldHandle(type)) {
+      if (debugFlag) {
+        console.debug("[WebSocketClient] Dropped by context", {
+          sessionType: this.sessionType,
+          type
+        });
+      }
+      return;
+    }
+
+    switch (type) {
 
       case "ui-bank":
-        this._emit("ui-bank", msg.payload);
+        this._emit("ui-bank", enrichedPayload);
         break;
 
       case "ui-model":
-        this._emit("ui-model", msg.payload);
+        this._emit("ui-model", enrichedPayload);
         break;
 
       case "control-update":
-        this._emit("control-update", msg.payload);
+        this._emit("control-update", enrichedPayload);
         break;
-      
+
       case "meter-update":
-        this._emit("meter-update", msg.payload);
+        this._emit("meter-update", enrichedPayload);
         break;
 
       case "error":
-        this._emit("error", msg.payload);
+        this._emit("error", enrichedPayload);
         break;
 
       case "ack":
-        if (!debugFlag) console.debug("[WebSocketClient] ACK:", msg.payload);
+        if (debugFlag) {
+          console.debug("[WebSocketClient] ACK:", {
+            sequence,
+            requestId,
+            payload: msg.payload
+          });
+        }
         break;
 
-      case "midi-device-list":
-        this._emit("midi-device-list", msg.payload.devices);
+      case "midi-device-list": {
+        const devices = msg.payload?.devices || [];
+
+        if (!Array.isArray(devices)) {
+          console.error("[WebSocketClient] Invalid device list payload", {
+            received: msg.payload,
+            type,
+            sequence
+          });
+        }
+
+        // attach meta directly to the array
+        devices.__meta = enrichedPayload.__meta;
+
+        this._emit("midi-device-list", devices);
         break;
-      
+      }
+
       case "name-update":
-        this._emit("name-update", msg.payload);
-        break;
-      
-      case "telemetry":
-          this._emit("telemetry", msg.payload);
-          break;
-      
-      case "server-event":
-        this._emit("server-event", msg.payload);
-        break;
-      
-      case "REGISTRY_CHANGED":
-        this._emit("REGISTRY_CHANGED", msg.payload);
+        this._emit("name-update", enrichedPayload);
         break;
 
-      default:
-        console.warn("[WebSocketClient] Unknown message type:", msg.type, msg);
+      case "telemetry":
+        this._emit("telemetry", enrichedPayload);
         break;
+
+      case "server-event": {
+        const level = msg.payload?.level?.toLowerCase() || "info";
+
+        console[level]("[ServerEvent]", {
+          category: msg.payload?.category,
+          message: msg.payload?.message,
+          details: msg.payload?.details,
+          sequence
+        });
+
+        this._emit("server-event", enrichedPayload);
+        break;
+      }
+
+      case "REGISTRY_CHANGED":
+        this._emit("REGISTRY_CHANGED", enrichedPayload);
+        break;
+
+      default: {
+        const level =
+          normalizedClassification === "ERROR" ? "error" :
+          normalizedClassification === "RESPONSE" ? "error" :
+          "warn";
+
+        console[level]("[WebSocketClient] Unhandled message", {
+          type,
+          classification,
+          sequence,
+          payload: msg.payload
+        });
+
+        break;
+      }
     }
   }
 
-  
+  // ------------------------------------------------------------
+
   _scheduleReconnect() {
     this.reconnectAttempts++;
+
     console.info(
       `[WebSocketClient] Attempting reconnect #${this.reconnectAttempts} in ${this.reconnectDelay}ms`
     );
@@ -154,7 +283,6 @@ export class WebSocketClient {
     setTimeout(() => {
       this.connect();
 
-      // Exponential backoff
       this.reconnectDelay = Math.min(
         this.reconnectDelay * 1.5,
         this.maxReconnectDelay
@@ -172,16 +300,17 @@ export class WebSocketClient {
       payload: { contextId, uiType }
     };
 
-    console.debug(`[WebSocketClient] Requesting UI model: context=${contextId}, uiType=${uiType}`);
+    console.debug("[WebSocketClient] Requesting UI model:", message);
     this.ws.send(JSON.stringify(message));
     return requestId;
   }
 
   requestBank(bankId) {
     const message = {
-        type: "get-ui-bank",
-        payload: { bankId }
+      type: "get-ui-bank",
+      payload: { bankId }
     };
+
     console.debug("[WebSocketClient] Requesting UI bank:", message);
     this.ws.send(JSON.stringify(message));
   }
@@ -191,6 +320,7 @@ export class WebSocketClient {
       type: "subscribe-context",
       payload: { contextId }
     };
+
     console.info("[WebSocketClient] Sending subscribe request:", message);
     this.ws.send(JSON.stringify(message));
   }
@@ -200,16 +330,24 @@ export class WebSocketClient {
       type: "set-control-value",
       payload: { canonicalId, value }
     };
-    if (debugFlag){console.debug("[WebSocketClient] Sending control change: ", message);}
+
+    if (debugFlag) {
+      console.debug("[WebSocketClient] Sending control change:", message);
+    }
+
     this.ws.send(JSON.stringify(message));
   }
 
   sendMeterKeepAlive() {
     const message = {
       type: "meter-keep-alive",
-      payload: { "timestamp": Date.now() }
+      payload: { timestamp: Date.now() }
     };
-    if (debugFlag){console.debug("[WebSocketClient] Sending meter keep alive: ");}
+
+    if (debugFlag) {
+      console.debug("[WebSocketClient] Sending meter keep alive");
+    }
+
     this.ws.send(JSON.stringify(message));
   }
 
@@ -219,6 +357,7 @@ export class WebSocketClient {
       requestId: `req-${++this.requestCounter}`,
       payload: {}
     };
+
     console.info("[WebSocketClient] Requesting MIDI devices:", message);
     this.ws.send(JSON.stringify(message));
   }
@@ -229,28 +368,31 @@ export class WebSocketClient {
       requestId: `req-${++this.requestCounter}`,
       payload: settings
     };
+
     console.info("[WebSocketClient] Applying MIDI settings:", message);
     this.ws.send(JSON.stringify(message));
   }
 
-    saveMidiSettings(settings) {
+  saveMidiSettings(settings) {
     const message = {
       type: "save-midi-settings",
       requestId: `req-${++this.requestCounter}`,
       payload: settings
     };
+
     console.info("[WebSocketClient] Saving MIDI settings:", message);
     this.ws.send(JSON.stringify(message));
   }
 
-  requestChannelNames(){
+  requestChannelNames() {
     const message = {
       type: "request-channel-names",
       requestId: `req-${++this.requestCounter}`,
-      payload: "{ \"empty\" : \"true\" }"
+      payload: { empty: true }
     };
-    const json = JSON.stringify(message)
-    this.ws.send(json)
-    console.info("[WebSocketClient] Requesting Channel Names "+json)
+
+    const json = JSON.stringify(message);
+    this.ws.send(json);
+    console.info("[WebSocketClient] Requesting Channel Names", json);
   }
 }

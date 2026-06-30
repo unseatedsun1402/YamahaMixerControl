@@ -19,6 +19,8 @@ import MidiControl.MidiDeviceManager.ServerSettings;
 import MidiControl.MidiDeviceManager.Settings;
 import MidiControl.Routing.HardwareOutputRouter;
 import MidiControl.Routing.WebSocketEndpoint;
+import MidiControl.Server.EventStream.ServerEvents;
+import MidiControl.Server.EventStream.ServerResponses;
 import MidiControl.Server.Protocol.NotifyClients;
 import MidiControl.Server.Protocol.ServerEvent;
 import MidiControl.Server.Protocol.ServerRequest;
