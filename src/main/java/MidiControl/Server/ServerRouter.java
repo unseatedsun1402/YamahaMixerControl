@@ -96,6 +96,8 @@ public class ServerRouter {
             case "save-midi-settings" -> handleSaveMidiSettings(session, requestId, payload);
             case "meter-keep-alive" -> handleMeterKeepAlive(session, requestId, payload);
             case "request-channel-names" -> handleRequestChannelNames(session, requestId, payload);
+            case "register-session" -> handleRegisterSession(session,requestId,payload);
+
             default -> ServerResponses.error(
                 session,
                 requestId,
@@ -158,7 +160,7 @@ public class ServerRouter {
         if (ci != null) {
             ci.updateValue(value);
             guiInputHandler.handleGuiChange(canonicalId, value);
-            subscriptions.broadcastControlUpdateWithout(canonicalId, value, session);
+            subscriptions.broadcastControlUpdate(canonicalId, value, session);
             ServerResponses.ackOk(session, requestId);
         } else {
             logger.warning("Unknown canonicalId in set-control-value: " + canonicalId);
@@ -319,6 +321,12 @@ public class ServerRouter {
             serverSettings.saveSettings();
         }
         else{logger.warning("Failed to save settings, configuration not accepted: "+payload);}
+    }
+
+    private void handleRegisterSession(Session session, String requestId, JsonObject payload) {
+        String sessionType = payload.get("sessionType").getAsString();
+        subscriptions.registerSessionType(session, sessionType);
+        ServerResponses.ackOk(session, requestId);
     }
 
     public HardwareOutputRouter getOutputRouter() {

@@ -2,24 +2,26 @@ import { WebSocketClient } from "./websocketClient.js";
 
 console.log(">>> settings.js LOADED <<<");
 
-const wsClient = new WebSocketClient(`ws://${location.host}/MidiControl/endpoint`);
+const ws = new WebSocketClient(`ws://${location.host}/MidiControl/endpoint`);
 const SERVER_LOG_LIMIT = 50;
 const serverLogBuffer = [];
 
 const serverLog = document.getElementById("server-log");
 
-wsClient.connect();
+ws.connect();
 
-wsClient.on("connected", () => {
+ws.on("connected", () => {
   console.log("[Settings] Connected, requesting device list...");
-  wsClient.requestMidiDevices();
+  ws.requestMidiDevices();
+  ws.setSessionType("settings");
+  console.info(`[Settings] Registering session type ${ws.sessionType}`);
 });
 
-wsClient.on("telemetry", updateTelemetry);
-wsClient.on("server-event", handleServerEvent)
-wsClient.on("REGISTRY_CHANGED", handleRegistryChanged);
+ws.on("telemetry", updateTelemetry);
+ws.on("server-event", handleServerEvent)
+ws.on("REGISTRY_CHANGED", handleRegistryChanged);
 
-wsClient.on("midi-device-list", (devices) => {
+ws.on("midi-device-list", (devices) => {
   console.log("[Settings] Received device list:", devices);
   populateDeviceDropdowns(devices);
 });
@@ -56,7 +58,7 @@ document.getElementById("apply-settings").addEventListener("click", () => {
     // showCanonical: document.getElementById("show-canonical").checked
   };
 
-  wsClient.applyMidiSettings(settings);
+  ws.applyMidiSettings(settings);
   showStatus("Settings applied");
 });
 
@@ -71,12 +73,12 @@ document.getElementById("save-settings").addEventListener("click", () => {
     consoleType
   };
 
-  wsClient.saveMidiSettings(settings);
+  ws.saveMidiSettings(settings);
   showStatus("Settings saved");
 });
 
 document.getElementById("rescan-devices").addEventListener("click", () => {
-  wsClient.requestMidiDevices();
+  ws.requestMidiDevices();
 });
 
 function populateDeviceDropdowns(devices) {

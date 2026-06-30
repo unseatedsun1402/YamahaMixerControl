@@ -41,11 +41,8 @@ public class NameContextDiscoverer implements ContextDiscoverer {
                 .max()
                 .orElse(0);
 
-            logger.info("Detected name-capable group: " + group.getName()
-                + " with " + nameSubcontrols.size()
-                + " name subcontrols and max "
-                + maxChannels
-                + " instances");
+            logger.fine(String.format("Detected name-capable group: %s  with %d subcontrols and max %s instances",
+                group.getName(),nameSubcontrols.size(),maxChannels));
 
             String groupKey = normaliseNameGroup(group.getName());
 

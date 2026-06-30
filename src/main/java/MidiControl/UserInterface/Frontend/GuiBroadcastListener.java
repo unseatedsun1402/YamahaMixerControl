@@ -50,7 +50,6 @@ public class GuiBroadcastListener {
                 return;
             }
 
-            // Broadcaster may be null or may throw if context is not registered
             try {
                 broadcaster.broadcast(json, contextId);
             } catch (Exception ex) {

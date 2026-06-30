@@ -28,6 +28,9 @@
         ws.on("connected", () => {
             console.info("[Bootstrap] Connected — requesting bank.inputs…");
             ws.requestBank("bank.inputs");
+            
+            ws.setSessionType("control");
+            console.info(`[Mix] Registering session type ${ws.sessionType}`);
         });
 
         function handleViewSelection(sendId) {
