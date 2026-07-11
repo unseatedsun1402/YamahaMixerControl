@@ -1,12 +1,15 @@
 package MidiControl.Server;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import com.google.gson.JsonObject;
 
 import MidiControl.Routing.WebSocketEndpoint;
+import MidiControl.Server.EventStream.EventObject;
 import jakarta.websocket.Session;
 
 public class SubscriptionManager {
@@ -16,6 +19,8 @@ public class SubscriptionManager {
 
     // contextId -> set of sessions
     private final Map<String, Set<Session>> contextToSessions = new ConcurrentHashMap<>();
+
+    private final Map<Session, String> sessionTypes = new ConcurrentHashMap<>();
 
     private static final Logger logger = Logger.getLogger(SubscriptionManager.class.getName());
     private static boolean debug = false;
@@ -30,6 +35,12 @@ public class SubscriptionManager {
         contextToSessions
             .computeIfAbsent(contextId, c -> ConcurrentHashMap.newKeySet())
             .add(session);
+    }
+
+    public void registerSessionType(Session session, String type) {
+        if (type == null) {logger.warning("No session type provided for "+session.getId()); return;};
+        sessionTypes.put(session, type);
+        logger.info(String.format("%s Session %s registered",type,session.getId()));
     }
 
     public void unsubscribe(Session session, String contextId) {
@@ -63,6 +74,8 @@ public class SubscriptionManager {
                 }
             }
         }
+        sessionTypes.remove(session);
+        logger.info(String.format("Removed Session %s",session.getId()));
     }
 
     public Set<Session> getSubscribers(String contextId) {
@@ -73,61 +86,54 @@ public class SubscriptionManager {
         return sessionToContexts.keySet();
     }
 
-    public void broadcastControlUpdate(String canonicalId, int value) {
-        String contextId = canonicalId.split("\\.")[0];
-
-        Set<Session> sessions = getSubscribers(contextId);
-        if (sessions.isEmpty()) {
-            return;
-        }
-
-        JsonObject msg = new JsonObject();
-        msg.addProperty("type", "control-update");
-
-        JsonObject payload = new JsonObject();
-        payload.addProperty("contextId", contextId);
-        payload.addProperty("canonicalId", canonicalId);
-        payload.addProperty("value", value);
-        msg.add("payload", payload);
-
-        String json = msg.toString();
-
-        for (Session s : sessions) {
-            WebSocketEndpoint.send(s, json);
-            logger.info("Gui control update from "+s.getId());
-        }
+    public String getSessionType(Session session) {
+        return sessionTypes.getOrDefault(session, "unknown");
     }
 
-    public void broadcastControlUpdateWithout(String canonicalId, int value,Session session){
+    public void broadcastControlUpdate(String canonicalId, int value, Session origin) {
+
         String contextId = canonicalId.split("\\.")[0];
-        if(debug)logger.info("Boardcasting control update: "+canonicalId+"->"+contextId+" val: "+value);
 
         Set<Session> sessions = getSubscribers(contextId);
-        if(sessions.isEmpty()){contextId = "channel."+canonicalId.split("\\.")[2];
+
+        if (sessions.isEmpty()) {
+            contextId = "channel." + canonicalId.split("\\.")[2];
             sessions = getSubscribers(contextId);
         }
-        
+
         if (sessions.isEmpty()) {
-            logger.warning("Cannot find any subscribers to "+canonicalId);
+            logger.warning(String.format("Cannot find any subscribers to %s",canonicalId));
             return;
         }
-
-        JsonObject msg = new JsonObject();
-        msg.addProperty("type", "control-update");
 
         JsonObject payload = new JsonObject();
         payload.addProperty("contextId", contextId);
         payload.addProperty("canonicalId", canonicalId);
         payload.addProperty("value", value);
-        msg.add("payload", payload);
+
+        JsonObject msg = EventObject.envelope(
+            EventObject.Classification.EVENT,
+            "control-update",
+            Optional.empty(),
+            payload
+        );
 
         String json = msg.toString();
 
         for (Session s : sessions) {
-            if(s.getId() != session.getId()){
-                WebSocketEndpoint.send(s, json);
-                if(debug)logger.fine("Gui control update from "+session.getId()+" sent to "+s.getId());
+
+            if (s == origin) continue;
+
+            String type = getSessionType(s);
+
+            if ("settings".equals(type)) {
+                if (debug) logger.fine("Skipping control update for settings session " + s.getId());
+                continue;
             }
+
+            WebSocketEndpoint.send(s, json);
+
+            if (debug)  logger.fine(String.format("Control update from  %s -> %s type=%s",canonicalId, origin.getId(), s.getId(), type));
         }
     }
 

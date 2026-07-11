@@ -8,7 +8,7 @@ import jakarta.websocket.Session;
 
 public class WebSocketGuiBroadcaster implements GuiBroadcaster {
 
-    private final SubscriptionManager subscriptions;
+    private SubscriptionManager subscriptions;
 
     public WebSocketGuiBroadcaster(SubscriptionManager subscriptions) {
         this.subscriptions = subscriptions;

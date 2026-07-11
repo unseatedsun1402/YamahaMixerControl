@@ -36,6 +36,10 @@ export class WebSocketClient {
 
   setSessionType(type) {
     this.sessionType = type;
+        this.ws.send(JSON.stringify({
+        type: "register-session",
+        payload: { sessionType: `${this.sessionType}` }
+    }));
   }
 
   connect() {
