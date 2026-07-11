@@ -9,18 +9,25 @@ const renderedStrips = new Map();
 const stripContainer = document.getElementById("strip-container");
 
 export function renderUiModel(model) {
+
     if (!stripContainer) return;
 
     const ctxId = model.contextId;
 
-    // Reuse or create strip
     let stripEl = renderedStrips.get(ctxId);
+
     if (!stripEl) {
         stripEl = createStripElement(ctxId);
         renderedStrips.set(ctxId, stripEl);
+    }
+
+    if (!stripEl.parentNode) {
         stripContainer.appendChild(stripEl);
     }
 
-    // Update the strip with the new model
     updateStrip(stripEl, model);
+}
+
+export function getRenderedStrip(ctxId) {
+    return renderedStrips.get(ctxId);
 }

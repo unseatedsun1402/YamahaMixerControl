@@ -36,3 +36,32 @@
     background: #550000;
     border-color: #992222;
 }
+
+#bank-selector {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+
+    padding: 8px;
+    background: #1f1f1f;
+    border-bottom: 1px solid #444;
+}
+
+.bank-btn {
+    flex: 0 0 auto;
+
+    padding: 8px 12px;
+
+    background: #333;
+    border: 1px solid #666;
+    border-radius: 4px;
+
+    color: white;
+    cursor: pointer;
+}
+
+.bank-btn.active {
+    background: #0066aa;
+    border-color: #3399ff;
+}

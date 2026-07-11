@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.MidiDeviceManager.TransportMode;
+import MidiControl.Server.MidiServer;
+import MidiControl.Server.Rehydration.RehydrationManager;
 import MidiControl.Controls.CanonicalRegistry;;
 
 public class HardwareOutputRouter implements OutputRequestSender{
@@ -38,14 +40,19 @@ public class HardwareOutputRouter implements OutputRequestSender{
         TransportMode mode = ioManager.getTransportMode();
 
         switch (mode) {
-
             case NRPN:
-                if (ci.getNrpn().isPresent()) sendNrpn(ci, newValue);
+                if (ci.getNrpn().isPresent()){
+                    sendNrpn(ci, newValue);
+                    break;
+                }
 
-                else sendSysex(ci, newValue);
-
+                sendSysex(ci, newValue);
                 break;
             case SYSEX:
+                if(registry.getDeskType().equals("YAMAHA_01V96I")){
+                    sendSysex(ci,newValue);
+                    break;
+                }
                 if (ci.getNrpn().isPresent()) {
                     sendNrpn(ci, newValue);
                     break;
@@ -98,7 +105,7 @@ public class HardwareOutputRouter implements OutputRequestSender{
 
     public void setRegistry(CanonicalRegistry newRegistry){
         this.registry = newRegistry;
-        logger.info("Registry reloaded for hardware output router");
+        logger.info(String.format("Registry reloaded for hardware output router: %s",registry.getDeskType()) );
     }
 
     @Override
