@@ -15,6 +15,7 @@
         import { applyControlUpdate } from './js/partial-update.js';
         import { buildViewRibbonFromModel } from './js/view-ribbon.js';
         import { updateChannelStripName } from './js/utils/channel-name.js';
+        // import { createLedMeter } from "./js/widgets/meter.js";
         window.ribbonInitialised = false;
         window.lastBankContexts= [];
         
@@ -22,6 +23,7 @@
         window.currentBank = 0;
         window.channelsPerBank = 8;
         window.currentView = "basic-input-view";
+        window.channelMeters = new Map();
 
         
         console.log(">>> MidiControl UI bootstrap running <<<");
@@ -34,6 +36,13 @@
         ws.on("connected", () => {
             console.info("[Bootstrap] Connected — requesting bank.inputs…");
             ws.requestBank("bank.inputs");
+            ws.sendMeterKeepAlive();
+
+            if (!ws.keepAliveInterval) {
+                ws.keepAliveInterval = setInterval(() => {
+                    ws.sendMeterKeepAlive();
+                }, 10000);
+            }
             
             ws.setSessionType("control");
             console.info(`[Mix] Registering session type ${ws.sessionType}`);
@@ -114,6 +123,19 @@
             loadBank(0);
         });
 
+        ws.on("meter-update", (payload) => {
+            const ctxId = `channel.${payload.offset}`;
+            const meter = window.channelMeters?.get(ctxId);
+
+            if (meter) {
+                meter.update(
+                    payload.value,
+                    payload.dB,
+                    payload.is14Bit,
+                    payload.offset
+                );
+            }
+        });
 
         ws.on("ui-model", (model) => {
 

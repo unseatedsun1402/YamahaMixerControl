@@ -126,3 +126,34 @@ export function createFifteenSegmentMeter() {
 
     return wrapper;
 }
+
+export function createLedMeter() {
+
+    const led = document.createElement("div");
+    led.className = "led-meter";
+
+    led.update = throttle((rawValue, dB) => {
+
+        const db = parseFloat(dB);
+
+        let colour = "#222";
+
+        if (db >= 0) {
+            colour = "#ff0000";
+        }
+        else if (db > -10) {
+            colour = "#ffb000";
+        }
+        else if (db > -30) {
+            colour = "#00ff00";
+        }
+        else if (db > -56) {
+            colour = "#0044ff";
+        }
+
+        led.style.backgroundColor = colour;
+
+    }, 50);
+
+    return led;
+}

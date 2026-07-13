@@ -1,9 +1,11 @@
 package MidiControl.unit.Server;
 
+import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlGroup;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.Controls.SourceAllInstances;
 import MidiControl.Controls.SubControl;
+import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.Routing.OutputRequestSender;
 import MidiControl.Server.Rehydration.RehydrationListener;
 import MidiControl.Server.Rehydration.RehydrationManager;
@@ -39,13 +41,6 @@ class RehydrationManagerTest {
         public void send(byte[] message) {
             this.lastSent = message;
             this.sendCount++;
-        }
-    }
-
-    static class FakeRegistry implements SourceAllInstances {
-        @Override
-        public Collection<ControlInstance> getAllInstances() {
-            return List.of();
         }
     }
 
@@ -112,7 +107,7 @@ class RehydrationManagerTest {
     @Test
     void request_callsOutputRouterApplyRequest() {
         FakeOutputRouter fakeRouter = new FakeOutputRouter();
-        FakeRegistry fakeRegistry = new FakeRegistry();
+        CanonicalRegistry fakeRegistry = new MockCanonicalRegistry();
         NoOpScheduler fakeScheduler = new NoOpScheduler();
 
         RehydrationManager mgr = new RehydrationManager(fakeRouter, fakeRegistry, fakeScheduler);
@@ -126,7 +121,7 @@ class RehydrationManagerTest {
     @Test
     void request_addsCanonicalIdToPending() {
         FakeOutputRouter fakeRouter = new FakeOutputRouter();
-        FakeRegistry fakeRegistry = new FakeRegistry();
+        CanonicalRegistry fakeRegistry = new MockCanonicalRegistry();
         NoOpScheduler fakeScheduler = new NoOpScheduler();
 
         RehydrationManager mgr = new RehydrationManager(fakeRouter, fakeRegistry, fakeScheduler);
@@ -139,7 +134,7 @@ class RehydrationManagerTest {
     @Test
     void onControlUpdated_clearsPending() {
         FakeOutputRouter fakeRouter = new FakeOutputRouter();
-        FakeRegistry fakeRegistry = new FakeRegistry();
+        CanonicalRegistry fakeRegistry = new MockCanonicalRegistry();
         NoOpScheduler fakeScheduler = new NoOpScheduler();
 
         RehydrationManager mgr = new RehydrationManager(fakeRouter, fakeRegistry, fakeScheduler);
@@ -153,7 +148,7 @@ class RehydrationManagerTest {
     @Test
     void timeout_removesPending() {
         FakeOutputRouter fakeRouter = new FakeOutputRouter();
-        FakeRegistry fakeRegistry = new FakeRegistry();
+        CanonicalRegistry fakeRegistry = new MockCanonicalRegistry();
 
         // Immediate schedule => timeout check runs immediately and removes pending
         CappedImmediateScheduler scheduler = new CappedImmediateScheduler(5);
@@ -174,7 +169,7 @@ class RehydrationManagerTest {
         ControlInstance c1 = makeInstance("kTestGroupA", "kTestSub", 0, 1);
         ControlInstance c2 = makeInstance("kTestGroupB", "kTestSub", 0, 4);
 
-        SourceAllInstances reg = new SourceAllInstances() {
+        CanonicalRegistry reg = new MockCanonicalRegistry() {
             @Override
             public Collection<ControlInstance> getAllInstances() {
                 return List.of(c1, c2);
@@ -202,7 +197,7 @@ class RehydrationManagerTest {
     @Test
     void clearPending_clearsAndNotifiesListener() {
         FakeOutputRouter fakeRouter = new FakeOutputRouter();
-        FakeRegistry fakeRegistry = new FakeRegistry();
+        CanonicalRegistry fakeRegistry = new MockCanonicalRegistry();
         NoOpScheduler fakeScheduler = new NoOpScheduler();
 
         RehydrationManager mgr = new RehydrationManager(fakeRouter, fakeRegistry, fakeScheduler);

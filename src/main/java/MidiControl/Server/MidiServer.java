@@ -24,7 +24,6 @@ import MidiControl.ContextModel.ViewBuilder;
 import MidiControl.ContextModel.ViewRegistry;
 import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.Controls.CanonicalRegistry;
-import MidiControl.Controls.SourceAllInstances;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.NrpnUtils.NrpnMapping;
 import MidiControl.NrpnUtils.NrpnMappingLoader;
@@ -104,7 +103,7 @@ public class MidiServer implements Runnable, UiModelService{
         this.discoveryEngine = new ContextDiscoveryEngine(canonicalRegistry);
         this.bankFactory = new UiBankFactory(discoveryEngine, this);
         this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
-        this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(), (SourceAllInstances) this.canonicalRegistry, Executors.newSingleThreadScheduledExecutor());
+        this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(), this.canonicalRegistry, Executors.newSingleThreadScheduledExecutor());
         systemTelemetry.registerRehydrationTelemetry(rehydrationManager.getRehydrationTelemetry());
         initContextIndex();
         serverRouter.injectApp(new StateRehydrationService(rehydrationManager, deviceManager));
@@ -128,7 +127,7 @@ public class MidiServer implements Runnable, UiModelService{
         this.guiBroadcastListener = new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
         this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
         this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(),
-            (SourceAllInstances) this.canonicalRegistry,
+            this.canonicalRegistry,
             Executors.newSingleThreadScheduledExecutor());
 
     }
@@ -151,7 +150,7 @@ public class MidiServer implements Runnable, UiModelService{
         this.systemTelemetry = new SystemTelemetry();
 
         this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(),
-            (SourceAllInstances) this.canonicalRegistry,
+            this.canonicalRegistry,
             Executors.newSingleThreadScheduledExecutor());
     }
 
