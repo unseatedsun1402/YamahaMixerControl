@@ -38,7 +38,7 @@ public class ServerEventTest {
         ServerEvent actual = ServerEvent.warning(testCategory, testMessage);
         assertEquals(testCategory, actual.category());
         assertEquals(testMessage, actual.message());
-        assertEquals(ServerEventLevel.WARNING, actual.level());
+        assertEquals(ServerEventLevel.WARN, actual.level());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class ServerEventTest {
         ServerEvent actual = ServerEvent.warning(testCategory, testMessage, testDetailsJson);
         assertEquals(testCategory, actual.category());
         assertEquals(testMessage, actual.message());
-        assertEquals(ServerEventLevel.WARNING, actual.level());
+        assertEquals(ServerEventLevel.WARN, actual.level());
         assertEquals(testDetailsJson, actual.details());
     }
 }

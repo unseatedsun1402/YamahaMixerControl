@@ -11,8 +11,6 @@ import java.util.logging.Logger;
 
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
-import MidiControl.Controls.SourceAllInstances;
-import MidiControl.MidiDeviceManager.ServerSettings;
 import MidiControl.Routing.OutputRequestSender;
 import MidiControl.SysexUtils.ModelNumbers;
 import MidiControl.UserInterface.Meter.MeterRequest;
@@ -20,7 +18,7 @@ import MidiControl.UserInterface.Meter.MeterRequest;
 public class RehydrationManager{
 
     private final OutputRequestSender outputRouter;
-    private SourceAllInstances registry;
+    private CanonicalRegistry registry;
     private final ScheduledExecutorService scheduler;
 
     private final Map<String, Long> pending = new ConcurrentHashMap<>();
@@ -53,7 +51,7 @@ public class RehydrationManager{
     private static final Logger logger = Logger.getLogger(RehydrationManager.class.getName());
 
     public RehydrationManager(OutputRequestSender outputRouter,
-                              SourceAllInstances registry,
+                              CanonicalRegistry registry,
                               ScheduledExecutorService scheduler) {
         this.outputRouter = outputRouter;
         this.registry = registry;
@@ -235,7 +233,7 @@ public class RehydrationManager{
 
     public synchronized void requestMeters() {
         byte checkModelNumber = ModelNumbers.getModelByteByString(
-                new ServerSettings().getConsoleName()
+                registry.getDeskType()
         );
 
         if (checkModelNumber < 0 || checkModelNumber > 127) {

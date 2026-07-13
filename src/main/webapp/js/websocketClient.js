@@ -1,6 +1,6 @@
 console.log(">>> websocketClient.js LOADED <<<");
 
-const debugFlag = true;
+const debugFlag = false;
 
 export class WebSocketClient {
   constructor(url) {

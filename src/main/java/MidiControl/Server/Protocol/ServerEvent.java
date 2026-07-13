@@ -27,7 +27,7 @@ public record ServerEvent(
     public static ServerEvent warning(String category, String message) {
         return new ServerEvent(
                 Instant.now(),
-                ServerEventLevel.WARNING,
+                ServerEventLevel.WARN,
                 category,
                 message,
                 null
@@ -59,7 +59,7 @@ public record ServerEvent(
     public static ServerEvent warning(String category, String message, JsonObject details) {
         return new ServerEvent(
                 Instant.now(),
-                ServerEventLevel.WARNING,
+                ServerEventLevel.WARN,
                 category,
                 message,
                 details

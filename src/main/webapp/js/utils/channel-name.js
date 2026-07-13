@@ -8,7 +8,7 @@ export function updateChannelStripName(contextId, name) {
         return;
     }
 
-    const label = strip.querySelector(".context-header");
+    const label = strip.querySelector(".context-title");
 
     if (!label) {
         console.warn(
