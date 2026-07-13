@@ -2150,7 +2150,7 @@
     "max_channels": 1,
     "sub_control": "kPanModeAUX0102",
     "semantic": {
-      "domain": "pan",
+      "domain": "",
       "parameter": "position"
     },
     "value": 0,
@@ -2204,7 +2204,7 @@
     "max_channels": 1,
     "sub_control": "kPanModeAUX0304",
     "semantic": {
-      "domain": "pan",
+      "domain": "",
       "parameter": "position"
     },
     "value": 1,

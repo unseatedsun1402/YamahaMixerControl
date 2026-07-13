@@ -51,16 +51,40 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         List<ViewControl> result = new ArrayList<>();
 
         all.stream()
-                .filter(ci -> "kInputOn".equals(ci.getGroup()))
-                .filter(ci -> "kChannelOn".equals(ci.getSubcontrol()))
-                .findFirst()
-                .ifPresent(ci -> result.add(createToggle(ci, viewType, viewSuffix)));
+            .filter(ci -> "kInputOn".equals(ci.getGroup()))
+            .filter(ci -> "kChannelOn".equals(ci.getSubcontrol()))
+            .findFirst()
+            .ifPresent(ci -> result.add(createToggle(ci, viewType, viewSuffix)));
 
         all.stream()
-                .filter(ci -> "kInputPan".equals(ci.getGroup()))
-                .filter(ci -> "kChannelPan".equals(ci.getSubcontrol()))
-                .findFirst()
-                .ifPresent(ci -> result.add(createPan(ci, viewType, viewSuffix)));
+            .filter(ci -> "kInputPan".equals(ci.getGroup()) | "kInputChannelPan".equals(ci.getGroup()))
+            .filter(ci -> "kChannelPan".equals(ci.getSubcontrol()))
+            .findFirst()
+            .ifPresent(ci -> result.add(createPan(ci, viewType, viewSuffix)));
+        
+        all.stream()
+            .filter(ci -> "kInputEQ".equals(ci.getGroup()))
+            .filter(ci -> "kEQ1G".equals(ci.getSubcontrol()) | "kEQLowG".equals(ci.getSubcontrol()))
+            .findFirst()
+            .ifPresent(ci -> result.add(createEQGain(ci, viewType, viewSuffix, 1)));
+        
+        all.stream()
+            .filter(ci -> "kInputEQ".equals(ci.getGroup()))
+            .filter(ci -> "kEQ2G".equals(ci.getSubcontrol()) | "kEQLowMidG".equals(ci.getSubcontrol()))
+            .findFirst()
+            .ifPresent(ci -> result.add(createEQGain(ci, viewType, viewSuffix, 2)));
+        
+        all.stream()
+            .filter(ci -> "kInputEQ".equals(ci.getGroup()))
+            .filter(ci -> "kEQ3G".equals(ci.getSubcontrol())| "kEQHiMidG".equals(ci.getSubcontrol()))
+            .findFirst()
+            .ifPresent(ci -> result.add(createEQGain(ci, viewType, viewSuffix, 3)));
+        
+        all.stream()
+            .filter(ci -> "kInputEQ".equals(ci.getGroup()))
+            .filter(ci -> "kEQ4G".equals(ci.getSubcontrol())| "kEQHiG".equals(ci.getSubcontrol()))
+            .findFirst()
+            .ifPresent(ci -> result.add(createEQGain(ci, viewType, viewSuffix, 4)));
 
         all.stream()
                 .filter(ci ->
@@ -71,7 +95,9 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
                 .findFirst()
                 .ifPresentOrElse(
                         ci -> result.add(createSendAsFader(ci, viewType, viewSuffix)),
-                        () -> logger.warning("SOF: No matching send found for " + targetBusId)
+                        () -> {
+                            if(! targetBusId.contains("EDIT")) logger.warning("SOF: No matching send found for " + targetBusId);
+                        }
                 );
 
         return result;
@@ -139,6 +165,28 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
                 viewType,
                 viewSuffix,
                 "INPUT_PAN",
+                null,
+                ci.getInstanceIndex()
+        );
+    }
+
+        private ViewControl createEQGain(ControlInstance ci, String viewType, String viewSuffix, int subControlindex) {
+        return new ViewControl(
+                String.format("EQ%dG",subControlindex),
+                String.format("input.eq%dg",subControlindex),
+                String.format("EQ %d Gain",subControlindex),
+                ControlType.SLIDER_HORIZONTAL,
+                0,
+                ci.getMin(),
+                ci.getMax(),
+                ci.getValue(),
+                ci.getSysex().getDefault_value(),
+                ci.getGroup(),
+                ci.getSubcontrol(),
+                ci.getInstanceIndex(),
+                viewType,
+                viewSuffix,
+                String.format("INPUT_EQ%d_GAIN",subControlindex),
                 null,
                 ci.getInstanceIndex()
         );

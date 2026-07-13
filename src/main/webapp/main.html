@@ -18,6 +18,12 @@
         window.ribbonInitialised = false;
         window.lastBankContexts= [];
         
+        window.allContexts = [];
+        window.currentBank = 0;
+        window.channelsPerBank = 8;
+        window.currentView = "basic-input-view";
+
+        
         console.log(">>> MidiControl UI bootstrap running <<<");
 
         const contextPath = window.location.pathname.split('/')[1];
@@ -34,39 +40,90 @@
         });
 
         function handleViewSelection(sendId) {
-            console.info("[Bootstrap] View selection sendId:", sendId);
 
             const view = sendId
                 ? `basic-sends-on-fader-view:${sendId}`
                 : "basic-input-view";
 
-            console.info("[Bootstrap] Requesting view:", view);
+            window.currentView = view;
 
-            for (const ctxId of window.lastBankContexts) {
-                ws.requestUiModel(ctxId, view);
+            loadBank(window.currentBank);
+        }
+
+        function loadBank(bankIndex) {
+            window.currentBank = bankIndex;    
+            console.log("Loading bank", bankIndex);
+
+            const start = bankIndex * window.channelsPerBank;
+            const end = start + window.channelsPerBank;
+
+            const visibleContexts =
+                window.allContexts.slice(start, end);
+            console.log("Contexts", visibleContexts);
+            
+            const stripContainer =
+                document.getElementById("strip-container");
+
+            stripContainer.innerHTML = "";
+
+            for (const ctxId of visibleContexts) {
+                ws.requestUiModel(ctxId, window.currentView);
             }
-
             ws.requestChannelNames();
+        }
+
+        function buildBankSelector() {
+            const container =
+                document.getElementById("bank-selector");
+
+            container.innerHTML = "";
+
+            const banks =
+                Math.ceil(
+                    window.allContexts.length /
+                    window.channelsPerBank
+                );
+
+            for (let i = 0; i < banks; i++) {
+
+                const btn = document.createElement("button");
+
+                const start = (i * 8) + 1;
+                const end = Math.min(
+                    start + 7,
+                    window.allContexts.length
+                );
+
+                btn.textContent = `${start}-${end}`;
+
+                btn.onclick = () => loadBank(i);
+
+                container.appendChild(btn);
+            }
         }
         
         ws.on("ui-bank", (bank) => {
-            console.debug("[Bootstrap] Bank received:", bank);
-            window.lastBankContexts = bank.contexts;
 
-            const stripContainer = document.getElementById("strip-container");
-            stripContainer.innerHTML = "";
+            window.allContexts = bank.contexts;
 
             for (const ctxId of bank.contexts) {
-                ws.requestUiModel(ctxId, "basic-input-view");
                 ws.subscribe(ctxId);
             }
+
+            buildBankSelector();
+            loadBank(0);
         });
 
+
         ws.on("ui-model", (model) => {
+
+            console.log("UI MODEL RECEIVED", model.contextId);
+
             if (!window.ribbonInitialised) {
                 buildViewRibbonFromModel(model, handleViewSelection);
                 window.ribbonInitialised = true;
             }
+
             renderUiModel(model);
         });
 
@@ -104,6 +161,7 @@
 <body>
     <div id="ui-root">
         <div id="view-ribbon"></div>
+        <div id="bank-selector"></div>
         <div id="strip-container"></div>
     </div>
 

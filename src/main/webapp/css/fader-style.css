@@ -1,6 +1,4 @@
-/* ----------------------------------------------------------
-   FADER CONTAINER
-   ---------------------------------------------------------- */
+/* FADER CONTAINER */
 
 .fader-container {
     position: relative;
@@ -13,32 +11,19 @@
 }
 
 
-/* ----------------------------------------------------------
-   HIDDEN RANGE INPUT (still handles drag logic + events)
-   ---------------------------------------------------------- */
+/* HIDDEN RANGE INPUT (still handles drag logic + events)*/
 
 .fader.real-input {
-    position: absolute;
-    inset: 0;
-    opacity: 0.001;           /* hide native appearance */
-    z-index: 20;              /* receives mouse/touch events */
-    
-    padding: 20px 0;      /* expands hitbox vertically */
-    margin: -20px 0;      /* cancels out visual displacement */
-
-    cursor: pointer;
-    writing-mode: vertical-lr;
-    direction: rtl;
+    pointer-events: none;
+    opacity: 0;
 }
 
 
-/* ----------------------------------------------------------
-   CUSTOM TRACK
-   ---------------------------------------------------------- */
+/* CUSTOM TRACK */
 
 .fader-track {
     position: absolute;
-    width: 10px;
+    width: 15px;
     height: 100%;
     background: #222;
     border: 1px solid #444;
@@ -63,17 +48,16 @@
 }
 
 
-/* ----------------------------------------------------------
-   CUSTOM THUMB – REPLACE WITH YOUR SVG IF YOU WANT
-   ---------------------------------------------------------- */
+/* CUSTOM THUMB */
 
 .fader-thumb {
     position: absolute;
-    width: 30px;
-    height: 38px;
+    width: 50px;
+    height: 40px;
     left: 50%;
-    transform: translateX(-50%);
-    transform: translateY(calc(height/2));
+    /* transform: translateX(-50%); */
+    /* transform: translateY(calc(height/2)); */
+    transform: translate(-50%);
     background: url("assets/fader-thumb.svg") no-repeat center center;
     background-size: contain;
     z-index: 10;
@@ -81,9 +65,7 @@
 }
 
 
-/* ----------------------------------------------------------
-   VALUE + LABEL STYLING
-   ---------------------------------------------------------- */
+/* VALUE + LABEL STYLING */
 
 .fader-value {
     font-size: 0.9rem;
@@ -108,9 +90,7 @@
 }
 
 
-/* ----------------------------------------------------------
-   BLOCKS AND BANKS
-   ---------------------------------------------------------- */
+/* BLOCKS AND BANKS*/
 
 .fader-block {
     display: flex;
@@ -135,13 +115,21 @@
     border-radius: 6px;
 }
 
-/* ----------------------------------------------------------
-   SMALL VIEWPORT ADAPTATION
-   ---------------------------------------------------------- */
+/* MOVEMENT STYLE */
+
+.fader-container,
+.fader.real-input,
+.fader-track,
+.fader-thumb {
+    touch-action: none;
+}
+
+
+/* SMALL VIEWPORT ADAPTATION */
 
 @media (max-width: 768px) {
     .fader-container {
-        width: 26px;
+        width: 30px;
         height: clamp(180px, 35vh, 340px);
         margin-right: 0.25rem;
     }

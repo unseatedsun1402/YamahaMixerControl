@@ -23,9 +23,7 @@ body {
     white-space: nowrap; /* CRITICAL: allows horizontal overflow */
 }
 
-/* ==========================================================
-   CHANNEL STRIP
-   ========================================================== */
+/* CHANNEL STRIP */
 .channel-strip {
     display: flex;
     flex-direction: column;
@@ -41,17 +39,13 @@ body {
     box-sizing: border-box;
     box-shadow: 0 0 10px rgba(0,0,0,0.4);
 }
-/* ----------------------------------------
-   TOP FIXED SECTION (labels, name, icon)
-   ---------------------------------------- */
+/* TOP FIXED SECTION (labels, name, icon) */
 .strip-top {
     flex-shrink: 0;
     margin-bottom: 8px;
 }
 
-/* ----------------------------------------
-   SCROLLABLE MIDDLE SECTION (mix knobs, EQ)
-   ---------------------------------------- */
+/* SCROLLABLE MIDDLE SECTION (mix knobs, EQ) */
 .strip-scroll-area {
     flex: 1;
     overflow-y: auto;
@@ -59,9 +53,7 @@ body {
     min-height: 0; /* critical for flexbox scrolling */
 }
 
-/* ----------------------------------------
-   FADER SECTION (always visible)
-   ---------------------------------------- */
+/* FADER SECTION (always visible) */
 .strip-fader-area {
     flex-shrink: 0;
     margin-top: 10px;
@@ -69,9 +61,7 @@ body {
     border-top: 1px solid #333;
 }
 
-/* ==========================================================
-   GENERIC CONTROL STYLES
-   ========================================================== */
+/* GENERIC CONTROL STYLES */
 .section {
     display: flex;
     flex-direction: column;
@@ -102,9 +92,7 @@ body {
     color: #ccc;
 }
 
-/* ==========================================================
-   ROTARY KNOBS
-   ========================================================== */
+/* ROTARY KNOBS */
 .rotary-knob {
     width: 48px;
     height: 48px;
@@ -114,6 +102,7 @@ body {
     justify-content: center;
     cursor: grab;
     user-select: none;
+    touch-action: none;
 }
 
 .knob-dial {
@@ -153,9 +142,7 @@ body {
 }
 
 
-/* ==========================================================
-   TOGGLE BUTTONS
-   ========================================================== */
+/* TOGGLE BUTTONS */
 
 .toggle-control {
     width: 100%;
@@ -181,9 +168,7 @@ body {
 }
 
 
-/* ==========================================================
-   SELECT INPUTS
-   ========================================================== */
+/* SELECT INPUTS */
 
 select {
     width: 100%;
@@ -195,9 +180,7 @@ select {
 }
 
 
-/* ==========================================================
-   STRING DISPLAY
-   ========================================================== */
+/* STRING DISPLAY */
 
 .string-display {
     background: #222;
@@ -209,9 +192,7 @@ select {
 }
 
 
-/* ==========================================================
-   EQ BANDS
-   ========================================================== */
+/* EQ BANDS */
 
 .eq-section {
     display: flex;
@@ -241,15 +222,14 @@ select {
 }
 
 
-/* ==========================================================
-   MIX SENDS GRID
-   ========================================================== */
+/* MIX SENDS GRID */
 
 .group-kInputToMix {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
 }
+
 /* =========================================================*/
 
 .strip-scroll-area::-webkit-scrollbar-track {
@@ -271,9 +251,7 @@ select {
     background: rgba(255,255,255,0.25);
 }
 
-/* ==========================================================
-   FIREFOX AUTO-HIDE
-   ========================================================== */
+/* FIREFOX AUTO-HIDE */
 
 .strip-scroll-area {
     scrollbar-width: none;        /* hide by default */
@@ -284,13 +262,12 @@ select {
     scrollbar-color: rgba(255,255,255,0.25) transparent;
 }
 
-/* ==========================================================
-   RESPONSIVE LAYOUT
-   ========================================================== */
+/* RESPONSIVE LAYOUT */
 
 @media (max-width: 600px) {
     .channel-strip {
-        width: 25vh;
-        padding: 8px;
+        flex: 0 0 90px;
+        width: 90px;
+        padding: 6px;
     }
 }

@@ -1,13 +1,20 @@
+import { getRenderedStrip } from "../new-ui-renderer.js";
+
 export function updateChannelStripName(contextId, name) {
-    const strip = document.querySelector(`[data-context-id="${contextId}"]`);
+
+    const strip = getRenderedStrip(contextId);
+
     if (!strip) {
-        console.warn("Received name-update but strip not found:", contextId);
         return;
     }
 
     const label = strip.querySelector(".context-header");
+
     if (!label) {
-        console.warn("Strip exists but has no label .strip-label:", contextId);
+        console.warn(
+            "Strip exists but has no .context-header:",
+            contextId
+        );
         return;
     }
 

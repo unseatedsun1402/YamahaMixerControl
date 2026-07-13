@@ -139,8 +139,8 @@ export class WebSocketClient {
 
     // sequence tracking
     if (this._lastSequence !== undefined && sequence !== undefined) {
-      if (sequence !== this._lastSequence + 1) {
-        console.warn("[WebSocketClient] Sequence gap", {
+      if (sequence <= this._lastSequence + 1) {
+        console.warn("[WebSocketClient] Sequence out of order", {
           expected: this._lastSequence + 1,
           received: sequence,
           type,
