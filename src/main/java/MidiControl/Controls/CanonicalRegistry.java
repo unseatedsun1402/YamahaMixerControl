@@ -22,6 +22,10 @@ public class CanonicalRegistry implements SourceAllInstances {
 
     private final Map<String, ControlGroup> groups = new HashMap<>();
     private final Map<String, ControlInstance> controlsById = new HashMap<>();
+    private final Map<Integer,
+                    Map<String, ControlInstance>>
+            contextLookup = new HashMap<>();
+    private Map<String, ControlInstance> controlsByNrpn;
     private SysexParser sysexParser;
     private final List<RegistryReloadListener> reloadListeners = new ArrayList<>();
     private String deskType = null;
@@ -37,6 +41,7 @@ public class CanonicalRegistry implements SourceAllInstances {
         this.sysexParser = sysexParser;
         groups.putAll(built);
         indexControlsByCanonicalId();
+        buildContextIndex();
         attachBroadcastListeners();
     }
 
@@ -78,6 +83,7 @@ public class CanonicalRegistry implements SourceAllInstances {
     }
 
     public void attachNrpnMappings(List<NrpnMapping> nrpnMappings) {
+        controlsByNrpn = new HashMap<>();
         for (NrpnMapping nrpn : nrpnMappings) {
             String[] parts = nrpn.getCanonicalId().split("\\.");
             if (parts.length != 3) continue;
@@ -100,6 +106,27 @@ public class CanonicalRegistry implements SourceAllInstances {
             if (ci == null) continue;
 
             ci.setNrpn(nrpn);
+            controlsByNrpn.put(nrpn.getMsb()+":"+nrpn.getLsb(), ci);
+        }
+    }
+
+    private void buildContextIndex() {
+        contextLookup.clear();
+
+        for (ControlGroup cg : groups.values()) {
+            for (SubControl sc : cg.getSubcontrols().values()) {
+
+                for (ControlInstance ci : sc.getInstances()) {
+
+                    contextLookup
+                        .computeIfAbsent(
+                            ci.getInstanceIndex(),
+                            k -> new HashMap<>())
+                        .put(
+                            ci.getGroup() + "|" + ci.getSubcontrol(),
+                            ci);
+                }
+            }
         }
     }
 
@@ -140,15 +167,7 @@ public class CanonicalRegistry implements SourceAllInstances {
     }
 
     public ControlInstance resolveNrpn(int msb, int lsb) {
-        for (ControlInstance ci : controlsById.values()) {
-            if (ci.getNrpn().isPresent()) {
-                NrpnMapping nrpn = ci.getNrpn().get();
-                if (nrpn.msbInt() == msb && nrpn.lsbInt() == lsb) {
-                    return ci;
-                }
-            }
-        }
-        return null;
+        return controlsByNrpn.get(msb+":"+lsb);
     }
 
     private ControlInstance resolveCc(ShortMessage cc) {
@@ -194,7 +213,7 @@ public class CanonicalRegistry implements SourceAllInstances {
      * Examples:
      *   "channel.1"   → 1
      */
-    private int extractContextIndex(String contextId) {
+    public int extractContextIndex(String contextId) {
         int dot = contextId.lastIndexOf('.');
         if (dot == -1)
             return -1;
@@ -225,6 +244,20 @@ public class CanonicalRegistry implements SourceAllInstances {
         return null;
     }
 
+    public ControlInstance find(int index,
+                                String group,
+                                String subcontrol)
+    {
+        Map<String, ControlInstance> context =
+                contextLookup.get(index);
+
+        if (context == null) {
+            return null;
+        }
+
+        return context.get(group + "|" + subcontrol);
+    }
+
 
     public void reloadMappings(List<SysexMapping> newMappings, SysexParser newParser, String deskType) {
         this.groups.clear();
@@ -237,6 +270,7 @@ public class CanonicalRegistry implements SourceAllInstances {
         this.deskType = deskType;
 
         indexControlsByCanonicalId();
+        buildContextIndex();
         attachNrpnMappings(NrpnMappingLoader.loadFromResource(MidiControl.NrpnUtils.MappingFiles.getFilePathByKey(deskType)));
         attachBroadcastListeners();
         notifyReloadListeners();

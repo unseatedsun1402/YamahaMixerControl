@@ -1,6 +1,7 @@
 package MidiControl.ContextModel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -25,9 +26,118 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
 
     @Override
     public List<ViewControl> build(Context context,
-                                  CanonicalRegistry registry,
-                                  String suffix) {
+                                CanonicalRegistry registry,
+                                String suffix) {
 
+        
+        int channelIndex =registry.extractContextIndex(context.getId());
+
+        if (suffix != null && !suffix.isBlank()) {
+            targetBusId = suffix.toUpperCase();
+        }
+
+        String viewType = "input-sof-view";
+        String viewSuffix = suffix != null ? suffix : targetBusId;
+
+        List<ViewControl> result = new ArrayList<>();
+
+        // CHANNEL ON
+
+        ControlInstance toggle =
+                registry.find(channelIndex,
+                            "kInputOn",
+                            "kChannelOn");
+
+        if (toggle != null) {
+            result.add(createToggle(toggle, viewType, viewSuffix));
+        }
+
+        // PAN
+
+        ControlInstance pan =
+                registry.find(channelIndex,
+                            "kInputPan",
+                            "kChannelPan");
+
+        if (pan == null) {
+            pan = registry.find(channelIndex,
+                                "kInputChannelPan",
+                                "kChannelPan");
+        }
+
+        if (pan != null) {
+            result.add(createPan(pan, viewType, viewSuffix));
+        }
+
+        // EQ1
+
+        ControlInstance eq1 =
+                registry.find(channelIndex,
+                            "kInputEQ",
+                            "kEQ1G");
+
+        if (eq1 == null) {
+            eq1 = registry.find(channelIndex,
+                                "kInputEQ",
+                                "kEQLowG");
+        }
+
+        if (eq1 != null) {
+            result.add(createEQGain(eq1, viewType, viewSuffix, 1));
+        }
+
+        // EQ2
+
+        ControlInstance eq2 =
+                registry.find(channelIndex,
+                            "kInputEQ",
+                            "kEQ2G");
+
+        if (eq2 == null) {
+            eq2 = registry.find(channelIndex,
+                                "kInputEQ",
+                                "kEQLowMidG");
+        }
+
+        if (eq2 != null) {
+            result.add(createEQGain(eq2, viewType, viewSuffix, 2));
+        }
+
+        // EQ3
+
+        ControlInstance eq3 =
+                registry.find(channelIndex,
+                            "kInputEQ",
+                            "kEQ3G");
+
+        if (eq3 == null) {
+            eq3 = registry.find(channelIndex,
+                                "kInputEQ",
+                                "kEQHiMidG");
+        }
+
+        if (eq3 != null) {
+            result.add(createEQGain(eq3, viewType, viewSuffix, 3));
+        }
+
+        // EQ4
+
+        ControlInstance eq4 =
+                registry.find(channelIndex,
+                            "kInputEQ",
+                            "kEQ4G");
+
+        if (eq4 == null) {
+            eq4 = registry.find(channelIndex,
+                                "kInputEQ",
+                                "kEQHiG");
+        }
+
+        if (eq4 != null) {
+            result.add(createEQGain(eq4, viewType, viewSuffix, 4));
+        }
+
+        
         List<ControlInstance> all = registry.getAllInstancesForContext(context.getId());
 
         hasMixBuses = all.stream().anyMatch(ci -> ci.getSubcontrol().startsWith("kMix"));
@@ -45,47 +155,6 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
             targetBusId = targetBusId.replace("AUX", "MIX");
         }
 
-        String viewType = "input-sof-view";
-        String viewSuffix = suffix != null ? suffix : targetBusId;
-
-        List<ViewControl> result = new ArrayList<>();
-
-        all.stream()
-            .filter(ci -> "kInputOn".equals(ci.getGroup()))
-            .filter(ci -> "kChannelOn".equals(ci.getSubcontrol()))
-            .findFirst()
-            .ifPresent(ci -> result.add(createToggle(ci, viewType, viewSuffix)));
-
-        all.stream()
-            .filter(ci -> "kInputPan".equals(ci.getGroup()) | "kInputChannelPan".equals(ci.getGroup()))
-            .filter(ci -> "kChannelPan".equals(ci.getSubcontrol()))
-            .findFirst()
-            .ifPresent(ci -> result.add(createPan(ci, viewType, viewSuffix)));
-        
-        all.stream()
-            .filter(ci -> "kInputEQ".equals(ci.getGroup()))
-            .filter(ci -> "kEQ1G".equals(ci.getSubcontrol()) | "kEQLowG".equals(ci.getSubcontrol()))
-            .findFirst()
-            .ifPresent(ci -> result.add(createEQGain(ci, viewType, viewSuffix, 1)));
-        
-        all.stream()
-            .filter(ci -> "kInputEQ".equals(ci.getGroup()))
-            .filter(ci -> "kEQ2G".equals(ci.getSubcontrol()) | "kEQLowMidG".equals(ci.getSubcontrol()))
-            .findFirst()
-            .ifPresent(ci -> result.add(createEQGain(ci, viewType, viewSuffix, 2)));
-        
-        all.stream()
-            .filter(ci -> "kInputEQ".equals(ci.getGroup()))
-            .filter(ci -> "kEQ3G".equals(ci.getSubcontrol())| "kEQHiMidG".equals(ci.getSubcontrol()))
-            .findFirst()
-            .ifPresent(ci -> result.add(createEQGain(ci, viewType, viewSuffix, 3)));
-        
-        all.stream()
-            .filter(ci -> "kInputEQ".equals(ci.getGroup()))
-            .filter(ci -> "kEQ4G".equals(ci.getSubcontrol())| "kEQHiG".equals(ci.getSubcontrol()))
-            .findFirst()
-            .ifPresent(ci -> result.add(createEQGain(ci, viewType, viewSuffix, 4)));
-
         all.stream()
                 .filter(ci ->
                         "kInputToMix".equals(ci.getGroup()) ||
@@ -102,6 +171,7 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
 
         return result;
     }
+
 
     private boolean isSendLevel(String sub) {
         return SEND_PATTERN.matcher(sub).matches();
