@@ -325,7 +325,7 @@ export class WebSocketClient {
       payload: { contextId }
     };
 
-    console.info("[WebSocketClient] Sending subscribe request:", message);
+    console.debug("[WebSocketClient] Sending subscribe request:", message);
     this.ws.send(JSON.stringify(message));
   }
 

@@ -156,4 +156,12 @@ export function updateFader(el, value) {
         thumb.style.top =
             `calc(${pct * 100}% - ${thumbHeight / 2}px)`;
     }
+
+    
+    el.dispatchEvent(
+        new CustomEvent("control-update", {
+            detail: { value }
+        })
+    );
+
 }

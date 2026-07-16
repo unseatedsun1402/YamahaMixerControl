@@ -12,13 +12,16 @@ public class UiContextIndex implements CanonicalContextResolver {
 
     private final Map<String, String> canonicalToContext = new ConcurrentHashMap<>();
     private final Map<String, Context> contextsById = new ConcurrentHashMap<>();
+    private static boolean debug;
+
+    public static void enableDebug(){
+        debug = true;
+    }
 
     public void addAll(List<Context> contexts) {
         for (Context ctx : contexts) {
-            // Store the actual Context object
             contextsById.put(ctx.getId(), ctx);
 
-            // Store canonical → context mappings
             for (ContextFilter filter : ctx.getFilters()) {
                 String group = filter.getControlGroup();
                 String sub = filter.getSubControl();
@@ -40,7 +43,40 @@ public class UiContextIndex implements CanonicalContextResolver {
 
     @Override
     public String getContextIdForCanonical(String canonicalId) {
-        return canonicalToContext.get(canonicalId);
+
+        String exact = canonicalToContext.get(canonicalId);
+
+        if (exact != null) {
+            return exact;
+        }
+
+        String[] parts = canonicalId.split("\\.");
+
+        if (parts.length == 3) {
+
+            String wildcard =
+                parts[0] + ".*." + parts[2];
+
+            String resolved =
+                canonicalToContext.get(wildcard);
+
+            if(debug){if (resolved == null & parts[0].contains("kInput")) {
+                System.out.println(
+                    "FAILED " +
+                    canonicalId +
+                    " wildcard=" +
+                    wildcard
+                );
+            }}
+
+            return resolved;
+        }
+
+        System.out.println(
+            "FAILED " + canonicalId
+        );
+
+        return null;
     }
 
     public void register(String canonicalId, String contextId) {

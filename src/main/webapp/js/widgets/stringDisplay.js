@@ -9,4 +9,11 @@ export function renderStringDisplay(control) {
 
 export function updateStringDisplay(el, value){
     el.textContent = value
+    
+    el.dispatchEvent(
+        new CustomEvent("control-update", {
+            detail: { value }
+        })
+    );
+
 }

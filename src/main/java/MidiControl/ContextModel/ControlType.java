@@ -7,5 +7,10 @@ public enum ControlType {
     MOMENTARY,
     LABEL,
     METER,
-    SELECTOR, SELECT, STRING, BUTTON, SLIDER_HORIZONTAL
+    SELECTOR,
+    SELECT,
+    STRING,
+    BUTTON,
+    SLIDER_HORIZONTAL,
+    DATA
 }

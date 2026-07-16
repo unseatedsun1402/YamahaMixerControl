@@ -47,6 +47,16 @@ export function renderControl(control) {
     if (control.viewSuffix) {
         wrapper.dataset.suffix = control.viewSuffix;
     }
+
+    if (control.type == "DATA")
+    {
+        wrapper.dataset.value = control.value;
+        wrapper.dataset.defaultValue = control.defaultValue;
+
+        wrapper.hidden = true;
+
+        return wrapper;
+    }
     
     const label = document.createElement("div");
     label.className = "control-label";

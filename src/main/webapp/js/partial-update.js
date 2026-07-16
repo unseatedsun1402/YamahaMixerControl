@@ -7,9 +7,11 @@ import { updateToggle } from "./widgets/toggle.js";
 
 export function applyControlUpdate({ canonicalId, value }) {
     const el = document.querySelector(`[data-canonical-id="${canonicalId}"]`);
-    console.debug("Update for "+canonicalId+" val:"+value);
     if (!el) {
-        console.warn("Partial update: control not found:", canonicalId);
+        console.debug(
+            "Ignoring update for non-rendered control:",
+            canonicalId
+        );
         return;
     }
 
@@ -24,7 +26,7 @@ export function applyControlUpdate({ canonicalId, value }) {
             updateKnob(el, value);
             break;
 
-        case "HORIZONTAL_SLIDER":
+        case "SLIDER_HORIZONTAL":
             updateHorizontalSlider(el,value);
             break;
         

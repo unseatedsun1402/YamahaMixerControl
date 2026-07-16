@@ -129,9 +129,7 @@
 
 @media (max-width: 768px) {
     .fader-container {
-        width: 30px;
-        height: clamp(180px, 35vh, 340px);
-        margin-right: 0.25rem;
+        height: clamp(120px, 22vh, 300px);
     }
 
     .fader-block {

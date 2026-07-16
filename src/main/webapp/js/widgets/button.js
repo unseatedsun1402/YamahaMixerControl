@@ -17,4 +17,12 @@ export function updateButton(el, value) {
     if (!btn) return;
     btn.classList.add("flash");
     setTimeout(() => btn.classList.remove("flash"), 100);
+
+    
+    el.dispatchEvent(
+        new CustomEvent("control-update", {
+            detail: { value }
+        })
+    );
+
 }

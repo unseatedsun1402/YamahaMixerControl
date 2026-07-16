@@ -2,6 +2,7 @@ package MidiControl.ContextModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import MidiControl.Controls.CanonicalRegistry;
@@ -10,6 +11,35 @@ import MidiControl.Controls.SubControl;
 
 public class ChannelContextDiscoverer implements ContextDiscoverer {
     private static final Logger log = Logger.getLogger(ChannelContextDiscoverer.class.getName());
+
+    
+    private static final Set<String> CHANNEL_GROUPS = Set.of(
+        "kInputEQ",
+        "kInputFader",
+
+        "kInputPan",
+        "kInputChannelPan",
+
+        "kInputOn",
+        "kInputChannelOn",
+
+        "kInputMute",
+
+        "kInputDynamics1",
+        "kInputGate",
+
+        "kInputDynamics2",
+        "kInputComp",
+
+        // kInputRouting
+        // kInputGroup
+        // kInputDelay
+        "kInputHA",
+        // kInputAutoStatus
+        "kInputPair"
+
+    );
+
     
     @Override
     public void discover(List<Context> out, CanonicalRegistry registry) {
@@ -20,9 +50,9 @@ public class ChannelContextDiscoverer implements ContextDiscoverer {
 
         for (ControlGroup group : registry.getGroups().values()) {
 
-            // Only input-related groups can define channels
-            if (!group.getName().startsWith("kInput"))
+            if (!CHANNEL_GROUPS.contains(group.getName())) {
                 continue;
+            }
 
             boolean isPerChannel = false;
 
@@ -30,7 +60,6 @@ public class ChannelContextDiscoverer implements ContextDiscoverer {
 
                 int count = sub.getInstances().size();
 
-                // Ignore huge tables (patch, library, scene, etc.)
                 if (count > 128)
                     continue;
 
@@ -42,7 +71,7 @@ public class ChannelContextDiscoverer implements ContextDiscoverer {
 
             if (isPerChannel) {
                 perChannelGroups.add(group);
-                log.fine("Per-channel group detected: " + group.getName());
+                log.info("Per-channel group detected: " + group.getName());
             }
         }
 
