@@ -121,7 +121,7 @@ def compute_priority(sub_control: str) -> int:
         return 1
 
     # Priority 2: level/gain suffixes
-    if sc.endswith("level") or sc.endswith("gain") or "nameshort" in sc:
+    if sc.endswith("level") or sc.endswith("gain") or "nameshort" in sc or "eq" in sc or "dyn" in sc or "comp" in sc:
         return 2
 
     # Default: priority 3

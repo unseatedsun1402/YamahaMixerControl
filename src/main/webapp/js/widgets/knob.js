@@ -115,4 +115,10 @@ export function updateKnob(el, rawValue) {
 
     const angle = valueToAngle(uiValue, uiMin, uiMax);
     valueArc.style.transform = `rotate(${angle}deg)`;
+    
+    el.dispatchEvent(
+        new CustomEvent("control-update", {
+            detail: { rawValue }
+        })
+    );
 }

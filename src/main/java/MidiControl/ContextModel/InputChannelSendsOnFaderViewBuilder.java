@@ -1,7 +1,6 @@
 package MidiControl.ContextModel;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -43,13 +42,28 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
 
         // CHANNEL ON
 
-        ControlInstance toggle =
+        ControlInstance channelOn =
                 registry.find(channelIndex,
                             "kInputOn",
                             "kChannelOn");
+        
+        if (channelOn == null) {
+            channelOn = registry.find(channelIndex,
+                                "kInputChannelOn",
+                                "kChannelOn");
+        }
 
-        if (toggle != null) {
-            result.add(createToggle(toggle, viewType, viewSuffix));
+        if (channelOn != null) {
+            result.add(createControl(
+                    channelOn,
+                    "CHANNEL_ON",
+                    "input.control",
+                    "Channel On",
+                    ControlType.TOGGLE,
+                    viewType,
+                    viewSuffix,
+                    "INPUT_CHANNEL_ON",
+                    null));
         }
 
         // PAN
@@ -66,7 +80,16 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (pan != null) {
-            result.add(createPan(pan, viewType, viewSuffix));
+            result.add(createControl(
+                    pan,
+                    "PAN",
+                    "input.pan",
+                    "Pan",
+                    ControlType.SLIDER_HORIZONTAL,
+                    viewType,
+                    viewSuffix,
+                    "INPUT_PAN",
+                    null));
         }
 
         // EQ1
@@ -83,7 +106,16 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (eq1 != null) {
-            result.add(createEQGain(eq1, viewType, viewSuffix, 1));
+            result.add(createControl(
+                    eq1,
+                    "EQ1G",
+                    "input.eq",
+                    "EQ 1 Gain",
+                    ControlType.SLIDER_HORIZONTAL,
+                    viewType,
+                    viewSuffix,
+                    "INPUT_EQ1_GAIN",
+                    null));
         }
 
         // EQ2
@@ -100,7 +132,16 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (eq2 != null) {
-            result.add(createEQGain(eq2, viewType, viewSuffix, 2));
+            result.add(createControl(
+                    eq2,
+                    "EQ2G",
+                    "input.eq",
+                    "EQ 2 Gain",
+                    ControlType.SLIDER_HORIZONTAL,
+                    viewType,
+                    viewSuffix,
+                    "INPUT_EQ2_GAIN",
+                    null));
         }
 
         // EQ3
@@ -117,7 +158,16 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (eq3 != null) {
-            result.add(createEQGain(eq3, viewType, viewSuffix, 3));
+            result.add(createControl(
+                    eq3,
+                    "EQ3G",
+                    "input.eq",
+                    "EQ 3 Gain",
+                    ControlType.SLIDER_HORIZONTAL,
+                    viewType,
+                    viewSuffix,
+                    "INPUT_EQ3_GAIN",
+                    null));
         }
 
         // EQ4
@@ -134,7 +184,108 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (eq4 != null) {
-            result.add(createEQGain(eq4, viewType, viewSuffix, 4));
+            result.add(createControl(
+                    eq4,
+                    "EQ4G",
+                    "input.eq",
+                    "EQ 4 Gain",
+                    ControlType.SLIDER_HORIZONTAL,
+                    viewType,
+                    viewSuffix,
+                    "INPUT_EQ4_GAIN",
+                    null));
+        }
+
+        // GATE/DYN1
+
+        ControlInstance dyn1On = registry.find(channelIndex,
+                    "kInputDynamics1",
+                    "kDynaOn");
+        
+        if (dyn1On == null) {
+            dyn1On = registry.find(channelIndex,
+                                "kInputGate",
+                                "kGateOn");
+        }
+
+        if (dyn1On != null) {
+            result.add(createControl(
+                    dyn1On,
+                    "DYN1_ON",
+                    "input.dynamics",
+                    "DYN1 On",
+                    ControlType.TOGGLE,
+                    viewType,
+                    viewSuffix,
+                    "DYNAMICS1_ON",
+                    null));
+        }
+
+        // COMP/DYN2
+
+        ControlInstance dyn2On = registry.find(channelIndex,
+                    "kInputDynamics2",
+                    "kDynaOn");
+        
+        ControlInstance dyn2Ratio = registry.find(channelIndex,
+            "kInputDynamics2", 
+            "kDynaRatio");
+        
+        ControlInstance dyn2Thresh = registry.find(channelIndex, 
+                "kInputDynamics2", 
+                "kDynaThreshold");
+        
+        if (dyn2On == null) {
+            dyn2On = registry.find(channelIndex,
+                                "kInputComp",
+                                "kCompOn");
+
+            dyn2Ratio = registry.find(channelIndex, 
+                "kInputComp", 
+                "kCompRatio");
+
+            dyn2Thresh = registry.find(channelIndex, 
+                "kInputComp", 
+                "kCompThreshold");
+        }
+
+        if (dyn2On != null) {
+            result.add(createControl(
+                dyn2On,
+                "DYN2_ON",
+                "input.dynamics",
+                "DYN2 On",
+                ControlType.TOGGLE,
+                viewType,
+                viewSuffix,
+                "DYNAMICS2_ON",
+                null));
+        }
+
+        if (dyn2Ratio != null){
+            result.add(createControl(
+                dyn2Ratio,
+                "DYN2_RATIO",
+                "input.dynamics",
+                "DYN2 Ratio",
+                ControlType.SLIDER_HORIZONTAL,
+                viewType,
+                viewSuffix,
+                "DYNAMICS2_RATIO",
+                null));
+        }
+
+        if (dyn2Thresh != null){
+            result.add(createControl(
+                    dyn2Thresh,
+                "THRESHOLD",
+                "input.dynamics",
+                "Threshold",
+                ControlType.SLIDER_HORIZONTAL,
+                viewType,
+                viewSuffix,
+                "DYNAMICS2_THRESHOLD",
+                null));
         }
 
         
@@ -196,72 +347,6 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         return Integer.parseInt(m.group(2));
     }
 
-    private ViewControl createToggle(ControlInstance ci, String viewType, String viewSuffix) {
-        return new ViewControl(
-                "CHANNEL_ON",
-                "input.control",
-                "On",
-                ControlType.TOGGLE,
-                0,
-                ci.getMin(),
-                ci.getMax(),
-                ci.getValue(),
-                ci.getSysex().getDefault_value(),
-                ci.getGroup(),
-                ci.getSubcontrol(),
-                ci.getInstanceIndex(),
-                viewType,
-                viewSuffix,
-                "INPUT_CHANNEL_ON",
-                null,
-                ci.getInstanceIndex()
-        );
-    }
-
-    private ViewControl createPan(ControlInstance ci, String viewType, String viewSuffix) {
-        return new ViewControl(
-                "PAN",
-                "input.pan",
-                "Pan",
-                ControlType.SLIDER_HORIZONTAL,
-                0,
-                ci.getMin(),
-                ci.getMax(),
-                ci.getValue(),
-                ci.getSysex().getDefault_value(),
-                ci.getGroup(),
-                ci.getSubcontrol(),
-                ci.getInstanceIndex(),
-                viewType,
-                viewSuffix,
-                "INPUT_PAN",
-                null,
-                ci.getInstanceIndex()
-        );
-    }
-
-        private ViewControl createEQGain(ControlInstance ci, String viewType, String viewSuffix, int subControlindex) {
-        return new ViewControl(
-                String.format("EQ%dG",subControlindex),
-                String.format("input.eq%dg",subControlindex),
-                String.format("EQ %d Gain",subControlindex),
-                ControlType.SLIDER_HORIZONTAL,
-                0,
-                ci.getMin(),
-                ci.getMax(),
-                ci.getValue(),
-                ci.getSysex().getDefault_value(),
-                ci.getGroup(),
-                ci.getSubcontrol(),
-                ci.getInstanceIndex(),
-                viewType,
-                viewSuffix,
-                String.format("INPUT_EQ%d_GAIN",subControlindex),
-                null,
-                ci.getInstanceIndex()
-        );
-    }
-
     private ViewControl createSendAsFader(ControlInstance ci, String viewType, String viewSuffix) {
 
         int sendIndex = extractSendIndex(ci.getSubcontrol());
@@ -283,6 +368,38 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
                 viewType,
                 viewSuffix,
                 "INPUT_SEND_LEVEL",
+                sendIndex,
+                ci.getInstanceIndex()
+        );
+    }
+
+    private ViewControl createControl(
+        ControlInstance ci,
+        String logicalId,
+        String uiGroup,
+        String label,
+        ControlType type,
+        String viewType,
+        String viewSuffix,
+        String role,
+        Integer sendIndex) {
+
+        return new ViewControl(
+                logicalId,
+                uiGroup,
+                label,
+                type,
+                0,
+                ci.getMin(),
+                ci.getMax(),
+                ci.getValue(),
+                ci.getSysex().getDefault_value(),
+                ci.getGroup(),
+                ci.getSubcontrol(),
+                ci.getInstanceIndex(),
+                viewType,
+                viewSuffix,
+                role,
                 sendIndex,
                 ci.getInstanceIndex()
         );

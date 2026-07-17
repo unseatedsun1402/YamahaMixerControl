@@ -9,8 +9,13 @@ import MidiControl.UserInterface.DTO.ControlUpdateDTO;
 public class GuiBroadcastListener {
 
     private final GuiBroadcaster broadcaster;
-    private final CanonicalContextResolver contextResolver;
+    private volatile CanonicalContextResolver contextResolver;
     private static final Logger logger = Logger.getLogger(GuiBroadcastListener.class.getName());
+    private static boolean debug = false;
+
+    public static void enableDebug(){
+        debug = true;
+    }
 
     public GuiBroadcastListener(GuiBroadcaster broadcaster,
                                 CanonicalContextResolver contextResolver) {
@@ -19,6 +24,13 @@ public class GuiBroadcastListener {
     }
 
     public void onControlChanged(ControlInstance instance, int value) {
+        if(debug)logger.info(
+            String.format(
+                "GUI UPDATE %s = %d",
+                instance != null ? instance.getCanonicalId() : "NULL",
+                value
+            )
+        );
         try {
             if (instance == null) {
                 logger.warning("GuiBroadcastListener: instance was null");
@@ -26,6 +38,7 @@ public class GuiBroadcastListener {
             }
 
             String canonicalId = instance.getCanonicalId();
+
             if (canonicalId == null) {
                 logger.warning("GuiBroadcastListener: canonicalId was null");
                 return;
@@ -33,6 +46,13 @@ public class GuiBroadcastListener {
 
             // Context may legitimately be null during hydration
             String contextId = contextResolver.getContextIdForCanonical(canonicalId);
+            if(debug)logger.info(
+                String.format(
+                    "RESOLVE %s -> %s",
+                    canonicalId,
+                    contextId
+                )
+            );
             if (contextId == null) {
                 // UI not interested in this control yet — safe to ignore
                 return;
@@ -60,5 +80,9 @@ public class GuiBroadcastListener {
         } catch (Exception e) {
             logger.severe("GuiBroadcastListener.onControlChanged unexpected exception: " + e);
         }
+    }
+
+    public void reloadContextIndex(CanonicalContextResolver resolver){
+        this.contextResolver = resolver;
     }
 }

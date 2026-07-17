@@ -1,7 +1,44 @@
+#view-ribbon {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 8px;
+}
+
+
+#view-ribbon:hover {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.25) transparent;
+}
+
+#view-ribbon::-webkit-scrollbar {
+    height: 6px;
+}
+
+#view-ribbon::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#view-ribbon::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    transition: background 0.1s;
+}
+
+#view-ribbon:hover::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.25);
+}
 
 #sof-panel {
     display: flex;
-    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    justify-content: flex-start;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+
     gap: 8px;
     background: #222;
     border-bottom: 2px solid #444;
@@ -12,14 +49,14 @@
     display: inline-flex;
     flex-direction: row;
     align-items: flex-end;
-    justify-content: center;
-    min-width: 100vw;          /* but never smaller than window */
-    flex-shrink: 0; 
-    box-sizing: border-box;     /* include padding in width calc */
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .sof-btn {
     padding: 8px 12px;
+    flex: 0 0 auto;
     background: #333;
     border: 1px solid #666;
     color: #eee;
@@ -64,4 +101,33 @@
 .bank-btn.active {
     background: #0066aa;
     border-color: #3399ff;
+}
+
+#bank-selector {
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scrollbar-width: none;
+}
+
+#bank-selector:hover {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.25) transparent;
+}
+
+#bank-selector::-webkit-scrollbar {
+    height: 6px;
+}
+
+#bank-selector::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#bank-selector::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+}
+
+#bank-selector:hover::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.25);
 }

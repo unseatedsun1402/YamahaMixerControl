@@ -137,10 +137,18 @@ public class SysexMapping {
     }
 
     public int extractValue(byte[] sysex) {
+
         int value = 0;
 
         for (int idx : valueByteIndices) {
             value = (value << 7) | (sysex[idx] & 0x7F);
+        }
+
+        if (min_value < 0 && valueByteIndices.length > 0) {
+
+            int bitCount = valueByteIndices.length * 7;
+
+            value = signExtend(value, bitCount);
         }
 
         return value;
@@ -154,6 +162,17 @@ public class SysexMapping {
         }
 
         Logger.getLogger("SysexMapping").fine("Index extracted as "+value);
+
+        return value;
+    }
+
+    private int signExtend(int value, int bitCount) {
+
+        int signBit = 1 << (bitCount - 1);
+
+        if ((value & signBit) != 0) {
+            value |= ~((1 << bitCount) - 1);
+        }
 
         return value;
     }

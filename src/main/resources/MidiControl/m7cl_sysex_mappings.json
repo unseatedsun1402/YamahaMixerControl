@@ -1197,7 +1197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneInputLink",
@@ -1257,7 +1257,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneOutputLink",
@@ -1317,7 +1317,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneOutputLink",
@@ -1377,7 +1377,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneOutputLink",
@@ -1437,7 +1437,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneOutputLink",
@@ -2217,7 +2217,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputHA",
@@ -3537,7 +3537,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -3597,7 +3597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -3777,7 +3777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -3837,7 +3837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -3897,7 +3897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -3957,7 +3957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -4017,7 +4017,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -4077,7 +4077,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -4137,7 +4137,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -4197,7 +4197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -4257,7 +4257,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -4317,7 +4317,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -4437,7 +4437,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics1",
@@ -4497,7 +4497,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDyna2Pair",
@@ -4677,7 +4677,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics2",
@@ -4737,7 +4737,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics2",
@@ -4917,7 +4917,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics2",
@@ -4977,7 +4977,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics2",
@@ -5037,7 +5037,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics2",
@@ -5097,7 +5097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics2",
@@ -5157,7 +5157,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics2",
@@ -5217,7 +5217,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics2",
@@ -5337,7 +5337,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDynamics2",
@@ -5397,7 +5397,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQLink",
@@ -5517,7 +5517,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputHPF",
@@ -5577,7 +5577,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -5637,7 +5637,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -5697,7 +5697,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -5757,7 +5757,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -5817,7 +5817,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -5877,7 +5877,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -5937,7 +5937,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -5997,7 +5997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6057,7 +6057,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6117,7 +6117,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6177,7 +6177,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6237,7 +6237,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6297,7 +6297,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6357,7 +6357,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6417,7 +6417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6477,7 +6477,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6537,7 +6537,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6597,7 +6597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6657,7 +6657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6717,7 +6717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6777,7 +6777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6837,7 +6837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6897,7 +6897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6957,7 +6957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputMute",
@@ -14457,7 +14457,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixDynamics",
@@ -14517,7 +14517,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixDynamics",
@@ -14697,7 +14697,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixDynamics",
@@ -14757,7 +14757,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixDynamics",
@@ -14817,7 +14817,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixDynamics",
@@ -14877,7 +14877,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixDynamics",
@@ -14937,7 +14937,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixDynamics",
@@ -14997,7 +14997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixDynamics",
@@ -15117,7 +15117,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixDynamics",
@@ -15177,7 +15177,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQLink",
@@ -15297,7 +15297,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -15357,7 +15357,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -15417,7 +15417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -15477,7 +15477,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -15537,7 +15537,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -15597,7 +15597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -15657,7 +15657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -15717,7 +15717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -15777,7 +15777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -15837,7 +15837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -15897,7 +15897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -15957,7 +15957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -16017,7 +16017,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -16077,7 +16077,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -16137,7 +16137,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -16197,7 +16197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -16257,7 +16257,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -16317,7 +16317,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -16377,7 +16377,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -16437,7 +16437,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -16497,7 +16497,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -16557,7 +16557,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixEQ",
@@ -16617,7 +16617,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMixToMatrix",
@@ -20097,7 +20097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixDynamics",
@@ -20157,7 +20157,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixDynamics",
@@ -20337,7 +20337,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixDynamics",
@@ -20397,7 +20397,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixDynamics",
@@ -20457,7 +20457,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixDynamics",
@@ -20517,7 +20517,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixDynamics",
@@ -20577,7 +20577,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixDynamics",
@@ -20637,7 +20637,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixDynamics",
@@ -20757,7 +20757,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixDynamics",
@@ -20817,7 +20817,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQLink",
@@ -20937,7 +20937,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -20997,7 +20997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21057,7 +21057,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21117,7 +21117,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21177,7 +21177,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21237,7 +21237,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21297,7 +21297,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21357,7 +21357,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21417,7 +21417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21477,7 +21477,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21537,7 +21537,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21597,7 +21597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21657,7 +21657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21717,7 +21717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21777,7 +21777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21837,7 +21837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21897,7 +21897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -21957,7 +21957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -22017,7 +22017,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -22077,7 +22077,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -22137,7 +22137,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -22197,7 +22197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixEQ",
@@ -22257,7 +22257,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kMatrixGroup",
@@ -23697,7 +23697,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoDynamics",
@@ -23757,7 +23757,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoDynamics",
@@ -23937,7 +23937,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoDynamics",
@@ -23997,7 +23997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoDynamics",
@@ -24057,7 +24057,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoDynamics",
@@ -24117,7 +24117,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoDynamics",
@@ -24177,7 +24177,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoDynamics",
@@ -24237,7 +24237,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoDynamics",
@@ -24357,7 +24357,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoDynamics",
@@ -24417,7 +24417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQLink",
@@ -24537,7 +24537,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -24597,7 +24597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -24657,7 +24657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -24717,7 +24717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -24777,7 +24777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -24837,7 +24837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -24897,7 +24897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -24957,7 +24957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25017,7 +25017,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25077,7 +25077,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25137,7 +25137,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25197,7 +25197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25257,7 +25257,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25317,7 +25317,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25377,7 +25377,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25437,7 +25437,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25497,7 +25497,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25557,7 +25557,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25617,7 +25617,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25677,7 +25677,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25737,7 +25737,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25797,7 +25797,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -25857,7 +25857,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoToMatrix",
@@ -28917,7 +28917,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -28977,7 +28977,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29037,7 +29037,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29097,7 +29097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29157,7 +29157,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29217,7 +29217,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29277,7 +29277,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29457,7 +29457,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29517,7 +29517,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29577,7 +29577,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29637,7 +29637,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29697,7 +29697,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29757,7 +29757,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29817,7 +29817,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29877,7 +29877,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29937,7 +29937,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -29997,7 +29997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30057,7 +30057,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30117,7 +30117,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30177,7 +30177,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30237,7 +30237,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30297,7 +30297,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30357,7 +30357,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30417,7 +30417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30477,7 +30477,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30537,7 +30537,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30597,7 +30597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30657,7 +30657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30717,7 +30717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30777,7 +30777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30837,7 +30837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30897,7 +30897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -30957,7 +30957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31017,7 +31017,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31077,7 +31077,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31137,7 +31137,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31197,7 +31197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31257,7 +31257,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31317,7 +31317,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31377,7 +31377,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31437,7 +31437,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31497,7 +31497,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31557,7 +31557,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31617,7 +31617,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31677,7 +31677,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31737,7 +31737,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31797,7 +31797,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31857,7 +31857,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31917,7 +31917,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -31977,7 +31977,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32037,7 +32037,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32097,7 +32097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32157,7 +32157,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32217,7 +32217,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32277,7 +32277,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32337,7 +32337,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32397,7 +32397,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32457,7 +32457,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32517,7 +32517,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32577,7 +32577,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32637,7 +32637,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32697,7 +32697,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32757,7 +32757,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32817,7 +32817,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32877,7 +32877,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32937,7 +32937,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -32997,7 +32997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -33057,7 +33057,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -33117,7 +33117,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kEffect",
@@ -40377,7 +40377,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAD824",
@@ -40437,7 +40437,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAD824",
@@ -40497,7 +40497,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAD824",
@@ -40557,7 +40557,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAD824",
@@ -40617,7 +40617,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAD824",
@@ -40677,7 +40677,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAD824",
@@ -40737,7 +40737,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAD824",
@@ -40797,7 +40797,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAD824",
@@ -55017,7 +55017,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupOscSetting",
@@ -55077,7 +55077,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupOscSetting",
@@ -55197,7 +55197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupOscSetting",
@@ -55317,7 +55317,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupOscSetting",

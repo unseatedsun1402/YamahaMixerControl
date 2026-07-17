@@ -24,4 +24,11 @@ export function updateSelect(el, value) {
     const select = el.querySelector("select");
     if (!select) return;
     select.value = value;
+
+    el.dispatchEvent(
+        new CustomEvent("control-update", {
+            detail: { value }
+        })
+    );
+
 }

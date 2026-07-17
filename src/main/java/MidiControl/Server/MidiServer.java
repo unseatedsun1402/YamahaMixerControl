@@ -287,8 +287,10 @@ public class MidiServer implements Runnable, UiModelService{
     }
 
     private void reloadContextIndex(){
-        contextIndex = new UiContextIndex();
+        this.contextIndex = new UiContextIndex();
+        logger.info("Reloading Context Index");
         contextIndex.addAll(discoveryEngine.discoverContexts());
+        this.guiBroadcastListener.reloadContextIndex(contextIndex);
     }
 
     @Override

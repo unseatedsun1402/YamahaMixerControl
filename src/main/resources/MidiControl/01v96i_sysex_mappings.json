@@ -1170,7 +1170,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kNumModules",
@@ -2150,7 +2150,7 @@
     "max_channels": 1,
     "sub_control": "kPanModeAUX0102",
     "semantic": {
-      "domain": "",
+      "domain": "pan",
       "parameter": "position"
     },
     "value": 0,
@@ -2204,7 +2204,7 @@
     "max_channels": 1,
     "sub_control": "kPanModeAUX0304",
     "semantic": {
-      "domain": "",
+      "domain": "pan",
       "parameter": "position"
     },
     "value": 1,
@@ -3597,7 +3597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneInputGroup",
@@ -3648,7 +3648,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneInputGroup",
@@ -3699,7 +3699,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneInputGroup",
@@ -3750,7 +3750,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneInputGroup",
@@ -3801,7 +3801,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneInputGroup",
@@ -3852,7 +3852,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneInputGroup",
@@ -3903,7 +3903,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneInputGroup",
@@ -3954,7 +3954,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneInputGroup",
@@ -4566,7 +4566,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneOutputGroup",
@@ -4617,7 +4617,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneOutputGroup",
@@ -4668,7 +4668,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneOutputGroup",
@@ -4719,7 +4719,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneOutputGroup",
@@ -4770,7 +4770,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneOutputGroup",
@@ -4821,7 +4821,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneOutputGroup",
@@ -4872,7 +4872,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneOutputGroup",
@@ -4923,7 +4923,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSceneOutputGroup",
@@ -6351,7 +6351,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputComp",
@@ -6406,7 +6406,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputComp",
@@ -6461,7 +6461,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputComp",
@@ -6516,7 +6516,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputComp",
@@ -6571,7 +6571,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputComp",
@@ -6626,7 +6626,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputComp",
@@ -6681,7 +6681,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputComp",
@@ -6791,7 +6791,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputComp",
@@ -6846,7 +6846,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6900,7 +6900,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -6954,7 +6954,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7008,7 +7008,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7062,7 +7062,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7116,7 +7116,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7170,7 +7170,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7224,7 +7224,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7278,7 +7278,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7332,7 +7332,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7386,7 +7386,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7440,7 +7440,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7494,7 +7494,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7548,7 +7548,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7602,7 +7602,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7656,7 +7656,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputEQ",
@@ -7710,7 +7710,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputDelay",
@@ -11448,7 +11448,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputGroup",
@@ -11499,7 +11499,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputGroup",
@@ -11550,7 +11550,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputGroup",
@@ -11601,7 +11601,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputGroup",
@@ -11652,7 +11652,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputGroup",
@@ -11703,7 +11703,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputGroup",
@@ -11754,7 +11754,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputGroup",
@@ -11805,7 +11805,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kInputGroup",
@@ -12523,7 +12523,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusComp",
@@ -12578,7 +12578,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusComp",
@@ -12633,7 +12633,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusComp",
@@ -12688,7 +12688,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusComp",
@@ -12743,7 +12743,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusComp",
@@ -12798,7 +12798,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusComp",
@@ -12853,7 +12853,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusComp",
@@ -12963,7 +12963,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusComp",
@@ -13018,7 +13018,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13072,7 +13072,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13126,7 +13126,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13180,7 +13180,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13234,7 +13234,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13288,7 +13288,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13342,7 +13342,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13396,7 +13396,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13450,7 +13450,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13504,7 +13504,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13558,7 +13558,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13612,7 +13612,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13666,7 +13666,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13720,7 +13720,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13774,7 +13774,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13828,7 +13828,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusEQ",
@@ -13882,7 +13882,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusDelay",
@@ -14599,7 +14599,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusOutGroup",
@@ -14650,7 +14650,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusOutGroup",
@@ -14701,7 +14701,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusOutGroup",
@@ -14752,7 +14752,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusOutGroup",
@@ -14803,7 +14803,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusOutGroup",
@@ -14854,7 +14854,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusOutGroup",
@@ -14905,7 +14905,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusOutGroup",
@@ -14956,7 +14956,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusOutGroup",
@@ -15776,7 +15776,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXComp",
@@ -15831,7 +15831,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXComp",
@@ -15886,7 +15886,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXComp",
@@ -15941,7 +15941,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXComp",
@@ -15996,7 +15996,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXComp",
@@ -16051,7 +16051,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXComp",
@@ -16106,7 +16106,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXComp",
@@ -16216,7 +16216,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXComp",
@@ -16271,7 +16271,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16325,7 +16325,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16379,7 +16379,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16433,7 +16433,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16487,7 +16487,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16541,7 +16541,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16595,7 +16595,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16649,7 +16649,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16703,7 +16703,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16757,7 +16757,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16811,7 +16811,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16865,7 +16865,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16919,7 +16919,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -16973,7 +16973,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -17027,7 +17027,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -17081,7 +17081,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXEQ",
@@ -17135,7 +17135,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXDelay",
@@ -17696,7 +17696,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXOutGroup",
@@ -17747,7 +17747,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXOutGroup",
@@ -17798,7 +17798,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXOutGroup",
@@ -17849,7 +17849,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXOutGroup",
@@ -17900,7 +17900,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXOutGroup",
@@ -17951,7 +17951,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXOutGroup",
@@ -18002,7 +18002,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXOutGroup",
@@ -18053,7 +18053,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAUXOutGroup",
@@ -18771,7 +18771,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoComp",
@@ -18826,7 +18826,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoComp",
@@ -18881,7 +18881,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoComp",
@@ -18936,7 +18936,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoComp",
@@ -18991,7 +18991,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoComp",
@@ -19046,7 +19046,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoComp",
@@ -19101,7 +19101,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoComp",
@@ -19211,7 +19211,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoComp",
@@ -19266,7 +19266,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19320,7 +19320,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19374,7 +19374,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19428,7 +19428,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19482,7 +19482,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19536,7 +19536,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19590,7 +19590,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19644,7 +19644,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19698,7 +19698,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19752,7 +19752,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19806,7 +19806,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19860,7 +19860,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19914,7 +19914,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -19968,7 +19968,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -20022,7 +20022,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -20076,7 +20076,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoEQ",
@@ -20130,7 +20130,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoDelay",
@@ -20691,7 +20691,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoOutGroup",
@@ -20742,7 +20742,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoOutGroup",
@@ -20793,7 +20793,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoOutGroup",
@@ -20844,7 +20844,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoOutGroup",
@@ -20895,7 +20895,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoOutGroup",
@@ -20946,7 +20946,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoOutGroup",
@@ -20997,7 +20997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoOutGroup",
@@ -21048,7 +21048,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kStereoOutGroup",
@@ -21255,7 +21255,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21309,7 +21309,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21363,7 +21363,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21417,7 +21417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21471,7 +21471,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21525,7 +21525,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21579,7 +21579,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21633,7 +21633,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21687,7 +21687,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21741,7 +21741,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21795,7 +21795,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21849,7 +21849,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21903,7 +21903,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -21957,7 +21957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22011,7 +22011,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22065,7 +22065,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22119,7 +22119,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22173,7 +22173,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22227,7 +22227,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22281,7 +22281,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22335,7 +22335,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22389,7 +22389,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22443,7 +22443,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22497,7 +22497,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22551,7 +22551,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22605,7 +22605,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22659,7 +22659,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22713,7 +22713,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22767,7 +22767,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22821,7 +22821,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22875,7 +22875,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22929,7 +22929,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -22983,7 +22983,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -23037,7 +23037,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -23091,7 +23091,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -23145,7 +23145,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -23199,7 +23199,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -23253,7 +23253,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -23307,7 +23307,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kGEQ",
@@ -23361,7 +23361,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kEffect",
@@ -37287,7 +37287,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBusModuleName",
@@ -63810,1230 +63810,6 @@
     "priority": 3
   },
   {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign1",
-    "semantic": null,
-    "value": 0,
-    "min_value": 0,
-    "max_value": 1,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411136,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      0,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      0,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign2",
-    "semantic": null,
-    "value": 1,
-    "min_value": 0,
-    "max_value": 1,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411137,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      1,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      1,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign3",
-    "semantic": null,
-    "value": 2,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411138,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      2,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      2,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign4",
-    "semantic": null,
-    "value": 3,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411139,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      3,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      3,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign5",
-    "semantic": null,
-    "value": 4,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411140,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      4,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      4,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign6",
-    "semantic": null,
-    "value": 5,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411141,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      5,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      5,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign7",
-    "semantic": null,
-    "value": 6,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411142,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      6,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      6,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign8",
-    "semantic": null,
-    "value": 7,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411143,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      7,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      7,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign9",
-    "semantic": null,
-    "value": 8,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411144,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      8,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      8,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign10",
-    "semantic": null,
-    "value": 9,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411145,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      9,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      9,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign11",
-    "semantic": null,
-    "value": 10,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411146,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      10,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      10,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign12",
-    "semantic": null,
-    "value": 11,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411147,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      11,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      11,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign13",
-    "semantic": null,
-    "value": 12,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411148,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      12,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      12,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign14",
-    "semantic": null,
-    "value": 13,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411149,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      13,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      13,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign15",
-    "semantic": null,
-    "value": 14,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411150,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      14,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      14,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign16",
-    "semantic": null,
-    "value": 15,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411151,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      15,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      15,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign17",
-    "semantic": null,
-    "value": 16,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411152,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      16,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      16,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign18",
-    "semantic": null,
-    "value": 17,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411153,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      17,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      17,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign19",
-    "semantic": null,
-    "value": 18,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411154,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      18,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      18,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign20",
-    "semantic": null,
-    "value": 19,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411155,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      19,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      19,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign21",
-    "semantic": null,
-    "value": 20,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411156,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      20,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      20,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign22",
-    "semantic": null,
-    "value": 21,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411157,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      21,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      21,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign23",
-    "semantic": null,
-    "value": 22,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411158,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      22,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      22,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
-    "control_group": "kSetupRemoteFreeChAss",
-    "control_id": 154,
-    "max_channels": 1,
-    "sub_control": "kRemoteFreeChAssign24",
-    "semantic": null,
-    "value": 23,
-    "min_value": 0,
-    "max_value": 255,
-    "default_value": 0,
-    "comment": "(not used)",
-    "key": 436411159,
-    "address_bytes": [
-      4,
-      5,
-      6,
-      7
-    ],
-    "index_bytes": [
-      8
-    ],
-    "parameter_change_format": [
-      240,
-      67,
-      "1n",
-      62,
-      26,
-      3,
-      27,
-      23,
-      "cc",
-      "dd",
-      "dd",
-      "dd",
-      "dd",
-      247
-    ],
-    "parameter_request_format": [
-      240,
-      67,
-      "3n",
-      62,
-      26,
-      3,
-      27,
-      23,
-      "cc",
-      247
-    ],
-    "priority": 3
-  },
-  {
     "control_group": "kSetupPortNameAD",
     "control_id": 155,
     "max_channels": 16,
@@ -83499,7 +82275,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupAutomixSetup",
@@ -84726,7 +83502,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAutomixEditParameter",
@@ -86256,7 +85032,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAutomixEditParameter",
@@ -86358,7 +85134,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAutomixEditParameter",
@@ -86460,7 +85236,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAutomixEditParameter",
@@ -87633,7 +86409,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAutomixSafeInput",
@@ -97125,7 +95901,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupEffectCursorPos",
@@ -97737,7 +96513,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupKeySelect",
@@ -98049,7 +96825,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupKeySelect",
@@ -99579,7 +98355,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupKeySelect",
@@ -100908,7 +99684,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMemoryEQLibrary",
@@ -100962,7 +99738,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMemoryEQLibrary",
@@ -101016,7 +99792,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMemoryEQLibrary",
@@ -101070,7 +99846,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMemoryEQLibrary",
@@ -101124,7 +99900,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMemoryEQLibrary",
@@ -101178,7 +99954,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMemoryGtLibrary",
@@ -102150,7 +100926,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMemoryGEQLibrary",
@@ -102204,7 +100980,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMemoryGEQLibrary",
@@ -102258,7 +101034,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMemoryGEQLibrary",
@@ -102312,7 +101088,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMemoryGEQLibrary",
@@ -102366,7 +101142,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMemoryGEQLibrary",
@@ -102420,7 +101196,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMemoryB2SLibrary",
@@ -109305,7 +108081,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupBLUKCategory",
@@ -109415,7 +108191,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupBLUKCategory",
@@ -109619,7 +108395,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupBLUKCategory",
@@ -112883,7 +111659,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kBackupMachine",
@@ -118037,7 +116813,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kHuiPanel",
@@ -120386,7 +119162,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kHuiPanel",
@@ -138590,7 +137366,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAutomixInputLib",
@@ -138794,7 +137570,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAutomixBusLib",
@@ -138998,7 +137774,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAutomixAUXLib",
@@ -139202,7 +137978,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAutomixStereoLib",
@@ -139409,7 +138185,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAutomixB2SLib",
@@ -139820,7 +138596,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kSetupMachineDaw",
@@ -142727,7 +141503,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 2
   },
   {
     "control_group": "kAutomixInfo",

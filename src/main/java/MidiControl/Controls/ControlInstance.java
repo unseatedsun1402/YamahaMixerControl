@@ -136,10 +136,7 @@ public class ControlInstance {
     public int updateValue(int value) {
         this.value = value;
 
-        if(debug)if (canonicalId.contains("Input") && canonicalId.contains("Name"))
-            logger.info("UPDATE VALUE " + canonicalId + " -> " + value
-                + " listeners=" + listeners.size()
-                + " instance=" + System.identityHashCode(this));
+        if(debug) logger.info("UPDATE VALUE " + canonicalId + " -> " + value);
 
         for (ControlListener l : listeners) {
             l.onControlChanged(this, value);
