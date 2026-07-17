@@ -1,3 +1,8 @@
+import {
+    renderHorizontalSlider,
+    updateHorizontalSlider
+} from "./sliderHorizontal.js";
+
 export function createEQWidget(section) {
 
     const eq1g = section.querySelector(
@@ -62,30 +67,37 @@ export function createEQWidget(section) {
         const label = document.createElement("label");
         label.textContent = band.label;
 
-        const slider = document.createElement("input");
-        slider.type = "range";
+        const slider = renderHorizontalSlider({
 
-        slider.min =
-            backingSlider?.min ?? -180;
+            min:
+                backingSlider
+                    ? Number(backingSlider.min)
+                    : -180,
 
-        slider.max =
-            backingSlider?.max ?? 180;
+            max:
+                backingSlider
+                    ? Number(backingSlider.max)
+                    : 180,
 
-        slider.value =
-            backingSlider?.value ?? 0;
+            value:
+                backingSlider
+                    ? Number(backingSlider.value)
+                    : 0,
 
-        slider.addEventListener("input", () => {
+            readOnly: false,
 
-            window.wsClient?.sendControlChange(
-                band.control.dataset.canonicalId,
-                Number(slider.value)
-            );
+            canonicalId:
+                band.control.dataset.canonicalId
         });
 
         band.control.addEventListener(
             "control-update",
             e => {
-                slider.value = e.detail.value;
+
+                updateHorizontalSlider(
+                    slider,
+                    e.detail.value
+                );
             }
         );
 

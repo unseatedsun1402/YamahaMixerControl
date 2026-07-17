@@ -23,6 +23,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 @ServerEndpoint(value = "/endpoint")
 public class WebSocketEndpoint{
@@ -37,6 +39,43 @@ public class WebSocketEndpoint{
     private MidiServer server;
     private SubscriptionManager subscriptions;
     private static Map<Integer,Boolean> sessionLocks = new ConcurrentHashMap<>();
+
+    private static final Map<String, Long> logTimes =
+        new ConcurrentHashMap<>();
+
+    private static final long LOG_DEBOUNCE_MS = 5000;
+
+    private static void warningDebounced(String key, String message) {
+
+        long now = System.currentTimeMillis();
+
+        Long last = logTimes.get(key);
+
+        if (last != null &&
+            (now - last) < LOG_DEBOUNCE_MS) {
+            return;
+        }
+
+        logTimes.put(key, now);
+
+        logger.warning(message);
+    }
+
+    private static void errorDebounced(String key, String message) {
+
+        long now = System.currentTimeMillis();
+
+        Long last = logTimes.get(key);
+
+        if (last != null &&
+            (now - last) < LOG_DEBOUNCE_MS) {
+            return;
+        }
+
+        logTimes.put(key, now);
+
+        logger.severe(message);
+    }
 
     public static void enabledebug(){
         debug = true;
@@ -65,7 +104,7 @@ public class WebSocketEndpoint{
             JsonElement root = JsonParser.parseString(message);
 
             if (!root.isJsonObject()) {
-                logger.severe("Invalid message (not an object): " + message);
+                errorDebounced("json-message","Invalid message (not an object): " + message);
                 return;
             }
 
@@ -85,7 +124,15 @@ public class WebSocketEndpoint{
                 }
 
                 default:
-                    server.getServerRouter().handleMessage(session, message); // inefficent to get the serverrouter each message, swap to a dynamic reference
+                    try {
+                        server.getServerRouter().handleMessage(session, message); // inefficent to get the serverrouter each message, swap to a dynamic reference
+                    } catch (Exception e) {
+                        warningDebounced(
+                            "process-message",
+                            "Failed to process message"
+                        );
+                    }
+
                     break;
             }
 

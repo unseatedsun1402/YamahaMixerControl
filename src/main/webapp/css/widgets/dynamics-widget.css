@@ -1,0 +1,37 @@
+.dynamics-widget input[type="range"],
+.dynamics-widget input[type="checkbox"] {
+    accent-color: #ef4444;
+}
+
+
+.dynamics-widget .slider-fill {
+    background: #ef4444;
+}
+
+.dynamics-widget .slider-thumb {
+    background-image:
+        url("../assets/slider-thumb-red.svg");
+}
+
+
+.dynamics-row {
+    display: grid;
+    grid-template-columns: 55px 1fr;
+    gap: 6px;
+    align-items: center;
+}
+
+.dynamics-toggle-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 6px;
+}
+
+@media (max-width: 768px) {
+    .dynamics-row {
+        display: grid;
+        grid-template-columns: 50px 1fr;
+        gap: 4px;
+        align-items: center;
+    }
+}

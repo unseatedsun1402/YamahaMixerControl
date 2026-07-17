@@ -1,3 +1,8 @@
+import {
+    renderHorizontalSlider,
+    updateHorizontalSlider
+} from "./sliderHorizontal.js";
+
 export function createDynamicsWidget(section) {
 
     const dyn1 = section.querySelector(
@@ -68,12 +73,14 @@ export function createDynamicsWidget(section) {
     compressorTitle.textContent =
         "Compressor";
 
-    const compEnable = document.createElement("button");
+    const compEnable =
+        document.createElement("button");
 
     compEnable.className =
         "toggle-button dynamics";
 
-    compEnable.textContent = "Comp On";
+    compEnable.textContent =
+        "Comp On";
 
     compEnable.addEventListener("click", () => {
 
@@ -147,7 +154,9 @@ export function createDynamicsWidget(section) {
         );
     });
 
+    //
     // THRESHOLD
+    //
 
     const thresholdLabel =
         document.createElement("label");
@@ -155,16 +164,41 @@ export function createDynamicsWidget(section) {
     thresholdLabel.textContent =
         "Thresh";
 
-    const thresholdSlider =
-        document.createElement("input");
+    const backingThreshold =
+        threshold?.querySelector(
+            'input[type="range"]'
+        );
 
-    thresholdSlider.type =
-        "range";
-    
-    // Backing
+    const thresholdSlider =
+        renderHorizontalSlider({
+
+            min:
+                backingThreshold
+                    ? Number(backingThreshold.min)
+                    : 0,
+
+            max:
+                backingThreshold
+                    ? Number(backingThreshold.max)
+                    : 127,
+
+            value:
+                backingThreshold
+                    ? Number(backingThreshold.value)
+                    : 64,
+
+            readOnly: false,
+
+            canonicalId:
+                threshold?.dataset.canonicalId
+        });
+
+    // INITIAL STATE FROM BACKING CONTROLS
 
     const backingGate =
-    dyn1?.querySelector(".toggle-button");
+        dyn1?.querySelector(
+            ".toggle-button"
+        );
 
     if (
         backingGate?.classList.contains(
@@ -175,7 +209,9 @@ export function createDynamicsWidget(section) {
     }
 
     const backingComp =
-        dyn2?.querySelector(".toggle-button");
+        dyn2?.querySelector(
+            ".toggle-button"
+        );
 
     if (
         backingComp?.classList.contains(
@@ -185,45 +221,7 @@ export function createDynamicsWidget(section) {
         compEnable.classList.add("active");
     }
 
-    const backingThreshold =
-        threshold?.querySelector(
-            'input[type="range"]'
-        );
-
-    if (backingThreshold) {
-
-        thresholdSlider.min =
-            backingThreshold.min;
-
-        thresholdSlider.max =
-            backingThreshold.max;
-
-        thresholdSlider.value =
-            backingThreshold.value;
-
-    } else {
-
-        thresholdSlider.min = 0;
-        thresholdSlider.max = 127;
-        thresholdSlider.value = 64;
-    }
-
-    thresholdSlider.addEventListener(
-        "input",
-        () => {
-
-            if (!threshold) {
-                return;
-            }
-
-            window.wsClient?.sendControlChange(
-                threshold.dataset.canonicalId,
-                Number(
-                    thresholdSlider.value
-                )
-            );
-        }
-    );
+    // UPDATE EVENTS
 
     dyn1?.addEventListener(
         "control-update",
@@ -270,14 +268,14 @@ export function createDynamicsWidget(section) {
         "control-update",
         e => {
 
-            thresholdSlider.value =
-                e.detail.value;
+            updateHorizontalSlider(
+                thresholdSlider,
+                e.detail.value
+            );
         }
     );
 
-    //
     // LAYOUT
-    //
 
     const gateRow =
         document.createElement("div");
@@ -285,7 +283,9 @@ export function createDynamicsWidget(section) {
     gateRow.className =
         "dynamics-toggle-row";
 
-    gateRow.appendChild(gateEnable);
+    gateRow.appendChild(
+        gateEnable
+    );
 
     const compRow =
         document.createElement("div");
@@ -293,7 +293,9 @@ export function createDynamicsWidget(section) {
     compRow.className =
         "dynamics-toggle-row";
 
-    compRow.appendChild(compEnable);
+    compRow.appendChild(
+        compEnable
+    );
 
     const ratioRow =
         document.createElement("div");
@@ -301,7 +303,9 @@ export function createDynamicsWidget(section) {
     ratioRow.className =
         "dynamics-toggle-row";
 
-    ratioRow.appendChild(ratioToggle);
+    ratioRow.appendChild(
+        ratioToggle
+    );
 
     const thresholdRow =
         document.createElement("div");
@@ -314,14 +318,29 @@ export function createDynamicsWidget(section) {
         thresholdSlider
     );
 
-    widget.appendChild(gateTitle);
-    widget.appendChild(gateRow);
+    widget.appendChild(
+        gateTitle
+    );
 
-    widget.appendChild(compressorTitle);
-    widget.appendChild(compRow);
+    widget.appendChild(
+        gateRow
+    );
 
-    widget.appendChild(ratioRow);
-    widget.appendChild(thresholdRow);
+    widget.appendChild(
+        compressorTitle
+    );
+
+    widget.appendChild(
+        compRow
+    );
+
+    widget.appendChild(
+        ratioRow
+    );
+
+    widget.appendChild(
+        thresholdRow
+    );
 
     section.appendChild(widget);
 }

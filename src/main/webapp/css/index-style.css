@@ -1,0 +1,48 @@
+body {
+    background-color: #777;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h2{
+    font-family:sans-serif;
+    color: #cccccc;
+    
+}
+
+.peek {
+  opacity: 20%;
+  transition: 1s;
+}
+
+.qr-grid {
+  display: grid;
+  gap: 2rem;
+  padding: 2rem;
+  justify-items: center;
+}
+
+.qr-row {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.qr-item {
+  background: #333;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.qr-item img {
+  width: 200px;
+  height: 200px;
+}
+
+.qr-item label {
+  display: block;
+  margin-top: 0.5rem;
+  color: #ccc;
+}
