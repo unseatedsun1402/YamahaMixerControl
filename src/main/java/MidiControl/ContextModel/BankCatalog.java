@@ -24,8 +24,29 @@ public class BankCatalog {
         // Mix Bus Bank
         // -------------------------
         BankContext mixes = new BankContext();
-        mixes.addFilter(new BankFilter("mix", null, ContextType.MIX));
-        mixes.addFilter(new BankFilter("aux", null, ContextType.MIX));
+        mixes.addFilter(
+            new BankFilter(
+                "mix",
+                null,
+                ContextType.MIX
+            )
+        );
+
+        mixes.addFilter(
+            new BankFilter(
+                "aux",
+                null,
+                ContextType.MIX
+            )
+        );
+
+        mixes.addFilter(
+            new BankFilter(
+                "stereo",
+                null,
+                ContextType.MIX
+            )
+        );
         banks.put("bank.mixes", mixes);
 
         // -------------------------
@@ -46,6 +67,18 @@ public class BankCatalog {
         BankContext names = new BankContext();
         names.addFilter(new BankFilter("name", null, ContextType.NAME)); 
         banks.put("bank.names", names);
+
+        
+        BankContext stereo = new BankContext();
+        stereo.addFilter(
+            new BankFilter(
+                "stereo",
+                null,
+                ContextType.STEREO_OUTPUT
+            )
+        );
+        banks.put("bank.stereo", stereo);
+
     }
 
     public BankContext getBank(String bankId) {

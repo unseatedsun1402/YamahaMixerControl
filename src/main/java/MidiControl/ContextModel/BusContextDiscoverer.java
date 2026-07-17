@@ -69,12 +69,45 @@ public class BusContextDiscoverer implements ContextDiscoverer {
             familyGroups.computeIfAbsent(family, k -> new ArrayList<>()).add(group);
         }
 
-        // 2. For each family, compute bus count and create contexts
+        
         for (Map.Entry<BusFamily, List<ControlGroup>> entry : familyGroups.entrySet()) {
             BusFamily family = entry.getKey();
             List<ControlGroup> groups = entry.getValue();
 
+            if (family == BusFamily.STEREO) {
+
+                List<ContextFilter> filters =
+                        new ArrayList<>();
+
+                for (ControlGroup group : groups) {
+                    filters.add(
+                        new ContextFilter(
+                            group.getName(),
+                            "*",
+                            0
+                        )
+                    );
+                }
+
+                out.add(
+                    new Context(
+                        "stereo.0",
+                        "Stereo LR",
+                        ContextType.MIX,
+                        List.of("Musician", "Monitor", "FOH"),
+                        filters
+                    )
+                );
+
+                log.info(
+                    "Detected stereo context"
+                );
+
+                continue;
+            }
+
             int busCount = computeBusCount(groups);
+
             if (busCount <= 0) {
                 log.fine("No instances found for bus family " + family + "; skipping.");
                 continue;

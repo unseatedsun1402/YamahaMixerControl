@@ -20,7 +20,6 @@ public class ContextDiscoveryEngine {
         this.discoverers.add(new NameContextDiscoverer());
         this.discoverers.add(new BusContextDiscoverer());
             // new MatrixContextDiscoverer(),
-            // new OutputContextDiscoverer()
             // later: new ProcessingContextDiscoverer()
     }
     
