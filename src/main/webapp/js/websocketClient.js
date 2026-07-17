@@ -138,8 +138,11 @@ export class WebSocketClient {
     }
 
     // sequence tracking
-    if (this._lastSequence !== undefined && sequence !== undefined) {
-      if (sequence <= this._lastSequence + 1) {
+    if (
+      this._lastSequence !== undefined &&
+      sequence !== undefined
+    ) {
+      if (sequence !== this._lastSequence + 1) {
         console.warn("[WebSocketClient] Sequence out of order", {
           expected: this._lastSequence + 1,
           received: sequence,
@@ -224,7 +227,6 @@ export class WebSocketClient {
           });
         }
 
-        // attach meta directly to the array
         devices.__meta = enrichedPayload.__meta;
 
         this._emit("midi-device-list", devices);
@@ -240,15 +242,6 @@ export class WebSocketClient {
         break;
 
       case "server-event": {
-        const level = msg.payload?.level?.toLowerCase() || "info";
-
-        console[level]("[ServerEvent]", {
-          category: msg.payload?.category,
-          message: msg.payload?.message,
-          details: msg.payload?.details,
-          sequence
-        });
-
         this._emit("server-event", enrichedPayload);
         break;
       }

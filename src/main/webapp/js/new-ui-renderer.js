@@ -6,6 +6,7 @@ import { createStripElement } from "./strip-renderer.js";
 import { updateStrip } from "./strip-renderer.js";
 import { createDynamicsWidget } from "./widgets/dynamics.js";
 import { createEQWidget } from "./widgets/eq.js"
+import { createChannelOnWidget } from "./widgets/channel-on.js"
 
 const renderedStrips = new Map();
 const stripContainer = document.getElementById("strip-container");
@@ -51,6 +52,15 @@ function enhanceCompositeWidgets(stripEl) {
                 section.querySelector(
                     '[data-role="INPUT_EQ1_GAIN"]'
                 );
+
+            const hasChannelOn =
+                section.querySelector(
+                    '[data-role="INPUT_CHANNEL_ON"]'
+                );
+
+            if (hasChannelOn) {
+                createChannelOnWidget(section)
+            }
 
             if (hasDynamics) {
                 createDynamicsWidget(section);

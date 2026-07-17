@@ -63,7 +63,7 @@ body {
 }
 
 .strip-scroll-area {
-    flex: 1;
+    flex: 0 1 auto;
     min-height: 0;
     min-width: 0;
 
@@ -92,7 +92,26 @@ body {
     background: rgba(255,255,255,0.25);
 }
 
+
 .strip-fader-area {
+    flex: 0 0 35vh;
+    min-height: 240px;
+    max-height: 450px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.strip-fader-area:empty {
+    display: none;
+}
+
+.strip-fader-area > .section {
+    flex: 1;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
     flex-shrink: 0;
 
     margin-top: 10px;
@@ -120,146 +139,6 @@ body {
         0 0 3px rgba(0,0,0,0.6);
 }
 
-.section {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-
-    border-bottom: 1px solid #333;
-}
-
-.section-title {
-    margin-bottom: 4px;
-
-    color: #aaa;
-    font-size: 0.8rem;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.control {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-
-    text-align: center;
-}
-
-.control-label {
-    color: #ccc;
-    font-size: 0.8rem;
-}
-
-.rotary-knob {
-    position: relative;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 48px;
-    height: 48px;
-
-    cursor: grab;
-    touch-action: none;
-    user-select: none;
-}
-
-.rotary-knob:hover {
-    background-color: #2a2a2a;
-    border-radius: 50%;
-}
-
-.rotary-knob:active {
-    cursor: grabbing;
-}
-
-.knob-dial {
-    position: relative;
-
-    width: 100%;
-    height: 100%;
-
-    background: #333;
-    border: 2px solid #666;
-    border-radius: 50%;
-
-    transform-origin: 50% 50%;
-
-    box-shadow: inset 0 0 4px rgba(0,0,0,0.6);
-}
-
-.knob-value {
-    position: absolute;
-    top: 10%;
-    left: 45%;
-
-    width: 4px;
-    height: 18px;
-
-    background: #4da3ff;
-    border-radius: 2px;
-
-    transform-origin: 50% 100%;
-    transition: transform 0.1s ease;
-}
-
-.knob-value.updated {
-    background-color: #7fc2ff;
-}
-
-.toggle-control {
-    width: 100%;
-    padding: 8px;
-
-    background: #333;
-    border: 1px solid #555;
-    border-radius: 4px;
-
-    color: #eee;
-    font-size: 0.9rem;
-    text-align: center;
-
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-}
-
-.toggle-button {
-    width: 100%;
-    padding: 8px 10px;
-
-    background: #2a2a2a;
-    border: 1px solid #555;
-    border-bottom: 4px solid #444;
-
-    border-radius: 4px;
-
-    color: #ddd;
-    cursor: pointer;
-
-    transition:
-        background 0.15s,
-        border-color 0.15s,
-        box-shadow 0.15s;
-}
-
-.toggle-button.active {
-    background: #3b2d2d;
-
-    border-color: #f87171;
-    border-bottom-color: #ef4444;
-
-    box-shadow:
-        0 0 12px rgba(239,68,68,0.25);
-}
-
-.eq-widget .toggle-button.active {
-    border-bottom-color: #22c55e;
-}
 
 
 .send-widget .toggle-button.active {
@@ -289,67 +168,6 @@ select {
     text-align: center;
 }
 
-.eq-section {
-    display: flex;
-    gap: 12px;
-
-    padding: 8px;
-
-    background: #222;
-    border: 1px solid #333;
-    border-radius: 6px;
-}
-
-.eq-band {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-
-    width: 100%;
-    padding: 6px;
-
-    background: #1e1e1e;
-    border-radius: 4px;
-}
-
-.eq-band-title {
-    margin-bottom: 4px;
-
-    color: #aaa;
-    font-size: 0.75rem;
-    text-align: center;
-    text-transform: uppercase;
-}
-
-.eq-row,
-.dynamics-row {
-    display: grid;
-    grid-template-columns: 55px 1fr;
-    gap: 6px;
-    align-items: center;
-}
-
-.group-kInputToMix {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-}
-
-.eq-widget input[type="range"] {
-    accent-color: #22c55e;
-}
-
-.dynamics-widget input[type="range"],
-.dynamics-widget input[type="checkbox"] {
-    accent-color: #ef4444;
-}
-
-.dynamics-toggle-row {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 6px;
-}
-
 @media (max-width: 768px) {
     .channel-strip {
         width: 140px;
@@ -371,12 +189,17 @@ select {
         width: 100%;
     }
     
-    
-    .eq-row,
-    .dynamics-row {
-            display: grid;
-            grid-template-columns: 50px 1fr;
-            gap: 4px;
-            align-items: center;
-        }
+}
+
+.global-alert {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #b00020;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  box-shadow: 0 0 12px rgba(0,0,0,0.6);
+  z-index: 9999;
 }
