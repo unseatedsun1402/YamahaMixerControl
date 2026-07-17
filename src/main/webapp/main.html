@@ -51,6 +51,30 @@
             console.info(`[Mix] Registering session type ${ws.sessionType}`);
         });
 
+
+        function selectOutputMode() {
+
+            window.currentDomain = "output";
+            window.currentView = "basic-master-view";
+            
+            window.currentBank = 0;
+            window.ribbonInitialised = false;
+
+            ws.requestBank("bank.mixes");
+        }
+
+
+        function selectInputMode() {
+
+            window.currentDomain ="input";
+            window.currentView ="basic-input-view";
+            
+            window.currentBank = 0;
+            window.ribbonInitialised = false;
+
+            ws.requestBank("bank.inputs" );
+        }
+
         function handleViewSelection(sendId) {
 
             const view = sendId
@@ -146,7 +170,12 @@
             console.log("UI MODEL RECEIVED", model.contextId);
 
             if (!window.ribbonInitialised) {
-                buildViewRibbonFromModel(model, handleViewSelection);
+                buildViewRibbonFromModel(
+                    model,
+                    handleViewSelection,
+                    selectInputMode,
+                    selectOutputMode
+                );
                 window.ribbonInitialised = true;
             }
 
