@@ -49,10 +49,6 @@ public class HardwareOutputRouter implements OutputRequestSender{
                 sendSysex(ci, newValue);
                 break;
             case SYSEX:
-                if(registry.getDeskType().equals("YAMAHA_01V96I")){
-                    sendSysex(ci,newValue);
-                    break;
-                }
                 if (ci.getNrpn().isPresent()) {
                     sendNrpn(ci, newValue);
                     break;

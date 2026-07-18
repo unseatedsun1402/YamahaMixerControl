@@ -52,7 +52,7 @@ public class BusContextDiscovererTest {
         // aux.0..7 (8)
         // bus.0..7 (8)
         // stereo.0/1 (2)
-        assertEquals(18, out.size());
+        assertEquals(17, out.size());
 
         // AUX
         for (int i = 0; i < 8; i++) {
@@ -78,7 +78,7 @@ public class BusContextDiscovererTest {
 
         // STEREO
         Context stereo = out.stream().filter(c -> c.getId().equals("stereo.0")).findFirst().orElseThrow();
-        assertEquals("Stereo 1", stereo.getLabel());
+        assertEquals("Stereo LR", stereo.getLabel());
     }
 
     // ------------------------------------------------------------
@@ -101,7 +101,7 @@ public class BusContextDiscovererTest {
         // mix.0..15 (16)
         // matrix.0..7 (8)
         // stereo.0/1/2 (3)
-        assertEquals(27, out.size());
+        assertEquals(25, out.size());
 
         // MIX
         for (int i = 0; i < 8; i++) {
@@ -127,7 +127,7 @@ public class BusContextDiscovererTest {
 
         // STEREO
         Context stereo = out.stream().filter(c -> c.getId().equals("stereo.0")).findFirst().orElseThrow();
-        assertEquals("Stereo 1", stereo.getLabel());
+        assertEquals("Stereo LR", stereo.getLabel());
     }
 
     // ------------------------------------------------------------

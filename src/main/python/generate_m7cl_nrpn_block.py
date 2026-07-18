@@ -41,7 +41,7 @@ def load_blocks(csv_file):
                     row["hex_from"],
                     row["canonical_id"],
                     int(row["count"]),
-                    row.get("value_mode", "CC6_ONLY"),
+                    row.get("value_mode", "NRPN_14BIT"),
                 )
             )
 
