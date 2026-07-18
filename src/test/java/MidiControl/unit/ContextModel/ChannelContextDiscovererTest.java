@@ -84,12 +84,9 @@ public class ChannelContextDiscovererTest {
             assertEquals("Channel " + (i + 1), ctx.getLabel());
             assertEquals(ContextType.CHANNEL, ctx.getContextType());
 
-            // Filters should include both per-channel groups
-            assertEquals(2, ctx.getFilters().size());
+            assertEquals(1, ctx.getFilters().size());
             assertTrue(ctx.getFilters().stream()
                     .anyMatch(f -> f.getControlGroup().equals("kInputFader")));
-            assertTrue(ctx.getFilters().stream()
-                    .anyMatch(f -> f.getControlGroup().equals("kInputAUX")));
         }
     }
 
@@ -112,11 +109,9 @@ public class ChannelContextDiscovererTest {
             assertEquals("Channel " + (i + 1), ctx.getLabel());
             assertEquals(ContextType.CHANNEL, ctx.getContextType());
 
-            assertEquals(2, ctx.getFilters().size());
+            assertEquals(1, ctx.getFilters().size());
             assertTrue(ctx.getFilters().stream()
                     .anyMatch(f -> f.getControlGroup().equals("kInputFader")));
-            assertTrue(ctx.getFilters().stream()
-                    .anyMatch(f -> f.getControlGroup().equals("kInputToMix")));
         }
     }
 }

@@ -94,6 +94,8 @@ public class MixAuxBusViewBuilderTest {
         MixAuxBusViewBuilder builder = new MixAuxBusViewBuilder();
         List<ViewControl> controls = builder.build(ctx, registry, null);
 
+        assertTrue(controls.size() > 5);
+
         // Validate presence
         assertTrue(contains(controls, "FADER"));
         assertTrue(contains(controls, "PAN"));

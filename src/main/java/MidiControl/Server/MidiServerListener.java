@@ -25,7 +25,7 @@ public class MidiServerListener implements ServletContextListener {
             Formatter logFormat = new CustomColorFormatter();
             root.setLevel(Level.INFO);
             for (Handler h : root.getHandlers()) {
-                h.setLevel(Level.INFO);
+                h.setLevel(Level.FINE);
                 h.setFormatter(logFormat);
             }
             MidiServer server = new MidiServer();

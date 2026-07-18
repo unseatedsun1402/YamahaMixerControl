@@ -28,7 +28,7 @@ public class CanonicalRegistry implements SourceAllInstances {
     private Map<String, ControlInstance> controlsByNrpn;
     private SysexParser sysexParser;
     private final List<RegistryReloadListener> reloadListeners = new ArrayList<>();
-    private String deskType = null;
+    private String deskType = "";
     private static final Logger logger = Logger.getLogger(CanonicalRegistry.class.getName());
     private boolean debug = false;
 
@@ -105,8 +105,11 @@ public class CanonicalRegistry implements SourceAllInstances {
             ControlInstance ci = sc.getInstances().get(instance);
             if (ci == null) continue;
 
-            ci.setNrpn(nrpn);
-            controlsByNrpn.put(nrpn.getMsb()+":"+nrpn.getLsb(), ci);
+            ci.setNrpn(nrpn);            
+            controlsByNrpn.put(
+                nrpn.msbInt() + ":" + nrpn.lsbInt(),
+                ci
+            );
         }
     }
 
@@ -167,7 +170,17 @@ public class CanonicalRegistry implements SourceAllInstances {
     }
 
     public ControlInstance resolveNrpn(int msb, int lsb) {
-        return controlsByNrpn.get(msb+":"+lsb);
+        String key = msb + ":" + lsb;
+
+        ControlInstance ci = controlsByNrpn.get(key);
+
+        if (ci == null) {
+            logger.warning(
+                String.format("NRPN lookup failed for %s registry size=%d",key, controlsByNrpn.size())
+            );
+        }
+
+        return ci;
     }
 
     private ControlInstance resolveCc(ShortMessage cc) {
@@ -271,6 +284,7 @@ public class CanonicalRegistry implements SourceAllInstances {
 
         indexControlsByCanonicalId();
         buildContextIndex();
+        if(deskType.isEmpty())logger.warning("Cannot attach NRPN mappings as the deskType is null");
         attachNrpnMappings(NrpnMappingLoader.loadFromResource(MidiControl.NrpnUtils.MappingFiles.getFilePathByKey(deskType)));
         attachBroadcastListeners();
         notifyReloadListeners();
