@@ -87,7 +87,7 @@ def parse_sysex_table(xls_path, output_json):
             addressD
         )
 
-        priority = compute_priority(sub_control)
+        priority = compute_priority(control_group,sub_control)
 
         mapping = {
             "control_group": control_group or "UnknownElement",
@@ -113,8 +113,9 @@ def parse_sysex_table(xls_path, output_json):
 
     print(f"Parsed {len(mappings)} mappings (including synthetic meter blocks) into {output_json}")
 
-def compute_priority(sub_control: str) -> int:
+def compute_priority(control_group: str, sub_control: str) -> int:
     sc = sub_control.lower()
+    cg = control_group
 
     # Priority 1: faders and channel on/off
     if "kfader" in sc or "kchannelon" in sc:
@@ -123,6 +124,11 @@ def compute_priority(sub_control: str) -> int:
     # Priority 2: level/gain suffixes
     if sc.endswith("level") or sc.endswith("gain") or "nameshort" in sc or "eq" in sc or "dyn" in sc or "comp" in sc:
         return 2
+    
+    for term in PRIORITY_BLACKLIST:
+        if(term in cg):
+            # print("Deprioritised control "+cg+"."+sc)
+            return 4
 
     # Default: priority 3
     return 3
@@ -137,6 +143,13 @@ DROP_IF_REGEX = [
     r"mix(1[7-9]|[2-9][0-9])",   # MIX > 16
     r"matrix(9|1[0-6])",         # Matrix > 8
     r"fx([5-9]|1[0-6])",         # FX > 4
+]
+
+PRIORITY_BLACKLIST = [
+   "kSceneFocusRecallMaster",
+   "kSceneFadeTimeEnable",
+   "kRP",
+   "kSetup",
 ]
 
 CONDITIONAL_DROP = [

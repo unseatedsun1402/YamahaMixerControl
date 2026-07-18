@@ -597,7 +597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSceneFadeTimeEnable",
@@ -657,7 +657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSceneFadeTimeEnable",
@@ -717,7 +717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSceneFadeTimeEnable",
@@ -777,7 +777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSceneFocusRecallMaster",
@@ -837,7 +837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSceneFocusRecallMaster",
@@ -897,7 +897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kGroupSelectorMask",
@@ -41337,7 +41337,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPreferenceByte",
@@ -41397,7 +41397,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDCAAssign",
@@ -41457,7 +41457,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDCAAssign",
@@ -41517,7 +41517,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDCAAssign",
@@ -41577,7 +41577,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDCAAssign",
@@ -41637,7 +41637,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDCAAssign",
@@ -41697,7 +41697,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDCAAssign",
@@ -41757,7 +41757,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDCAAssign",
@@ -41817,7 +41817,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDCAAssign",
@@ -41877,7 +41877,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDelayFunc",
@@ -41937,7 +41937,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDelayFunc",
@@ -41997,7 +41997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDelayFunc",
@@ -42057,7 +42057,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupAD824",
@@ -42117,7 +42117,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupAD824",
@@ -42177,7 +42177,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupAD824Type",
@@ -42237,7 +42237,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupTalkback",
@@ -42297,7 +42297,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupTalkback",
@@ -42357,7 +42357,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupTalkback",
@@ -42417,7 +42417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupTalkback",
@@ -42477,7 +42477,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupTalkback",
@@ -42597,7 +42597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupTalkbackDimmer",
@@ -42657,7 +42657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupTBAssign",
@@ -42717,7 +42717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOscAssign",
@@ -42777,7 +42777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMeterSetup",
@@ -42837,7 +42837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMeterSetup",
@@ -42897,7 +42897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMeterSetup",
@@ -42957,7 +42957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMeterSetup",
@@ -43017,7 +43017,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMeterSetup",
@@ -43077,7 +43077,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMeterSetup",
@@ -43137,7 +43137,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMeterSetup",
@@ -43197,7 +43197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPortNameAD",
@@ -43737,7 +43737,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOParam",
@@ -43797,7 +43797,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOParam",
@@ -43857,7 +43857,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -43917,7 +43917,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -43977,7 +43977,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44037,7 +44037,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44097,7 +44097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44157,7 +44157,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44217,7 +44217,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44277,7 +44277,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44337,7 +44337,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44397,7 +44397,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44457,7 +44457,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44517,7 +44517,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44577,7 +44577,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44637,7 +44637,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44697,7 +44697,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44757,7 +44757,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44817,7 +44817,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44877,7 +44877,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotParam",
@@ -44937,7 +44937,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIODitherSlot",
@@ -44997,7 +44997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIODitherSlot",
@@ -45057,7 +45057,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIODitherSlot",
@@ -45117,7 +45117,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIODitherSlot",
@@ -45177,7 +45177,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIODitherSlot",
@@ -45237,7 +45237,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIODitherSlot",
@@ -45297,7 +45297,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIODitherSlot",
@@ -45357,7 +45357,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIODitherSlot",
@@ -45417,7 +45417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIODitherD2Tr",
@@ -45477,7 +45477,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -45537,7 +45537,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -45597,7 +45597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -45657,7 +45657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -45717,7 +45717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -45777,7 +45777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -45837,7 +45837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -45897,7 +45897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -45957,7 +45957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46017,7 +46017,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46077,7 +46077,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46197,7 +46197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46257,7 +46257,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46317,7 +46317,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46377,7 +46377,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46437,7 +46437,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46497,7 +46497,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46557,7 +46557,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46617,7 +46617,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46677,7 +46677,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46737,7 +46737,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46797,7 +46797,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46857,7 +46857,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46917,7 +46917,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -46977,7 +46977,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -47037,7 +47037,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -47097,7 +47097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeLink",
@@ -47157,7 +47157,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascade",
@@ -47217,7 +47217,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascade",
@@ -47277,7 +47277,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascade",
@@ -47337,7 +47337,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascade",
@@ -47397,7 +47397,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascade",
@@ -47457,7 +47457,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeIO",
@@ -47517,7 +47517,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeIO",
@@ -47577,7 +47577,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOCascadeIO",
@@ -47637,7 +47637,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDIOTASCAM",
@@ -47697,7 +47697,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSoloSafeInput",
@@ -47757,7 +47757,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSoloSafeMix",
@@ -47817,7 +47817,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSoloSafeMatrix",
@@ -47877,7 +47877,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSoloSafeStereo",
@@ -47937,7 +47937,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -47997,7 +47997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48057,7 +48057,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48117,7 +48117,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48177,7 +48177,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48237,7 +48237,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48297,7 +48297,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48357,7 +48357,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48417,7 +48417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48477,7 +48477,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48537,7 +48537,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48597,7 +48597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48657,7 +48657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48717,7 +48717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCue",
@@ -48837,7 +48837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueInput",
@@ -48897,7 +48897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueMix",
@@ -48957,7 +48957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueMatrix",
@@ -49017,7 +49017,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueStereo",
@@ -49077,7 +49077,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueDCA",
@@ -49137,7 +49137,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueKeyIn",
@@ -49197,7 +49197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueEffect",
@@ -49257,7 +49257,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueExternal",
@@ -49317,7 +49317,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueStack",
@@ -49377,7 +49377,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueStackInput",
@@ -49437,7 +49437,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueStackMix",
@@ -49497,7 +49497,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueStackMatrix",
@@ -49557,7 +49557,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueStackStereo",
@@ -49617,7 +49617,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueStackDCA",
@@ -49677,7 +49677,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kMuteSafeInput",
@@ -49977,7 +49977,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNameAutoCopy",
@@ -50037,7 +50037,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNameAutoCopy",
@@ -50097,7 +50097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNameAutoCopy",
@@ -50157,7 +50157,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIRx",
@@ -50217,7 +50217,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIRx",
@@ -50277,7 +50277,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIRx",
@@ -50337,7 +50337,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDITx",
@@ -50397,7 +50397,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDITx",
@@ -50457,7 +50457,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDITx",
@@ -50517,7 +50517,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIThruPort",
@@ -50577,7 +50577,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIThruPort",
@@ -50637,7 +50637,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupStudioMgrPort",
@@ -50697,7 +50697,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupStudioMgrPort",
@@ -50757,7 +50757,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupStudioMgrPort",
@@ -50817,7 +50817,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDITxEnable",
@@ -50877,7 +50877,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDITxEnable",
@@ -50937,7 +50937,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDITxEnable",
@@ -50997,7 +50997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDITxEnable",
@@ -51057,7 +51057,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDITxEnable",
@@ -51117,7 +51117,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDITxEnable",
@@ -51177,7 +51177,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDITxEnable",
@@ -51237,7 +51237,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIRxEnable",
@@ -51297,7 +51297,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIRxEnable",
@@ -51357,7 +51357,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIRxEnable",
@@ -51417,7 +51417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIRxEnable",
@@ -51477,7 +51477,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIRxEnable",
@@ -51537,7 +51537,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIRxEnable",
@@ -51597,7 +51597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIOmniEnable",
@@ -51657,7 +51657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIOmniEnable",
@@ -51717,7 +51717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIOmniEnable",
@@ -51777,7 +51777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIOmniEnable",
@@ -51837,7 +51837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIOmniEnable",
@@ -51897,7 +51897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIOmniEnable",
@@ -51957,7 +51957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIEchoEnable",
@@ -52017,7 +52017,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIEchoEnable",
@@ -52077,7 +52077,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIEchoEnable",
@@ -52137,7 +52137,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIEchoEnable",
@@ -52197,7 +52197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIEchoEnable",
@@ -52257,7 +52257,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIEchoEnable",
@@ -52317,7 +52317,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIProgram",
@@ -52377,7 +52377,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIProgram",
@@ -52437,7 +52437,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIProgram",
@@ -52497,7 +52497,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMIDIControl",
@@ -52557,7 +52557,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -52617,7 +52617,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -52677,7 +52677,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -52737,7 +52737,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -52797,7 +52797,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -52857,7 +52857,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -52917,7 +52917,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -52977,7 +52977,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -53037,7 +53037,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -53097,7 +53097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -53157,7 +53157,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -53217,7 +53217,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -53277,7 +53277,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -53337,7 +53337,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -53397,7 +53397,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -53457,7 +53457,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupPGMChangeTable",
@@ -53517,7 +53517,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCntrlChangeTable",
@@ -53577,7 +53577,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCntrlChangeTable",
@@ -53637,7 +53637,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCntrlChangeTable",
@@ -53697,7 +53697,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOutPortAttLevel",
@@ -53817,7 +53817,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeIn",
@@ -53877,7 +53877,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeMix",
@@ -53937,7 +53937,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeMix",
@@ -53997,7 +53997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeMatrix",
@@ -54057,7 +54057,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeMatrix",
@@ -54117,7 +54117,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeStereo",
@@ -54177,7 +54177,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeStereo",
@@ -54237,7 +54237,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeRack",
@@ -54297,7 +54297,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeDCA",
@@ -54357,7 +54357,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeDCAAll",
@@ -54417,7 +54417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeMuteMaster",
@@ -54477,7 +54477,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeInputName",
@@ -54537,7 +54537,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeOutputName",
@@ -54597,7 +54597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeInputPatch",
@@ -54657,7 +54657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupRecallSafeOutputPatch",
@@ -54717,7 +54717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOscSetting",
@@ -54777,7 +54777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOscSetting",
@@ -54837,7 +54837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOscSetting",
@@ -54897,7 +54897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOscSetting",
@@ -54957,7 +54957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOscSetting",
@@ -55137,7 +55137,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOscSetting",
@@ -55257,7 +55257,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOscSetting",
@@ -55377,7 +55377,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOscSetting",
@@ -55437,7 +55437,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -55497,7 +55497,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -55557,7 +55557,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -55617,7 +55617,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -55677,7 +55677,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -55737,7 +55737,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -55797,7 +55797,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -55857,7 +55857,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -55917,7 +55917,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -55977,7 +55977,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -56037,7 +56037,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -56157,7 +56157,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -56277,7 +56277,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -56337,7 +56337,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -56397,7 +56397,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -56457,7 +56457,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -56517,7 +56517,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitor",
@@ -56637,7 +56637,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitorDefineAssign",
@@ -56697,7 +56697,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotDelay",
@@ -56757,7 +56757,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotDelay",
@@ -56817,7 +56817,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotDelay",
@@ -56877,7 +56877,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOmniDelay",
@@ -56937,7 +56937,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOmniDelay",
@@ -56997,7 +56997,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOmniDelay",
@@ -57057,7 +57057,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupD2TrOutDelay",
@@ -57117,7 +57117,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupD2TrOutDelay",
@@ -57177,7 +57177,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupD2TrOutDelay",
@@ -57237,7 +57237,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitorDelay",
@@ -57297,7 +57297,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitorDelay",
@@ -57357,7 +57357,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupMonitorDelay",
@@ -57417,7 +57417,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueDelay",
@@ -57477,7 +57477,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueDelay",
@@ -57537,7 +57537,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueDelay",
@@ -57597,7 +57597,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupCueDelay",
@@ -57657,7 +57657,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupSlotOutPhase",
@@ -57717,7 +57717,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupOmniOutPhase",
@@ -57777,7 +57777,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupD2TrOutPhase",
@@ -57837,7 +57837,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupBrightnessBank",
@@ -57897,7 +57897,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupBrightness",
@@ -57957,7 +57957,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupBrightness",
@@ -58017,7 +58017,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupBrightness",
@@ -58077,7 +58077,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58137,7 +58137,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58197,7 +58197,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58257,7 +58257,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58317,7 +58317,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58377,7 +58377,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58437,7 +58437,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58497,7 +58497,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58557,7 +58557,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58617,7 +58617,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58677,7 +58677,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58737,7 +58737,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58797,7 +58797,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58857,7 +58857,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58917,7 +58917,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -58977,7 +58977,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -59037,7 +59037,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -59097,7 +59097,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -59157,7 +59157,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupNetwork",
@@ -59217,7 +59217,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDateTimeFormat",
@@ -59277,7 +59277,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupDateTimeFormat",
@@ -59337,7 +59337,7 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   },
   {
     "control_group": "kSetupAD824CommPort",
@@ -59397,6 +59397,6 @@
       "cc",
       247
     ],
-    "priority": 3
+    "priority": 4
   }
 ]

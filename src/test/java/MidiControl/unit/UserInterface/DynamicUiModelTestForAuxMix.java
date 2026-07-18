@@ -66,8 +66,8 @@ public class DynamicUiModelTestForAuxMix {
 
         assertTrue(model.controls.stream().anyMatch(c -> "FADER".equals(c.logicId)));
         // assertTrue(model.controls.stream().anyMatch(c -> "PAN".equals(c.logicId)));
-        assertTrue(model.controls.stream().anyMatch(c -> c.logicId.startsWith("DYN_")));
-        assertTrue(model.controls.stream().anyMatch(c -> c.logicId.startsWith("EQ_")));
+        assertTrue(model.controls.stream().anyMatch(c -> c.logicId.startsWith("DYN")));
+        assertTrue(model.controls.stream().anyMatch(c -> c.logicId.startsWith("EQ")));
 
         for (ViewControlDTO vc : model.controls) {
             assertNotNull(vc.hwGroup);
