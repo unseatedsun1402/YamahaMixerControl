@@ -53,7 +53,7 @@ public class ChannelNameAssembler implements ControlListener {
                                 ChannelNameListener listener) {
         if (deskLifeName == "") {
             deskLifeName = registry.getDeskType();
-            logger.info("Building assemblers for desk " + deskLifeName + " " + registry.hashCode());
+            logger.info(String.format("Building assemblers for desk %s registry #%d",deskLifeName,registry.hashCode()));
         }
 
         this.codec = selectCodec(registry.getDeskType());

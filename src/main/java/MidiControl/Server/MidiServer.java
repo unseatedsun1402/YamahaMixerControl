@@ -357,4 +357,8 @@ public class MidiServer implements Runnable, UiModelService{
             logger.severe(e.toString());
         }
     }
+
+    public RehydrationManager getRehydrationManager() {
+        return this.rehydrationManager;
+    }
 }

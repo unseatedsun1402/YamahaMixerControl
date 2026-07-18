@@ -37,18 +37,28 @@ public class StateRehydrationService implements RehydrationListener{
     }
 
     public void requestMeters() {
-        logger.info("Request to refresh meter updates");
-        NotifyClients.publish(ServerEvent.info("METERS", "Requesting meter refresh"));
+        if(rehydrationManager.getMeterRequestsActive())NotifyClients.publish(ServerEvent.info("METERS", "Requesting meter refresh"));
         rehydrationManager.requestMeters();
     }
 
     @Override
     public void onFinished() {
+        logger.info("Publish finished rehydration");
         NotifyClients.publish(ServerEvent.info("REHYDRATION", "Rehydration Finished"));
     }
 
     @Override
     public void onReset() {
         NotifyClients.publish(ServerEvent.info("REHYDRATION", "Rehydration resetting"));
+    }
+
+    @Override
+    public void activateMeterRequests() {
+        NotifyClients.publish(ServerEvent.info("REHYDRATION", "Meter Requests Active"));
+    }
+
+    @Override
+    public void delayMeterRequests() {
+        NotifyClients.publish(ServerEvent.info("REHYDRATION", "Meter requests delayed"));
     }
 }

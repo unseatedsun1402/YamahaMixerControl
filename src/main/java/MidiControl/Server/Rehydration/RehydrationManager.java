@@ -30,6 +30,7 @@ public class RehydrationManager{
     private final AtomicInteger periodTimedOutTransactions = new AtomicInteger(0);
     private final LongAdder totalRttMs = new LongAdder();
     private final AtomicInteger completedRequests = new AtomicInteger(0);
+
     private static final int MAX_TIMEOUT_COUNT = 10_000;
     private final RehydrationTelemetry telemetry = new RehydrationTelemetry(this);
 
@@ -43,6 +44,8 @@ public class RehydrationManager{
     private static final long SAFE_DELAY_MS = 20;
     private static final long WARNING_RTT_MS = 60;
     private static final long CRITICAL_RTT_MS = 100;
+    private boolean meterRequestsDelayed = false;
+    private boolean meterRequestsDelayedWarning = false;
 
     private static volatile long effectiveDelayMs = BASE_DELAY_MS;
 
@@ -89,6 +92,7 @@ public class RehydrationManager{
 
     public void rehydrateAll(RehydrationListener listener) {
         final long rehydrationStart = System.currentTimeMillis();
+        running = true;
         startControlLoop();
 
         final List<ControlInstance> all = new ArrayList<>(registry.getAllInstances());
@@ -106,17 +110,30 @@ public class RehydrationManager{
         final ArrayDeque<ControlInstance> q2 = new ArrayDeque<>();
         final ArrayDeque<ControlInstance> q3 = new ArrayDeque<>();
         final ArrayDeque<ControlInstance> q4 = new ArrayDeque<>();
-
+        
+        int skipped = 0;
         for (ControlInstance ci : all) {
-            switch (normalizePriority(ci.getPriority())) {
+            
+            var priority = normalizePriority(ci.getPriority());
+            if (priority == 4) {
+                skipped += 1;
+                continue;
+            }
+            switch (priority) {
                 case 1 -> q1.add(ci);
                 case 2 -> q2.add(ci);
                 case 3 -> q3.add(ci);
                 default -> q4.add(ci);
             }
         }
+        
+        logger.info(String.format("Skipped rehydration of %d controls that were deprioritised",skipped));
+        logger.info(String.format("Rehydrating %d p1 controls %d p2 controls and %d p3 controls",
+            q1.size(),q2.size(),q3.size()));
 
-        final AtomicInteger remaining = new AtomicInteger(all.size());
+        
+        final AtomicInteger remaining =
+            new AtomicInteger(q1.size() + q2.size() + q3.size() + q4.size());
         final AtomicInteger patternIdx = new AtomicInteger(0);
 
         scheduler.schedule(new Runnable() {
@@ -124,13 +141,13 @@ public class RehydrationManager{
             public void run() {
                 if(!running)running = true;
                 if (remaining.get() <= 0) {
-                    logger.info("Rehydration complete: all priorities processed.");
+                    int timeFinished = (int)((System.currentTimeMillis() - rehydrationStart)/1000);
+                    logger.info(String.format("Rehydration complete: all priorities processed in: %d minutes %d seconds",
+                        (timeFinished / 60),(timeFinished % 60)));
                     all.clear();
-                    if (debug) {
-                        logger.info("Rehydration finished in: " + (int)((System.currentTimeMillis() - rehydrationStart)/1000) + " s"); 
-                    }
                     listener.onFinished();
                     running = false;
+                    if(meterRequestsDelayed)activateMeterRequests();
                     return;
                 }
 
@@ -245,7 +262,13 @@ public class RehydrationManager{
             cachedMeterRequest = buildRequestBytes(checkModelNumber).clone();
         }
 
-        outputRouter.send(cachedMeterRequest);
+        if(meterRequestsDelayedWarning){
+            logger.warning("Meter requests dropped while in safe mode");
+            meterRequestsDelayedWarning = false;
+        }
+        if(!meterRequestsDelayed){
+            outputRouter.send(cachedMeterRequest);
+        }
     }
 
     private byte[] buildRequestBytes(byte modelNumber) {
@@ -334,5 +357,20 @@ public class RehydrationManager{
 
         // Reset pacing back to default for next run
         effectiveDelayMs = BASE_DELAY_MS;
+    }
+
+    public void delayMeterRequests() {
+        logger.info("Delaying meters until rehydration complete or else activated");
+        meterRequestsDelayed = true;
+        meterRequestsDelayedWarning = true;
+    }
+
+    public void activateMeterRequests(){
+        meterRequestsDelayed = false;
+        logger.info("Meters requests activated");
+    }
+
+    public boolean getMeterRequestsActive(){
+        return !meterRequestsDelayed;
     }
 }

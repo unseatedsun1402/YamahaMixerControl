@@ -19,4 +19,8 @@ public final class RehydrationTelemetry {
     public long getAvgRequestRttMs() {
         return manager.getAvgRequestRttMsAndReset();
     }
+
+    public boolean getMeterRequestStatus(){
+        return manager.getMeterRequestsActive();
+    }
 }

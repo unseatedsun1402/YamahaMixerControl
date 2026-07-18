@@ -3,7 +3,6 @@ package MidiControl.unit.Server;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlGroup;
 import MidiControl.Controls.ControlInstance;
-import MidiControl.Controls.SourceAllInstances;
 import MidiControl.Controls.SubControl;
 import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.Routing.OutputRequestSender;
@@ -53,7 +52,6 @@ class RehydrationManagerTest {
 
         @Override
         public ScheduledFuture<?> schedule(Runnable r, long delay, TimeUnit unit) {
-            // intentionally do nothing
             return null;
         }
     }
@@ -83,9 +81,15 @@ class RehydrationManagerTest {
     static class FakeListener implements RehydrationListener {
         int finished = 0;
         int reset = 0;
+        int activated = 0;
+        int delayed = 0;
 
         @Override public void onFinished() { finished++; }
         @Override public void onReset() { reset++; }
+        @Override
+        public void activateMeterRequests() { activated++; }
+        @Override
+        public void delayMeterRequests() { delayed++; }
     }
 
     // ---------------- Helpers ----------------
@@ -150,7 +154,6 @@ class RehydrationManagerTest {
         FakeOutputRouter fakeRouter = new FakeOutputRouter();
         CanonicalRegistry fakeRegistry = new MockCanonicalRegistry();
 
-        // Immediate schedule => timeout check runs immediately and removes pending
         CappedImmediateScheduler scheduler = new CappedImmediateScheduler(5);
 
         RehydrationManager mgr = new RehydrationManager(fakeRouter, fakeRegistry, scheduler);
@@ -162,6 +165,35 @@ class RehydrationManagerTest {
 
     @Test
     void rehydrateAll_requestsEachControlInstance() {
+        FakeOutputRouter router = new FakeOutputRouter();
+
+        ControlInstance c1 = makeInstance("kTestGroupA", "kTestSub", 0, 1);
+        ControlInstance c2 = makeInstance("kTestGroupB", "kTestSub", 0, 3);
+
+        CanonicalRegistry reg = new MockCanonicalRegistry() {
+            @Override
+            public Collection<ControlInstance> getAllInstances() {
+                return List.of(c1, c2);
+            }
+        };
+
+        CappedImmediateScheduler scheduler = new CappedImmediateScheduler(50);
+
+        RehydrationManager mgr = new RehydrationManager(router, reg, scheduler);
+
+        FakeListener listener = new FakeListener();
+
+        mgr.rehydrateAll(listener);
+
+        assertEquals(2, router.callCount);
+        assertEquals(1, listener.finished);
+
+        // Because FakeOutputRouter only keeps the lastRequestedId, we can at least assert it ends on c2.
+        assertEquals("kTestGroupB.kTestSub.0", router.lastRequestedId);
+    }
+
+        @Test
+    void testRehydrateAllSkipsP4() {
         FakeOutputRouter router = new FakeOutputRouter();
 
         // Build real composite instances so canonical IDs are valid:
@@ -176,7 +208,6 @@ class RehydrationManagerTest {
             }
         };
 
-        // Cap high enough to allow the initial run + reschedules to drain 2 items and finish
         CappedImmediateScheduler scheduler = new CappedImmediateScheduler(50);
 
         RehydrationManager mgr = new RehydrationManager(router, reg, scheduler);
@@ -185,13 +216,10 @@ class RehydrationManagerTest {
 
         mgr.rehydrateAll(listener);
 
-        assertEquals(2, router.callCount);
+        assertEquals(1, router.callCount);
         assertEquals(1, listener.finished);
-
-        // The weighted pattern should select priority-1 first when available
-        // so the first request should be c1's canonicalId.
-        // Because FakeOutputRouter only keeps the lastRequestedId, we can at least assert it ends on c2.
-        assertEquals("kTestGroupB.kTestSub.0", router.lastRequestedId);
+        
+        assertEquals("kTestGroupA.kTestSub.0", router.lastRequestedId);
     }
 
     @Test

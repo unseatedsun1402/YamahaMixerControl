@@ -71,7 +71,7 @@ def parse_01v96i_sysex(xls_path, output_json):
             addressB
         )
         
-        priority = compute_priority(sub_control)
+        priority = compute_priority(control_group,sub_control)
 
         mapping = {
             "control_group": control_group or "UnknownElement",
@@ -134,7 +134,14 @@ def infer_semantic(control_group: str, sub_control: str):
 
     return None
 
-def compute_priority(sub_control: str) -> int:
+PRIORITY_BLACKLIST = [
+   "kSceneFocusRecallMaster",
+   "kSceneFadeTimeEnable",
+   "kRP",
+   "kSetup",
+]
+
+def compute_priority(control_group: str,sub_control: str) -> int:
     sc = sub_control.lower()
 
     # Priority 1: faders and channel on/off
@@ -144,6 +151,11 @@ def compute_priority(sub_control: str) -> int:
     # Priority 2: level/gain suffixes
     if sc.endswith("level") or sc.endswith("gain") or "nameshort" in sc or "eq" in sc or "dyn" in sc or "comp" in sc:
         return 2
+    
+    for term in PRIORITY_BLACKLIST:
+        if(term in control_group):
+            print("Deprioritised control "+control_group+"."+sc)
+            return 4
 
     # Default: priority 3
     return 3
