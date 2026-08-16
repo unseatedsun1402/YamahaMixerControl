@@ -12,13 +12,11 @@ public class ControlFactory {
 
         for (SysexMapping mapping : mappings) {
 
-            String groupName = mapping.getControlGroup();   // e.g. "kMixFader"
-            String subName   = mapping.getSubControl();     // e.g. "kFader"
+            String groupName = mapping.getControlGroup();
+            String subName   = mapping.getSubControl();
 
-            // 1. Get or create ControlGroup
             ControlGroup group = groups.computeIfAbsent(groupName, ControlGroup::new);
 
-            // 2. Get or create Subcontrol
             SubControl sub = group.getSubcontrol(subName);
             if (sub == null) {
                 sub = new SubControl(group, subName);
@@ -28,10 +26,9 @@ public class ControlFactory {
             for (int instance=0; instance < mapping.getMax_Channels(); instance ++) {
               ControlInstance control = new ControlInstance(
                 sub, instance,
-                mapping,   // store the entire SysexMapping object
-                null // NRPN mapping added later
+                mapping,
+                null
               );
-              // 4. Add instance to subcontrol
               sub.addInstance(control);
             }
         }

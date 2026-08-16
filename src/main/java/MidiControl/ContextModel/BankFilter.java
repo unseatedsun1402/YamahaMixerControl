@@ -27,10 +27,6 @@ public class BankFilter {
         this(prefix, index, type, null);
     }
 
-    public BankFilter(String prefix, ContextType type) {
-        this(prefix, null, type, null);
-    }
-
     public BankFilter(String prefix) {
         this(prefix, null, null, null);
     }

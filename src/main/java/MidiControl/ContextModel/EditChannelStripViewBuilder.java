@@ -100,17 +100,4 @@ public class EditChannelStripViewBuilder implements ViewBuilder {
                 channelIndex
         );
     }
-
-    private int extractContextIndex(String contextId) {
-        int dot = contextId.lastIndexOf('.');
-        if (dot == -1) {
-            return -1;
-        }
-
-        try {
-            return Integer.parseInt(contextId.substring(dot + 1));
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-    }
 }

@@ -25,7 +25,6 @@ public class ControlSchema {
         for (SubControl sub : group.getSubcontrols().values()) {
             String name = sub.getName();
 
-            // Extract prefix up to first digit or uppercase transition
             String prefix = extractPrefix(name);
             if (prefix != null)
                 prefixes.add(prefix);
@@ -85,13 +84,12 @@ public class ControlSchema {
 
 
     private String extractPrefix(String name) {
-        // Prefix ends before the first digit
         for (int i = 0; i < name.length(); i++) {
             if (Character.isDigit(name.charAt(i))) {
                 return name.substring(0, i);
             }
         }
-        return name; // no digits → whole name is prefix
+        return name;
     }
 
     private Integer extractIndex(String name) {
@@ -126,7 +124,6 @@ public class ControlSchema {
                 if (!name.startsWith(prefix))
                     continue;
 
-                // Extract index from name (kFader1 → 1)
                 Integer idx = extractIndex(name);
                 if (idx != null && idx > max)
                     max = idx;

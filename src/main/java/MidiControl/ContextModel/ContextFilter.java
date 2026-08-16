@@ -1,9 +1,9 @@
 package MidiControl.ContextModel;
 
 public class ContextFilter {
-    private final String controlGroup;   // e.g. "kInput"
-    private final String subControl;     // e.g. "Fader" or "*"
-    private final Integer index;         // null = all
+    private final String controlGroup;
+    private final String subControl;
+    private final Integer index;
 
     public ContextFilter(String controlGroup, String subControl, Integer index) {
         this.controlGroup = controlGroup;

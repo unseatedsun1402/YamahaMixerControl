@@ -9,7 +9,7 @@ public class ContextDiscoveryEngine {
 
     private static final Logger log = Logger.getLogger(ContextDiscoveryEngine.class.getName());
 
-    private final CanonicalRegistry registry;
+    private final CanonicalRegistry registry; // should not be final and should have a limited lifetime
     private List<ContextDiscoverer> discoverers = new ArrayList<>();
 
     public ContextDiscoveryEngine(CanonicalRegistry registry) {
@@ -74,11 +74,10 @@ public class ContextDiscoveryEngine {
             // 3. Match context type
             if (filter.getType() != null) {
                 if (ctx.getContextType() != filter.getType()) {
-                    continue;
+                    continue; // this order is bad, it should be the first check, but we need to check prefix first to avoid null pointer exceptions
                 }
             }
 
-            // If we reach here → this filter matches
             return true;
         }
 
