@@ -27,6 +27,7 @@ public class ControlInstance {
     private int priority = 3;
     private int canonMax = 1;
     private int canonMin = 0;
+    private byte[] lastSysex = {};
 
     public static void enableDebug(){
         debug = true;
@@ -82,7 +83,8 @@ public class ControlInstance {
 
     public void addListener(ControlListener listener) {
         listeners.add(listener);
-        if(debug){logger.finer("Created a new listener" + listener.hashCode() + "for "+this.canonicalId);}
+        if(debug)logger.fine(String.format("Created a new listener %d for %s",
+         listener.hashCode(), this.canonicalId));
     }
 
     public int extractValue(CanonicalInputEvent event) {
@@ -219,5 +221,13 @@ public class ControlInstance {
 
     public void removeListener(ChannelNameAssembler channelNameAssembler) {
         this.listeners.remove(channelNameAssembler);
+    }
+
+    public void setLastSysex(byte[] bytes){
+        this.lastSysex = bytes;
+    }
+
+    public byte[] getLastSysex(){
+        return lastSysex;
     }
 }

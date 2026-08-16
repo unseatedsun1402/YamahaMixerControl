@@ -1,0 +1,121 @@
+[
+    {
+    "deskmodel":"YAMAHA_01V96I",
+    "sysexmapping":
+        {
+            "control_group": "kInputFader",
+            "control_id": 27,
+            "max_channels": 40,
+            "sub_control": "kFader",
+            "semantic": null,
+            "value": 0,
+            "min_value": 0,
+            "max_value": 1023,
+            "default_value": 0,
+            "comment": "PRM TABLE #05-2",
+            "key": 2130779136,
+            "address_bytes": [
+            4,
+            5,
+            6,
+            7
+            ],
+            "index_bytes": [
+            8
+            ],
+            "parameter_change_format": [
+            240,
+            67,
+            "1n",
+            62,
+            127,
+            1,
+            28,
+            0,
+            "cc",
+            "dd",
+            "dd",
+            "dd",
+            "dd",
+            247
+            ],
+            "parameter_request_format": [
+            240,
+            67,
+            "3n",
+            62,
+            127,
+            1,
+            28,
+            0,
+            "cc",
+            247
+            ],
+            "priority":1
+        }
+    },
+    {
+        "deskmodel":"YAMAHA_M7CL",
+        "sysexmapping":
+        {
+            "control_group": "kInputFader",
+            "control_id": 50,
+            "max_channels": 56,
+            "sub_control": "kFader",
+            "value": 0,
+            "min_value": 0,
+            "max_value": 1023,
+            "default_value": 0,
+            "comment": "PRM TABLE #03",
+            "key": 18695995916288,
+            "address_bytes": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+            ],
+            "index_bytes": [
+            10,
+            11
+            ],
+            "parameter_change_format": [
+            240,
+            67,
+            "1n",
+            62,
+            17,
+            1,
+            0,
+            50,
+            0,
+            0,
+            "cc",
+            "cc",
+            "dd",
+            "dd",
+            "dd",
+            "dd",
+            "dd",
+            247
+            ],
+            "parameter_request_format": [
+            240,
+            67,
+            "3n",
+            62,
+            17,
+            1,
+            0,
+            50,
+            0,
+            0,
+            "cc",
+            "cc",
+            247
+            ],
+            "priority": 1
+        }
+    }
+]

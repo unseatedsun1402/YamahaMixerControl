@@ -11,6 +11,7 @@ import MidiControl.Server.MidiServer;
 import MidiControl.Server.Rehydration.RehydrationManager;
 import MidiControl.Telemetry.SystemTelemetry;
 import MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile;
+import MidiControl.SystemTools.Format;
 
 public class MidiIOManager {
 
@@ -121,7 +122,6 @@ public class MidiIOManager {
             logger.warning("Attempted to send MIDI before output device was set.");
             return;
         }
-
         if (!sendEngine.offer(data)) {
             logger.warning("Send queue full; message dropped or consider coalescing.");
         }
@@ -217,5 +217,9 @@ public class MidiIOManager {
     public CoalesceEngine getCoalesceEngine(){
         if(sendEngine == null) return null;
         return this.sendEngine.getCoalesceEngine();
+    }
+
+    public RehydrationManager getRehydrationManager(){
+        return this.server.getRehydrationManager();
     }
 }
