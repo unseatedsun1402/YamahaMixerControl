@@ -7,6 +7,7 @@ import MidiControl.MidiDeviceManager.MidiSendEngine;
 import MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Server.MidiServer;
+import MidiControl.Server.Rehydration.RehydrationManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,18 @@ public class MockMidiIOManager extends MidiIOManager {
 
     public boolean setResult = true;   // result returned by trySetOutputDevice
     public int lastSetIndex = -1;      // track which device index was requested
+    public byte[] lastSentMessage;
+    public List<byte[]> sentMessages = new ArrayList<byte[]>();
+    private RehydrationManager rehydrationManager;
 
+    public int lastOutIndex = -1;
+    public int lastInIndex = -1;
+    public boolean simulateHasDevices = true;
+
+    @Override
+    public RehydrationManager getRehydrationManager() {
+        return rehydrationManager != null ? rehydrationManager : new MockRehydrationManager();
+    }
 
     @Override
     public MidiOutput getMidiOut() {
@@ -51,7 +63,16 @@ public class MockMidiIOManager extends MidiIOManager {
 
     @Override
     public boolean hasValidDevices(){
-        return true;
+        if(simulateHasDevices)return true;
+        
+        if (lastOutIndex < 0 || lastInIndex < 0) return false;
+        if (lastOutIndex >= devices.size()) return false;
+        if (lastInIndex >= devices.size()) return false;
+
+        MidiDeviceDTO out = devices.get(lastOutIndex);
+        MidiDeviceDTO in = devices.get(lastInIndex);
+
+        return out.canOutput && in.canInput;
     }
 
     @Override
@@ -70,6 +91,8 @@ public class MockMidiIOManager extends MidiIOManager {
     @Override
     public void sendAsync(byte[] message){
         this.out.sendMessage(message);
+        this.lastSentMessage = message;
+        this.sentMessages.add(message);
     }
 
     /**
@@ -92,5 +115,9 @@ public class MockMidiIOManager extends MidiIOManager {
     @Override
     public  void setThroughputProfile(MidiSendEngine.ThroughputProfile profile){
         return;
+    }
+
+    public void setRehydrationManager(RehydrationManager manager){
+        this.rehydrationManager = manager;
     }
 }

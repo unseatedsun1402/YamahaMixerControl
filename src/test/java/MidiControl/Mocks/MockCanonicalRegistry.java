@@ -1,4 +1,3 @@
-
 package MidiControl.Mocks;
 
 import MidiControl.Controls.CanonicalRegistry;
@@ -44,5 +43,11 @@ public class MockCanonicalRegistry extends CanonicalRegistry {
     @Override
     public ControlInstance resolveCanonicalId(String canonicalId) {
         return canonicalMap.get(canonicalId);
+    }
+    
+    @Override
+    public Collection<ControlInstance> getAllInstances() {
+        System.out.println(String.format("Returning all values of size %d",canonicalMap.size()));
+        return canonicalMap.values();
     }
 }

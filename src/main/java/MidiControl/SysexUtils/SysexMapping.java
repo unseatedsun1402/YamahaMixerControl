@@ -34,7 +34,7 @@ public class SysexMapping {
 
     public int priority;
 
-    private static int deviceNumber = 0; // 0–15
+    private volatile int deviceNumber = 0; // 0–15
 
     public SysexMapping(
             String control_group,
@@ -117,7 +117,7 @@ public class SysexMapping {
     public int[] getValueByteIndices() { return valueByteIndices; }
     public int[] getIndexByteIndices() { return indexByteIndices; }
 
-    private Byte parseLiteralByte(Object token) {
+    private Byte parseLiteralByte(Object token, int channel) {
         if (token instanceof Number n) {
             return (byte) n.intValue();
         }
@@ -126,8 +126,8 @@ public class SysexMapping {
 
         if (s.equals("cc") || s.equals("dd")) return null;
 
-        if (s.equalsIgnoreCase("1n")) return (byte) (0x10 | (deviceNumber & 0x0F));
-        if (s.equalsIgnoreCase("3n")) return (byte) (0x30 | (deviceNumber & 0x0F));
+        if (s.equalsIgnoreCase("1n")) return (byte) (0x10 | (channel & 0x0F));
+        if (s.equalsIgnoreCase("3n")) return (byte) (0x30 | (channel & 0x0F));
 
         try {
             return (byte) Integer.parseInt(s);
@@ -178,6 +178,10 @@ public class SysexMapping {
     }
 
     public byte[] buildChangeMessage(int value, int index) {
+        return buildChangeMessage(value,index,deviceNumber);
+    }
+
+    public byte[] buildChangeMessage(int value, int index, int channel) {
         List<Byte> out = new ArrayList<>();
 
         int[] valueChunks = splitInto7BitChunks(value, valueByteIndices.length);
@@ -198,7 +202,7 @@ public class SysexMapping {
                 continue;
             }
 
-            Byte literal = parseLiteralByte(token);
+            Byte literal = parseLiteralByte(token, channel);
             if (literal != null) {
                 out.add(literal);
                 continue;
@@ -211,6 +215,10 @@ public class SysexMapping {
     }
 
     public byte[] buildRequestMessage(int index) {
+        return buildRequestMessage(index,deviceNumber);
+    }
+
+    public byte[] buildRequestMessage(int index, int channel) {
         List<Byte> out = new ArrayList<>();
 
         int[] indexChunks = splitInto7BitChunks(index, indexByteIndices.length);
@@ -228,7 +236,7 @@ public class SysexMapping {
                 continue;
             }
 
-            Byte literal = parseLiteralByte(token);
+            Byte literal = parseLiteralByte(token, channel);
             if (literal != null) {
                 out.add(literal);
                 continue;
@@ -255,6 +263,12 @@ public class SysexMapping {
         return arr;
     }
 
+    public void setDeviceNumber(int midi_channel){
+        if (midi_channel < 0) midi_channel = 0;
+        if (midi_channel > 15) midi_channel = 15;
+        this.deviceNumber = midi_channel;
+    }
+
     // Getters
     public String getControlGroup() { return control_group; }
     public int getControl_id() { return control_id; }
@@ -272,4 +286,5 @@ public class SysexMapping {
     public String getComment() { return comment; }
     public List<String> getParameter_change_format() { return parameter_change_format; }
     public List<String> getParameter_request_format() { return parameter_request_format; }
+    public int getDeviceNumber(){ return deviceNumber; }
 }

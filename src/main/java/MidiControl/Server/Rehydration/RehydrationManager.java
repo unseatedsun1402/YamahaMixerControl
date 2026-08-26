@@ -5,14 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.logging.Logger;
 
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
+import MidiControl.MidiDeviceManager.DeskDiscovery.ProbeCallback;
 import MidiControl.Routing.OutputRequestSender;
 import MidiControl.SysexUtils.ModelNumbers;
+import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.UserInterface.Meter.MeterRequest;
 
 public class RehydrationManager{
@@ -190,6 +194,65 @@ public class RehydrationManager{
                 };
             }
         }, 0, TimeUnit.MILLISECONDS);
+    }
+
+    public void probe(String canonicalId, long timeoutMs, int midi_channel, ProbeCallback callback) {
+
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicReference<ControlInstance> respondingInstance = new AtomicReference<>(null);
+        final AtomicBoolean completed = new AtomicBoolean(false);
+
+        pending.put(canonicalId, System.currentTimeMillis());
+        outstandingTransactions.incrementAndGet();
+
+        ControlInstance ci = registry.resolveCanonicalId(canonicalId);
+        SysexMapping mapping = ci.getSysex();
+        byte[] probe = mapping.buildRequestMessage(0, midi_channel);
+
+        ci.addListener((instance, newValue) -> {
+            if (!completed.compareAndSet(false, true)) {
+                return;
+            }
+
+            Long expected = pending.remove(canonicalId);
+            long rtt = expected != null ? System.currentTimeMillis() - expected : 0;
+
+            totalRttMs.add(rtt);
+            completedRequests.incrementAndGet();
+            outstandingTransactions.decrementAndGet();
+
+            respondingInstance.set(instance);
+            latch.countDown();
+        });
+
+        logger.fine(String.format("PROBE: sending probe for canonicalId=%s channel %d", canonicalId, midi_channel));
+        outputRouter.send(probe);
+
+        scheduler.schedule(() -> {
+            if (pending.remove(canonicalId) != null) {
+                outstandingTransactions.decrementAndGet();
+                incrementRequestTimeoutCounter();
+                latch.countDown();
+                callback.onProbeSuccess(null, -1);
+            }
+        }, timeoutMs, TimeUnit.MILLISECONDS);
+
+        try {
+            latch.await(timeoutMs + 20, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ignored) {}
+
+        ControlInstance result = respondingInstance.get();
+        if (result != null) {
+            byte[] last = result.getLastSysex();
+            int resolvedChannel = extractMidiChannel(last);
+            callback.onProbeSuccess(result, resolvedChannel);
+        }
+    }
+
+    private int extractMidiChannel(byte[] sysex) {
+        if (sysex.length < 3) return -1;
+        byte opcode = sysex[2];
+        return opcode & 0x0F;
     }
 
     public void onControlUpdated(String canonicalId) {

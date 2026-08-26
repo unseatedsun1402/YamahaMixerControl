@@ -24,6 +24,8 @@ import MidiControl.ContextModel.ViewBuilder;
 import MidiControl.ContextModel.ViewRegistry;
 import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.Controls.CanonicalRegistry;
+import MidiControl.MidiDeviceManager.DeskDiscovery;
+import MidiControl.MidiDeviceManager.DeskDiscoveryResult;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.NrpnUtils.NrpnMapping;
 import MidiControl.NrpnUtils.NrpnMappingLoader;
@@ -33,6 +35,7 @@ import MidiControl.Routing.WebSocketEndpoint;
 import MidiControl.Server.EventStream.EventObject;
 import MidiControl.Server.Protocol.ServerEventSerializer;
 import MidiControl.Server.Rehydration.RehydrationManager;
+import MidiControl.SysexUtils.MappingFiles;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
@@ -246,13 +249,35 @@ public class MidiServer implements Runnable, UiModelService{
                     )).getAsString()
                 );
             });
-        processingThread.start();
-        }
+            processingThread.start();
 
-        catch (Exception e) {
+            DeskDiscovery discovery = new DeskDiscovery(deviceManager);
+            discovery.setDiscoveryRegistry(canonicalRegistry);
+            DeskDiscoveryResult result = discovery.discoverDeskModel();
+
+            if (result != null) {
+                String deskModel = result.getModel();
+                logger.info(String.format("Detected valid desk %s", deskModel));
+
+                List<SysexMapping> discoveredMappings =
+                    SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(deskModel));
+
+                int midi_channel = result.midiChannel();
+                if (midi_channel != 0) {
+                    for (SysexMapping m : discoveredMappings) {
+                        m.setDeviceNumber(midi_channel);
+                    }
+                }
+                logger.info(String.format("Desk operating on midi channel %d",midi_channel));
+
+                onRegistryReloaded(new CanonicalRegistry(discoveredMappings, new SysexParser(discoveredMappings)));
+            }
+            else {
+                logger.info("Discovery failed to detect a valid desk response on the midi system");
+            }
+
+        } catch (Exception e) {
             logger.log(Level.SEVERE, "MidiServer thread crashed", e);
-
-            
 
             WebSocketEndpoint.broadcast(
                 ServerEventSerializer.fatal(
@@ -262,8 +287,8 @@ public class MidiServer implements Runnable, UiModelService{
                 ).getAsString()
             );
         }
-
     }
+
 
     public ServerRouter getServerRouter() {
         return this.serverRouter;
