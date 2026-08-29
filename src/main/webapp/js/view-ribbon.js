@@ -171,4 +171,11 @@ export function buildViewRibbonFromModel(
     panel.appendChild(
         editBtn
     );
+
+    const deskStatusElement = document.createElement("div");
+    deskStatusElement.id = "desk-status";
+    deskStatusElement.className = "desk-dead";
+    deskStatusElement.textContent = "Waiting for desk status…";
+
+    panel.appendChild(deskStatusElement);
 }

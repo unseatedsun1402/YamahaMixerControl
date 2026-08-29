@@ -1,9 +1,11 @@
-package MidiControl.MidiDeviceManager;
+package MidiControl.DeskDiscovery;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -18,6 +20,8 @@ import com.google.gson.JsonObject;
 
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
+import MidiControl.MidiDeviceManager.MidiDeviceDTO;
+import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Server.Rehydration.RehydrationManager;
 import MidiControl.SysexUtils.MappingFiles;
 import MidiControl.SysexUtils.SysexMapping;
@@ -31,6 +35,7 @@ public class DeskDiscovery {
     private MidiIOManager ioManager;
     private RehydrationManager rehydrationManager;
     public JsonArray deskProfiles;
+    private Map<String,SysexMapping> deskProfileMap;
     private CanonicalRegistry registry;
 
     @FunctionalInterface
@@ -101,13 +106,13 @@ public class DeskDiscovery {
         final AtomicBoolean stop = new AtomicBoolean(false);
 
         List<MidiDeviceDTO> devices = ioManager.listDeviceDTOs();
-        logger.info("DeskDiscovery: found " + devices.size() + " MIDI devices");
+        logger.info(String.format("DeskDiscovery: found %d MIDI devices",devices.size()));
 
         for (JsonElement jsonElement : deskProfiles) {
             if (stop.get()) break;
 
             JsonObject deskProfile = jsonElement.getAsJsonObject();
-            String deskModel = deskProfile.get("deskmodel").getAsString();
+            String deskModel = getDeskModel(deskProfile);
             logger.info("DeskDiscovery: trying candidate desk model " + deskModel);
 
             try {
@@ -120,13 +125,10 @@ public class DeskDiscovery {
 
                 SysexParser parser = new SysexParser(fullMappings);
 
-                // 2. Reload the global registry for this candidate desk
                 logger.info("DeskDiscovery: reloading registry for candidate desk " + deskModel);
                 registry.reloadMappings(fullMappings, parser, deskModel);
 
-                // 3. Use the discovery-specific mapping from known-desks.json to choose which control to probe
-                SysexMapping probeMapping =
-                    new Gson().fromJson(deskProfile.get("sysexmapping"), SysexMapping.class);
+                SysexMapping probeMapping = getSysexMapping(deskProfile);
                 probeMapping.initialize();
 
                 logger.info("DeskDiscovery: probe mapping group=" +
@@ -155,7 +157,6 @@ public class DeskDiscovery {
                     }
                 }
 
-                // Fallback for tests / degenerate cases: no pairs → single pseudo pair
                 if (pairs.isEmpty() && !devices.isEmpty()) {
                     logger.info("DeskDiscovery: no matching name pairs, using fallback pair [0,0]");
                     pairs.add(new int[]{0, 0});
@@ -194,68 +195,22 @@ public class DeskDiscovery {
                         continue;
                     }
 
-                    CountDownLatch batchLatch = new CountDownLatch(1);
-
-                    // Fire all 16 probes asynchronously
                     for (int channel = 0; channel < 16; channel++) {
                         if (stop.get()) break;
-                        final int probeChannel = channel;
 
-                        String canonicalId = String.format(
-                            "%s.%s.%d",
-                            probeMapping.getControlGroup(),
-                            probeMapping.getSubControl(),
-                            channel
-                        );
+                        DeskDiscoveryResult result =
+                            probeWithCanonicalId(deskModel, probeMapping, channel, 100, 110);
 
-                        logger.info(String.format(
-                            "DeskDiscovery: probing canonicalId=%s channel=%d",
-                            canonicalId, channel
-                        ));
-
-                        try {
-                            rehydrationManager.probe(
-                                canonicalId,
-                                100,
-                                channel,
-                                (instance, midiChannel) -> {
-                                    logger.info(String.format(
-                                        "DeskDiscovery: probe callback for canonicalId=%s channel=%d instance=%s midiChannel=%d",
-                                        canonicalId,
-                                        probeChannel,
-                                        (instance == null ? "null" : instance.getCanonicalId()),
-                                        midiChannel
-                                    ));
-
-                                    if (instance != null && !stop.get()) {
-                                        detected.set(new DeskDiscoveryResult(
-                                            deskModel,
-                                            midiChannel
-                                        ));
-                                        stop.set(true);
-                                        batchLatch.countDown();
-                                    }
-                                }
-                            );
-                        } catch (Exception e) {
-                            logger.log(Level.SEVERE,
-                                "DeskDiscovery: probe threw exception for canonicalId=" + canonicalId,
-                                e);
+                        if (result != null) {
+                            detected.set(result);
+                            stop.set(true);
+                            break;
                         }
-                    }
-
-                    // Wait for either success or all timeouts
-                    try {
-                        batchLatch.await(200, TimeUnit.MILLISECONDS);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        logger.log(Level.WARNING, "DeskDiscovery: batchLatch interrupted", e);
                     }
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE,
-                    "DeskDiscovery: exception while processing candidate desk " + deskModel,
-                    e);
+                logger.severe("DeskDiscovery: exception while processing candidate desk " + deskModel);
+                e.printStackTrace();
             }
         }
 
@@ -269,6 +224,55 @@ public class DeskDiscovery {
         return result;
     }
 
+    public boolean probeForLiveness(String deskModel) {
+        SysexMapping mapping = deskProfileMap.get(deskModel);
+        mapping = registry.resolveCanonicalId(buildCanonicalIdFromMapping(mapping,0)).getSysex();
+        if (mapping == null) return false;
+
+        DeskDiscoveryResult result =
+            probeWithCanonicalId(deskModel, mapping, 0, 100,110);
+
+        return result != null;
+    }
+
+    private DeskDiscoveryResult probeWithCanonicalId(String deskModel,SysexMapping mapping,int channel,long timeoutMs, long waitForMs) 
+    {
+        final AtomicReference<DeskDiscoveryResult> detected = new AtomicReference<>(null);
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        logger.info("Desk model probing "+deskModel);
+
+        String canonicalId = buildCanonicalIdFromMapping(mapping, channel);
+
+        try {
+            logger.info(String.format("Probing canonicalId=%s channel=%d",canonicalId,channel));
+            rehydrationManager.probe(
+            canonicalId,
+            timeoutMs,
+            channel,
+            (instance, midiChannel) -> {
+                if (instance != null && latch.getCount() > 0) {
+                    detected.set(new DeskDiscoveryResult(deskModel, midiChannel));
+                    latch.countDown();
+                }
+            }
+        );
+        } catch (Exception e) {
+            logger.log(Level.SEVERE,
+                "Probe failed for canonicalId=" + canonicalId,
+                e
+            );
+        }
+
+        try {
+            latch.await(waitForMs, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        return detected.get();
+    }
+
     private void loadMappingsFromResource(String resourceName) {
         if (deskProfiles != null) return;
 
@@ -279,12 +283,51 @@ public class DeskDiscovery {
 
             InputStreamReader reader = new InputStreamReader(is);
             deskProfiles = new Gson().fromJson(reader, JsonArray.class);
+            mapDeskProfiles();
             logger.info("DeskDiscovery: loaded " + deskProfiles.size() +
                 " desk profiles from " + resourceName);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to load mappings from " + resourceName, e);
         }
+    }
+
+    private void mapDeskProfiles() {
+        if (deskProfileMap == null) {
+            deskProfileMap = new HashMap<>();
+            logger.info("Building desk profile map");
+        }
+
+        if(deskProfiles == null) {
+            logger.warning("No desk profiles available - cannot build desk profile map");
+            return;
+        }
+
+        for (JsonElement profile : deskProfiles) {
+            JsonObject profileObject = profile.getAsJsonObject();
+            String deskModel = getDeskModel(profileObject);
+            SysexMapping mapping = getSysexMapping(profileObject);
+
+            mapping.initialize();
+            deskProfileMap.put(deskModel, mapping);
+            logger.info(String.format("Desk profile mapp added for %s",deskModel));
+        }
+    }
+
+    private String getDeskModel(JsonObject profile){
+        return profile.get("deskmodel").getAsString();
+    }
+
+    private SysexMapping getSysexMapping(JsonObject profile){
+        return new Gson().fromJson(
+                    profile.get("sysexmapping"),
+                    SysexMapping.class
+                );
+    }
+
+    private String buildCanonicalIdFromMapping(SysexMapping mapping,int index){
+        if(mapping == null)logger.info(String.format("Mapping is null"));
+        return String.format( "%s.%s.%d",mapping.getControlGroup(),mapping.getSubControl(),index);
     }
 
     public int getKnownDeskProfilesSize() {
@@ -295,8 +338,8 @@ public class DeskDiscovery {
         this.rehydrationManager = testManager;
     }
 
-    public void setDiscoveryRegistry(CanonicalRegistry registry) {
+    public void injectNewRegistry (CanonicalRegistry registry) {
         this.registry = registry;
-        logger.info("Registry injected - " + registry);
+        logger.info("Registry injected - @" + registry.hashCode());
     }
 }

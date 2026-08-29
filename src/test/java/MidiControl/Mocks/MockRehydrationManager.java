@@ -1,7 +1,7 @@
 package MidiControl.Mocks;
 
 import MidiControl.Controls.ControlInstance;
-import MidiControl.MidiDeviceManager.DeskDiscovery.ProbeCallback;
+import MidiControl.DeskDiscovery.DeskDiscovery.ProbeCallback;
 import MidiControl.Server.Rehydration.RehydrationManager;
 
 public class MockRehydrationManager extends RehydrationManager {
@@ -21,4 +21,3 @@ public class MockRehydrationManager extends RehydrationManager {
         // All other channels do nothing (timeout)
     }
 }
-

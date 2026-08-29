@@ -9,9 +9,9 @@ import javax.sound.midi.*;
 
 import MidiControl.Server.MidiServer;
 import MidiControl.Server.Rehydration.RehydrationManager;
+import MidiControl.SystemTools.Format;
 import MidiControl.Telemetry.SystemTelemetry;
 import MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile;
-import MidiControl.SystemTools.Format;
 
 public class MidiIOManager {
 
@@ -22,6 +22,7 @@ public class MidiIOManager {
     private MidiServer server;
     private final Logger logger = Logger.getLogger(MidiIOManager.class.getName());
     private TransportMode mode;
+    private static boolean debug;
 
     private final ArrayBlockingQueue<byte[]> sendQueue = new ArrayBlockingQueue<>(4096);
 
@@ -122,6 +123,7 @@ public class MidiIOManager {
             logger.warning("Attempted to send MIDI before output device was set.");
             return;
         }
+        if(debug) logger.info(String.format("Outputing on %s - %s",getMidiOutName(),Format.bytesToHex(data)));
         if (!sendEngine.offer(data)) {
             logger.warning("Send queue full; message dropped or consider coalescing.");
         }
@@ -221,5 +223,23 @@ public class MidiIOManager {
 
     public RehydrationManager getRehydrationManager(){
         return this.server.getRehydrationManager();
+    }
+
+    public String getMidiOutName(){
+        if(midiOut != null){
+        return midiOut.getDeviceInfo().getName();
+        }
+        return "Device not set";
+    }
+
+    public String getMidiInName(){
+        if(midiIn != null){
+        return midiIn.getDeviceInfo().getName();
+        }
+        return null;
+    }
+
+    private static void enableDebug(){
+        debug = true;
     }
 }

@@ -13,7 +13,8 @@ import java.util.logging.Logger;
 
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
-import MidiControl.MidiDeviceManager.DeskDiscovery.ProbeCallback;
+import MidiControl.Controls.ControlListener;
+import MidiControl.DeskDiscovery.DeskDiscovery.ProbeCallback;
 import MidiControl.Routing.OutputRequestSender;
 import MidiControl.SysexUtils.ModelNumbers;
 import MidiControl.SysexUtils.SysexMapping;
@@ -83,6 +84,8 @@ public class RehydrationManager{
                 onControlUpdated(instance.getCanonicalId());
             });
         }
+
+        logger.info("Added rehydration listeners");
     }
 
     public void request(String canonicalId) {
@@ -209,7 +212,7 @@ public class RehydrationManager{
         SysexMapping mapping = ci.getSysex();
         byte[] probe = mapping.buildRequestMessage(0, midi_channel);
 
-        ci.addListener((instance, newValue) -> {
+        ControlListener tmpListener = (instance, newValue) -> {
             if (!completed.compareAndSet(false, true)) {
                 return;
             }
@@ -223,9 +226,12 @@ public class RehydrationManager{
 
             respondingInstance.set(instance);
             latch.countDown();
-        });
+        };
 
-        logger.fine(String.format("PROBE: sending probe for canonicalId=%s channel %d", canonicalId, midi_channel));
+        ci.addListener(tmpListener);
+        logger.info(String.format("Added tmp listener %d",tmpListener.hashCode()));
+
+        logger.info(String.format("PROBE: sending probe for control instance=%d channel %d", ci.hashCode(), midi_channel));
         outputRouter.send(probe);
 
         scheduler.schedule(() -> {
@@ -240,11 +246,16 @@ public class RehydrationManager{
         try {
             latch.await(timeoutMs + 20, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ignored) {}
+        finally {
+            ci.removeListener(tmpListener);
+            logger.info(String.format("Removed tmp listener %d",tmpListener.hashCode()));
+        }
 
         ControlInstance result = respondingInstance.get();
         if (result != null) {
             byte[] last = result.getLastSysex();
             int resolvedChannel = extractMidiChannel(last);
+            logger.info("Success on probe");
             callback.onProbeSuccess(result, resolvedChannel);
         }
     }

@@ -1,4 +1,4 @@
-package MidiControl.MidiDeviceManager;
+package MidiControl.DeskDiscovery;
 
 public record DeskDiscoveryResult(
     String model,

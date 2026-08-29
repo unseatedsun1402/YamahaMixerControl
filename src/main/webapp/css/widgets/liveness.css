@@ -1,0 +1,15 @@
+  .desk-alive {
+    background: #d4ffd4;
+    color: #006600;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: bold;
+  }
+
+  .desk-dead {
+    background: #ffe0e0;
+    color: #990000;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: bold;
+  }

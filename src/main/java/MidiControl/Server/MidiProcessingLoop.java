@@ -16,7 +16,7 @@ public class MidiProcessingLoop implements Runnable {
     private final int HEARTBEAT_INTERVAL= 9960; //ms
     private final ConcurrentLinkedQueue<MidiMessage> inputBuffer;
     private final HardwareInputHandler inputHandler;
-    private final CanonicalRegistry canonicalRegistry;
+    private CanonicalRegistry canonicalRegistry;
     private final GuiBroadcastListener guiBroadcastListener;
 
     private static final Logger logger = Logger.getLogger(MidiProcessingLoop.class.getName());
@@ -92,8 +92,13 @@ public class MidiProcessingLoop implements Runnable {
 
             } catch (Exception ex) {
                 logger.warning("Error processing MIDI message: " + ex.getMessage());
-                if(debug){logger.finer("Stack trace: " + ex);}
+                ex.printStackTrace();
             }
         }
+    }
+
+    public void setCanonicalRegistry(CanonicalRegistry newRegistry){
+        this.canonicalRegistry = newRegistry;
+        logger.info(String.format("Set new registry @%d",newRegistry.hashCode()));
     }
 }

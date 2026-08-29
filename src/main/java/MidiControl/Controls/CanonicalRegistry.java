@@ -18,7 +18,7 @@ import MidiControl.SysexUtils.RegistryReloadListener;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexParser;
 
-public class CanonicalRegistry implements SourceAllInstances {
+public class CanonicalRegistry implements SourceAllInstances, DeskProvider {
 
     private final Map<String, ControlGroup> groups = new HashMap<>();
     private final Map<String, ControlInstance> controlsById = new HashMap<>();
@@ -59,16 +59,14 @@ public class CanonicalRegistry implements SourceAllInstances {
         return groups.get(name);
     }
 
-    public String getDeskType(){
-        return deskType;
-    }
-
     public Map<String, ControlGroup> getGroups() {
         return groups;
     }
 
     public ControlInstance resolveCanonicalId(String canonicalId) {
-        return controlsById.get(canonicalId);
+        ControlInstance res = controlsById.get(canonicalId);
+        if(debug)logger.info(String.format("Resolved @%d for canonicalId %s",res.hashCode(),canonicalId));
+        return res;
     }
 
     private void attachBroadcastListeners() {
@@ -147,7 +145,10 @@ public class CanonicalRegistry implements SourceAllInstances {
 
         if(mapping==null){return null;}
         
-        if(debug){logger.info("DEBUG: Mapping matched = " + (mapping == null ? "null" : mapping.getControlGroup() + "." + mapping.getSubControl()));}
+        if(debug){
+            logger.info(String.format("DEBUG: Mapping matched = %s.%s", (mapping == null ? "null" : mapping.getControlGroup()), mapping.getSubControl()));
+            logger.info("Registry instances size: "+this.getSize());
+        }
         ControlGroup cg = groups.get(mapping.getControlGroup());
 
         if (cg == null) {
@@ -245,6 +246,10 @@ public class CanonicalRegistry implements SourceAllInstances {
         }
     }
 
+    public int getSize(){
+        return getAllInstances().size();
+    }
+
     public ControlInstance resolve(String string) {
         if(!string.matches("^[A-Za-z0-9_]+\\.[A-Za-z0-9_]+\\.[0-9]+$")){return null;}
         int index = Integer.parseInt(string.split("\\.")[2]);
@@ -303,7 +308,6 @@ public class CanonicalRegistry implements SourceAllInstances {
         }
     }
 
-    public void setDeskType(String deskString) {
-        this.deskType = deskString;
-    }
+    public String getDeskType(){return deskType;}
+    public void setDeskType(String deskString) {deskType = deskString;}
 }
