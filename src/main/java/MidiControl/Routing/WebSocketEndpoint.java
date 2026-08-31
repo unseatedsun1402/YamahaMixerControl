@@ -23,8 +23,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Map;
 
 @ServerEndpoint(value = "/endpoint")
 public class WebSocketEndpoint{

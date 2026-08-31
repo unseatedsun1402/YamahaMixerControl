@@ -6,8 +6,6 @@ import java.util.logging.Logger;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.MidiDeviceManager.TransportMode;
-import MidiControl.Server.MidiServer;
-import MidiControl.Server.Rehydration.RehydrationManager;
 import MidiControl.Controls.CanonicalRegistry;;
 
 public class HardwareOutputRouter implements OutputRequestSender{

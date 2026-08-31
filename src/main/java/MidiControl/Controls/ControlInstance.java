@@ -1,8 +1,9 @@
 package MidiControl.Controls;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import MidiControl.ControlServer.CanonicalInputEvent;
@@ -17,7 +18,7 @@ public class ControlInstance {
     private final int index;
     private static boolean debug = false;
 
-    private final List<ControlListener> listeners = new ArrayList<>();
+    private final Map<Integer,ControlListener> listeners = new ConcurrentHashMap<>();
 
     private int value;
     private final String canonicalId;
@@ -82,9 +83,13 @@ public class ControlInstance {
     }
 
     public void addListener(ControlListener listener) {
-        listeners.add(listener);
-        if(debug)logger.fine(String.format("Created a new listener %d for %s",
-         listener.hashCode(), this.canonicalId));
+        listeners.put(listener.hashCode(), listener);
+        if(debug)logger.info(String.format("Created a new listener @%d for %s @%d",
+         listener.hashCode(), this.canonicalId,this.hashCode()));
+    }
+
+    public void removeListener(ControlListener listener) {
+        listeners.remove(listener.hashCode());
     }
 
     public int extractValue(CanonicalInputEvent event) {
@@ -138,10 +143,10 @@ public class ControlInstance {
     public int updateValue(int value) {
         this.value = value;
 
-        if(debug) logger.info("UPDATE VALUE " + canonicalId + " -> " + value);
 
-        for (ControlListener l : listeners) {
+        for (ControlListener l : listeners.values()) {
             l.onControlChanged(this, value);
+            if(debug) logger.info(String.format("UPDATE CONTROLINST @%d -> VAL %d listener @%d",this.hashCode(),value,l.hashCode()));
         }
 
         return this.value;
@@ -220,7 +225,10 @@ public class ControlInstance {
     }
 
     public void removeListener(ChannelNameAssembler channelNameAssembler) {
-        this.listeners.remove(channelNameAssembler);
+        if(listeners.remove(channelNameAssembler.hashCode()) != null) {
+            if(debug)logger.info("Removed listener @"+channelNameAssembler.hashCode());
+        }
+       
     }
 
     public void setLastSysex(byte[] bytes){

@@ -18,6 +18,7 @@
         import { applyControlUpdate } from './js/partial-update.js';
         import { buildViewRibbonFromModel } from './js/view-ribbon.js';
         import { updateChannelStripName } from './js/utils/channel-name.js';
+        import { DeskStatusWidget } from "./js/widgets/liveness.js";
         
         window.ribbonInitialised = false;
         window.lastBankContexts= [];
@@ -35,6 +36,7 @@
         const wsUrl = `ws://${location.host}/${contextPath}/endpoint`;
 
         const ws = new WebSocketClient(wsUrl);
+        var deskStatusWidget; 
 
         ws.on("connected", () => {
             console.info("[Bootstrap] Connected — requesting bank.inputs…");
@@ -178,7 +180,9 @@
                 );
                 window.ribbonInitialised = true;
             }
-
+            
+            deskStatusWidget = new DeskStatusWidget(document.getElementById("desk-status"));
+            console.info("Instantiated desk status widget")
             renderUiModel(model);
         });
 
@@ -207,6 +211,14 @@
         ws.on("REGISTRY_CHANGED", (payload) => {
             console.info("[Bootstrap] Registry changed:", payload);
         });
+
+        ws.on("server-event", handleServerEvent)
+        
+        function handleServerEvent(event) {
+            if (event.category === "LIVENESS") {
+                if (deskStatusWidget) deskStatusWidget.update(event);
+            }
+        }
 
         ws.connect();
         window.wsClient = ws;

@@ -1,4 +1,5 @@
 import { WebSocketClient } from "./websocketClient.js";
+import { DeskStatusWidget } from "./widgets/liveness.js";
 
 console.log(">>> settings.js LOADED <<<");
 
@@ -7,6 +8,7 @@ const SERVER_LOG_LIMIT = 50;
 const serverLogBuffer = [];
 
 const serverLog = document.getElementById("server-log");
+const deskStatusWidget = new DeskStatusWidget(document.getElementById("desk-status"));
 
 ws.connect();
 
@@ -204,6 +206,10 @@ function handleServerEvent(event) {
     level: event.level,
     text: `[${time}] [${event.category}] ${event.message}`
   };
+
+  if (event.category === "LIVENESS") {
+    deskStatusWidget.update(event);
+  }
 
   serverLogBuffer.push(line);
   if (serverLogBuffer.length > SERVER_LOG_LIMIT) {

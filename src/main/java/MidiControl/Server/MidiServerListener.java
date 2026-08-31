@@ -46,9 +46,9 @@ public class MidiServerListener implements ServletContextListener {
         public String format(LogRecord record) {
         String color = switch (record.getLevel().getName()) {
             case "SEVERE" -> "\u001B[31m";  // Red
-            case "INFO"   -> "\u001B[32m";  // Green
+            case "INFO"   -> "\u001B[36m";  // Cyan
             case "WARNING"->"\u001B[33m";   // Yellow
-            case "FINE"   -> "\u001B[36m";  // Cyan
+            case "FINE"   -> "\u001B[32m";  // Green
             case "FINER"  -> "\u001B[45m";  // Bckgrnd Magenta
             default -> "\u001B[0m"; // Reset
             };

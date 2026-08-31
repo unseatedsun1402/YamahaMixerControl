@@ -24,8 +24,9 @@ import MidiControl.ContextModel.ViewBuilder;
 import MidiControl.ContextModel.ViewRegistry;
 import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.Controls.CanonicalRegistry;
-import MidiControl.MidiDeviceManager.DeskDiscovery;
-import MidiControl.MidiDeviceManager.DeskDiscoveryResult;
+import MidiControl.DeskDiscovery.DeskDiscovery;
+import MidiControl.DeskDiscovery.DeskDiscoveryResult;
+import MidiControl.LivenessMonitor.DeviceLivenessMonitor;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.NrpnUtils.NrpnMapping;
 import MidiControl.NrpnUtils.NrpnMappingLoader;
@@ -49,6 +50,7 @@ import MidiControl.UserInterface.UiModelFactory;
 import MidiControl.UserInterface.UiModelService;
 import MidiControl.Telemetry.SystemTelemetry;
 import jakarta.annotation.PreDestroy;
+
 public class MidiServer implements Runnable, UiModelService{
     private volatile boolean shutdownFlag = false;
     private final ConcurrentLinkedQueue<MidiMessage> inputBuffer = new ConcurrentLinkedQueue<>();
@@ -72,8 +74,11 @@ public class MidiServer implements Runnable, UiModelService{
     private static final GuiBroadcastListener NO_OP_LISTENER =
             new GuiBroadcastListener((json, ctx) -> {}, canonicalId -> null);
     private RehydrationManager rehydrationManager;
+    private DeskDiscovery deskDiscovery;
+    private DeviceLivenessMonitor livenessMonitor;
 
     private static final Logger logger = Logger.getLogger(MidiServer.class.getName());
+    private volatile MidiProcessingLoop processingLoop;
 
     // 1. Default constructor (used by ServletContextListener)
     public MidiServer() {
@@ -231,10 +236,8 @@ public class MidiServer implements Runnable, UiModelService{
     public void run() {
         try {
             logger.info("MidiServer thread started.");
-
-            Thread processingThread =
-                new Thread(new MidiProcessingLoop(inputBuffer, inputHandler, canonicalRegistry, guiBroadcastListener),
-                        "MidiProcessingThread");
+            processingLoop=new MidiProcessingLoop(inputBuffer, inputHandler, canonicalRegistry, guiBroadcastListener);
+            Thread processingThread = new Thread(processingLoop,"MidiProcessingThread");
 
             processingThread.setPriority(Thread.NORM_PRIORITY + 1);
             processingThread.setUncaughtExceptionHandler((t, e) -> {
@@ -251,9 +254,9 @@ public class MidiServer implements Runnable, UiModelService{
             });
             processingThread.start();
 
-            DeskDiscovery discovery = new DeskDiscovery(deviceManager);
-            discovery.setDiscoveryRegistry(canonicalRegistry);
-            DeskDiscoveryResult result = discovery.discoverDeskModel();
+            deskDiscovery = new DeskDiscovery(deviceManager);
+            deskDiscovery.injectNewRegistry(canonicalRegistry);
+            DeskDiscoveryResult result = deskDiscovery.discoverDeskModel();
 
             if (result != null) {
                 String deskModel = result.getModel();
@@ -269,8 +272,12 @@ public class MidiServer implements Runnable, UiModelService{
                     }
                 }
                 logger.info(String.format("Desk operating on midi channel %d",midi_channel));
-
-                onRegistryReloaded(new CanonicalRegistry(discoveredMappings, new SysexParser(discoveredMappings)));
+                CanonicalRegistry newRegistry = new CanonicalRegistry(discoveredMappings, new SysexParser(discoveredMappings));
+                newRegistry.setDeskType(result.getModel());
+                onRegistryReloaded(newRegistry);
+                logger.info("Starting liveness monitor");
+                livenessMonitor = new DeviceLivenessMonitor(deskDiscovery,newRegistry);
+                livenessMonitor.startMonitoring();
             }
             else {
                 logger.info("Discovery failed to detect a valid desk response on the midi system");
@@ -348,10 +355,33 @@ public class MidiServer implements Runnable, UiModelService{
     private void onRegistryReloaded(CanonicalRegistry newRegistry) {
         logger.info("Performing discovery after registry reload");
 
+        canonicalRegistry = newRegistry;
+        logger.info("Replaced server canonical registry");
+
+
+        if(deskDiscovery != null){
+        deskDiscovery.injectNewRegistry(newRegistry);
+        logger.info(String.format("Injected registry to desk discovery on registry reload"));
+        }
+
+        if(livenessMonitor != null) {
+            livenessMonitor.injectNewRegistry(newRegistry);
+            logger.info(String.format("Injected registry to liveness monitor on registry reload"));
+        }
+
+        if(processingLoop != null){
+            processingLoop.setCanonicalRegistry(newRegistry);
+            logger.info("Updating processing loop");
+        }
+
         discoveryEngine = new ContextDiscoveryEngine(newRegistry);
+        logger.info(String.format("Rebuilt discovery engine on registry reload"));
+
         reloadContextIndex();
+        logger.info(String.format("Reloaded context index on registry reload"));
 
         rehydrationManager.injectNewRegistry(newRegistry);
+        logger.info(String.format("Injected registry to rehydrationManager on registry reload"));
 
         recreateNameAssemblers();
 

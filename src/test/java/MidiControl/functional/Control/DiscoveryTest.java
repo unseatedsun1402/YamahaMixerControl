@@ -21,8 +21,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import MidiControl.Controls.ControlInstance;
-import MidiControl.MidiDeviceManager.DeskDiscovery;
-import MidiControl.MidiDeviceManager.DeskDiscoveryResult;
+import MidiControl.DeskDiscovery.DeskDiscovery;
+import MidiControl.DeskDiscovery.DeskDiscoveryResult;
 import MidiControl.MidiDeviceManager.MidiDeviceDTO;
 import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.Mocks.MockMidiDevice;
