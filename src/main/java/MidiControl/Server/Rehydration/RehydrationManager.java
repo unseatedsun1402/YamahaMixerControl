@@ -2,8 +2,12 @@ package MidiControl.Server.Rehydration;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,7 +33,6 @@ public class RehydrationManager{
     private final Map<String, Long> pending = new ConcurrentHashMap<>();
     private static final long TIMEOUT_MS = 200;
 
-    // Metrics counters and configuration values
     private final AtomicInteger outstandingTransactions = new AtomicInteger(0);
     private final AtomicInteger timedOutTransactions = new AtomicInteger(0);
     private final AtomicInteger periodTimedOutTransactions = new AtomicInteger(0);
@@ -37,6 +40,12 @@ public class RehydrationManager{
     private final AtomicInteger completedRequests = new AtomicInteger(0);
 
     private static final int MAX_TIMEOUT_COUNT = 10_000;
+    private final int[] WEIGHTED_PATTERN = new int[] {
+        1, 1, 1, 1,
+        2, 2, 2,
+        3, 3,
+        4
+    };
     private final RehydrationTelemetry telemetry = new RehydrationTelemetry(this);
 
     private static byte[] cachedMeterRequest = null;
@@ -98,105 +107,36 @@ public class RehydrationManager{
     }
 
     public void rehydrateAll(RehydrationListener listener) {
-        final long rehydrationStart = System.currentTimeMillis();
-        running = true;
-        startControlLoop();
+        long start = beginRehydration();
 
-        final List<ControlInstance> all = new ArrayList<>(registry.getAllInstances());
-        all.sort((a, b) -> Integer.compare(a.getPriority(), b.getPriority()));
+        List<ControlInstance> all = new ArrayList<>(registry.getAllInstances());
+        all.sort(Comparator.comparingInt(ControlInstance::getPriority));
 
-        // ---- Weighted Rnd Rbn Configuration ----
-        final int[] WEIGHTED_PATTERN = new int[] {
-            1, 1, 1, 1,
-            2, 2, 2,
-            3, 3,
-            4
-        };
+        Map<Integer, ArrayDeque<ControlInstance>> queues = partitionByPriority(all);
 
-        final ArrayDeque<ControlInstance> q1 = new ArrayDeque<>();
-        final ArrayDeque<ControlInstance> q2 = new ArrayDeque<>();
-        final ArrayDeque<ControlInstance> q3 = new ArrayDeque<>();
-        final ArrayDeque<ControlInstance> q4 = new ArrayDeque<>();
-        
-        int skipped = 0;
-        for (ControlInstance ci : all) {
-            
-            var priority = normalizePriority(ci.getPriority());
-            if (priority == 4) {
-                skipped += 1;
-                continue;
-            }
-            switch (priority) {
-                case 1 -> q1.add(ci);
-                case 2 -> q2.add(ci);
-                case 3 -> q3.add(ci);
-                default -> q4.add(ci);
-            }
+        runRehydrationLoop(queues, listener, start);
+    }
+
+    public void rehydrateQuick(RehydrationListener listener) {
+        long start = beginRehydration();
+
+        Optional<ControlInstance> subsetOptional =
+            registry.getAllInstances().stream()
+                .filter(ci -> ci.getNrpn().isPresent())
+                .findFirst();
+
+        if (subsetOptional.isEmpty()) {
+            logger.warning("No ControlInstance found with Nrpn");
+            listener.onFinished();
+            return;
         }
-        
-        logger.info(String.format("Skipped rehydration of %d controls that were deprioritised",skipped));
-        logger.info(String.format("Rehydrating %d p1 controls %d p2 controls and %d p3 controls",
-            q1.size(),q2.size(),q3.size()));
 
-        
-        final AtomicInteger remaining =
-            new AtomicInteger(q1.size() + q2.size() + q3.size() + q4.size());
-        final AtomicInteger patternIdx = new AtomicInteger(0);
+        List<ControlInstance> subset = Collections.singletonList(subsetOptional.get());
+        subset.sort(Comparator.comparingInt(ControlInstance::getPriority));
 
-        scheduler.schedule(new Runnable() {
-            @Override
-            public void run() {
-                if(!running)running = true;
-                if (remaining.get() <= 0) {
-                    int timeFinished = (int)((System.currentTimeMillis() - rehydrationStart)/1000);
-                    logger.info(String.format("Rehydration complete: all priorities processed in: %d minutes %d seconds",
-                        (timeFinished / 60),(timeFinished % 60)));
-                    all.clear();
-                    listener.onFinished();
-                    running = false;
-                    if(meterRequestsDelayed)activateMeterRequests();
-                    return;
-                }
+        Map<Integer, ArrayDeque<ControlInstance>> queues = partitionByPriority(subset);
 
-                ControlInstance selected = null;
-
-                int probes = 0;
-                while (probes < WEIGHTED_PATTERN.length && selected == null) {
-                    int p = WEIGHTED_PATTERN[patternIdx.getAndUpdate(i -> (i + 1) % WEIGHTED_PATTERN.length)];
-                    selected = pollFromQueue(p);
-                    probes++;
-                }
-
-                if (selected == null) {
-                    selected = pollFromQueue(1);
-                    if (selected == null) selected = pollFromQueue(2);
-                    if (selected == null) selected = pollFromQueue(3);
-                    if (selected == null) selected = pollFromQueue(4);
-                }
-
-                if (selected == null) {
-                    remaining.set(0);
-                    logger.info("Rehydration complete: all priorities processed.");
-                    all.clear();
-                    stopControlLoop();
-                    return;
-                }
-
-                request(selected.getCanonicalId());
-                remaining.decrementAndGet();
-
-                scheduler.schedule(this, effectiveDelayMs, TimeUnit.MILLISECONDS);
-            }
-
-            private ControlInstance pollFromQueue(int normalizedPrio) {
-                return switch (normalizedPrio) {
-                    case 1 -> q1.pollFirst();
-                    case 2 -> q2.pollFirst();
-                    case 3 -> q3.pollFirst();
-                    default -> q4.pollFirst();
-                };
-            }
-        }, 0, TimeUnit.MILLISECONDS);
+        runRehydrationLoop(queues, listener, start);
     }
 
     public void probe(String canonicalId, long timeoutMs, int midi_channel, ProbeCallback callback) {
@@ -267,7 +207,7 @@ public class RehydrationManager{
     public void onControlUpdated(String canonicalId) {
         Long expected = pending.remove(canonicalId);
         if (expected == null) {
-            if(debug)logger.warning(canonicalId + " was not expected or no longer pending i.e. already recieved or timedout and removed");
+            if(debug)logger.fine(canonicalId + " was not expected or no longer pending i.e. already recieved or timedout and removed");
             return;
         }
 
@@ -278,18 +218,18 @@ public class RehydrationManager{
     }
 
     public static boolean isRunning(){ return running; }
-
-    
     public int getOutstandingRequests() {return outstandingTransactions.get();}
     public int getTimedOutRequestsTotal() {return timedOutTransactions.get();}
 
     private int normalizePriority(int p) {
-        if (p <= 1) return 1;
-        if (p == 2) return 2;
-        if (p == 3) return 3;
-        return 4;
+        return switch(p){
+            case 0 -> 1;
+            case 1 -> 1;
+            case 2 -> 2;
+            case 3 -> 3;
+            default -> 4;
+        };
     }
-
 
     private void checkTimeout(String canonicalId) {
         if (pending.remove(canonicalId) != null) {
@@ -427,7 +367,6 @@ public class RehydrationManager{
             controlLoopFuture = null;
         }
 
-        // Reset pacing back to default for next run
         effectiveDelayMs = BASE_DELAY_MS;
     }
 
@@ -444,5 +383,115 @@ public class RehydrationManager{
 
     public boolean getMeterRequestsActive(){
         return !meterRequestsDelayed;
+    }
+
+    private static final class RehydrationState {
+    final Map<Integer, ArrayDeque<ControlInstance>> queues;
+    final AtomicInteger remaining;
+
+    RehydrationState(Map<Integer, ArrayDeque<ControlInstance>> queues) {
+        this.queues = queues;
+        this.remaining = new AtomicInteger(
+            queues.get(1).size() +
+            queues.get(2).size() +
+            queues.get(3).size() +
+            queues.get(4).size()
+        );
+    }
+}
+
+
+    private long beginRehydration() {
+        running = true;
+        startControlLoop();
+        return System.currentTimeMillis();
+    }
+
+
+    private Map<Integer, ArrayDeque<ControlInstance>> partitionByPriority(List<ControlInstance> instances) {
+        Map<Integer, ArrayDeque<ControlInstance>> queues = new HashMap<>();
+        queues.put(1, new ArrayDeque<>());
+        queues.put(2, new ArrayDeque<>());
+        queues.put(3, new ArrayDeque<>());
+        queues.put(4, new ArrayDeque<>());
+
+        int skipped = 0;
+
+        for (ControlInstance ci : instances) {
+            int p = normalizePriority(ci.getPriority());
+            if (p == 4) {
+                skipped++;
+                continue;
+            }
+            queues.get(p).add(ci);
+        }
+
+        logger.info(String.format(
+            "Skipped rehydration of %d controls that were deprioritised", skipped));
+
+        logger.info(String.format(
+            "Rehydrating %d p1 controls %d p2 controls and %d p3 controls",
+            queues.get(1).size(), queues.get(2).size(), queues.get(3).size()));
+
+        return queues;
+    }
+
+    private void runRehydrationLoop(
+        Map<Integer, ArrayDeque<ControlInstance>> queues,
+        RehydrationListener listener,
+        long startTime) {
+
+        RehydrationState state = new RehydrationState(queues);
+        AtomicInteger patternIdx = new AtomicInteger(0);
+
+        scheduler.scheduleAtFixedRate(() -> {
+
+            if (!running) running = true;
+
+            if (state.remaining.get() <= 0) {
+                int timeFinished = (int)((System.currentTimeMillis() - startTime)/1000);
+                logger.info(String.format(
+                    "Rehydration complete: all priorities processed in: %d minutes %d seconds",
+                    (timeFinished / 60), (timeFinished % 60)));
+
+                listener.onFinished();
+                running = false;
+
+                if (meterRequestsDelayed) activateMeterRequests();
+
+                stopControlLoop(); // stop pacing loop
+                throw new RuntimeException("STOP"); // minimal way to stop this fixed-rate task
+
+            }
+
+            ControlInstance selected = null;
+
+            int probes = 0;
+            while (probes < WEIGHTED_PATTERN.length && selected == null) {
+                int p = WEIGHTED_PATTERN[
+                    patternIdx.getAndUpdate(i -> (i + 1) % WEIGHTED_PATTERN.length)
+                ];
+                selected = queues.get(p).pollFirst();
+                probes++;
+            }
+
+            if (selected == null) {
+                selected = queues.get(1).pollFirst();
+                if (selected == null) selected = queues.get(2).pollFirst();
+                if (selected == null) selected = queues.get(3).pollFirst();
+                if (selected == null) selected = queues.get(4).pollFirst();
+            }
+
+            if (selected == null) {
+                state.remaining.set(0);
+                logger.info("Rehydration complete: all priorities processed.");
+                stopControlLoop();
+                throw new RuntimeException("STOP");
+            }
+
+            request(selected.getCanonicalId());
+            state.remaining.decrementAndGet();
+
+        }, 0, effectiveDelayMs, TimeUnit.MILLISECONDS);
     }
 }
