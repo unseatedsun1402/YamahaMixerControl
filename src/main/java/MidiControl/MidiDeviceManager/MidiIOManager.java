@@ -88,9 +88,10 @@ public class MidiIOManager {
         sendEngine = new MidiSendEngine(midiOut, 2048, 4096);
         sendEngine.setThroughputProfile(throughput);
 
-        if (telemetryAvailable){
+        if (telemetryAvailable) {
             systemTelemetry.registerMidiTelemetry(sendEngine.getTelemetry());
             systemTelemetry.start();
+        } else {
             logger.warning("Failed to register and start telemetry process - server SystemTelemetry engine is null");
         }
 
@@ -233,13 +234,74 @@ public class MidiIOManager {
     }
 
     public String getMidiInName(){
-        if(midiIn != null){
-        return midiIn.getDeviceInfo().getName();
+        if (midiIn != null) {
+            return midiIn.getDeviceInfo().getName();
         }
-        return null;
+        return "Device not set";
     }
 
-    private static void enableDebug(){
+    public static void enableDebug(){
         debug = true;
     }
+    
+    public synchronized void hardReset() {
+        logger.warning("Hard MIDI reset triggered");
+
+        // Stop send engine
+        if (sendEngine != null) {
+            sendEngine.stop();
+            sendEngine = null;
+        }
+
+        // Close input
+        if (midiIn != null && midiIn.isOpen()) {
+            midiIn.close();
+            midiIn = null;
+        }
+
+        // Close output
+        if (midiOut != null && midiOut.isOpen()) {
+            midiOut.close();
+            midiOut = null;
+        }
+
+        // Clear ports
+        inPort = -1;
+        outPort = -1;
+    }
+
+    public boolean rebuildDevices(int inIndex, int outIndex) {
+        logger.info("Rebuilding MIDI devices");
+
+        boolean inOk  = trySetInputDevice(inIndex);
+        boolean outOk = trySetOutputDevice(outIndex);
+
+        return inOk && outOk;
+    }
+
+    public synchronized boolean resetMidiSubsystem() {
+        int cachedInput  = inPort;
+        int cachedOutput = outPort;
+
+        logger.warning(String.format(
+            "Resetting MIDI subsystem (cached in=%d, out=%d)", cachedInput, cachedOutput
+        ));
+
+        hardReset();
+        boolean ok = rebuildDevices(cachedInput, cachedOutput);
+
+        if (outPort != cachedOutput)
+            try {
+                setOutputDevice(cachedOutput);
+            } catch (MidiUnavailableException e) {
+                e.printStackTrace();
+            }
+
+        if (!ok) {
+            logger.severe("MIDI subsystem reset failed; devices not valid after rebuild");
+        }
+
+        return ok;
+    }
+
 }

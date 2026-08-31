@@ -229,9 +229,8 @@ public class RehydrationManager{
         };
 
         ci.addListener(tmpListener);
-        logger.info(String.format("Added tmp listener %d",tmpListener.hashCode()));
 
-        logger.info(String.format("PROBE: sending probe for control instance=%d channel %d", ci.hashCode(), midi_channel));
+        if(debug)logger.fine(String.format("PROBE: sending probe for control instance=%d channel %d", ci.hashCode(), midi_channel));
         outputRouter.send(probe);
 
         scheduler.schedule(() -> {
@@ -248,7 +247,6 @@ public class RehydrationManager{
         } catch (InterruptedException ignored) {}
         finally {
             ci.removeListener(tmpListener);
-            logger.info(String.format("Removed tmp listener %d",tmpListener.hashCode()));
         }
 
         ControlInstance result = respondingInstance.get();

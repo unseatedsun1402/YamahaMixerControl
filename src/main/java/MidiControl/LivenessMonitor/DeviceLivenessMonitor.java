@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.DeskProvider;
 import MidiControl.DeskDiscovery.DeskDiscovery;
+import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Server.Protocol.NotifyClients;
 import MidiControl.Server.Protocol.ServerEvent;
 
@@ -20,11 +21,17 @@ public class DeviceLivenessMonitor{
     private static final Logger logger = Logger.getLogger(DeviceLivenessMonitor.class.getName());
     private DeskProvider deskModelProvider;
     private static boolean debug = false;
+    private int consecutiveFailures = 0;
+    private static final int FAILURE_THRESHOLD = 3;
+    private static final long COOLDOWN_MS = 15000;
+    private long lastRecoveryTime = 0;
+    private final MidiIOManager ioManager;
 
-    public DeviceLivenessMonitor(DeskDiscovery deskDiscovery, DeskProvider canonicalRegistry) {
+    public DeviceLivenessMonitor(DeskDiscovery deskDiscovery, DeskProvider canonicalRegistry, MidiIOManager manager) {
         this.deskDiscovery = deskDiscovery;
         this.deskModelProvider = canonicalRegistry;
         this.timer = new Timer();
+        this.ioManager = manager;
     }
 
     public void startMonitoring() {
@@ -52,8 +59,20 @@ public class DeviceLivenessMonitor{
                         isConnectedObject(true)
                     )
                 );
+                if(consecutiveFailures > 0) consecutiveFailures = 0;
             } else {
                 logger.warning("Not connected");
+                consecutiveFailures ++;
+                if (consecutiveFailures >= FAILURE_THRESHOLD) {
+                    long now = System.currentTimeMillis();
+                    if (now - lastRecoveryTime > COOLDOWN_MS) {
+
+                        logger.warning("Liveness threshold exceeded - triggering MIDI subsystem reset");
+
+                        ioManager.resetMidiSubsystem();
+                        lastRecoveryTime = now;
+                    }
+                }
                 NotifyClients.publish(
                     ServerEvent.warning(
                         "LIVENESS",

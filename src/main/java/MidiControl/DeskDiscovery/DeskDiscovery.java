@@ -31,16 +31,22 @@ import MidiControl.SysexUtils.SysexParser;
 public class DeskDiscovery {
 
     private static final Logger logger = Logger.getLogger(DeskDiscovery.class.getName());
+    private static volatile boolean debug = false;
 
     private MidiIOManager ioManager;
     private RehydrationManager rehydrationManager;
     public JsonArray deskProfiles;
     private Map<String,SysexMapping> deskProfileMap;
     private CanonicalRegistry registry;
+    private static final long MAX_DICOVERY_TIME = 8000; // 8 seconds
 
     @FunctionalInterface
     public interface ProbeCallback {
         void onProbeSuccess(ControlInstance instance, int midi_channel);
+    }
+
+    public void enableDebug(){
+        debug = true;
     }
 
     private boolean isBlacklisted(MidiDeviceDTO dto) {
@@ -87,6 +93,8 @@ public class DeskDiscovery {
 
     public DeskDiscoveryResult discoverDeskModel() {
         logger.info("DeskDiscovery: starting discoverDeskModel()");
+        long deadline = System.currentTimeMillis() + MAX_DICOVERY_TIME;
+
         loadMappingsFromResource("MidiControl/discovery/known-desks.json");
 
         if (ioManager == null) {
@@ -109,7 +117,10 @@ public class DeskDiscovery {
         logger.info(String.format("DeskDiscovery: found %d MIDI devices",devices.size()));
 
         for (JsonElement jsonElement : deskProfiles) {
-            if (stop.get()) break;
+            if (stop.get() || timedOut(deadline)) {
+                logger.warning("DeskDiscovery: timeout during desk profile scan");
+                break;
+            }
 
             JsonObject deskProfile = jsonElement.getAsJsonObject();
             String deskModel = getDeskModel(deskProfile);
@@ -136,7 +147,6 @@ public class DeskDiscovery {
 
                 List<int[]> pairs = new ArrayList<>();
 
-                // Build candidate pairs by matching names
                 for (int out = 0; out < devices.size(); out++) {
                     MidiDeviceDTO outDev = devices.get(out);
                     if (!outDev.canOutput) continue;
@@ -163,7 +173,10 @@ public class DeskDiscovery {
                 }
 
                 for (int[] pair : pairs) {
-                    if (stop.get()) break;
+                    if (stop.get() || timedOut(deadline)) {
+                        logger.warning("DeskDiscovery: timeout during device pair scan");
+                        break;
+                    }
 
                     int out = pair[0];
                     int in = pair[1];
@@ -196,7 +209,10 @@ public class DeskDiscovery {
                     }
 
                     for (int channel = 0; channel < 16; channel++) {
-                        if (stop.get()) break;
+                        if (stop.get() || timedOut(deadline)) {
+                            logger.warning("DeskDiscovery: timeout during channel probe");
+                            break;
+                        }
 
                         DeskDiscoveryResult result =
                             probeWithCanonicalId(deskModel, probeMapping, channel, 100, 110);
@@ -214,6 +230,11 @@ public class DeskDiscovery {
             }
         }
 
+        if (timedOut(deadline)) {
+            logger.warning("DeskDiscovery: timed out, returning early");
+            return detected.get();
+        }
+
         DeskDiscoveryResult result = detected.get();
         if (result == null) {
             logger.info("DeskDiscovery: no desk detected");
@@ -222,6 +243,10 @@ public class DeskDiscovery {
                 " on MIDI channel " + result.midiChannel());
         }
         return result;
+    }
+
+    private boolean timedOut(long deadline) {
+        return System.currentTimeMillis() > deadline;
     }
 
     public boolean probeForLiveness(String deskModel) {
@@ -240,7 +265,7 @@ public class DeskDiscovery {
         final AtomicReference<DeskDiscoveryResult> detected = new AtomicReference<>(null);
         final CountDownLatch latch = new CountDownLatch(1);
 
-        logger.info("Desk model probing "+deskModel);
+        if(debug)logger.fine("Desk model probing "+deskModel);
 
         String canonicalId = buildCanonicalIdFromMapping(mapping, channel);
 

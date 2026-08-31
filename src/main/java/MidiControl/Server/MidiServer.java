@@ -276,11 +276,19 @@ public class MidiServer implements Runnable, UiModelService{
                 newRegistry.setDeskType(result.getModel());
                 onRegistryReloaded(newRegistry);
                 logger.info("Starting liveness monitor");
-                livenessMonitor = new DeviceLivenessMonitor(deskDiscovery,newRegistry);
+                livenessMonitor = new DeviceLivenessMonitor(deskDiscovery,newRegistry, this.deviceManager);
                 livenessMonitor.startMonitoring();
             }
             else {
-                logger.info("Discovery failed to detect a valid desk response on the midi system");
+                String deskType = "YAMAHA_M7CL";
+                List<SysexMapping> defaultMappings =
+                    SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(deskType));
+                CanonicalRegistry newRegistry = new CanonicalRegistry(defaultMappings, new SysexParser(defaultMappings));
+                newRegistry.setDeskType(deskType);
+                onRegistryReloaded(newRegistry);
+
+                logger.info("Discovery failed to detect a valid desk response on the midi system\n"+
+                    String.format("fallback %s", deskType));
             }
 
         } catch (Exception e) {
@@ -368,6 +376,10 @@ public class MidiServer implements Runnable, UiModelService{
             livenessMonitor.injectNewRegistry(newRegistry);
             logger.info(String.format("Injected registry to liveness monitor on registry reload"));
         }
+        else{
+            livenessMonitor = new DeviceLivenessMonitor(deskDiscovery,newRegistry, this.deviceManager);
+            livenessMonitor.startMonitoring();
+        }
 
         if(processingLoop != null){
             processingLoop.setCanonicalRegistry(newRegistry);
@@ -385,22 +397,7 @@ public class MidiServer implements Runnable, UiModelService{
 
         recreateNameAssemblers();
 
-        String deskType = canonicalRegistry.getDeskType();
-
-        String resource = switch (deskType) {
-            case "YAMAHA_01V96I":
-                logger.info("Reloading nrpn mapping for Yamaha 01v96i");
-                yield "MidiControl/nrpn/01v96i_nrpn_mappings.json";
-
-            case "YAMAHA_M7CL":
-                logger.info("Reloading nrpn mapping for Yamaha M7CL");
-                yield "MidiControl/nrpn/m7cl_nrpn_mappings.json";
-
-            default:
-                throw new IllegalStateException(
-                    String.format("Unsupported desk profile: %s", deskType)
-                );
-        };
+        String resource = MidiControl.NrpnUtils.MappingFiles.getFilePathByKey(canonicalRegistry.getDeskType());
 
         List<NrpnMapping> nrpnMappings =
             NrpnMappingLoader.loadFromResource(resource);
