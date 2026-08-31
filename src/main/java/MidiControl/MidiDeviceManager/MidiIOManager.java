@@ -41,70 +41,6 @@ public class MidiIOManager {
 
     public MidiIOManager() { logger.info("MidiIOManger available for tests");  }
 
-    public void setInputDevice(int index) throws MidiUnavailableException {
-        if (midiIn != null) {
-            midiIn.close();
-            logger.info("Closed previous input device and transmitter.");
-        }
-        MidiDevice device = MidiDeviceUtils.getDevice(index);
-        logger.info("Opening input device: " + device.getDeviceInfo().getName());
-        device.open();
-
-        if (device.getMaxTransmitters() > 0 || device.getMaxTransmitters() == -1) {
-            midiIn = new InputWrapper(device, server.getInputBuffer());
-            
-            if (sendEngine != null) {
-                midiIn.getInputReceiver().setIngressListener(sendEngine);
-                logger.info("Ingress telemetry attached (input set)");
-            }
-
-            inPort = index;
-            logger.info("Transmitter set for input device index: " + index);
-        } else {
-            logger.warning("Device is output-only: " + index);
-        }
-    }
-
-    public void setOutputDevice(int index) throws MidiUnavailableException {
-        SystemTelemetry systemTelemetry = null;
-        boolean telemetryAvailable = false;
-
-        if (server != null) {
-            systemTelemetry = server.getSystemTelemetry();
-            telemetryAvailable = (systemTelemetry != null);
-        }
-
-        if (sendEngine != null) {
-            if (telemetryAvailable) systemTelemetry.stop();
-            sendEngine.stop();
-            sendEngine = null;
-        }
-
-        MidiDevice device = MidiDeviceUtils.getDevice(index);
-        midiOut = new ReceiverWrapper(device);
-        logger.info("Opening output device: " + midiOut.getDeviceInfo().getName());
-        outPort = index;
-
-        sendEngine = new MidiSendEngine(midiOut, 2048, 4096);
-        sendEngine.setThroughputProfile(throughput);
-
-        if (telemetryAvailable) {
-            systemTelemetry.registerMidiTelemetry(sendEngine.getTelemetry());
-            systemTelemetry.start();
-        } else {
-            logger.warning("Failed to register and start telemetry process - server SystemTelemetry engine is null");
-        }
-
-        sendEngine.start();
-
-        if (midiIn != null) {
-            midiIn.getInputReceiver().setIngressListener(sendEngine);
-            logger.info("Ingress telemetry attached");
-        } else {
-            logger.warning("Could not measure ingress telemetry, midiIn is null");
-        }
-    }
-
     public void setMidiOutForTest(MidiOutput mock) {
         this.midiOut = mock;
         this.sendEngine = new MidiSendEngine(midiOut, 2048, 4096);
@@ -131,33 +67,15 @@ public class MidiIOManager {
     }
 
     public boolean trySetOutputDevice(int index) {
-        try {
-            if (outPort != index) setOutputDevice(index);
-            if (outPort != index) {
-                logger.warning("Failed to set new output port to " + index + " the out port is " + outPort);
-                return false;
-            }
-            logger.info("The current output device is: " + outPort);
-            return true;
-        } catch (MidiUnavailableException e) {
-            logger.warning("Failed to open output device: " + e.getMessage());
-            return false;
-        }
+        boolean ok = openOutputDevice(index);
+        if (ok) logger.info("The current output device is: " + outPort);
+        return ok;
     }
 
     public boolean trySetInputDevice(int index) {
-        try {
-            if (inPort != index) setInputDevice(index);
-            if (inPort != index) {
-                logger.warning("Failed to set new input port to " + index + " the in port is " + inPort);
-                return false;
-            }
-            logger.info("The current input device is: " + inPort);
-            return true;
-        } catch (MidiUnavailableException e) {
-            logger.warning("Failed to open input device: " + e.getMessage());
-            return false;
-        }
+        boolean ok = openInputDevice(index);
+        if (ok) logger.info("The current input device is: " + inPort);
+        return ok;
     }
 
     public TransportMode getTransportMode() {
@@ -276,6 +194,8 @@ public class MidiIOManager {
         boolean inOk  = trySetInputDevice(inIndex);
         boolean outOk = trySetOutputDevice(outIndex);
 
+        attachIngressTelemetry();
+
         return inOk && outOk;
     }
 
@@ -288,14 +208,8 @@ public class MidiIOManager {
         ));
 
         hardReset();
-        boolean ok = rebuildDevices(cachedInput, cachedOutput);
 
-        if (outPort != cachedOutput)
-            try {
-                setOutputDevice(cachedOutput);
-            } catch (MidiUnavailableException e) {
-                e.printStackTrace();
-            }
+        boolean ok = rebuildDevices(cachedInput, cachedOutput);
 
         if (!ok) {
             logger.severe("MIDI subsystem reset failed; devices not valid after rebuild");
@@ -304,4 +218,74 @@ public class MidiIOManager {
         return ok;
     }
 
+    private void attachIngressTelemetry() {
+        if (midiIn != null && sendEngine != null) {
+            midiIn.getInputReceiver().setIngressListener(sendEngine);
+            logger.info("Ingress telemetry attached (post-reset)");
+        } else {
+            logger.warning("Ingress telemetry NOT attached (post-reset)");
+        }
+    }
+
+    private boolean openOutputDevice(int index) {
+        SystemTelemetry systemTelemetry = server != null ? server.getSystemTelemetry() : null;
+
+        // Stop old engine
+        if (sendEngine != null) {
+            if (systemTelemetry != null) systemTelemetry.stop();
+            sendEngine.stop();
+            sendEngine = null;
+        }
+
+        try {
+            MidiDevice device = MidiDeviceUtils.getDevice(index);
+            midiOut = new ReceiverWrapper(device);
+            logger.info("Opening output device: " + midiOut.getDeviceInfo().getName());
+            outPort = index;
+
+            sendEngine = new MidiSendEngine(midiOut, 2048, 4096);
+            sendEngine.setThroughputProfile(throughput);
+
+            if (systemTelemetry != null) {
+                systemTelemetry.registerMidiTelemetry(sendEngine.getTelemetry());
+                systemTelemetry.start();
+            }
+
+            sendEngine.start();
+            return true;
+
+        } catch (MidiUnavailableException e) {
+            logger.warning("Failed to open output device: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean openInputDevice(int index) {
+        try {
+            if (midiIn != null) {
+                midiIn.close();
+                logger.info("Closed previous input device and transmitter.");
+            }
+
+            MidiDevice device = MidiDeviceUtils.getDevice(index);
+            logger.info("Opening input device: " + device.getDeviceInfo().getName());
+            device.open();
+
+            if (device.getMaxTransmitters() > 0 || device.getMaxTransmitters() == -1) {
+                midiIn = new InputWrapper(device, server.getInputBuffer());
+                inPort = index;
+
+                attachIngressTelemetry();   // always attach here
+                logger.info("Transmitter set for input device index: " + index);
+                return true;
+            }
+
+            logger.warning("Device is output-only: " + index);
+            return false;
+
+        } catch (MidiUnavailableException e) {
+            logger.warning("Failed to open input device: " + e.getMessage());
+            return false;
+        }
+    }
 }

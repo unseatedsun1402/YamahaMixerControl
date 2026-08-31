@@ -73,7 +73,7 @@ public class MidiServerTest {
 
         assertThrows(
             MidiUnavailableException.class,
-            () -> server.getMidiDeviceManager().setInputDevice(999),
+            () -> server.getMidiDeviceManager().trySetInputDevice(999),
             "Should throw for invalid device index");
     }
 
@@ -83,7 +83,7 @@ public class MidiServerTest {
 
         assertThrows(
             MidiUnavailableException.class,
-            () -> server.getMidiDeviceManager().setOutputDevice(999),
+            () -> server.getMidiDeviceManager().trySetOutputDevice(999),
             "Should throw for invalid device index");
     }
 
@@ -98,14 +98,8 @@ public class MidiServerTest {
             MidiServer server = new MidiServer();
 
             assertDoesNotThrow(
-                () -> {
-                    try {
-                        server.getMidiDeviceManager().setInputDevice(0);
-                    } catch (MidiUnavailableException e) {
-                        // Device is valid but not usable as input; this is acceptable for this test.
-                    }
-                },
-                "Should not crash when setting output-only device as input");
+                () -> server.getMidiDeviceManager().trySetInputDevice(0),
+            "Should throw for invalid device index");
         }
     }
 

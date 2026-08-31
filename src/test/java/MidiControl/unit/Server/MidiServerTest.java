@@ -29,7 +29,7 @@ public class MidiServerTest {
             return;
         }
 
-        assertDoesNotThrow(() -> server.getMidiDeviceManager().setOutputDevice(index));
+        assertDoesNotThrow(() -> server.getMidiDeviceManager().trySetOutputDevice(index));
     }
 
     @Test
@@ -42,7 +42,7 @@ public class MidiServerTest {
             return;
         }
 
-        assertDoesNotThrow(() -> server.getMidiDeviceManager().setInputDevice(index));
+        assertDoesNotThrow(() -> server.getMidiDeviceManager().trySetInputDevice(index));
     }
 
     @Test
