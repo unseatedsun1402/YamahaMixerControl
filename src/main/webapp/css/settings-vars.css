@@ -1,0 +1,47 @@
+:root {
+
+    /* ====== COLOURS ====== */
+    --color-bg: #1b1b1d;
+    --color-bg-header: #111113;
+    --color-bg-card: #242427;
+    --color-bg-card-border: #2f2f33;
+    --color-bg-input: #1a1a1c;
+    --color-bg-hover: #2a2a2d;
+    --color-bg-telemetry: #111;
+    --color-bg-log: #111;
+
+    --color-text: #e6e6e6;
+    --color-text-muted: #e0e0e0;
+    --color-link: #4da3ff;
+    --color-link-hover: #6bb4ff;
+
+    --color-border: #3a3a3d;
+    --color-border-header: #2a2a2d;
+
+    --color-button: #4da3ff;
+    --color-button-hover: #6bb4ff;
+
+    --color-danger: #8b0000;
+    --color-danger-hover: #b30000;
+    --color-warning-bg: #ffefef;
+    --color-warning-text: #600;
+
+    /* ====== TYPOGRAPHY ====== */
+    --font-main: "Segoe UI", Roboto, sans-serif;
+    --font-mono: monospace;
+
+    /* ====== SPACING ====== */
+    --space-xs: 4px;
+    --space-sm: 6px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 20px;
+
+    /* ====== RADIUS ====== */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+
+    /* ====== TABS ====== */
+    --tab-bg: #444;
+    --tab-bg-hover: #666;
+}

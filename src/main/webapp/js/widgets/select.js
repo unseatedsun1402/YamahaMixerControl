@@ -1,23 +1,31 @@
 import { canonicalIdFor } from "../utils/canonical.js";
 
 export function renderSelect(control) {
+    const wrapper = document.createElement("div");
+    wrapper.dataset.canonicalId = control.canonicalId;
+    wrapper.dataset.type = "SELECT";
+
     const select = document.createElement("select");
     select.disabled = control.readOnly;
 
-    ["Type A", "Type B"].forEach((opt, i) => {
+    // Build source list dynamically
+    for (let i = control.min; i <= control.max; i++) {
         const o = document.createElement("option");
         o.value = i;
-        o.textContent = opt;
+        o.textContent = `Source ${i}`;
         select.appendChild(o);
-    });
+    }
 
     select.value = control.value;
 
     select.addEventListener("change", () => {
-        sendControlChange(canonicalIdFor(control), Number(select.value));
+        const canonicalId = canonicalIdFor(control);
+        console.log("SELECT canonicalId:", canonicalId);
+        window.wsClient?.sendControlChange(canonicalId, Number(select.value));
     });
 
-    return select;
+    wrapper.appendChild(select);
+    return wrapper;
 }
 
 export function updateSelect(el, value) {

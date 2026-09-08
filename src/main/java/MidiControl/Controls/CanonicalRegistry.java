@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.ShortMessage;
 
+import MidiControl.ContextModel.ContextFilter;
 import MidiControl.ControlServer.CanonicalInputEvent;
 import MidiControl.NrpnUtils.NrpnMapping;
 import MidiControl.NrpnUtils.NrpnMappingLoader;
@@ -22,7 +23,7 @@ public class CanonicalRegistry implements SourceAllInstances, DeskProvider {
 
     private final Map<String, ControlGroup> groups = new HashMap<>();
     private final Map<String, ControlInstance> controlsById = new HashMap<>();
-    private final Map<Integer,
+    public final Map<Integer,
                     Map<String, ControlInstance>>
             contextLookup = new HashMap<>();
     private Map<String, ControlInstance> controlsByNrpn;
@@ -274,6 +275,48 @@ public class CanonicalRegistry implements SourceAllInstances, DeskProvider {
         }
 
         return context.get(group + "|" + subcontrol);
+    }
+
+    public List<ControlInstance> getInstancesForFilter(ContextFilter filter) {
+
+        String group = filter.getControlGroup();
+        String sub   = filter.getSubControl();
+        Integer idx  = filter.getIndex();
+
+        ControlGroup cg = groups.get(group);
+        if (cg == null) return List.of();
+
+        // WILDCARD SUBCONTROL SUPPORT
+        if ("*".equals(sub)) {
+            if (idx == null) {
+                // all instances of all subcontrols in this group
+                return cg.getSubcontrols().values().stream()
+                    .flatMap(sc -> sc.getInstances().stream())
+                    .toList();
+            } else {
+                // specific index across all subcontrols
+                return cg.getSubcontrols().values().stream()
+                    .map(sc -> (idx < sc.getInstances().size() ? sc.getInstances().get(idx) : null))
+                    .filter(ci -> ci != null)
+                    .toList();
+            }
+        }
+
+        // NORMAL CASE
+        SubControl sc = cg.getSubcontrol(sub);
+        if (sc == null) return List.of();
+
+        List<ControlInstance> instances = sc.getInstances();
+
+        if (idx == null) {
+            return instances;
+        }
+
+        if (idx >= 0 && idx < instances.size()) {
+            return List.of(instances.get(idx));
+        }
+
+        return List.of();
     }
 
 

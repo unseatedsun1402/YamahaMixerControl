@@ -32,9 +32,7 @@ public class BusContextDiscovererTest {
         return reg;
     }
 
-    // ------------------------------------------------------------
     // 01V96i: AUX (8), BUS (8), STEREO (2)
-    // ------------------------------------------------------------
     @Test
     public void test01V96iBusDiscovery() {
         ControlGroup auxFader = makeGroup("kAUXFader", "kFader", 8);
@@ -48,10 +46,6 @@ public class BusContextDiscovererTest {
 
         discoverer.discover(out, registry);
 
-        // Expect:
-        // aux.0..7 (8)
-        // bus.0..7 (8)
-        // stereo.0/1 (2)
         assertEquals(17, out.size());
 
         // AUX
@@ -81,9 +75,7 @@ public class BusContextDiscovererTest {
         assertEquals("Stereo LR", stereo.getLabel());
     }
 
-    // ------------------------------------------------------------
     // M7CL: MIX (16), MATRIX (8), STEREO (3)
-    // ------------------------------------------------------------
     @Test
     public void testM7CLBusDiscovery() {
         ControlGroup mixFader = makeGroup("kMixFader", "kFader", 16);
@@ -97,10 +89,6 @@ public class BusContextDiscovererTest {
 
         discoverer.discover(out, registry);
 
-        // Expect:
-        // mix.0..15 (16)
-        // matrix.0..7 (8)
-        // stereo.0/1/2 (3)
         assertEquals(25, out.size());
 
         // MIX
@@ -130,9 +118,7 @@ public class BusContextDiscovererTest {
         assertEquals("Stereo LR", stereo.getLabel());
     }
 
-    // ------------------------------------------------------------
     // Missing families should produce no contexts
-    // ------------------------------------------------------------
     @Test
     public void testMissingFamiliesProducesNoContexts() {
         // No kMix*, no kAUX*, no kBus*, no kMatrix*, no kStereo* 

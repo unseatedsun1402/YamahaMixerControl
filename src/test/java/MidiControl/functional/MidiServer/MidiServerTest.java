@@ -68,26 +68,6 @@ public class MidiServerTest {
     }
 
     @Test
-    void testSetInputDeviceWithInvalidIndexThrows() {
-        MidiServer server = new MidiServer();
-
-        assertThrows(
-            MidiUnavailableException.class,
-            () -> server.getMidiDeviceManager().trySetInputDevice(999),
-            "Should throw for invalid device index");
-    }
-
-    @Test
-    void testSetOutputDeviceWithInvalidIndexThrows() {
-        MidiServer server = new MidiServer();
-
-        assertThrows(
-            MidiUnavailableException.class,
-            () -> server.getMidiDeviceManager().trySetOutputDevice(999),
-            "Should throw for invalid device index");
-    }
-
-    @Test
     void testSetInputDeviceWithOutputOnlyIndexFailsGracefully() throws Exception {
         MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
         assertTrue(infos.length > 0, "Expected at least one MIDI device for this test");

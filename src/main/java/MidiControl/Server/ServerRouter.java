@@ -130,23 +130,27 @@ public class ServerRouter {
     }
 
     private void handleGetUiModel(Session session, String requestId, JsonObject payload) {
-        String contextId = payload.get("contextId").getAsString();
+
         String uiType = payload.has("uiType")
                 ? payload.get("uiType").getAsString()
                 : "basic-input-view";
 
         UiModelDTO model;
+        JsonObject out = new JsonObject();
+
+        String contextId = payload.get("contextId").getAsString();
         model = uiModels.buildUiModel(contextId, uiType);
+        out.addProperty("contextId", model.contextId);
 
         JsonObject response = new JsonObject();
         response.addProperty("type", "ui-model");
         if (requestId != null) response.addProperty("requestId", requestId);
 
-        JsonObject out = new JsonObject();
-        out.addProperty("contextId", model.contextId);
         out.add("controls", gson.toJsonTree(model.controls));
         out.add("metadata", gson.toJsonTree(model.metadata));
+        out.addProperty("viewType",uiType);
         response.add("payload", out);
+        logger.info(String.format("Returning Ui Model: %s",model.contextId));
 
         WebSocketEndpoint.send(session, response.toString());
     }
@@ -154,7 +158,7 @@ public class ServerRouter {
     private void handleSetControlValue(Session session, String requestId, JsonObject payload) {
         String canonicalId = payload.get("canonicalId").getAsString();
         int value = payload.get("value").getAsInt();
-        if(debug)logger.fine("Update from " + canonicalId + " val: " + value);
+        if(!debug)logger.severe("Update from " + canonicalId + " val: " + value);
 
         ControlInstance ci = registry.resolveCanonicalId(canonicalId);
         if (ci != null) {

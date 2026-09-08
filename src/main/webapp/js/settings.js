@@ -1,5 +1,8 @@
 import { WebSocketClient } from "./websocketClient.js";
 import { DeskStatusWidget } from "./widgets/liveness.js";
+import { renderHiddenPatchControls } from "./widgets/patch-matrix.js";
+import { renderPatchMatrixOverlay } from "./widgets/patch-matrix.js";
+import { applyControlUpdate } from './partial-update.js';
 
 console.log(">>> settings.js LOADED <<<");
 
@@ -10,7 +13,15 @@ const serverLogBuffer = [];
 const serverLog = document.getElementById("server-log");
 const deskStatusWidget = new DeskStatusWidget(document.getElementById("desk-status"));
 
+const patchMatrix = document.getElementById("patch-matrix");
+
+document.querySelector('[data-tab="patching"]').addEventListener("click", () => {
+    console.info("[Settings] Requesting patch ui");
+    ws.requestBank("bank.inputs" );
+});
+
 ws.connect();
+window.wsClient = ws;
 
 ws.on("connected", () => {
   console.log("[Settings] Connected, requesting device list...");
@@ -26,6 +37,75 @@ ws.on("REGISTRY_CHANGED", handleRegistryChanged);
 ws.on("midi-device-list", (devices) => {
   console.log("[Settings] Received device list:", devices);
   populateDeviceDropdowns(devices);
+});
+
+// ws.on("ui-model", (model) => {
+//     if (model.viewType === "basic-patch-view") {
+//         const container = document.getElementById("patch-matrix");
+//         renderHiddenPatchControls(model, container);
+//         renderPatchMatrixOverlay(model, container);
+//         return;
+//     }
+//     console.warn(`${model.viewType} is an unknown type and not handled`);
+// });
+
+// ws.on("control-update", (payload) => {
+//     if(payload.canonicalId.includes("kChannelIn")){console.info("[Bootstrap] Control update:", payload);}
+//     applyControlUpdate(payload);
+// });
+
+// ws.on("ui-bank", (bank) => {
+//     patchMatrix.innerHTML = "";
+//     patchMatrix._patchMap = new Map();
+//     console.info("Recieved ui bank - requesting uiModels")
+
+//     for (const ctxId of bank.contexts) {
+//         ws.subscribe(ctxId);
+//         ws.requestUiModel(ctxId, "basic-patch-view");
+//     }
+// });
+
+let expectedChannels = 0;
+
+ws.on("ui-bank", (bank) => {
+    const container = document.getElementById("patch-matrix");
+
+    // reset
+    container.innerHTML = "";
+    container._hiddenControls = new Map();
+
+    expectedChannels = bank.contexts.length;
+
+    console.info("Received ui bank - requesting uiModels");
+
+    for (const ctxId of bank.contexts) {
+        ws.subscribe(ctxId);
+        ws.requestUiModel(ctxId, "basic-patch-view");
+    }
+});
+
+ws.on("ui-model", (model) => {
+    if (model.viewType !== "basic-patch-view") {
+        console.warn(`${model.viewType} is an unknown type and not handled`);
+        return;
+    }
+
+    const container = document.getElementById("patch-matrix");
+
+    // Step 1: build hidden controls
+    renderHiddenPatchControls(model, container);
+
+    // Step 2: once all hidden controls exist, render canvas ONCE
+    if (container._hiddenControls.size === expectedChannels) {
+        renderPatchMatrixOverlay(container);
+    }
+});
+
+ws.on("control-update", (payload) => {
+    if (payload.canonicalId.includes("kChannelIn")) {
+        console.info("[Bootstrap] Control update:", payload);
+    }
+    applyControlUpdate(payload);
 });
 
 document.addEventListener("change", function (e) {
@@ -49,15 +129,9 @@ document.getElementById("apply-settings").addEventListener("click", () => {
     inputDeviceId,
     outputDeviceId,
     consoleType,
-    // Future settings:
-    // inputChannel: document.getElementById("input-channel").value,
-    // outputChannel: parseInt(document.getElementById("output-channel").value, 10),
     safeprofile: document.getElementById("safe-profile").checked,
     mainprofile: document.getElementById("main-profile").checked,
     highprofile: document.getElementById("high-profile").checked
-    // debugLogging: document.getElementById("debug-logging").checked,
-    // showRaw: document.getElementById("show-raw").checked,
-    // showCanonical: document.getElementById("show-canonical").checked
   };
 
   ws.applyMidiSettings(settings);

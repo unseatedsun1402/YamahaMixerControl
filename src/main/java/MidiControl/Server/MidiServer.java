@@ -20,6 +20,7 @@ import MidiControl.ContextModel.ControlSchema;
 import MidiControl.ContextModel.InputChannelSendsOnFaderViewBuilder;
 import MidiControl.ContextModel.InputChannelStripViewBuilder;
 import MidiControl.ContextModel.MixAuxBusViewBuilder;
+import MidiControl.ContextModel.PatchViewBuilder;
 import MidiControl.ContextModel.ViewBuilder;
 import MidiControl.ContextModel.ViewRegistry;
 import MidiControl.ControlServer.HardwareInputHandler;
@@ -65,7 +66,7 @@ public class MidiServer implements Runnable, UiModelService{
     private UiContextIndex contextIndex;
     private final UiModelFactory uiFactory;
     private final UiBankFactory bankFactory;
-    private final BankCatalog bankCatalog;
+    private final BankCatalog bankCatalog = new BankCatalog();
     private final ServerRouter serverRouter;
     private CanonicalRegistry canonicalRegistry;
     private List<ChannelNameAssembler> nameAssemblers = new ArrayList<>();
@@ -103,11 +104,11 @@ public class MidiServer implements Runnable, UiModelService{
         this.viewBuilders.addView(new InputChannelStripViewBuilder(), "basic-input-view");
         this.viewBuilders.addView(new InputChannelSendsOnFaderViewBuilder(), "basic-sends-on-fader-view");
         this.viewBuilders.addView(new MixAuxBusViewBuilder(), "basic-master-view");
+        this.viewBuilders.addView(new PatchViewBuilder(), "basic-patch-view");
 
         this.systemTelemetry = new SystemTelemetry();
         
         this.guiBroadcastListener = new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
-        this.bankCatalog = new BankCatalog();
         this.discoveryEngine = new ContextDiscoveryEngine(canonicalRegistry);
         this.bankFactory = new UiBankFactory(discoveryEngine, this);
         this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
@@ -124,7 +125,6 @@ public class MidiServer implements Runnable, UiModelService{
         this.viewBuilders.addView(new InputChannelStripViewBuilder(),"basic-input-view");
         this.uiFactory = null;
         this.bankFactory = null;
-        this.bankCatalog = new BankCatalog();
         this.guiBroadcastListener = NO_OP_LISTENER;
         this.subscriptions = new SubscriptionManager();
         this.schema = new ControlSchema(canonicalRegistry);
@@ -153,7 +153,6 @@ public class MidiServer implements Runnable, UiModelService{
         this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
         this.uiFactory = null;
         this.bankFactory = null;
-        this.bankCatalog = new BankCatalog();
 
         this.systemTelemetry = new SystemTelemetry();
 
@@ -162,32 +161,18 @@ public class MidiServer implements Runnable, UiModelService{
             Executors.newSingleThreadScheduledExecutor());
     }
 
-    // Optional: setter for late injection
     public void setGuiBroadcastListener(GuiBroadcastListener listener) {this.guiBroadcastListener = listener;}
-
-
     public MidiIOManager getMidiDeviceManager() {return this.deviceManager;}
-
     public CanonicalRegistry getCanonicalRegistry() {return this.canonicalRegistry;}
-
     public void setCanonicalRegistry(CanonicalRegistry registry) {this.canonicalRegistry = registry;}
-
     public ConcurrentLinkedQueue<MidiMessage> getInputBuffer(){return this.inputBuffer;}
-
     public void addtoinputqueue(MidiMessage msg) {inputBuffer.add(msg);}
-
     public int getInputBufferSize() {return inputBuffer.size();}
-
     public ControlSchema getControlSchema() {return this.schema;}
-
     public Optional<ViewBuilder> getViewBuilder(String key) {return this.viewBuilders.getView(key);}
-
     public UiContextIndex getContextIndex() {return this.contextIndex;}
-
     public SubscriptionManager getSubscriptionManager() {return this.subscriptions;}
-
     public void clearInputBuffer() {inputBuffer.clear();}
-
     public SystemTelemetry getSystemTelemetry() {return this.systemTelemetry;}
     
     private void initNameAssemblers() {
@@ -206,10 +191,7 @@ public class MidiServer implements Runnable, UiModelService{
         nameAssemblers.forEach(ChannelNameAssembler::shutdown);
         logger.info("Shutdown stale nameAssemblers");
         nameAssemblers = new ArrayList<>();
-        List<Context> nameContexts = contextIndex.getAllContexts().stream()
-            .filter(c -> c.getContextType() == ContextType.NAME)
-            .filter(c -> c.getId() != null)
-            .toList();
+        List<Context> nameContexts = contextIndex.getByType(ContextType.NAME);
         logger.info("Found "+nameContexts.size() + " name contexts to attach assemblers to");
         for (Context ctx : nameContexts) {
             if(ctx.getId() == null) {logger.warning("[RecreateNameAssemblers] Context given is null"); return;}
@@ -346,6 +328,7 @@ public class MidiServer implements Runnable, UiModelService{
         }
 
         final String baseType = baseTypeTmp;
+        logger.severe(String.format("Get builder %s",baseType));
 
         ViewBuilder builder = viewBuilders.getView(baseType)
                 .orElseThrow(() ->
