@@ -9,19 +9,26 @@
 
 <body>
 
-    <header class="page-header">
-        <h1>MIDI Settings</h1>
-        <nav>
-            <a href="/">Back to Console</a>
-        </nav>
-    </header>
+<header class="page-header">
+    <h1>MIDI Settings</h1>
 
-    <main class="settings-container">
+    <nav class="settings-tabs">
+        <button data-tab="devices">Devices</button>
+        <button data-tab="routing">Routing</button>
+        <button data-tab="mixer">Mixer Model</button>
+        <button data-tab="advanced">Advanced</button>
+        <button data-tab="patching" class="danger-zone">Patching</button>
+        <div id="desk-status" class="desk-dead">Waiting for desk status…</div>
+        <a href="/MidiControl/main.html">Back to Console</a>
+    </nav>
+</header>
 
-        <!-- LEFT COLUMN -->
+<main class="settings-container">
+
+    <!-- TAB: DEVICES -->
+    <section class="settings-tab" id="tab-devices">
+
         <section class="settings-column">
-
-            <!-- DEVICE SELECTION -->
             <section class="settings-card">
                 <h2>Devices</h2>
 
@@ -37,8 +44,75 @@
 
                 <button id="rescan-devices">Rescan Devices</button>
             </section>
+        </section>
 
-            <!-- ROUTING -->
+        <section class="settings-column">
+            <section class="settings-card telemetry-card">
+                <h2>Engine Telemetry</h2>
+
+                <div class="telemetry-grid">
+                    <div class="telemetry-item">
+                        <label>Bytes In / sec</label>
+                        <span id="telemetry-in">–</span>
+                    </div>
+
+                    <div class="telemetry-item">
+                        <label>Bytes Out / sec</label>
+                        <span id="telemetry-out">–</span>
+                    </div>
+
+                    <div class="telemetry-item">
+                        <label>Combined / sec</label>
+                        <span id="telemetry-combined">–</span>
+                    </div>
+
+                    <div class="telemetry-item">
+                        <label>In‑Flight (peak)</label>
+                        <span id="telemetry-inflight">–</span>
+                    </div>
+
+                    <div class="telemetry-item">
+                        <label>Dropped (peak)</label>
+                        <span id="telemetry-dropped">–</span>
+                    </div>
+
+                    <div class="telemetry-item">
+                        <label>Queue Capacity (%)</label>
+                        <span id="remaining-capacity">–</span>
+                    </div>
+                </div>
+
+                <div class="telemetry-log" id="telemetry-log"></div>
+            </section>
+
+            <section class="settings-card server-log-card">
+                <h2>Server Event Log</h2>
+                <div class="server-log" id="server-log"></div>
+            </section>
+
+            <section class="settings-card">
+                <h2>Control Mappings</h2>
+                <table class="mapping-table">
+                    <thead>
+                        <tr>
+                            <th>Canonical ID</th>
+                            <th>Transport</th>
+                            <th>Resolution</th>
+                            <th>Param</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mapping-table-body"></tbody>
+                </table>
+            </section>
+        </section>
+
+    </section>
+
+    <!-- TAB: ROUTING -->
+    <section class="settings-tab" id="tab-routing" hidden>
+
+        <section class="settings-column">
             <section class="settings-card">
                 <h2>Routing</h2>
 
@@ -87,26 +161,38 @@
                     </select>
                 </label>
 
-            <div class="toggle-row">
-                <label><input type="checkbox" class="profile-toggle" data-group="throughput" id="safe-profile"> Set DIN MIDI / Safe</label>
-                <label><input type="checkbox" class="profile-toggle" data-group="throughput" id="main-profile"> Set USB MIDI</label>
-                <label><input type="checkbox" class="profile-toggle" data-group="throughput" id="high-profile"> Set Remote</label>
-            </div>
-
+                <div class="toggle-row">
+                    <label><input type="checkbox" class="profile-toggle" data-group="throughput" id="safe-profile"> Set DIN MIDI / Safe</label>
+                    <label><input type="checkbox" class="profile-toggle" data-group="throughput" id="main-profile"> Set USB MIDI</label>
+                    <label><input type="checkbox" class="profile-toggle" data-group="throughput" id="high-profile"> Set Remote</label>
+                </div>
             </section>
+        </section>
 
-    <section class="settings-card">
-        <h2>Mixer Model</h2>
-        <label>
-            Select Mixer Model
-            <select id="console-type">
-                <option value="YAMAHA_01V96I">Yamaha_01V96i</option>
-                <option value="YAMAHA_M7CL">Yamaha_M7CL</option>
-            </select>
-        </label>
     </section>
 
-            <!-- ADVANCED -->
+    <!-- TAB: MIXER MODEL -->
+    <section class="settings-tab" id="tab-mixer" hidden>
+
+        <section class="settings-column">
+            <section class="settings-card">
+                <h2>Mixer Model</h2>
+                <label>
+                    Select Mixer Model
+                    <select id="console-type">
+                        <option value="YAMAHA_01V96I">Yamaha_01V96i</option>
+                        <option value="YAMAHA_M7CL">Yamaha_M7CL</option>
+                    </select>
+                </label>
+            </section>
+        </section>
+
+    </section>
+
+    <!-- TAB: ADVANCED -->
+    <section class="settings-tab" id="tab-advanced" hidden>
+
+        <section class="settings-column">
             <section class="settings-card">
                 <h2>Advanced</h2>
                 <label><input type="checkbox" id="debug-logging"> Debug Logging</label>
@@ -118,89 +204,45 @@
                 <button id="apply-settings" class="apply-button">Apply Settings</button>
                 <button id="save-settings" class="apply-button">Save Settings</button>
             </section>
-
         </section>
 
-        <!-- RIGHT COLUMN -->
+    </section>
+
+    <!-- TAB: PATCHING -->
+    <section class="settings-tab" id="tab-patching" hidden>
+
         <section class="settings-column">
+            <section class="settings-card danger-zone">
+                <h2>Patching</h2>
 
-            <!-- LIVE MONITOR -->
-            <section class="settings-card telemetry-card">
-                <h2>Engine Telemetry</h2>
+                <p class="warning">
+                    ! Patching affects signal flow.  
+                    Only use this section if you understand the desk routing.
+                </p>
 
-                <div class="telemetry-grid">
-                    <div class="telemetry-item">
-                        <label>Bytes In / sec</label>
-                        <span id="telemetry-in">–</span>
-                    </div>
+                <button id="patch-default">Default Patch</button>
+                <button id="patch-clear">Clear All Patches</button>
 
-                    <div class="telemetry-item">
-                        <label>Bytes Out / sec</label>
-                        <span id="telemetry-out">–</span>
-                    </div>
-
-                    <div class="telemetry-item">
-                        <label>Combined / sec</label>
-                        <span id="telemetry-combined">–</span>
-                    </div>
-
-                    <div class="telemetry-item">
-                        <label>In‑Flight (peak)</label>
-                        <span id="telemetry-inflight">–</span>
-                    </div>
-
-                    <div class="telemetry-item">
-                        <label>Dropped (peak)</label>
-                        <span id="telemetry-dropped">–</span>
-                    </div>
-
-                    <div class="telemetry-item">
-                        <label>Queue Capacity (%)</label>
-                        <span id="remaining-capacity">–</span>
-                    </div>
-                </div>
-
-                <div class="telemetry-log" id="telemetry-log"></div>
-            </section>
-
-            
-            <!-- SERVER EVENT LOG -->
-            <section class="settings-card server-log-card">
-                <h2>Server Event Log</h2>
-                <div class="server-log" id="server-log"></div>
-            </section>
-
-
-            <!-- CONTROL MAPPING TABLE -->
-            <section class="settings-card">
-                <h2>Control Mappings</h2>
-
-                <table class="mapping-table">
-                    <thead>
-                        <tr>
-                            <th>Canonical ID</th>
-                            <th>Transport</th>
-                            <th>Resolution</th>
-                            <th>Param</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody id="mapping-table-body">
-                        <!-- Filled dynamically -->
-                    </tbody>
-                </table>
-            </section>
-
-            <section>
-                <h2>Desk Connected</h2>
-                <div id="desk-status" class="desk-dead">
-                Waiting for desk status…
+                <div id="patch-matrix-scroll" class="patch-matrix-scroll">
+                    <div id="patch-matrix"></div>
                 </div>
             </section>
-
         </section>
 
-    </main>
+    </section>
+
+</main>
+
+<script>
+document.querySelectorAll('.settings-tabs button').forEach(btn => {
+    btn.onclick = () => {
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.settings-tab').forEach(t => {
+            t.hidden = (t.id !== `tab-${tab}`);
+        });
+    };
+});
+</script>
 
 </body>
 </html>

@@ -1,0 +1,16 @@
+:root {
+    /* ====== PATCH MATRIX ====== */
+    --patch-cell-size: 32px;
+    --patch-cell-height: 24px;
+
+    --patch-cell-bg: #1a1a1c;
+    --patch-cell-bg-hover: #2a2a2d;
+    --patch-cell-bg-selected: #4da3ff;
+
+    --patch-cell-border: #3a3a3d;
+
+    --patch-header-bg: #242427;
+    --patch-header-text: #e6e6e6;
+
+    --patch-label-width: 120px;
+}

@@ -1,6 +1,6 @@
 console.log(">>> websocketClient.js LOADED <<<");
 
-const debugFlag = false;
+const debugFlag = true;
 
 export class WebSocketClient {
   constructor(url) {
@@ -107,7 +107,7 @@ export class WebSocketClient {
     if (!this.sessionType) return true;
 
     if (this.sessionType === "settings") {
-      if (type === "control-update" || type === "meter-update") return false;
+      if (type === "meter-update") return false;
     }
 
     if (this.sessionType === "control") {
