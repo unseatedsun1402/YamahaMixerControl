@@ -12,10 +12,7 @@
 }
 
 .patch-matrix-scroll {
-    max-width: 80vw;
-    height: 400px;
-    overflow: auto;
-    border: 1px solid var(--color-border);
-    background: var(--color-bg-card);
-    padding: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
 }

@@ -44,6 +44,12 @@ public class BankCatalog {
         BankContext stereo = new BankContext();
         stereo.addFilter(new BankFilter("stereo", null, ContextType.STEREO_OUTPUT));
         banks.put("bank.stereo", stereo);
+
+        // Output Patch Bank
+        BankContext outputs = new BankContext();
+        // outputs.addFilter(new BankFilter("output", null, ContextType.OUTPUT));
+        outputs.addFilter(new BankFilter(null, null, ContextType.OUTPUT));
+        banks.put("bank.outputs", outputs);
     }
 
     public BankContext getBank(String bankId) {

@@ -32,6 +32,16 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>SourceMapServlet</servlet-name>
+        <servlet-class>MidiControl.ContextModel.PatchViewBuilder$SourceMapServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SourceMapServlet</servlet-name>
+        <url-pattern>/source-map</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>SetMidiOutputDevice</servlet-name>
         <servlet-class>MidiControl.SetMidiOutputDevice</servlet-class>
     </servlet>

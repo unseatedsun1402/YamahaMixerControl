@@ -7,20 +7,6 @@ import MidiControl.Controls.SubControl;
 import java.util.*;
 import java.util.logging.Logger;
 
-/**
- * Discovers all bus-type contexts (Mix, Aux, Bus, Matrix, Stereo, Mono).
- *
- * Bus-owned groups:
- *   - kMix*     (M7CL/LS9/CL/QL mixes)
- *   - kAUX*     (01V96i aux mixes)
- *   - kBus*     (01V96i bus outputs)
- *   - kMatrix*  (matrix outputs)
- *   - kStereo*  (stereo master)
- *   - kMono*    (mono master)
- *
- * Input-owned sends (kInputToMix, kInputAUX, kInputToBus, kInputToMatrix)
- * are intentionally ignored here and handled by input view builders.
- */
 public class BusContextDiscoverer implements ContextDiscoverer {
 
     private static final Logger log = Logger.getLogger(BusContextDiscoverer.class.getName());
@@ -56,7 +42,6 @@ public class BusContextDiscoverer implements ContextDiscoverer {
     public void discover(List<Context> out, CanonicalRegistry registry) {
         log.info("--- Discovering bus contexts (Mix/Aux/Bus/Matrix/Stereo/Mono) ---");
 
-        // 1. Group control groups by bus family
         Map<BusFamily, List<ControlGroup>> familyGroups = new EnumMap<>(BusFamily.class);
         for (ControlGroup group : registry.getGroups().values()) {
             String groupName = group.getName();
@@ -139,10 +124,6 @@ public class BusContextDiscoverer implements ContextDiscoverer {
         }
     }
 
-    /**
-     * Computes the maximum instance count across all groups' subcontrols for a bus family.
-     * This matches the "one instance per bus" model used by Yamaha.
-     */
     private int computeBusCount(List<ControlGroup> groups) {
         int max = 0;
         for (ControlGroup group : groups) {
@@ -156,10 +137,6 @@ public class BusContextDiscoverer implements ContextDiscoverer {
         return max;
     }
 
-    /**
-     * Builds a label for the given bus. For now, everything is treated as mono:
-     *   Mix 1, Aux 1, Bus 1, Matrix 1, Stereo 1
-     */
     private String buildLabel(BusFamily family, int index, int busCount) {
         // Simple, consistent, 1-based labeling
         return family.labelBase + " " + (index + 1);

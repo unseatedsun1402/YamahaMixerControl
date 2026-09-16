@@ -86,7 +86,7 @@ public class MidiServer implements Runnable, UiModelService{
 
         List<SysexMapping> sysexMappings =
                 // SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
-                SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
+                SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
         this.canonicalRegistry =
                 new CanonicalRegistry(sysexMappings, new SysexParser(sysexMappings));
         
@@ -262,7 +262,7 @@ public class MidiServer implements Runnable, UiModelService{
                 livenessMonitor.startMonitoring();
             }
             else {
-                String deskType = "YAMAHA_M7CL";
+                String deskType = "YAMAHA_01V96I";
                 List<SysexMapping> defaultMappings =
                     SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(deskType));
                 CanonicalRegistry newRegistry = new CanonicalRegistry(defaultMappings, new SysexParser(defaultMappings));
@@ -328,19 +328,21 @@ public class MidiServer implements Runnable, UiModelService{
         }
 
         final String baseType = baseTypeTmp;
-        logger.severe(String.format("Get builder %s",baseType));
+        logger.warning(String.format("Get builder %s",baseType));
 
         ViewBuilder builder = viewBuilders.getView(baseType)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Unknown uiType: " + baseType));
 
-        UiModelFactory factory = new UiModelFactory(
+        UiModelDTO model = new UiModelFactory(
                 canonicalRegistry,
                 builder,
                 contextIndex
-        );
+        ).buildUiModel(contextId,suffix);
 
-        return factory.buildUiModel(contextId, suffix);
+        logger.info(String.format("returning from server %s ui model",model.contextId));
+
+        return model;
     }
     
     private void onRegistryReloaded(CanonicalRegistry newRegistry) {

@@ -9,5 +9,5 @@ public enum ContextType {
     DCA,
     STEREO_INPUT,
     BANK, STEREO_OUTPUT,
-    NAME
+    NAME, OUTPUT
 }

@@ -19,6 +19,7 @@ public class ContextDiscoveryEngine {
         this.discoverers.add(new ChannelContextDiscoverer());
         this.discoverers.add(new NameContextDiscoverer());
         this.discoverers.add(new BusContextDiscoverer());
+        this.discoverers.add(new OutputContextDiscoverer());
     }
     
     public void addDiscoverer(ContextDiscoverer d) {

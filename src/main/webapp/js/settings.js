@@ -17,8 +17,12 @@ const patchMatrix = document.getElementById("patch-matrix");
 
 document.querySelector('[data-tab="patching"]').addEventListener("click", () => {
     console.info("[Settings] Requesting patch ui");
-    ws.requestBank("bank.inputs" );
+    ws.requestBank("bank.outputs" );
 });
+
+function dump(obj) {
+    return JSON.stringify(obj, null, 2);
+}
 
 ws.connect();
 window.wsClient = ws;
@@ -39,32 +43,6 @@ ws.on("midi-device-list", (devices) => {
   populateDeviceDropdowns(devices);
 });
 
-// ws.on("ui-model", (model) => {
-//     if (model.viewType === "basic-patch-view") {
-//         const container = document.getElementById("patch-matrix");
-//         renderHiddenPatchControls(model, container);
-//         renderPatchMatrixOverlay(model, container);
-//         return;
-//     }
-//     console.warn(`${model.viewType} is an unknown type and not handled`);
-// });
-
-// ws.on("control-update", (payload) => {
-//     if(payload.canonicalId.includes("kChannelIn")){console.info("[Bootstrap] Control update:", payload);}
-//     applyControlUpdate(payload);
-// });
-
-// ws.on("ui-bank", (bank) => {
-//     patchMatrix.innerHTML = "";
-//     patchMatrix._patchMap = new Map();
-//     console.info("Recieved ui bank - requesting uiModels")
-
-//     for (const ctxId of bank.contexts) {
-//         ws.subscribe(ctxId);
-//         ws.requestUiModel(ctxId, "basic-patch-view");
-//     }
-// });
-
 let expectedChannels = 0;
 
 ws.on("ui-bank", (bank) => {
@@ -76,7 +54,7 @@ ws.on("ui-bank", (bank) => {
 
     expectedChannels = bank.contexts.length;
 
-    console.info("Received ui bank - requesting uiModels");
+    console.info("Received ui bank - requesting uiModels: "+dump(bank));
 
     for (const ctxId of bank.contexts) {
         ws.subscribe(ctxId);
@@ -84,7 +62,7 @@ ws.on("ui-bank", (bank) => {
     }
 });
 
-ws.on("ui-model", (model) => {
+ws.on("ui-model", async model => {
     if (model.viewType !== "basic-patch-view") {
         console.warn(`${model.viewType} is an unknown type and not handled`);
         return;
@@ -92,11 +70,23 @@ ws.on("ui-model", (model) => {
 
     const container = document.getElementById("patch-matrix");
 
-    // Step 1: build hidden controls
     renderHiddenPatchControls(model, container);
 
-    // Step 2: once all hidden controls exist, render canvas ONCE
     if (container._hiddenControls.size === expectedChannels) {
+
+        if (!container._sourceMap) {
+            const contextPath = window.location.pathname.split('/')[1];
+            const serveUrl = `http://${location.host}/${contextPath}/source-map`;
+            const sources = await fetch(serveUrl).then(r => r.json());
+
+            if (!Array.isArray(sources)) {
+                console.warn("Source map not ready yet:", sources);
+                return;
+            }
+
+            container._sourceMap = sources;
+        }
+
         renderPatchMatrixOverlay(container);
     }
 });
@@ -252,7 +242,6 @@ function appendTelemetryLog(data) {
         `BufPressure=${data.inflight}B ` +
         `QueueFree=${data.remainingcapacity}`;
 
-    // Optional rehydration signals (only if present)
     if (data.inflightTransactions !== undefined) {
         line.textContent += ` ReqPressure=${data.inflightTransactions}`;
     }
