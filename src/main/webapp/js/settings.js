@@ -3,6 +3,7 @@ import { DeskStatusWidget } from "./widgets/liveness.js";
 import { renderHiddenPatchControls } from "./widgets/patch-matrix.js";
 import { renderPatchMatrixOverlay } from "./widgets/patch-matrix.js";
 import { applyControlUpdate } from './partial-update.js';
+import { buildPatchRibbon } from "./view-ribbon.js";
 
 console.log(">>> settings.js LOADED <<<");
 
@@ -15,9 +16,30 @@ const deskStatusWidget = new DeskStatusWidget(document.getElementById("desk-stat
 
 const patchMatrix = document.getElementById("patch-matrix");
 
+window.patchBanks = [
+    { id: "bank.inputs", label: "INPUT" },
+    { id: "bank.outputs", label: "OUTPUT" },
+    { id: "bank.slot", label: "SLOT" },
+    { id: "bank.omni", label: "OMNI" },
+    // { id: "bank.adat", label: "ADAT" },
+    // { id: "bank.usb", label: "USB" },
+    // { id: "bank.direct", label: "DIRECT" },
+    // { id: "bank.insert", label: "INSERT" }
+];
+
+
 document.querySelector('[data-tab="patching"]').addEventListener("click", () => {
-    console.info("[Settings] Requesting patch ui");
-    ws.requestBank("bank.outputs" );
+    console.info("[Settings] Entering patching mode");
+
+    window.currentDomain = "patching";
+    window.currentView = "patch-view";
+    window.currentBank = 0;
+    window.ribbonInitialised = false;
+
+    buildPatchRibbon(selectPatchBank);
+    window.ribbonInitialised = true;
+
+    ws.requestBank("bank.outputs");
 });
 
 function dump(obj) {
@@ -43,8 +65,17 @@ ws.on("midi-device-list", (devices) => {
   populateDeviceDropdowns(devices);
 });
 
-let expectedChannels = 0;
+function selectPatchBank(bankId) {
+    window.currentDomain = "patching";
+    window.currentView = "patch-view";
 
+    window.currentBank = 0;
+    window.ribbonInitialised = false;
+
+    ws.requestBank(bankId);
+}
+
+let expectedChannels = 0;
 ws.on("ui-bank", (bank) => {
     const container = document.getElementById("patch-matrix");
 

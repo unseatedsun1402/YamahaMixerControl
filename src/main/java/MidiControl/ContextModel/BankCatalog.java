@@ -47,9 +47,18 @@ public class BankCatalog {
 
         // Output Patch Bank
         BankContext outputs = new BankContext();
-        // outputs.addFilter(new BankFilter("output", null, ContextType.OUTPUT));
         outputs.addFilter(new BankFilter(null, null, ContextType.OUTPUT));
         banks.put("bank.outputs", outputs);
+
+        // Slot Patch Bank
+        BankContext slotoutputs = new BankContext();
+        outputs.addFilter(new BankFilter("slotout", null, ContextType.OUTPUT));
+        banks.put("bank.slot", slotoutputs);
+
+        // Omni Patch Bank
+        BankContext omnioutputs = new BankContext();
+        outputs.addFilter(new BankFilter("omniout", null, ContextType.OUTPUT));
+        banks.put("bank.omni", omnioutputs);
     }
 
     public BankContext getBank(String bankId) {
