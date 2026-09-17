@@ -4,6 +4,7 @@ export function renderSelect(control) {
     const wrapper = document.createElement("div");
     wrapper.dataset.canonicalId = control.canonicalId;
     wrapper.dataset.type = "SELECT";
+    wrapper.dataset.default = control.defaultValue;
 
     const select = document.createElement("select");
     select.disabled = control.readOnly;

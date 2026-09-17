@@ -3,6 +3,7 @@ import { DeskStatusWidget } from "./widgets/liveness.js";
 import { renderHiddenPatchControls } from "./widgets/patch-matrix.js";
 import { renderPatchMatrixOverlay } from "./widgets/patch-matrix.js";
 import { applyControlUpdate } from './partial-update.js';
+import { buildPatchRibbon } from "./view-ribbon.js";
 
 console.log(">>> settings.js LOADED <<<");
 
@@ -15,10 +16,35 @@ const deskStatusWidget = new DeskStatusWidget(document.getElementById("desk-stat
 
 const patchMatrix = document.getElementById("patch-matrix");
 
+window.patchBanks = [
+    { id: "bank.inputs", label: "INPUT" },
+    { id: "bank.outputs", label: "OUTPUT" },
+    { id: "bank.slot", label: "SLOT" },
+    { id: "bank.omni", label: "OMNI" },
+    // { id: "bank.adat", label: "ADAT" },
+    // { id: "bank.usb", label: "USB" },
+    // { id: "bank.direct", label: "DIRECT" },
+    // { id: "bank.insert", label: "INSERT" }
+];
+
+
 document.querySelector('[data-tab="patching"]').addEventListener("click", () => {
-    console.info("[Settings] Requesting patch ui");
-    ws.requestBank("bank.inputs" );
+    console.info("[Settings] Entering patching mode");
+
+    window.currentDomain = "patching";
+    window.currentView = "patch-view";
+    window.currentBank = 0;
+    window.ribbonInitialised = false;
+
+    buildPatchRibbon(selectPatchBank);
+    window.ribbonInitialised = true;
+
+    ws.requestBank("bank.outputs");
 });
+
+function dump(obj) {
+    return JSON.stringify(obj, null, 2);
+}
 
 ws.connect();
 window.wsClient = ws;
@@ -39,34 +65,17 @@ ws.on("midi-device-list", (devices) => {
   populateDeviceDropdowns(devices);
 });
 
-// ws.on("ui-model", (model) => {
-//     if (model.viewType === "basic-patch-view") {
-//         const container = document.getElementById("patch-matrix");
-//         renderHiddenPatchControls(model, container);
-//         renderPatchMatrixOverlay(model, container);
-//         return;
-//     }
-//     console.warn(`${model.viewType} is an unknown type and not handled`);
-// });
+function selectPatchBank(bankId) {
+    window.currentDomain = "patching";
+    window.currentView = "patch-view";
 
-// ws.on("control-update", (payload) => {
-//     if(payload.canonicalId.includes("kChannelIn")){console.info("[Bootstrap] Control update:", payload);}
-//     applyControlUpdate(payload);
-// });
+    window.currentBank = 0;
+    window.ribbonInitialised = false;
 
-// ws.on("ui-bank", (bank) => {
-//     patchMatrix.innerHTML = "";
-//     patchMatrix._patchMap = new Map();
-//     console.info("Recieved ui bank - requesting uiModels")
-
-//     for (const ctxId of bank.contexts) {
-//         ws.subscribe(ctxId);
-//         ws.requestUiModel(ctxId, "basic-patch-view");
-//     }
-// });
+    ws.requestBank(bankId);
+}
 
 let expectedChannels = 0;
-
 ws.on("ui-bank", (bank) => {
     const container = document.getElementById("patch-matrix");
 
@@ -76,7 +85,7 @@ ws.on("ui-bank", (bank) => {
 
     expectedChannels = bank.contexts.length;
 
-    console.info("Received ui bank - requesting uiModels");
+    console.info("Received ui bank - requesting uiModels: "+dump(bank));
 
     for (const ctxId of bank.contexts) {
         ws.subscribe(ctxId);
@@ -84,7 +93,7 @@ ws.on("ui-bank", (bank) => {
     }
 });
 
-ws.on("ui-model", (model) => {
+ws.on("ui-model", async model => {
     if (model.viewType !== "basic-patch-view") {
         console.warn(`${model.viewType} is an unknown type and not handled`);
         return;
@@ -92,11 +101,23 @@ ws.on("ui-model", (model) => {
 
     const container = document.getElementById("patch-matrix");
 
-    // Step 1: build hidden controls
     renderHiddenPatchControls(model, container);
 
-    // Step 2: once all hidden controls exist, render canvas ONCE
     if (container._hiddenControls.size === expectedChannels) {
+
+        if (!container._sourceMap) {
+            const contextPath = window.location.pathname.split('/')[1];
+            const serveUrl = `http://${location.host}/${contextPath}/source-map`;
+            const sources = await fetch(serveUrl).then(r => r.json());
+
+            if (!Array.isArray(sources)) {
+                console.warn("Source map not ready yet:", sources);
+                return;
+            }
+
+            container._sourceMap = sources;
+        }
+
         renderPatchMatrixOverlay(container);
     }
 });
@@ -252,7 +273,6 @@ function appendTelemetryLog(data) {
         `BufPressure=${data.inflight}B ` +
         `QueueFree=${data.remainingcapacity}`;
 
-    // Optional rehydration signals (only if present)
     if (data.inflightTransactions !== undefined) {
         line.textContent += ` ReqPressure=${data.inflightTransactions}`;
     }

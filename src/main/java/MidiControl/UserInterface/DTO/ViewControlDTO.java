@@ -14,6 +14,7 @@ public class ViewControlDTO {
     public String canonicalId;
 
     public int value;
+    public int defaultValue;
     public int min;
     public int max;
 

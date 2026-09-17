@@ -158,7 +158,7 @@ public class DeskDiscovery {
                         if (isBlacklisted(inDev)) continue;
 
                         if (outDev.name != null && outDev.name.equals(inDev.name)) {
-                            logger.info(String.format(
+                            if(debug)logger.fine(String.format(
                                 "DeskDiscovery: candidate pair out=%d (%s) in=%d (%s)",
                                 out, outDev.name, in, inDev.name
                             ));
@@ -183,7 +183,7 @@ public class DeskDiscovery {
 
                     MidiDeviceDTO outDev = devices.get(out);
                     if (!outDev.canOutput) {
-                        logger.info("DeskDiscovery: outDev " + outDev.name + " cannot output, skipping");
+                        if(debug)logger.fine("DeskDiscovery: outDev " + outDev.name + " cannot output, skipping");
                         continue;
                     }
                     if (isBlacklisted(outDev)) continue;
@@ -195,16 +195,16 @@ public class DeskDiscovery {
                     MidiDeviceDTO inDev = devices.get(in);
                     if (isBlacklisted(inDev)) continue;
                     if (!inDev.canInput) {
-                        logger.info("DeskDiscovery: inDev " + inDev.name + " cannot input, skipping");
+                        if(debug)logger.fine("DeskDiscovery: inDev " + inDev.name + " cannot input, skipping");
                         continue;
                     }
                     if (!ioManager.trySetInputDevice(in)) {
-                        logger.info("DeskDiscovery: failed to set input device index " + in);
+                        if(debug)logger.fine("DeskDiscovery: failed to set input device index " + in);
                         continue;
                     }
 
                     if (!ioManager.hasValidDevices()) {
-                        logger.info("DeskDiscovery: ioManager reports invalid devices, skipping pair");
+                        logger.warning("DeskDiscovery: ioManager reports invalid devices, skipping pair");
                         continue;
                     }
 
@@ -270,7 +270,7 @@ public class DeskDiscovery {
         String canonicalId = buildCanonicalIdFromMapping(mapping, channel);
 
         try {
-            logger.info(String.format("Probing canonicalId=%s channel=%d",canonicalId,channel));
+            if(debug)logger.fine(String.format("Probing canonicalId=%s channel=%d",canonicalId,channel));
             rehydrationManager.probe(
             canonicalId,
             timeoutMs,
@@ -283,10 +283,9 @@ public class DeskDiscovery {
             }
         );
         } catch (Exception e) {
-            logger.log(Level.SEVERE,
-                "Probe failed for canonicalId=" + canonicalId,
-                e
-            );
+            logger.severe(String.format("Probe failed for canonicalId=%s \n", canonicalId)
+                );
+            e.printStackTrace();
         }
 
         try {
@@ -320,7 +319,6 @@ public class DeskDiscovery {
     private void mapDeskProfiles() {
         if (deskProfileMap == null) {
             deskProfileMap = new HashMap<>();
-            logger.info("Building desk profile map");
         }
 
         if(deskProfiles == null) {
@@ -335,7 +333,7 @@ public class DeskDiscovery {
 
             mapping.initialize();
             deskProfileMap.put(deskModel, mapping);
-            logger.info(String.format("Desk profile mapp added for %s",deskModel));
+            logger.info(String.format("Desk profile map loaded for %s",deskModel));
         }
     }
 
@@ -365,6 +363,6 @@ public class DeskDiscovery {
 
     public void injectNewRegistry (CanonicalRegistry registry) {
         this.registry = registry;
-        logger.info("Registry injected - @" + registry.hashCode());
+        if(debug)logger.info("Registry injected - @" + registry.hashCode());
     }
 }

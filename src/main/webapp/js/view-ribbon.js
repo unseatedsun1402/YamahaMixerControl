@@ -179,3 +179,24 @@ export function buildViewRibbonFromModel(
 
     panel.appendChild(deskStatusElement);
 }
+
+export function buildPatchRibbon(selectBank) {
+
+    const panel = document.getElementById("patch-ribbon");
+    if (!panel) return;
+
+    panel.innerHTML = "";
+
+    for (const bank of window.patchBanks) {
+
+        const btn = document.createElement("button");
+        btn.className = "sof-btn off";
+        btn.textContent = bank.label;
+
+        btn.addEventListener("click", () => {
+            selectBank(bank.id);
+        });
+
+        panel.appendChild(btn);
+    }
+}

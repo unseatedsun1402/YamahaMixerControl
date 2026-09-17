@@ -193,7 +193,7 @@ public class RehydrationManager{
         if (result != null) {
             byte[] last = result.getLastSysex();
             int resolvedChannel = extractMidiChannel(last);
-            logger.info("Success on probe");
+            if(debug)logger.fine("Success on probe");
             callback.onProbeSuccess(result, resolvedChannel);
         }
     }

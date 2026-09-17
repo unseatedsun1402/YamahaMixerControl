@@ -39,6 +39,7 @@ public class DTOMapper {
         dto.canonicalId = vc.canonicalId;
 
         dto.value = vc.value;
+        dto.defaultValue = vc.defaultValue;
         dto.min = vc.min;
         dto.max = vc.max;
 
