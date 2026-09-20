@@ -137,23 +137,6 @@ export class WebSocketClient {
       return;
     }
 
-    // sequence tracking
-    if (
-      this._lastSequence !== undefined &&
-      sequence !== undefined
-    ) {
-      if (sequence !== this._lastSequence + 1) {
-        console.warn("[WebSocketClient] Sequence out of order", {
-          expected: this._lastSequence + 1,
-          received: sequence,
-          type,
-          classification
-        });
-      }
-    }
-
-    this._lastSequence = sequence;
-
     const enrichedPayload = {
       ...(msg.payload || {}),
       __meta: {
@@ -172,6 +155,22 @@ export class WebSocketClient {
         sequence,
         payload: msg.payload
       });
+    }
+
+    // sequence tracking
+    if (sequence !== undefined) {
+
+        if (this._lastSequence !== undefined &&
+            sequence !== this._lastSequence + 1) {
+
+            console.warn("[WebSocketClient] Sequence out of order", {
+                expected: this._lastSequence + 1,
+                received: sequence,
+                type,
+                classification
+            });
+        }
+        this._lastSequence = sequence;
     }
 
     if (!this._shouldHandle(type)) {
