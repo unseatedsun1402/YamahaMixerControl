@@ -84,7 +84,7 @@ public class ChannelContextDiscovererTest {
             assertEquals("Channel " + (i + 1), ctx.getLabel());
             assertEquals(ContextType.CHANNEL, ctx.getContextType());
 
-            assertEquals(1, ctx.getFilters().size());
+            assertEquals(18, ctx.getFilters().size());
             assertTrue(ctx.getFilters().stream()
                     .anyMatch(f -> f.getControlGroup().equals("kInputFader")));
         }
@@ -109,7 +109,7 @@ public class ChannelContextDiscovererTest {
             assertEquals("Channel " + (i + 1), ctx.getLabel());
             assertEquals(ContextType.CHANNEL, ctx.getContextType());
 
-            assertEquals(1, ctx.getFilters().size());
+            assertEquals(18, ctx.getFilters().size());
             assertTrue(ctx.getFilters().stream()
                     .anyMatch(f -> f.getControlGroup().equals("kInputFader")));
         }

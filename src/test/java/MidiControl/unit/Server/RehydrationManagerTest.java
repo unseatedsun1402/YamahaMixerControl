@@ -164,7 +164,7 @@ class RehydrationManagerTest {
     }
 
     @Test
-    void rehydrateAll_requestsEachControlInstance() {
+    void rehydrateAll_requestsEachControlInstance() throws InterruptedException {
         FakeOutputRouter router = new FakeOutputRouter();
 
         ControlInstance c1 = makeInstance("kTestGroupA", "kTestSub", 0, 1);
@@ -184,6 +184,8 @@ class RehydrationManagerTest {
         FakeListener listener = new FakeListener();
 
         mgr.rehydrateAll(listener);
+        
+        Thread.sleep(210);
 
         assertEquals(2, router.callCount);
         assertEquals(1, listener.finished);
@@ -193,7 +195,7 @@ class RehydrationManagerTest {
     }
 
         @Test
-    void testRehydrateAllSkipsP4() {
+    void testRehydrateAllSkipsP4() throws InterruptedException {
         FakeOutputRouter router = new FakeOutputRouter();
 
         // Build real composite instances so canonical IDs are valid:
@@ -215,6 +217,8 @@ class RehydrationManagerTest {
         FakeListener listener = new FakeListener();
 
         mgr.rehydrateAll(listener);
+
+        Thread.sleep(210);
 
         assertEquals(1, router.callCount);
         assertEquals(1, listener.finished);
