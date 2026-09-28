@@ -158,7 +158,7 @@ public class ServerRouter {
     private void handleSetControlValue(Session session, String requestId, JsonObject payload) {
         String canonicalId = payload.get("canonicalId").getAsString();
         int value = payload.get("value").getAsInt();
-        if(!debug)logger.severe("Update from " + canonicalId + " val: " + value);
+        if(debug)logger.fine("Update from " + canonicalId + " val: " + value);
 
         ControlInstance ci = registry.resolveCanonicalId(canonicalId);
         if (ci != null) {

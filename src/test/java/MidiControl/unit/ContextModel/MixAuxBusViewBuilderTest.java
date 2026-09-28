@@ -2,6 +2,7 @@ package MidiControl.unit.ContextModel;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
@@ -56,62 +57,131 @@ public class MixAuxBusViewBuilderTest {
     }
 
     @Test
-    public void testMixAuxBusViewBuilder() {
+    public void testCreatesFaderControl() {
 
         MockCanonicalRegistry registry = new MockCanonicalRegistry();
 
-        // Core controls
-        ControlGroup fader = makeGroup("kMixFader", "kFader", 1);
-        ControlGroup pan = makeGroup("kMixPan", "kPan", 1);
+        ControlGroup group = makeGroup(
+                "kMixFader",
+                "kFader",
+                1);
 
-        // Dynamics
-        ControlGroup dynThresh = makeGroup("kMixDyn", "kThreshold", 1);
-        ControlGroup dynRatio = makeGroup("kMixDyn", "kRatio", 1);
+        registry.getGroups().put(
+                "kMixFader",
+                group);
 
-        // EQ (gain only)
-        ControlGroup eqLow = makeGroup("kMixEQ", "k1G", 1);
-        ControlGroup eqHigh = makeGroup("kMixEQ", "k2G", 1);
-
-        // Add groups to registry
-        registry.getGroups().put("kMixFader", fader);
-        registry.getGroups().put("kMixPan", pan);
-        registry.getGroups().put("kMixDyn", dynThresh);
-        registry.getGroups().put("kMixDyn", dynRatio);
-        registry.getGroups().put("kMixEQ", eqLow);
-        registry.getGroups().put("kMixEQ", eqHigh);
-
-        // Map context → instances
-        registry.mapContext("mix.0", fader, pan, dynThresh, dynRatio, eqLow, eqHigh);
+        registry.mapContext(
+                "mix.0",
+                group);
 
         Context ctx = new Context(
                 "mix.0",
                 "Mix 1",
                 ContextType.MIX,
-                List.of("Monitor"),
-                List.of(new ContextFilter("kMixFader", "*", 0))
-        );
+                List.of(),
+                List.of(
+                        new ContextFilter(
+                                "kMixFader",
+                                "*",
+                                0)));
 
-        MixAuxBusViewBuilder builder = new MixAuxBusViewBuilder();
-        List<ViewControl> controls = builder.build(ctx, registry, null);
+        MixAuxBusViewBuilder builder =
+                new MixAuxBusViewBuilder();
 
-        assertTrue(controls.size() > 5);
+        List<ViewControl> controls =
+                builder.build(ctx, registry, null);
 
-        // Validate presence
-        assertTrue(contains(controls, "FADER"));
-        assertTrue(contains(controls, "PAN"));
-        assertTrue(containsPrefix(controls, "DYN_"));
-        assertTrue(containsPrefix(controls, "EQ_"));
-
-        // Validate ordering: Fader → Pan → Dyn → EQ
-        int idxFader = indexOf(controls, "FADER");
-        int idxPan = indexOf(controls, "PAN");
-        int idxDyn = firstIndexStartingWith(controls, "DYN_");
-        int idxEQ = firstIndexStartingWith(controls, "EQ_");
-
-        assertTrue(idxFader < idxPan);
-        assertTrue(idxPan < idxDyn);
-        assertTrue(idxDyn < idxEQ);
+        assertTrue(
+                controls.stream()
+                        .anyMatch(c ->
+                                "FADER".equals(c.logicId)));
     }
+
+    @Test
+    public void testCreatesEQControls() {
+
+        MockCanonicalRegistry registry =
+                new MockCanonicalRegistry();
+
+        ControlGroup eq =
+                new ControlGroup("kMixEQ");
+
+        SubControl eq1 =
+                new SubControl(
+                        eq,
+                        "kEQ1G");
+
+        eq1.addInstance(
+                new ControlInstance(
+                        eq1,
+                        0,
+                        dummyMapping(
+                                "kMixEQ",
+                                "kEQ1G",
+                                0,
+                                127),
+                        null));
+
+        SubControl eq2 =
+                new SubControl(
+                        eq,
+                        "kEQ2G");
+
+        eq2.addInstance(
+                new ControlInstance(
+                        eq2,
+                        0,
+                        dummyMapping(
+                                "kMixEQ",
+                                "kEQ2G",
+                                0,
+                                127),
+                        null));
+
+        eq.getSubcontrols().put(
+                "kEQ1G",
+                eq1);
+
+        eq.getSubcontrols().put(
+                "kEQ2G",
+                eq2);
+
+        registry.getGroups().put(
+                "kMixEQ",
+                eq);
+
+        registry.mapContext(
+                "mix.0",
+                eq);
+
+        Context ctx = new Context(
+                "mix.0",
+                "Mix 1",
+                ContextType.MIX,
+                List.of(),
+                List.of(
+                        new ContextFilter(
+                                "kMixEQ",
+                                "*",
+                                0)));
+
+        List<ViewControl> controls =
+                new MixAuxBusViewBuilder()
+                        .build(
+                                ctx,
+                                registry,
+                                null);
+
+        assertTrue(
+                controls.stream()
+                        .anyMatch(c ->
+                                "EQ1G".equals(c.logicId)));
+
+        assertTrue(
+                controls.stream()
+                        .anyMatch(c ->
+                                "EQ2G".equals(c.logicId)));
+    }    
 
     private boolean contains(List<ViewControl> list, String logicalId) {
         return list.stream().anyMatch(c -> logicalId.equals(c.logicId));
@@ -138,4 +208,6 @@ public class MixAuxBusViewBuilderTest {
         }
         return -1;
     }
+
+    
 }

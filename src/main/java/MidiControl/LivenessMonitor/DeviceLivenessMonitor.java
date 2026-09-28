@@ -26,6 +26,7 @@ public class DeviceLivenessMonitor{
     private static final long COOLDOWN_MS = 15000;
     private long lastRecoveryTime = 0;
     private final MidiIOManager ioManager;
+    private boolean everConnected = false;
 
     public DeviceLivenessMonitor(DeskDiscovery deskDiscovery, DeskProvider canonicalRegistry, MidiIOManager manager) {
         this.deskDiscovery = deskDiscovery;
@@ -59,28 +60,28 @@ public class DeviceLivenessMonitor{
                         isConnectedObject(true)
                     )
                 );
+                if(!everConnected) everConnected = true;
                 if(consecutiveFailures > 0) consecutiveFailures = 0;
-            } else {
-                logger.warning("Not connected");
-                consecutiveFailures ++;
-                if (consecutiveFailures >= FAILURE_THRESHOLD) {
-                    long now = System.currentTimeMillis();
-                    if (now - lastRecoveryTime > COOLDOWN_MS) {
-
-                        logger.warning("Liveness threshold exceeded - triggering MIDI subsystem reset");
-
-                        ioManager.resetMidiSubsystem();
-                        lastRecoveryTime = now;
-                    }
-                }
-                NotifyClients.publish(
-                    ServerEvent.warning(
-                        "LIVENESS",
-                        String.format("Desk %s  is not connected", deskModelProvider.getDeskType()),
-                        isConnectedObject(false)
-                    )
-                );
+                return;
             }
+            logger.warning("Not connected");
+            consecutiveFailures ++;
+            if (consecutiveFailures >= FAILURE_THRESHOLD) {
+                long now = System.currentTimeMillis();
+                if (now - lastRecoveryTime > COOLDOWN_MS) {
+                    logger.warning("Liveness threshold exceeded - triggering MIDI subsystem reset");
+                    ioManager.resetMidiSubsystem();
+                    lastRecoveryTime = now;
+                }
+                consecutiveFailures = 0;
+            }
+            NotifyClients.publish(
+                ServerEvent.warning(
+                    "LIVENESS",
+                    String.format("Desk %s  is not connected", deskModelProvider.getDeskType()),
+                    isConnectedObject(false)
+                )
+            );
         }
     }
 

@@ -163,8 +163,11 @@ public class DiscoveryTest {
         ioManager.devices.add(dto);
 
         ioManager.setMidiOutForTest(device);
+        
 
         DeskDiscovery discoverer = new DeskDiscovery(ioManager);
+        discoverer.injectNewRegistry(registry);
+
         DeskDiscoveryResult result = discoverer.discoverDeskModel();
         assertEquals("YAMAHA_01V96I", result.getModel());
     }

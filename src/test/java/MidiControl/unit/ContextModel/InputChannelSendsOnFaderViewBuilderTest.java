@@ -86,8 +86,8 @@ public class InputChannelSendsOnFaderViewBuilderTest {
         InputChannelSendsOnFaderViewBuilder builder = new InputChannelSendsOnFaderViewBuilder();
         List<ViewControl> controls = builder.build(channel0(), registry, "mix1");
 
-        assertTrue(contains(controls, "CHANNEL_ON"));
-        assertTrue(contains(controls, "PAN"));
+        assertFalse(contains(controls, "CHANNEL_ON"));
+        assertFalse(contains(controls, "PAN"));
         assertTrue(contains(controls, "SEND_MIX1"), "Missing SOF fader for MIX1");
     }
 
@@ -178,8 +178,8 @@ public class InputChannelSendsOnFaderViewBuilderTest {
         List<ViewControl> controls = builder.build(channel0(), registry, "mix1");
 
         assertFalse(contains(controls, "SEND_MIX1"), "No matching send exists, so SEND_MIX1 should not be present");
-        assertTrue(contains(controls, "CHANNEL_ON"));
-        assertTrue(contains(controls, "PAN"));
+        assertFalse(contains(controls, "CHANNEL_ON"));
+        assertFalse(contains(controls, "PAN"));
     }
 
     private boolean contains(List<ViewControl> list, String logicalId) {

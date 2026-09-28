@@ -58,29 +58,24 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
                         : contextId;
         
         
-        int busIndex =
-            registry.extractContextIndex(
-                context.getId()
-            );
+        List<ControlInstance> all =
+                new ArrayList<>();
 
-
-        ControlInstance fader =
-            registry.find(
-                busIndex,
-                prefix + "Fader",
-                "kFader");
-
-        boolean stereo = context.getId().startsWith("stereo.");      
-        
-        if(stereo){
-            logger.info("Found a stereo fader");
-            fader = registry.find(
-                    0,
-                    "kStereoFader",
-                    "kFader");
-            if(fader == null)logger.warning("Stereo fader not found despite context hit");
+        for (ContextFilter filter : context.getFilters()) {
+        all.addAll(
+                registry.getInstancesForFilter(
+                        filter));
         }
 
+
+        ControlInstance fader =findInstance(all,prefix + "Fader","kFader");
+        
+        if (context.getId().startsWith("stereo.")) {
+        fader = findInstance(
+                all,
+                "kStereoFader",
+                "kFader");
+        }
 
         if (fader != null) {
             result.add(
@@ -90,18 +85,7 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
                             viewSuffix));
         }
 
-        ControlInstance pan =
-                registry.find(
-                        busIndex,
-                        prefix + "Pan",
-                        "kPan");
-
-        if (pan == null) {
-            pan = registry.find(
-                    busIndex,
-                    prefix + "Pan",
-                    "kBalance");
-        }
+        ControlInstance pan =findFirst(all,prefix + "Pan","kPan",prefix + "Pan","kBalance");
 
         if (pan != null) {
             result.add(createControl(
@@ -117,43 +101,29 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
         }
 
         ControlInstance dynOn =
-                registry.find(
-                        busIndex,
+                findFirst(
+                        all,
                         prefix + "Comp",
-                        "kCompOn");
-
-        if (dynOn == null) {
-            dynOn = registry.find(
-                    busIndex,
-                    prefix + "Dyn",
-                    "kDynaOn");
-        }
+                        "kCompOn",
+                        prefix + "Dyn",
+                        "kDynaOn");
 
         ControlInstance ratio =
-                registry.find(
-                        busIndex,
+                findFirst(
+                        all,
                         prefix + "Comp",
-                        "kCompRatio");
-
-        if (ratio == null) {
-            ratio = registry.find(
-                    busIndex,
-                    prefix + "Dyn",
-                    "kDynaRatio");
-        }
+                        "kCompRatio",
+                        prefix + "Dyn",
+                        "kDynaRatio");
 
         ControlInstance threshold =
-                registry.find(
-                        busIndex,
+                findFirst(
+                        all,
                         prefix + "Comp",
-                        "kCompThreshold");
+                        "kCompThreshold",
+                        prefix + "Dyn",
+                        "kDynaThreshold");
 
-        if (threshold == null) {
-            threshold = registry.find(
-                    busIndex,
-                    prefix + "Dyn",
-                    "kDynaThreshold");
-        }
 
         if (dynOn != null) {
             result.add(createControl(
@@ -194,59 +164,51 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
                     null));
         }
 
-        ControlInstance eq1 =
-                registry.find(
-                        busIndex,
-                        prefix + "EQ",
-                        "kEQ1G");
-        
-        
-        if (eq1 == null) {
-            eq1 = registry.find(
-                    busIndex,
-                    "kAUXEQ",
-                    "kEQLowG");
+        if (dynOn != null) {
+            result.add(createControl(
+                    dynOn,
+                    "DYN2_ON",
+                    "input.dynamics",
+                    "DYN2 On",
+                    ControlType.TOGGLE,
+                    viewType,
+                    viewSuffix,
+                    "DYNAMICS2_ON",
+                    null));
         }
 
+
+        ControlInstance eq1 =
+                findFirst(
+                        all,
+                        prefix + "EQ",
+                        "kEQ1G",
+                        "kAUXEQ",
+                        "kEQLowG");
 
         ControlInstance eq2 =
-                registry.find(
-                        busIndex,
+                findFirst(
+                        all,
                         prefix + "EQ",
-                        "kEQ2G");
-
-        if (eq2 == null) {
-            eq2 = registry.find(
-                    busIndex,
-                    "kAUXEQ",
-                    "kEQLowMidQ");
-        }
+                        "kEQ2G",
+                        "kAUXEQ",
+                        "kEQLowMidQ");
 
         ControlInstance eq3 =
-                registry.find(
-                        busIndex,
+                findFirst(
+                        all,
                         prefix + "EQ",
-                        "kEQ3G");
-
-        if (eq3 == null) {
-            eq3 = registry.find(
-                busIndex,
-                "kAUXEQ",
-                "kEQHiMidG");
-        }
+                        "kEQ3G",
+                        "kAUXEQ",
+                        "kEQHiMidG");
 
         ControlInstance eq4 =
-                registry.find(
-                        busIndex,
+                findFirst(
+                        all,
                         prefix + "EQ",
-                        "kEQ4G");
-
-        if (eq4 == null) {
-            eq4 = registry.find(
-                busIndex,
-                "kAUXEQ",
-                "kEQHiQ");
-        }
+                        "kEQ4G",
+                        "kAUXEQ",
+                        "kEQHiQ");
 
         if (eq1 != null) {
             result.add(createControl(
@@ -300,6 +262,12 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
                     null));
         }
 
+        System.out.println("controls = " + result.size());
+
+        for (ViewControl c : result) {
+        System.out.println(c.logicId);
+        }
+
         return result;
     }
 
@@ -337,35 +305,45 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
         );
     }
 
-    private ViewControl createControl(
-            ControlInstance ci,
-            String logicalId,
-            String uiGroup,
-            String label,
-            ControlType type,
-            String viewType,
-            String viewSuffix,
-            String role,
-            Integer sendIndex) {
+    private ViewControl createControl( ControlInstance ci,String logicalId,String uiGroup,String label,
+            ControlType type,String viewType,String viewSuffix,String role,Integer sendIndex) {
 
-        return new ViewControl(
-                logicalId,
-                uiGroup,
-                label,
-                type,
-                0,
-                ci.getMin(),
-                ci.getMax(),
-                ci.getValue(),
-                ci.getSysex().getDefault_value(),
-                ci.getGroup(),
-                ci.getSubcontrol(),
-                ci.getInstanceIndex(),
-                viewType,
-                viewSuffix,
-                role,
-                sendIndex,
-                ci.getInstanceIndex()
+        return new ViewControl(logicalId,uiGroup,label,type,0,ci.getMin(),ci.getMax(),ci.getValue(),ci.getSysex().getDefault_value(),
+                ci.getGroup(),ci.getSubcontrol(),ci.getInstanceIndex(),viewType,viewSuffix,role,sendIndex,ci.getInstanceIndex()
         );
     }
+
+    private ControlInstance findInstance(
+        List<ControlInstance> instances,
+        String group,
+        String subcontrol) {
+
+        return instances.stream()
+                .filter(ci -> group.equals(ci.getGroup()) && subcontrol.equals(ci.getSubcontrol()))
+                .findFirst()
+                .orElse(null);
+        }
+
+        private ControlInstance findFirst(
+                List<ControlInstance> instances,
+                String group1,
+                String sub1,
+                String group2,
+                String sub2) {
+
+                ControlInstance result =
+                        findInstance(
+                                instances,
+                                group1,
+                                sub1);
+
+                if (result != null) {
+                return result;
+                }
+
+                return findInstance(
+                        instances,
+                        group2,
+                        sub2);
+        }
 }

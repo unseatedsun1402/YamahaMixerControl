@@ -2977,30 +2977,6 @@
   },
   {
     "canonical_id": "kStereoFader.kFader.0",
-    "lsb": "0x79",
-    "msb": "0x00",
-    "value_mode": "NRPN_14BIT"
-  },
-  {
-    "canonical_id": "kStereoFader.kFader.1",
-    "lsb": "0x7A",
-    "msb": "0x00",
-    "value_mode": "NRPN_14BIT"
-  },
-  {
-    "canonical_id": "kStereoFader.kFader.2",
-    "lsb": "0x7B",
-    "msb": "0x00",
-    "value_mode": "NRPN_14BIT"
-  },
-  {
-    "canonical_id": "kStereoFader.kFader.3",
-    "lsb": "0x7C",
-    "msb": "0x00",
-    "value_mode": "NRPN_14BIT"
-  },
-  {
-    "canonical_id": "kStereoFader.kFader.4",
     "lsb": "0x7D",
     "msb": "0x00",
     "value_mode": "NRPN_14BIT"
