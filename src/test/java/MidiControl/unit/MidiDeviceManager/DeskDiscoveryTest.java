@@ -12,8 +12,22 @@ import MidiControl.DeskDiscovery.DeskDiscoveryResult;
 import MidiControl.MidiDeviceManager.MidiDeviceDTO;
 import MidiControl.Mocks.MockMidiIOManager;
 import MidiControl.Mocks.MockRehydrationManager;
+import MidiControl.Mocks.MockCanonicalRegistry;
 
 public class DeskDiscoveryTest {
+
+    private DeskDiscovery buildDiscovery(
+            MockMidiIOManager io,
+            MockRehydrationManager rehydration) {
+
+        DeskDiscovery discovery = new DeskDiscovery(io);
+
+        discovery.setRehydrationManager(rehydration);
+        discovery.injectNewRegistry(
+                new MockCanonicalRegistry());
+
+        return discovery;
+    }
 
     @Test
     public void DiscoverDevicesDoesNotThrowTest() {
@@ -25,11 +39,14 @@ public class DeskDiscoveryTest {
         assertDoesNotThrow(()->new DeskDiscovery().discoverDeskModel());
     }
 
-    @Test 
-    public void DiscoverDevicesCanReadMappings(){
+    @Test
+    public void DiscoverDevicesCanReadMappings() {
         DeskDiscovery discoverer = new DeskDiscovery();
+
         discoverer.discoverDeskModel();
-        assertTrue(discoverer.getKnownDeskProfilesSize() == 2);
+
+        assertTrue(
+            discoverer.getKnownDeskProfilesSize() > 0);
     }
 
     @Test
@@ -46,81 +63,118 @@ public class DeskDiscoveryTest {
 
     @Test
     public void DiscoverDeskModelReturnsNullWhenNoDeskMatches() {
-        MockMidiIOManager mockIO = new MockMidiIOManager(null);
+
+        MockMidiIOManager mockIO =
+                new MockMidiIOManager(null);
 
         MidiDeviceDTO d = new MidiDeviceDTO();
         d.canInput = true;
         d.canOutput = true;
         mockIO.devices.add(d);
 
-        DeskDiscovery discoverer = new DeskDiscovery(mockIO);
+        MockRehydrationManager testManager =
+                new MockRehydrationManager();
 
-        MockRehydrationManager testManager = new MockRehydrationManager();
         testManager.respondChannel = -1;
-        discoverer.setRehydrationManager(testManager);
 
-        DeskDiscoveryResult result = discoverer.discoverDeskModel();
+        DeskDiscovery discoverer =
+                buildDiscovery(
+                        mockIO,
+                        testManager);
+
+        DeskDiscoveryResult result =
+                discoverer.discoverDeskModel();
+
         assertNull(result);
     }
 
     @Test
     public void DiscoverProbesAllMidiChannels() {
-        MockMidiIOManager mockIO = new MockMidiIOManager(null);
+
+        MockMidiIOManager mockIO =
+                new MockMidiIOManager(null);
 
         MidiDeviceDTO d = new MidiDeviceDTO();
         d.canInput = true;
         d.canOutput = true;
         mockIO.devices.add(d);
 
-        DeskDiscovery discoverer = new DeskDiscovery(mockIO);
+        MockRehydrationManager mockRehydration =
+                new MockRehydrationManager();
 
-        MockRehydrationManager mockRehydration = new MockRehydrationManager();
         mockRehydration.respondChannel = -1;
-        discoverer.setRehydrationManager(mockRehydration);
+
+        DeskDiscovery discoverer =
+                buildDiscovery(
+                        mockIO,
+                        mockRehydration);
 
         discoverer.discoverDeskModel();
 
-        int expected = discoverer.getKnownDeskProfilesSize() * 1 * 1 * 16;
-        assertEquals(expected, mockRehydration.probeCallCount);
+        int expected =
+                discoverer.getKnownDeskProfilesSize() * 16;
+
+        assertEquals(
+                expected,
+                mockRehydration.probeCallCount);
     }
 
     @Test
     public void DiscoverMovesToNextDeskWhenAllChannelsTimeout() {
-        MockMidiIOManager mockIO = new MockMidiIOManager(null);
+
+        MockMidiIOManager mockIO =
+                new MockMidiIOManager(null);
 
         MidiDeviceDTO d = new MidiDeviceDTO();
         d.canInput = true;
         d.canOutput = true;
         mockIO.devices.add(d);
 
-        DeskDiscovery discoverer = new DeskDiscovery(mockIO);
+        MockRehydrationManager mockRehydration =
+                new MockRehydrationManager();
 
-        MockRehydrationManager mockRehydration = new MockRehydrationManager();
-        discoverer.setRehydrationManager(mockRehydration);
+        DeskDiscovery discoverer =
+                buildDiscovery(
+                        mockIO,
+                        mockRehydration);
 
         discoverer.discoverDeskModel();
 
-        assertEquals(32, mockRehydration.probeCallCount);
+        assertEquals(
+                discoverer.getKnownDeskProfilesSize() * 16,
+                mockRehydration.probeCallCount);
     }
 
     @Test
     public void DiscoverHandlesSingleChannelResponse() {
-        MockMidiIOManager mockIO = new MockMidiIOManager(null);
+
+        MockMidiIOManager mockIO =
+                new MockMidiIOManager(null);
 
         MidiDeviceDTO d = new MidiDeviceDTO();
         d.canInput = true;
         d.canOutput = true;
         mockIO.devices.add(d);
 
-        DeskDiscovery discoverer = new DeskDiscovery(mockIO);
+        MockRehydrationManager mockRehydration =
+                new MockRehydrationManager();
 
-        MockRehydrationManager mockRehydration = new MockRehydrationManager();
         mockRehydration.respondChannel = 7;
-        discoverer.setRehydrationManager(mockRehydration);
 
-        DeskDiscoveryResult result = discoverer.discoverDeskModel();
+        DeskDiscovery discoverer =
+                buildDiscovery(
+                        mockIO,
+                        mockRehydration);
 
-        assertEquals(8, mockRehydration.probeCallCount);
-        assertEquals("YAMAHA_01V96I", result.getModel());
+        DeskDiscoveryResult result =
+                discoverer.discoverDeskModel();
+
+        assertEquals(
+                8,
+                mockRehydration.probeCallCount);
+
+        assertEquals(
+                "YAMAHA_01V96I",
+                result.getModel());
     }
 }

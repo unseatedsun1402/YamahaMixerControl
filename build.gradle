@@ -14,6 +14,7 @@ dependencies {
     // API + annotations
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.junit.jupiter:junit-jupiter-params'
+    testImplementation 'org.awaitility:awaitility:4.3.0'
 
     // Runtime engine + launcher (must be explicit!)
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
