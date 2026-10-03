@@ -11,11 +11,14 @@ import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.sound.midi.SysexMessage;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.awaitility.Awaitility.*;
 
 public class NameAssemblerFunctional01V96iTest {
 
@@ -276,7 +279,7 @@ public class NameAssemblerFunctional01V96iTest {
 
         List<ChannelNameAssembler> testAssemblers = new ArrayList<ChannelNameAssembler>();
 
-        Map<String,String> results = new HashMap<>();
+        Map<String,String> results = new ConcurrentHashMap<>();
         for (Context c : nameContexts) {
             testAssemblers.add(new ChannelNameAssembler(c, registry,
                 (id,name)->results.put(id, name)));
@@ -294,13 +297,13 @@ public class NameAssemblerFunctional01V96iTest {
         server.addtoinputqueue(new SysexMessage(buildNameSysex(3, 1, ' '), len)); // ch1
 
         server.processIncomingMidiForTest();
-        Thread.sleep(2000);
 
-        assertEquals("Kick", results.get("name.input.0"));
-        assertEquals("Snr",  results.get("name.input.1"));
-        for (ChannelNameAssembler channelNameAssembler : testAssemblers) {
-            channelNameAssembler.shutdown();
-        }
+        await()
+            .atMost(5, TimeUnit.SECONDS)
+            .untilAsserted(() -> {
+                assertEquals("Kick", results.get("name.input.0"));
+                assertEquals("Snr", results.get("name.input.1"));
+            });
     }
     
     @Test
