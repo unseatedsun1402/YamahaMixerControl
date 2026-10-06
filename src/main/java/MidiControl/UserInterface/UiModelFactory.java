@@ -15,6 +15,15 @@ public class UiModelFactory {
     private final DTOMapper mapper = new DTOMapper();
     private final ViewBuilder viewBuilder;
     private static final Logger logger = Logger.getLogger(UiModelFactory.class.getName());
+    private static volatile boolean debug = false;
+
+    private static void enableDebug(){
+        debug = true;
+    }
+
+    private static void disableDebug(){
+        debug = false;
+    }
 
     public UiModelFactory(CanonicalRegistry registry,
                           ViewBuilder viewBuilder,
@@ -27,7 +36,7 @@ public class UiModelFactory {
 
     public UiModelDTO buildUiModel(String contextId, String suffix) {
 
-        logger.info(String.format("[UiModelFactory] buildUiModel contextId=%s suffix=%s", contextId, suffix));
+        if(debug)logger.fine(String.format("[UiModelFactory] buildUiModel contextId=%s suffix=%s", contextId, suffix));
 
         Context ctx = contextIndex.getContext(contextId);
         if (ctx == null) {
@@ -36,11 +45,9 @@ public class UiModelFactory {
         }
 
         List<ViewControl> controls = viewBuilder.build(ctx, registry, suffix);
-        logger.info(String.format("[UiModelFactory] ViewBuilder returned %d controls for %s", controls.size(), contextId));
+        if(debug)logger.fine(String.format("[UiModelFactory] ViewBuilder returned %d controls for %s", controls.size(), contextId));
 
         for (ViewControl vc : controls) {
-            logger.info(String.format("[UiModelFactory]   ViewControl logicId=%s canonicalId=%s",
-                                    vc.logicId, vc.canonicalId));
             if (vc.canonicalId != null && !vc.canonicalId.isBlank()) {
                 contextIndex.register(vc.canonicalId, contextId);
             } else {
@@ -49,7 +56,7 @@ public class UiModelFactory {
         }
 
         UiModelDTO dto = mapper.toDto(ctx, controls);
-        logger.info(String.format("[UiModelFactory] mapper.toDto produced model for %s", contextId));
+        if(debug)logger.fine(String.format("[UiModelFactory] mapper.toDto produced model for %s", contextId));
 
         return dto;
     }

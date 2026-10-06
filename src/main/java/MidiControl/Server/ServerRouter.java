@@ -172,7 +172,6 @@ public class ServerRouter {
         out.add("metadata", gson.toJsonTree(model.metadata));
         out.addProperty("viewType",uiType);
         response.add("payload", out);
-        logger.info(String.format("Returning Ui Model: %s",model.contextId));
 
         WebSocketEndpoint.send(session, response.toString());
     }
