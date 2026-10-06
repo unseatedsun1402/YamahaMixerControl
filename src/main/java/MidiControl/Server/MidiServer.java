@@ -328,7 +328,6 @@ public class MidiServer implements Runnable, UiModelService{
         }
 
         final String baseType = baseTypeTmp;
-        logger.warning(String.format("Get builder %s",baseType));
 
         ViewBuilder builder = viewBuilders.getView(baseType)
                 .orElseThrow(() ->
@@ -339,8 +338,6 @@ public class MidiServer implements Runnable, UiModelService{
                 builder,
                 contextIndex
         ).buildUiModel(contextId,suffix);
-
-        logger.info(String.format("returning from server %s ui model",model.contextId));
 
         return model;
     }
