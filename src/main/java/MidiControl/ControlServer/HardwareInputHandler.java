@@ -30,6 +30,10 @@ public class HardwareInputHandler {
         debug = true;
     }
 
+    public static void disableDebug(){
+        debug = false;
+    }
+
     public static MeterBroadcaster setMeterBroadcaster(MeterBroadcaster testHook){
         MeterSimpleParser.addListener(testHook);
         return meterBroadcaster = testHook;

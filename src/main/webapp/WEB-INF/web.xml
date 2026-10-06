@@ -41,6 +41,16 @@
         <url-pattern>/source-map</url-pattern>
     </servlet-mapping>
 
+        <servlet>
+        <servlet-name>DestinationMapServlet</servlet-name>
+        <servlet-class>MidiControl.ContextModel.PatchViewBuilder$DestinationMapServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DestinationMapServlet</servlet-name>
+        <url-pattern>/dest-map</url-pattern>
+    </servlet-mapping>
+
     <servlet>
         <servlet-name>SetMidiOutputDevice</servlet-name>
         <servlet-class>MidiControl.SetMidiOutputDevice</servlet-class>

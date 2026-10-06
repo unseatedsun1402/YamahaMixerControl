@@ -21,10 +21,6 @@ window.patchBanks = [
     { id: "bank.outputs", label: "OUTPUT" },
     { id: "bank.slot", label: "SLOT" },
     { id: "bank.omni", label: "OMNI" },
-    // { id: "bank.adat", label: "ADAT" },
-    // { id: "bank.usb", label: "USB" },
-    // { id: "bank.direct", label: "DIRECT" },
-    // { id: "bank.insert", label: "INSERT" }
 ];
 
 
@@ -72,6 +68,7 @@ function selectPatchBank(bankId) {
     window.currentBank = 0;
     window.ribbonInitialised = false;
 
+    window.currentBankId = bankId;
     ws.requestBank(bankId);
 }
 
@@ -79,7 +76,6 @@ let expectedChannels = 0;
 ws.on("ui-bank", (bank) => {
     const container = document.getElementById("patch-matrix");
 
-    // reset
     container.innerHTML = "";
     container._hiddenControls = new Map();
 
@@ -105,17 +101,23 @@ ws.on("ui-model", async model => {
 
     if (container._hiddenControls.size === expectedChannels) {
 
-        if (!container._sourceMap) {
-            const contextPath = window.location.pathname.split('/')[1];
-            const serveUrl = `http://${location.host}/${contextPath}/source-map`;
-            const sources = await fetch(serveUrl).then(r => r.json());
+        if (!container._channelMapType ||
+            container._channelMapType !== getMapEndpoint(window.currentBankId)) {
 
-            if (!Array.isArray(sources)) {
-                console.warn("Source map not ready yet:", sources);
+            const contextPath = window.location.pathname.split('/')[1];
+            const mapType = getMapEndpoint(window.currentBankId);
+
+            const map = await fetch(
+                `http://${location.host}/${contextPath}/${mapType}`
+            ).then(r => r.json());
+
+            if (!Array.isArray(map)) {
+                console.warn(`${mapType} not ready yet:`, map);
                 return;
             }
 
-            container._sourceMap = sources;
+            container._channelMap = map;
+            container._channelMapType = mapType;
         }
 
         renderPatchMatrixOverlay(container);
@@ -312,7 +314,6 @@ function handleServerEvent(event) {
 
   renderServerLog();
 
-  // Escalate critical events
   if (event.level === "ERROR") {
     showGlobalAlert(line.text);
   }
@@ -384,4 +385,41 @@ function showGlobalAlert(message) {
   document.body.appendChild(el);
 
   setTimeout(() => el.remove(), 6000);
+}
+
+document.getElementById("debug-resolution")
+    ?.addEventListener("change", e => {
+
+        ws.setDebugResolution(e.target.checked);
+
+        showStatus(
+            e.target.checked
+                ? "Control resolution logging enabled"
+                : "Control resolution logging disabled"
+        );
+    });
+
+document.getElementById("show-canonical")
+    ?.addEventListener("change", e => {
+
+        ws.setCanonicalEvents(e.target.checked);
+
+        showStatus(
+            e.target.checked
+                ? "Canonical event logging enabled"
+                : "Canonical event logging disabled"
+        );
+    });
+
+function getMapEndpoint(bankId) {
+    switch (bankId) {
+        case "bank.outputs":
+        case "bank.slot":
+        case "bank.omni":
+            return "dest-map";
+
+        case "bank.inputs":
+        default:
+            return "source-map";
+    }
 }

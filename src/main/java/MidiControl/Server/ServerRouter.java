@@ -97,6 +97,7 @@ public class ServerRouter {
             case "meter-keep-alive" -> handleMeterKeepAlive(session, requestId, payload);
             case "request-channel-names" -> handleRequestChannelNames(session, requestId, payload);
             case "register-session" -> handleRegisterSession(session,requestId,payload);
+            case "set-debug-flag" -> handleSetDebugFlag(session,requestId,payload);
 
             default -> ServerResponses.error(
                 session,
@@ -107,6 +108,27 @@ public class ServerRouter {
         }
     }
 
+    private void handleSetDebugFlag(
+            Session session,
+            String requestId,
+            JsonObject payload)
+    {
+        String flag =
+            payload.get("flag").getAsString();
+
+        boolean enabled =
+            payload.get("enabled").getAsBoolean();
+
+        DebugController.set(flag, enabled);
+
+        logger.info(String.format(
+            "Debug flag %s -> %s",
+            flag,
+            enabled
+        ));
+
+        ServerResponses.ackOk(session, requestId);
+    }
     private void handleRequestChannelNames(Session session, String requestId, JsonObject payload) {
         logger.info("Channel name request: " + requestId);
         Map<String,String> knownNames = ChannelNameAssembler.getChannelNames();

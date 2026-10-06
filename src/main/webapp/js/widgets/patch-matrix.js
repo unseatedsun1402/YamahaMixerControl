@@ -44,8 +44,9 @@ export function renderPatchMatrixOverlay(container) {
         console.info("Rendering Patch Matrix");
     }
 
-    if (!container._sourceMap) {
-        console.error("Source map does not exist and it should!");
+    if (!container._channelMap) {
+        console.error("Channel map does not exist and it should!");
+        return;
     }
 
     const canvas = document.createElement("canvas");
@@ -112,17 +113,41 @@ export function renderPatchMatrixOverlay(container) {
     const minSrc = Number(select.options[0].value);
     const maxSrc = Number(select.options[select.options.length - 1].value);
 
+    const visibleColumns = [];
+
+    for (let src = minSrc; src <= maxSrc; src++) {
+
+        const entry = container._channelMap.find(
+            entry => entry.source === src ||
+                    entry.destination === src
+        );
+
+        const name = entry?.name ?? `S${src}`;
+
+        if (name.toUpperCase() === "NA") {
+            continue;
+        }
+
+        visibleColumns.push({
+            value: src,
+            name
+        });
+    }
+
     const cellW = 52;
     const cellH = 24;
     const labelW = 120;
 
     const dpr = window.devicePixelRatio || 1;
 
-    canvas.width = (labelW + (maxSrc - minSrc + 1) * cellW) * dpr;
+    canvas.width = (labelW + visibleColumns.length * cellW) * dpr;
     canvas.height = (rows.length * cellH) * dpr;
 
-    canvas.style.width = labelW + (maxSrc - minSrc + 1) * cellW + "px";
-    canvas.style.height = rows.length * cellH + "px";
+    canvas.style.width =
+        (labelW + visibleColumns.length * cellW) + "px";
+
+    canvas.style.height =
+    rows.length * cellH + "px";
 
     ctx.scale(dpr, dpr);
 
@@ -134,7 +159,8 @@ export function renderPatchMatrixOverlay(container) {
         maxSrc,
         cellW,
         cellH,
-        labelW
+        labelW,
+        visibleColumns
     };
 
     drawMatrix(container);
@@ -145,8 +171,14 @@ export function renderPatchMatrixOverlay(container) {
 function drawMatrix(container) {
     const canvas = container._canvas;
     const {
-        ctx, rows, minSrc, maxSrc,
-        cellW, cellH, labelW
+        ctx,
+        rows,
+        minSrc,
+        maxSrc,
+        cellW,
+        cellH,
+        labelW,
+        visibleColumns
     } = container._canvasState;
 
     const headerH = 24;
@@ -160,13 +192,10 @@ function drawMatrix(container) {
     ctx.textBaseline = "top";
 
     // header
-    for (let src = minSrc; src <= maxSrc; src++) {
-        const x = marginLeft + labelW + (src - minSrc) * cellW;
-        const sourceMap = container._sourceMap;
-        const entry = sourceMap.find(s => s.source === src);
-        const name = entry ? entry.name : `S${src}`;
-        ctx.fillText(name, x + 4, 4);
-    }
+    visibleColumns.forEach((col, columnIndex) => {
+        const x = marginLeft + labelW + columnIndex * cellW;
+        ctx.fillText(col.name, x + 4, 4);
+    });
 
     // rows
     let destNo = 1;
@@ -180,12 +209,16 @@ function drawMatrix(container) {
         ctx.fillText(`${hidden.dataset.label} ${destNo}`, marginLeft, y + 4);
         destNo ++;
 
-        for (let src = minSrc; src <= maxSrc; src++) {
-            const x = marginLeft + labelW + (src - minSrc) * cellW;
+        visibleColumns.forEach((col, columnIndex) => {
+            const x = marginLeft + labelW + columnIndex * cellW;
 
-            ctx.fillStyle = (src === current) ? "#4da3ff" : "#1a1a1c";
+            ctx.fillStyle =
+                (col.value === current)
+                    ? "#4da3ff"
+                    : "#1a1a1c";
+
             ctx.fillRect(x, y, cellW - 1, cellH - 1);
-        }
+        });
     });
 
     // keep headerH/marginLeft in state for hit‑testing
@@ -196,9 +229,13 @@ function drawMatrix(container) {
 function attachCanvasEvents(container) {
     const canvas = container._canvas;
     const {
-        rows, minSrc, maxSrc,
-        cellW, cellH, labelW,
-        headerH, marginLeft
+        rows,
+        visibleColumns,
+        cellW,
+        cellH,
+        labelW,
+        headerH,
+        marginLeft
     } = container._canvasState;
 
     canvas.addEventListener("click", (e) => {
@@ -215,11 +252,13 @@ function attachCanvasEvents(container) {
 
         if (y < headerH) return;
 
-        const rowIndex = Math.floor((y - headerH) / cellH);
-        const srcIndex = Math.floor((x - (marginLeft + labelW)) / cellW) + minSrc;
+        const columnIndex =
+            Math.floor((x - (marginLeft + labelW)) / cellW);
 
         if (rowIndex < 0 || rowIndex >= rows.length) return;
-        if (srcIndex < minSrc || srcIndex > maxSrc) return;
+        if (columnIndex < 0 || columnIndex >= visibleColumns.length) return;
+
+        const srcIndex = visibleColumns[columnIndex].value;
 
         const [, hidden] = rows[rowIndex];
         const hiddenSelect = hidden.querySelector("select");
