@@ -20,6 +20,7 @@ public class PatchViewBuilder implements ViewBuilder {
 
     private static String deskCache;
     private static List<ChannelSource> sourceCache = List.of();
+    private static List<ChannelDestination> destCache = List.of();
 
     private static final Set<String> OUTPUT_GROUPS = Set.of(
         "kOmniOutput",
@@ -74,7 +75,8 @@ public class PatchViewBuilder implements ViewBuilder {
             // sourceCache = (type == ContextType.CHANNEL)
             //         ? ChannelSourceMapLoader.load(deskModel)
             //         : OutputSourceMapLoader.load(deskModel);
-            sourceCache = ChannelSourceMapLoader.load(deskModel);
+            sourceCache = ChannelMapLoader.loadSources(deskModel);
+            destCache = ChannelMapLoader.loadDestinations(deskModel);
         }
 
         int ch = extractContextIndex(context.getId());
@@ -209,6 +211,40 @@ public class PatchViewBuilder implements ViewBuilder {
             }
 
             new Gson().toJson(sourceCache, resp.getWriter());
+        }
+
+        private static class ErrorResponse {
+            public final String status;
+            public final String message;
+
+            public ErrorResponse(String status, String message) {
+                this.status = status;
+                this.message = message;
+            }
+        }
+    }
+
+    public static class DestinationMapServlet extends HttpServlet {
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws IOException {
+
+            resp.setContentType("application/json");
+            resp.setCharacterEncoding("UTF-8");
+
+            if (deskCache == null || destCache == null || destCache.isEmpty()) {
+
+                ErrorResponse err = new ErrorResponse(
+                    "NO_DEST_MAP",
+                    "Dest map not yet available. UI models may not be loaded."
+                );
+
+                new Gson().toJson(err, resp.getWriter());
+                return;
+            }
+
+            new Gson().toJson(destCache, resp.getWriter());
         }
 
         private static class ErrorResponse {

@@ -391,4 +391,39 @@ export class WebSocketClient {
     this.ws.send(json);
     console.info("[WebSocketClient] Requesting Channel Names", json);
   }
+  
+  setDebugResolution(enabled) {
+      const message = {
+      "type": "set-debug-flag",
+      "payload": {
+        "flag": "resolution",
+        "enabled": enabled
+        }
+      }
+
+      console.info(
+          "[WebSocketClient] Setting Debug Resolution:",
+          enabled
+      );
+
+      this.ws.send(JSON.stringify(message));
+  }
+
+  setCanonicalEvents(enabled) {
+      const message = {
+      "type": "set-debug-flag",
+      "payload": {
+        "flag": "canonical",
+        "enabled": enabled
+        }
+      }
+
+
+      console.info(
+          "[WebSocketClient] Setting Canonical Events:",
+          enabled
+      );
+
+      this.ws.send(JSON.stringify(message));
+  }
 }

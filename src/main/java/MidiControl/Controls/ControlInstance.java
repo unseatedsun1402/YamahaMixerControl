@@ -34,6 +34,10 @@ public class ControlInstance {
         debug = true;
     }
 
+    public static void disableDebug(){
+        debug = false;
+    }
+
     public ControlInstance(SubControl parent,
                         int index,
                         SysexMapping sysex,
@@ -146,7 +150,7 @@ public class ControlInstance {
 
         for (ControlListener l : listeners.values()) {
             l.onControlChanged(this, value);
-            if(debug) logger.info(String.format("UPDATE CONTROLINST @%d -> VAL %d listener @%d",this.hashCode(),value,l.hashCode()));
+            if(debug) logger.info(String.format("UPDATE CONTROLINST %s @%d -> VAL %d listener @%d",this.canonicalId, this.hashCode(),value,l.hashCode()));
         }
 
         return this.value;
