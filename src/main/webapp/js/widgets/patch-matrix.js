@@ -243,18 +243,12 @@ function attachCanvasEvents(container) {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        // const cssMarginLeft = parseInt(window.getComputedStyle(canvas).marginLeft, 10) || 0;
-        // const rawX = e.clientX - rect.left - cssMarginLeft;
-        // const rawY = e.clientY - rect.top;
-
-        // const x = rawX * (canvas.width / parseFloat(canvas.style.width));
-        // const y = rawY * (canvas.height / parseFloat(canvas.style.height));
-
         if (y < headerH) return;
-
+        const rowIndex = Math.floor((y - headerH) / cellH);
         const columnIndex =
             Math.floor((x - (marginLeft + labelW)) / cellW);
 
+        console.log("click",{x,y,rowIndex,columnIndex});
         if (rowIndex < 0 || rowIndex >= rows.length) return;
         if (columnIndex < 0 || columnIndex >= visibleColumns.length) return;
 
@@ -263,9 +257,18 @@ function attachCanvasEvents(container) {
         const [, hidden] = rows[rowIndex];
         const hiddenSelect = hidden.querySelector("select");
 
+        if (!hiddenSelect) {
+            console.error("No hidden select for row", rowIndex);
+            return;
+        }
+
         hiddenSelect.value = String(srcIndex);
-        hiddenSelect.dispatchEvent(new Event("change"));
-        hidden.dispatchEvent(new CustomEvent("control-update", { detail: { value: srcIndex } }));
+        hiddenSelect.dispatchEvent(new Event("change",{bubbles:true}));
+        hidden.dispatchEvent(
+            new CustomEvent("control-update",{
+                detail:{value:srcIndex}
+            })
+        );
 
         drawMatrix(container);
     });

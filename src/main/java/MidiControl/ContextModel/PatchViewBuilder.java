@@ -152,11 +152,16 @@ public class PatchViewBuilder implements ViewBuilder {
         int max = sourceCache.get(sourceCache.size() - 1).source;
 
         String label = switch (type) {
-            case CHANNEL -> "Input Patch";
-            case MIX     -> "Bus Patch";
-            case OUTPUT  -> "Output Patch";
-            default      -> "Patch";
+            case CHANNEL:
+                yield "Input Patch";
+            case MIX:
+                yield "Bus Patch";
+            case OUTPUT:
+                yield ci.getSubcontrol().substring(1);
+            default:
+                yield "Patch";
         };
+
 
         return new ViewControl(
             "PATCH_SELECTOR",
