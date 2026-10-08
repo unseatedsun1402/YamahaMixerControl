@@ -3,6 +3,7 @@ package MidiControl.ContextModel;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -105,25 +106,70 @@ public class OutputContextDiscoverer implements ContextDiscoverer {
 
         List<SubControl> subs = partialMatch(group, family.getSubPrefix());
 
+        logger.info("---- " + family.getGroupName() + " ----");
+        logger.info("Matched " + subs.size() + " subcontrols");
+
+        for (SubControl sc : subs) {
+            logger.info(String.format(
+                "  %s (instances=%d)",
+                sc.getName(),
+                sc.getInstances().size()
+            ));
+        }
+
         if (subs.isEmpty()) {
             for (SubControl sub : group.getSubcontrols().values()) {
                 logger.info(String.format("has sc %s", sub.getName()));
             }
-            logger.info("No subcontrols starting with " + family.getSubPrefix() +
-                        " in " + family.getGroupName());
+
+            logger.info(
+                "No subcontrols starting with "
+                + family.getSubPrefix()
+                + " in "
+                + family.getGroupName()
+            );
+
             return;
         }
 
-        Map<Integer, List<SubControl>> grouped = groupByMiddleNumber(subs, family.getSubPrefix());
+        Map<Integer, List<SubControl>> grouped =
+            groupByMiddleNumber(subs, family.getSubPrefix());
+
         int globalIdx = 0;
 
-        for (var entry : grouped.entrySet()) {
+        for (Map.Entry<Integer, List<SubControl>> entry :
+            grouped.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toList())) {
+
+            logger.info("Group " + entry.getKey());
 
             List<SubControl> slotSubs = entry.getValue();
-            slotSubs.sort(Comparator.comparing(SubControl::getName));
+
+            slotSubs.sort(
+                Comparator.comparing(
+                    sc -> extractMiddleNumber(sc.getName()) == null
+                        ? 0
+                        : extractMiddleNumber(sc.getName())
+                )
+            );
 
             for (SubControl sc : slotSubs) {
-                addContextsForSubControl(sc, out, family, globalIdx);
+
+                logger.info(
+                    "Processing "
+                    + sc.getName()
+                    + " startIndex="
+                    + globalIdx
+                );
+
+                addContextsForSubControl(
+                    sc,
+                    out,
+                    family,
+                    globalIdx
+                );
+
                 globalIdx += sc.getInstances().size();
             }
         }
@@ -168,22 +214,52 @@ public class OutputContextDiscoverer implements ContextDiscoverer {
         }
     }
 
-    private List<SubControl> partialMatch(ControlGroup group, String match) {
-        return group.getSubcontrols().values().stream()
+    private List<SubControl> partialMatch(ControlGroup group,String match) {
+
+        List<SubControl> result =group.getSubcontrols()
+            .values()
+            .stream()
             .filter(sub -> sub.getName().startsWith(match))
-            .sorted((a, b) -> a.getName().compareTo(b.getName()))
             .collect(Collectors.toList());
+
+        logger.info(String.format("partialMatch(%s) returned %d subcontrols", match, result.size()));
+
+        return result;
     }
 
     private Integer extractMiddleNumber(String name) {
-        var m = name.replaceAll("^k.*?(\\d+).*$", "$1");
-        return m.equals(name) ? null : Integer.parseInt(m);
+
+        String result =
+            name.replaceAll("^k.*?(\\d+).*$", "$1");
+
+        if (result.equals(name)) {
+            logger.fine(String.format("No number found in subcontrol: %s",name));
+            return null;
+        }
+
+        return Integer.parseInt(result);
     }
 
-    private Map<Integer, List<SubControl>> groupByMiddleNumber(List<SubControl> subs, String prefix) {
+    private Map<Integer, List<SubControl>> groupByMiddleNumber(
+        List<SubControl> subs,
+        String prefix) {
+
         return subs.stream()
-            .filter(sc -> extractMiddleNumber(sc.getName()) != null)
-            .collect(Collectors.groupingBy(sc -> extractMiddleNumber(sc.getName())));
+            .collect(Collectors.groupingBy(
+                sc -> {
+                    Integer num = extractMiddleNumber(sc.getName());
+
+                    if (num == null) {
+                        logger.info(String.format("No numeric suffix for %s assigning group 0",sc.getName()));
+
+                        return 0;
+                    }
+
+                    return num;
+                },
+                TreeMap::new,
+                Collectors.toList()
+            ));
     }
 
     private String buildLabel(OutputFamily family, int idx) {

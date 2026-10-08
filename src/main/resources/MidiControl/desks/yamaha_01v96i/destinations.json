@@ -1,5 +1,5 @@
 [
-  { "destination": 0,  "name": "NA" },
+  { "destination": 0,  "name": "unassign" },
 
   { "destination": 1,  "name": "Bus 1" },
   { "destination": 2,  "name": "Bus 2" },
