@@ -1,6 +1,7 @@
 package MidiControl.unit.ContextModel;
 
 import MidiControl.ContextModel.*;
+import MidiControl.ContextModel.ViewBuilders.InputChannelSendsOnFaderViewBuilder;
 import MidiControl.Controls.*;
 import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.SysexUtils.SysexMapping;
