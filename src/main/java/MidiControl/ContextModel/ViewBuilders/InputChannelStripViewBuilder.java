@@ -1,4 +1,4 @@
-package MidiControl.ContextModel;
+package MidiControl.ContextModel.ViewBuilders;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import MidiControl.ContextModel.Context;
+import MidiControl.ContextModel.ViewBuilder;
+import MidiControl.ContextModel.ViewControl;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
 
@@ -46,7 +49,7 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
             .filter(ci -> isSendLevel(ci.getSubcontrol()))
             .sorted(Comparator.comparingInt(ci -> extractSendIndex(ci.getSubcontrol())))
             .forEach(ci ->
-                result.add(createSendMix(ci, viewType, viewSuffix, channelIndex))
+                result.add(MidiControl.Controls.Widgets.SendMix.createSendMix(ci, viewType, viewSuffix, channelIndex))
             );
 
         all.stream()
@@ -54,70 +57,13 @@ public class InputChannelStripViewBuilder implements ViewBuilder {
             .filter(ci -> ci.getSubcontrol().equals("kFader"))
             .findFirst()
             .ifPresent(ci ->
-                result.add(createFader(ci, viewType, viewSuffix, channelIndex))
+                result.add(MidiControl.Controls.Widgets.Fader.createFader(ci, viewType, viewSuffix, channelIndex))
             );
 
         return result;
     }
 
-    private ViewControl createSendMix(
-            ControlInstance ci,
-            String viewType,
-            String viewSuffix,
-            int channelIndex
-    ) {
-        int mixIndex = extractSendIndex(ci.getSubcontrol());
 
-        String logicId = "SEND_MIX" + mixIndex;
-        String label = "Mix " + mixIndex;
-
-        return new ViewControl(
-                logicId,
-                "input.send",
-                label,
-                ControlType.KNOB,
-                mixIndex - 1,
-                ci.getMin(),
-                ci.getMax(),
-                ci.getValue(),
-                ci.getSysex().getDefault_value(),
-                ci.getGroup(),
-                ci.getSubcontrol(),
-                ci.getInstanceIndex(),
-                viewType,
-                viewSuffix,
-                "INPUT_SEND_LEVEL",
-                mixIndex,
-                channelIndex
-        );
-    }
-
-    private ViewControl createFader(
-            ControlInstance ci,
-            String viewType,
-            String viewSuffix,
-            int channelIndex
-    ) {
-        return new ViewControl(
-                "FADER",
-                "input.fader",
-                "Fader",
-                ControlType.FADER,
-                0,
-                ci.getMin(),
-                ci.getMax(),
-                ci.getValue(),
-                ci.getSysex().getDefault_value(),
-                ci.getGroup(),
-                ci.getSubcontrol(),
-                ci.getInstanceIndex(),
-                viewType,
-                viewSuffix,
-                "INPUT_FADER",
-                null,
-                channelIndex
-        );
-    }
 
     private int extractContextIndex(String contextId) {
         int dot = contextId.lastIndexOf('.');

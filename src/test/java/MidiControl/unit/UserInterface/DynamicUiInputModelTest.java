@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import MidiControl.ContextModel.ContextDiscoveryEngine;
-import MidiControl.ContextModel.InputChannelStripViewBuilder;
 import MidiControl.ContextModel.ViewRegistry;
+import MidiControl.ContextModel.ViewBuilders.InputChannelStripViewBuilder;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;

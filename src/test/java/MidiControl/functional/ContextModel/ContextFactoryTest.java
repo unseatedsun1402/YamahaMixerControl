@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 
 import MidiControl.ContextModel.Context;
 import MidiControl.ContextModel.ContextFactory;
-import MidiControl.ContextModel.InputChannelStripViewBuilder;
 import MidiControl.ContextModel.ViewBuilder;
 import MidiControl.ContextModel.ViewControl;
+import MidiControl.ContextModel.ViewBuilders.InputChannelStripViewBuilder;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;

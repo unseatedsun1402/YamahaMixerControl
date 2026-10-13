@@ -1,9 +1,14 @@
-package MidiControl.ContextModel;
+package MidiControl.ContextModel.ViewBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import MidiControl.ContextModel.Context;
+import MidiControl.ContextModel.ContextFilter;
+import MidiControl.ContextModel.ControlType;
+import MidiControl.ContextModel.ViewBuilder;
+import MidiControl.ContextModel.ViewControl;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
 
@@ -79,10 +84,7 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
 
         if (fader != null) {
             result.add(
-                    createFader(
-                            fader,
-                            viewType,
-                            viewSuffix));
+                    MidiControl.Controls.Widgets.Fader.createBusFader(fader,viewType,viewSuffix));
         }
 
         ControlInstance pan =findFirst(all,prefix + "Pan","kPan",prefix + "Pan","kBalance");
@@ -276,33 +278,6 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
         return context.getId().startsWith("mix.")
             || context.getId().startsWith("aux.")
             || context.getId().startsWith("stereo.");
-    }
-
-
-    private ViewControl createFader(
-            ControlInstance ci,
-            String viewType,
-            String viewSuffix) {
-
-        return new ViewControl(
-                "FADER",
-                "bus.fader",
-                "Fader",
-                ControlType.FADER,
-                0,
-                ci.getMin(),
-                ci.getMax(),
-                ci.getValue(),
-                ci.getSysex().getDefault_value(),
-                ci.getGroup(),
-                ci.getSubcontrol(),
-                ci.getInstanceIndex(),
-                viewType,
-                viewSuffix,
-                "BUS_FADER",
-                null,
-                ci.getInstanceIndex()
-        );
     }
 
     private ViewControl createControl( ControlInstance ci,String logicalId,String uiGroup,String label,

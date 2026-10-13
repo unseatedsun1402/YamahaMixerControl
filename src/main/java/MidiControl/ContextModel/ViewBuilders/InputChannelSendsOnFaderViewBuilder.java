@@ -1,4 +1,4 @@
-package MidiControl.ContextModel;
+package MidiControl.ContextModel.ViewBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import MidiControl.ContextModel.Context;
+import MidiControl.ContextModel.ControlType;
+import MidiControl.ContextModel.ViewBuilder;
+import MidiControl.ContextModel.ViewControl;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
 
@@ -54,16 +58,11 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (channelOn != null) {
-            result.add(createControl(
+            result.add(MidiControl.Controls.Widgets.ChannelOn.createChannelOn(
                     channelOn,
-                    "CHANNEL_ON",
-                    "input.control",
-                    "Channel On",
-                    ControlType.TOGGLE,
                     viewType,
                     viewSuffix,
-                    "INPUT_CHANNEL_ON",
-                    null));
+                    channelIndex));
         }
 
         // PAN
@@ -80,16 +79,7 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (pan != null) {
-            result.add(createControl(
-                    pan,
-                    "PAN",
-                    "input.pan",
-                    "Pan",
-                    ControlType.SLIDER_HORIZONTAL,
-                    viewType,
-                    viewSuffix,
-                    "INPUT_PAN",
-                    null));
+            result.add(MidiControl.Controls.Widgets.Pan.createPan(pan, viewType, viewSuffix, channelIndex));
         }
 
         // EQ1
@@ -106,7 +96,7 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (eq1 != null) {
-            result.add(createControl(
+            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
                     eq1,
                     "EQ1G",
                     "input.eq",
@@ -132,7 +122,7 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (eq2 != null) {
-            result.add(createControl(
+            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
                     eq2,
                     "EQ2G",
                     "input.eq",
@@ -158,7 +148,7 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (eq3 != null) {
-            result.add(createControl(
+            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
                     eq3,
                     "EQ3G",
                     "input.eq",
@@ -184,7 +174,7 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (eq4 != null) {
-            result.add(createControl(
+            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
                     eq4,
                     "EQ4G",
                     "input.eq",
@@ -209,7 +199,7 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (dyn1On != null) {
-            result.add(createControl(
+            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
                     dyn1On,
                     "DYN1_ON",
                     "input.dynamics",
@@ -250,7 +240,7 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (dyn2On != null) {
-            result.add(createControl(
+            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
                 dyn2On,
                 "DYN2_ON",
                 "input.dynamics",
@@ -263,7 +253,7 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (dyn2Ratio != null){
-            result.add(createControl(
+            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
                 dyn2Ratio,
                 "DYN2_RATIO",
                 "input.dynamics",
@@ -276,7 +266,7 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (dyn2Thresh != null){
-            result.add(createControl(
+            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
                     dyn2Thresh,
                 "THRESHOLD",
                 "input.dynamics",
@@ -314,7 +304,7 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
                 .filter(ci -> sendMatchesTargetBus(ci.getSubcontrol()))
                 .findFirst()
                 .ifPresentOrElse(
-                        ci -> result.add(createSendAsFader(ci, viewType, viewSuffix)),
+                        ci -> result.add(MidiControl.Controls.Widgets.Fader.createSendAsFader(ci, viewType, viewSuffix, targetBusId)),
                         () -> {
                             if(! targetBusId.contains("EDIT")) logger.warning("SOF: No matching send found for " + targetBusId);
                         }
@@ -339,69 +329,5 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         String busId = type + index;
 
         return busId.equalsIgnoreCase(targetBusId);
-    }
-
-    private int extractSendIndex(String subcontrol) {
-        Matcher m = SEND_PATTERN.matcher(subcontrol);
-        if (!m.matches()) return -1;
-        return Integer.parseInt(m.group(2));
-    }
-
-    private ViewControl createSendAsFader(ControlInstance ci, String viewType, String viewSuffix) {
-
-        int sendIndex = extractSendIndex(ci.getSubcontrol());
-        String logicId = "SEND_" + targetBusId;
-
-        return new ViewControl(
-                logicId,
-                "input.send.sof",
-                targetBusId,
-                ControlType.FADER,
-                0,
-                ci.getMin(),
-                ci.getMax(),
-                ci.getValue(),
-                ci.getSysex().getDefault_value(),
-                ci.getGroup(),
-                ci.getSubcontrol(),
-                ci.getInstanceIndex(),
-                viewType,
-                viewSuffix,
-                "INPUT_SEND_LEVEL",
-                sendIndex,
-                ci.getInstanceIndex()
-        );
-    }
-
-    private ViewControl createControl(
-        ControlInstance ci,
-        String logicalId,
-        String uiGroup,
-        String label,
-        ControlType type,
-        String viewType,
-        String viewSuffix,
-        String role,
-        Integer sendIndex) {
-
-        return new ViewControl(
-                logicalId,
-                uiGroup,
-                label,
-                type,
-                0,
-                ci.getMin(),
-                ci.getMax(),
-                ci.getValue(),
-                ci.getSysex().getDefault_value(),
-                ci.getGroup(),
-                ci.getSubcontrol(),
-                ci.getInstanceIndex(),
-                viewType,
-                viewSuffix,
-                role,
-                sendIndex,
-                ci.getInstanceIndex()
-        );
     }
 }

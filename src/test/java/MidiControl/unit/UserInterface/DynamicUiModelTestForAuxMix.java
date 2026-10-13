@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import MidiControl.ContextModel.Context;
 import MidiControl.ContextModel.ContextDiscoveryEngine;
-import MidiControl.ContextModel.MixAuxBusViewBuilder;
 import MidiControl.ContextModel.ViewRegistry;
+import MidiControl.ContextModel.ViewBuilders.MixAuxBusViewBuilder;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;

@@ -1,6 +1,7 @@
 package MidiControl.unit.ContextModel;
 
 import MidiControl.ContextModel.*;
+import MidiControl.ContextModel.ViewBuilders.EditChannelStripViewBuilder;
 import MidiControl.Controls.ControlGroup;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.Controls.SubControl;
