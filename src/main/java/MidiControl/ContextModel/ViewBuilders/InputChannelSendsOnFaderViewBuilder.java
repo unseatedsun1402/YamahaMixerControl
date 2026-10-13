@@ -96,16 +96,11 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (eq1 != null) {
-            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
-                    eq1,
-                    "EQ1G",
-                    "input.eq",
-                    "EQ 1 Gain",
-                    ControlType.SLIDER_HORIZONTAL,
-                    viewType,
-                    viewSuffix,
-                    "INPUT_EQ1_GAIN",
-                    null));
+            result.add(
+                    MidiControl.Controls.Widgets.EQ.createEq1Gain(
+                            eq1,
+                            viewType,
+                            viewSuffix));
         }
 
         // EQ2
@@ -122,16 +117,11 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (eq2 != null) {
-            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
-                    eq2,
-                    "EQ2G",
-                    "input.eq",
-                    "EQ 2 Gain",
-                    ControlType.SLIDER_HORIZONTAL,
-                    viewType,
-                    viewSuffix,
-                    "INPUT_EQ2_GAIN",
-                    null));
+            result.add(
+                    MidiControl.Controls.Widgets.EQ.createEq2Gain(
+                            eq1,
+                            viewType,
+                            viewSuffix));
         }
 
         // EQ3
@@ -148,16 +138,11 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (eq3 != null) {
-            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
-                    eq3,
-                    "EQ3G",
-                    "input.eq",
-                    "EQ 3 Gain",
-                    ControlType.SLIDER_HORIZONTAL,
-                    viewType,
-                    viewSuffix,
-                    "INPUT_EQ3_GAIN",
-                    null));
+            result.add(
+                    MidiControl.Controls.Widgets.EQ.createEq3Gain(
+                            eq1,
+                            viewType,
+                            viewSuffix));
         }
 
         // EQ4
@@ -174,16 +159,11 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
         }
 
         if (eq4 != null) {
-            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
-                    eq4,
-                    "EQ4G",
-                    "input.eq",
-                    "EQ 4 Gain",
-                    ControlType.SLIDER_HORIZONTAL,
-                    viewType,
-                    viewSuffix,
-                    "INPUT_EQ4_GAIN",
-                    null));
+            result.add(
+                    MidiControl.Controls.Widgets.EQ.createEq4Gain(
+                            eq1,
+                            viewType,
+                            viewSuffix));
         }
 
         // GATE/DYN1
