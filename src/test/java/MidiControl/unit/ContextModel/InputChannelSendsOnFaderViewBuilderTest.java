@@ -7,10 +7,14 @@ import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.SysexUtils.SysexMapping;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class InputChannelSendsOnFaderViewBuilderTest {
@@ -181,6 +185,48 @@ public class InputChannelSendsOnFaderViewBuilderTest {
         assertFalse(contains(controls, "SEND_MIX1"), "No matching send exists, so SEND_MIX1 should not be present");
         assertFalse(contains(controls, "CHANNEL_ON"));
         assertFalse(contains(controls, "PAN"));
+    }
+
+    @Test
+    public void testSendsOnFaderIncludesAllEqBandParameters() {
+        MockCanonicalRegistry registry = new MockCanonicalRegistry();
+        ControlGroup eq = new ControlGroup("kInputEQ");
+
+        for (String band : List.of("kEQ1", "kEQ2", "kEQ3", "kEQ4")) {
+            for (String parameter : List.of("G", "F", "Q")) {
+                String subcontrol = band + parameter;
+                SubControl sub = new SubControl(eq, subcontrol);
+                ControlInstance instance = new ControlInstance(
+                        sub,
+                        0,
+                        dummyMapping("kInputEQ", subcontrol, 0, 127),
+                        null);
+                sub.addInstance(instance);
+                eq.getSubcontrols().put(subcontrol, sub);
+
+                registry.contextLookup
+                        .computeIfAbsent(0, ignored -> new HashMap<>())
+                        .put("kInputEQ|" + subcontrol, instance);
+            }
+        }
+
+        registry.getGroups().put("kInputEQ", eq);
+
+        List<ViewControl> controls =
+                new InputChannelSendsOnFaderViewBuilder().build(channel0(), registry, "mix1");
+
+        List<ViewControl> eqControls = controls.stream()
+                .filter(control -> "input.eq".equals(control.uiGroup))
+                .toList();
+        assertEquals(12, eqControls.size());
+        assertEquals(Set.of(
+                        "kInputEQ.kEQ1G.0", "kInputEQ.kEQ1F.0", "kInputEQ.kEQ1Q.0",
+                        "kInputEQ.kEQ2G.0", "kInputEQ.kEQ2F.0", "kInputEQ.kEQ2Q.0",
+                        "kInputEQ.kEQ3G.0", "kInputEQ.kEQ3F.0", "kInputEQ.kEQ3Q.0",
+                        "kInputEQ.kEQ4G.0", "kInputEQ.kEQ4F.0", "kInputEQ.kEQ4Q.0"),
+                eqControls.stream()
+                        .map(control -> control.canonicalId)
+                        .collect(Collectors.toSet()));
     }
 
     private boolean contains(List<ViewControl> list, String logicalId) {

@@ -1,6 +1,8 @@
 package MidiControl.unit.ContextModel;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -106,45 +108,19 @@ public class MixAuxBusViewBuilderTest {
         ControlGroup eq =
                 new ControlGroup("kMixEQ");
 
-        SubControl eq1 =
-                new SubControl(
-                        eq,
-                        "kEQ1G");
-
-        eq1.addInstance(
-                new ControlInstance(
-                        eq1,
+        String[] bands = {"kEQ1", "kEQ2", "kEQ3", "kEQ4"};
+        for (String band : bands) {
+            for (String parameter : List.of("G", "F", "Q")) {
+                String subcontrol = band + parameter;
+                SubControl sub = new SubControl(eq, subcontrol);
+                sub.addInstance(new ControlInstance(
+                        sub,
                         0,
-                        dummyMapping(
-                                "kMixEQ",
-                                "kEQ1G",
-                                0,
-                                127),
+                        dummyMapping("kMixEQ", subcontrol, 0, 127),
                         null));
-
-        SubControl eq2 =
-                new SubControl(
-                        eq,
-                        "kEQ2G");
-
-        eq2.addInstance(
-                new ControlInstance(
-                        eq2,
-                        0,
-                        dummyMapping(
-                                "kMixEQ",
-                                "kEQ2G",
-                                0,
-                                127),
-                        null));
-
-        eq.getSubcontrols().put(
-                "kEQ1G",
-                eq1);
-
-        eq.getSubcontrols().put(
-                "kEQ2G",
-                eq2);
+                eq.getSubcontrols().put(subcontrol, sub);
+            }
+        }
 
         registry.getGroups().put(
                 "kMixEQ",
@@ -172,15 +148,18 @@ public class MixAuxBusViewBuilderTest {
                                 registry,
                                 null);
 
-        assertTrue(
+        assertEquals(12, controls.stream()
+                .filter(c -> "input.eq".equals(c.uiGroup))
+                .count());
+        assertEquals(Set.of(
+                        "kMixEQ.kEQ1G.0", "kMixEQ.kEQ1F.0", "kMixEQ.kEQ1Q.0",
+                        "kMixEQ.kEQ2G.0", "kMixEQ.kEQ2F.0", "kMixEQ.kEQ2Q.0",
+                        "kMixEQ.kEQ3G.0", "kMixEQ.kEQ3F.0", "kMixEQ.kEQ3Q.0",
+                        "kMixEQ.kEQ4G.0", "kMixEQ.kEQ4F.0", "kMixEQ.kEQ4Q.0"),
                 controls.stream()
-                        .anyMatch(c ->
-                                "EQ1G".equals(c.logicId)));
-
-        assertTrue(
-                controls.stream()
-                        .anyMatch(c ->
-                                "EQ2G".equals(c.logicId)));
+                        .filter(c -> "input.eq".equals(c.uiGroup))
+                        .map(c -> c.canonicalId)
+                        .collect(Collectors.toSet()));
     }    
 
     private boolean contains(List<ViewControl> list, String logicalId) {

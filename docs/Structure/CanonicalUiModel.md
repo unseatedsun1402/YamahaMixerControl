@@ -63,6 +63,16 @@ For each band `b = 1..4`:
 Global EQ toggle:
 - `EQ_ON` — TOGGLE — “EQ On”
 
+### Edit-channel EQ presets
+The edit-channel view exposes each available EQ band's gain, frequency, and Q
+controls to the EQ widget. Its tone-shape selector includes Vocal, Electric
+Guitar, Acoustic Guitar, Bass, Punchy Kick, Thick Wub Kick, Bright Tilt, and
+Warm Tilt presets. Presets send values through the controls' canonical hardware
+IDs: gain targets use each mapping's declared dB range, frequency targets are
+mapped logarithmically across the desk's control range, and Q targets are
+normalized to that desk's range. Bands or parameters absent from a desk are
+skipped. Changing a visible band gain returns the selector to Manual / current.
+
 ### kInputDynamics (optional)
 - `GATE_ON` — TOGGLE
 - `GATE_THRESH` — KNOB

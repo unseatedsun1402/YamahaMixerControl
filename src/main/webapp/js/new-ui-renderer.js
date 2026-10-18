@@ -50,7 +50,7 @@ function enhanceCompositeWidgets(stripEl) {
 
             const hasEQ =
                 section.querySelector(
-                    '[data-role="INPUT_EQ1_GAIN"]'
+                    '[data-role^="INPUT_EQ"][data-role$="_GAIN"]'
                 );
 
             const hasChannelOn =

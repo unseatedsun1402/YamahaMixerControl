@@ -37,6 +37,8 @@ public class ViewControl {
     public boolean stepped = false;
     public boolean readOnly = false;
     public String unit = null;
+    public Double unitMin = null;
+    public Double unitMax = null;
 
     public List<ControlInstance> multi = null;
 

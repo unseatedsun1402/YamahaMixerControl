@@ -180,89 +180,7 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
         }
 
 
-        ControlInstance eq1 =
-                findFirst(
-                        all,
-                        prefix + "EQ",
-                        "kEQ1G",
-                        "kAUXEQ",
-                        "kEQLowG");
-
-        ControlInstance eq2 =
-                findFirst(
-                        all,
-                        prefix + "EQ",
-                        "kEQ2G",
-                        "kAUXEQ",
-                        "kEQLowMidQ");
-
-        ControlInstance eq3 =
-                findFirst(
-                        all,
-                        prefix + "EQ",
-                        "kEQ3G",
-                        "kAUXEQ",
-                        "kEQHiMidG");
-
-        ControlInstance eq4 =
-                findFirst(
-                        all,
-                        prefix + "EQ",
-                        "kEQ4G",
-                        "kAUXEQ",
-                        "kEQHiQ");
-
-        if (eq1 != null) {
-            result.add(createControl(
-                    eq1,
-                    "EQ1G",
-                    "input.eq",
-                    "EQ 1 Gain",
-                    ControlType.SLIDER_HORIZONTAL,
-                    viewType,
-                    viewSuffix,
-                    "INPUT_EQ1_GAIN",
-                    null));
-        }
-
-        if (eq2 != null) {
-            result.add(createControl(
-                    eq2,
-                    "EQ2G",
-                    "input.eq",
-                    "EQ 2 Gain",
-                    ControlType.SLIDER_HORIZONTAL,
-                    viewType,
-                    viewSuffix,
-                    "INPUT_EQ2_GAIN",
-                    null));
-        }
-
-        if (eq3 != null) {
-            result.add(createControl(
-                    eq3,
-                    "EQ3G",
-                    "input.eq",
-                    "EQ 3 Gain",
-                    ControlType.SLIDER_HORIZONTAL,
-                    viewType,
-                    viewSuffix,
-                    "INPUT_EQ3_GAIN",
-                    null));
-        }
-
-        if (eq4 != null) {
-            result.add(createControl(
-                    eq4,
-                    "EQ4G",
-                    "input.eq",
-                    "EQ 4 Gain",
-                    ControlType.SLIDER_HORIZONTAL,
-                    viewType,
-                    viewSuffix,
-                    "INPUT_EQ4_GAIN",
-                    null));
-        }
+        addEqControls(result, all, prefix, viewType, viewSuffix);
 
         System.out.println("controls = " + result.size());
 
@@ -278,6 +196,40 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
         return context.getId().startsWith("mix.")
             || context.getId().startsWith("aux.")
             || context.getId().startsWith("stereo.");
+    }
+
+    private void addEqControls(
+            List<ViewControl> result,
+            List<ControlInstance> controls,
+            String prefix,
+            String viewType,
+            String viewSuffix
+    ) {
+        String[] legacyBandNames = {"kEQLow", "kEQLowMid", "kEQHiMid", "kEQHi"};
+
+        for (int band = 0; band < legacyBandNames.length; band++) {
+            int bandNumber = band + 1;
+            String canonicalPrefix = "kEQ" + bandNumber;
+            String legacyPrefix = legacyBandNames[band];
+
+            for (char parameter : new char[] {'G', 'F', 'Q'}) {
+                ControlInstance control = findFirst(
+                        controls,
+                        prefix + "EQ",
+                        canonicalPrefix + parameter,
+                        "kAUXEQ",
+                        legacyPrefix + parameter);
+
+                if (control != null) {
+                    result.add(MidiControl.Controls.Widgets.EQ.createEqBandControl(
+                            control,
+                            bandNumber,
+                            parameter,
+                            viewType,
+                            viewSuffix));
+                }
+            }
+        }
     }
 
     private ViewControl createControl( ControlInstance ci,String logicalId,String uiGroup,String label,
