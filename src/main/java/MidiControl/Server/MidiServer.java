@@ -203,6 +203,9 @@ public class MidiServer implements Runnable, UiModelService{
     @PreDestroy
     public void shutdown() {
         logger.info("Server is shutting down");
+        if (livenessMonitor != null) {
+            livenessMonitor.stopMonitoring();
+        }
         deviceManager.shutdown();
         MidiProcessingLoop.shutdown();
         logger.info("Shutdown finished");

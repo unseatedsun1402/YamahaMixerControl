@@ -2,19 +2,32 @@
     "Free for hobbyists, students, churches, and personal use.
      Commercial use requires a commercial license."
 ## ====== PREREQUISITES =====
-You need to setup the tomcat server, and this project was previously compiled using the java jdk version 21 but I decided thats unnecessarily high, so it now compiles to support jdk 18. This can be downloaded either from oracle or open JDK. You want to set this as your JRE_HOME value. It can be higher if you have that installed but nothing lower. Please follow the Tomcat setup carefully including you environment variables. I have teststed using JAVA_HOME for java 1.8 and JRE_HOME version 18
+The application runs as a self-contained Spring Boot executable JAR with an
+embedded Tomcat server; installing or configuring Tomcat separately is no
+longer required. Install JDK 18 or newer and make sure `java` is on your PATH.
 
-Then you can either try to make changes if you want and build this yourself and deploy a custom version or use whatever is in the build/libs/ section and deploy what I have built. Use an ide with gradle support like netbeans and import this project and create the war file.
+To build the executable:
 
-Take this war file, rename this to MidiControl.war (this matters for file path reasons) and drop it into the webapps area of the tomcat program filespace. This should unpack and you'll have a folder in the same directory with the same name. You dont need to remove the .war, in fact please dont remove it unless your are replacing it entirely.
+```powershell
+.\gradlew.bat clean bootJar
+```
 
-Run the tomcat server and go to http://127.0.0.1:8080/MidiControl
+Run it with:
+
+```powershell
+java -jar .\build\libs\YamahaMixerControl.jar
+```
+
+The application is available at http://127.0.0.1:8080/MidiControl. Stop it
+with Ctrl+C; the MIDI server shuts down with the embedded web server.
 ## ===== Model Support =====
 Currently this has been tested on both the Yamaha 01V96i and the Yamaha M7CL
 for this to work make sure control change tx and rx are enabled and that the desk is set to NRPN mode for remote control and that **fader resolution is hi res**, _it used to be low_ but now I normalize these values in the program as this reduces the setup for the engineer/end user. The gui is using low res and then this is scaled up to be sent back to the mixer. I plan to support hi res later in the gui but in most contexts, remote mixing from a phone for in ear mixes this should be sufficient.
 ## ===== Usage ======
 
-Load the index at https://<ip-address-of-server>:8080/MidiControl/settings.html and use the selectors to assign the input and output interfaces of the server to the yamaha desk
+Load the index at http://<ip-address-of-server>:8080/MidiControl/settings.html
+and use the selectors to assign the input and output interfaces of the server
+to the Yamaha desk.
 
 When the output is set you should be able to move faders and if the desk is receiving correctly faders on the desk should respond.
 
