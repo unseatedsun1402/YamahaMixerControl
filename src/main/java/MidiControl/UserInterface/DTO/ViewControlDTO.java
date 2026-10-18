@@ -22,6 +22,8 @@ public class ViewControlDTO {
     public boolean stepped;
     public boolean readOnly;
     public String unit;
+    public Double unitMin;
+    public Double unitMax;
 
     public String controlRole;
     public Integer sendIndex;

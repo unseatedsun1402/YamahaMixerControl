@@ -82,89 +82,7 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
             result.add(MidiControl.Controls.Widgets.Pan.createPan(pan, viewType, viewSuffix, channelIndex));
         }
 
-        // EQ1
-
-        ControlInstance eq1 =
-                registry.find(channelIndex,
-                            "kInputEQ",
-                            "kEQ1G");
-
-        if (eq1 == null) {
-            eq1 = registry.find(channelIndex,
-                                "kInputEQ",
-                                "kEQLowG");
-        }
-
-        if (eq1 != null) {
-            result.add(
-                    MidiControl.Controls.Widgets.EQ.createEq1Gain(
-                            eq1,
-                            viewType,
-                            viewSuffix));
-        }
-
-        // EQ2
-
-        ControlInstance eq2 =
-                registry.find(channelIndex,
-                            "kInputEQ",
-                            "kEQ2G");
-
-        if (eq2 == null) {
-            eq2 = registry.find(channelIndex,
-                                "kInputEQ",
-                                "kEQLowMidG");
-        }
-
-        if (eq2 != null) {
-            result.add(
-                    MidiControl.Controls.Widgets.EQ.createEq2Gain(
-                            eq1,
-                            viewType,
-                            viewSuffix));
-        }
-
-        // EQ3
-
-        ControlInstance eq3 =
-                registry.find(channelIndex,
-                            "kInputEQ",
-                            "kEQ3G");
-
-        if (eq3 == null) {
-            eq3 = registry.find(channelIndex,
-                                "kInputEQ",
-                                "kEQHiMidG");
-        }
-
-        if (eq3 != null) {
-            result.add(
-                    MidiControl.Controls.Widgets.EQ.createEq3Gain(
-                            eq1,
-                            viewType,
-                            viewSuffix));
-        }
-
-        // EQ4
-
-        ControlInstance eq4 =
-                registry.find(channelIndex,
-                            "kInputEQ",
-                            "kEQ4G");
-
-        if (eq4 == null) {
-            eq4 = registry.find(channelIndex,
-                                "kInputEQ",
-                                "kEQHiG");
-        }
-
-        if (eq4 != null) {
-            result.add(
-                    MidiControl.Controls.Widgets.EQ.createEq4Gain(
-                            eq1,
-                            viewType,
-                            viewSuffix));
-        }
+        addEqControls(result, registry, channelIndex, viewType, viewSuffix);
 
         // GATE/DYN1
 
@@ -291,6 +209,45 @@ public class InputChannelSendsOnFaderViewBuilder implements ViewBuilder {
                 );
 
         return result;
+    }
+
+    private void addEqControls(
+            List<ViewControl> result,
+            CanonicalRegistry registry,
+            int channelIndex,
+            String viewType,
+            String viewSuffix
+    ) {
+        String[] legacyBandNames = {"kEQLow", "kEQLowMid", "kEQHiMid", "kEQHi"};
+
+        for (int band = 0; band < legacyBandNames.length; band++) {
+            int bandNumber = band + 1;
+            String canonicalPrefix = "kEQ" + bandNumber;
+            String legacyPrefix = legacyBandNames[band];
+
+            for (char parameter : new char[] {'G', 'F', 'Q'}) {
+                ControlInstance control = registry.find(
+                        channelIndex,
+                        "kInputEQ",
+                        canonicalPrefix + parameter);
+
+                if (control == null) {
+                    control = registry.find(
+                            channelIndex,
+                            "kInputEQ",
+                            legacyPrefix + parameter);
+                }
+
+                if (control != null) {
+                    result.add(MidiControl.Controls.Widgets.EQ.createEqBandControl(
+                            control,
+                            bandNumber,
+                            parameter,
+                            viewType,
+                            viewSuffix));
+                }
+            }
+        }
     }
 
 

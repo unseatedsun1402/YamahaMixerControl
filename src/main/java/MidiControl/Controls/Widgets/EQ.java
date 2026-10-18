@@ -1,10 +1,16 @@
 package MidiControl.Controls.Widgets;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import MidiControl.ContextModel.ControlType;
 import MidiControl.ContextModel.ViewControl;
 import MidiControl.Controls.ControlInstance;
 
 public class EQ {
+    private static final Pattern GAIN_RANGE_PATTERN =
+            Pattern.compile("(-?\\d+(?:\\.\\d+)?)\\s*dB\\s*-\\s*\\+?(-?\\d+(?:\\.\\d+)?)\\s*dB", Pattern.CASE_INSENSITIVE);
+
     private static ViewControl createEqControl(
             ControlInstance ci,
             String logicId,
@@ -13,7 +19,7 @@ public class EQ {
             String viewType,
             String viewSuffix
     ) {
-        return new ViewControl(
+        ViewControl control = new ViewControl(
                 logicId,
                 "input.eq",
                 displayName,
@@ -32,6 +38,53 @@ public class EQ {
                 null,
                 ci.getInstanceIndex()
         );
+
+        if (logicId.endsWith("G")) {
+            control.unit = "dB";
+            String comment = ci.getSysex().getComment();
+            if (comment != null) {
+                Matcher gainRange = GAIN_RANGE_PATTERN.matcher(comment);
+                if (gainRange.find()) {
+                    control.unitMin = Double.parseDouble(gainRange.group(1));
+                    control.unitMax = Double.parseDouble(gainRange.group(2));
+                }
+            }
+        }
+
+        return control;
+    }
+
+    public static ViewControl createEqBandControl(
+            ControlInstance ci,
+            int band,
+            char parameter,
+            String viewType,
+            String viewSuffix
+    ) {
+        return switch (parameter) {
+            case 'G' -> switch (band) {
+                case 1 -> createEq1Gain(ci, viewType, viewSuffix);
+                case 2 -> createEq2Gain(ci, viewType, viewSuffix);
+                case 3 -> createEq3Gain(ci, viewType, viewSuffix);
+                case 4 -> createEq4Gain(ci, viewType, viewSuffix);
+                default -> throw new IllegalArgumentException("Unsupported EQ band: " + band);
+            };
+            case 'F' -> switch (band) {
+                case 1 -> createEq1Frequency(ci, viewType, viewSuffix);
+                case 2 -> createEq2Frequency(ci, viewType, viewSuffix);
+                case 3 -> createEq3Frequency(ci, viewType, viewSuffix);
+                case 4 -> createEq4Frequency(ci, viewType, viewSuffix);
+                default -> throw new IllegalArgumentException("Unsupported EQ band: " + band);
+            };
+            case 'Q' -> switch (band) {
+                case 1 -> createEq1Q(ci, viewType, viewSuffix);
+                case 2 -> createEq2Q(ci, viewType, viewSuffix);
+                case 3 -> createEq3Q(ci, viewType, viewSuffix);
+                case 4 -> createEq4Q(ci, viewType, viewSuffix);
+                default -> throw new IllegalArgumentException("Unsupported EQ band: " + band);
+            };
+            default -> throw new IllegalArgumentException("Unsupported EQ parameter: " + parameter);
+        };
     }
 
     public static ViewControl createEq1Gain(ControlInstance ci,String viewType,String viewSuffix)

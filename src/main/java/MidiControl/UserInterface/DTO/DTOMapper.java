@@ -47,6 +47,8 @@ public class DTOMapper {
         dto.stepped = vc.stepped;
         dto.readOnly = vc.readOnly;
         dto.unit = vc.unit;
+        dto.unitMin = vc.unitMin;
+        dto.unitMax = vc.unitMax;
         
         dto.controlRole = vc.controlRole;
         dto.sendIndex = vc.sendIndex;
