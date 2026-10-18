@@ -3,6 +3,7 @@
 *.bins
 
 #ignore build
+build/
 build/tmp
 build/resources
 build/classes/

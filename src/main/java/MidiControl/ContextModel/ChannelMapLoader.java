@@ -1,9 +1,9 @@
 package MidiControl.ContextModel;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 import java.lang.reflect.Type;
 
@@ -14,7 +14,7 @@ public class ChannelMapLoader {
     private static Logger logger = Logger.getLogger(ChannelMapLoader.class.getName());
 
     public static List<ChannelSource> loadSources(String deskModel) {
-        String resourceName = "MidiControl" + File.separator + "desks" + File.separator + deskModel.toLowerCase() + File.separator + "sources.json";
+        String resourceName = "MidiControl/desks/" + deskModel.toLowerCase(Locale.ROOT) + "/sources.json";
 
         try (InputStream is =
                 ChannelMapLoader.class.getClassLoader().getResourceAsStream(resourceName)) {
@@ -36,7 +36,7 @@ public class ChannelMapLoader {
     }
 
     public static List<ChannelDestination> loadDestinations(String deskModel) {
-        String resourceName = "MidiControl" + File.separator + "desks" + File.separator + deskModel.toLowerCase() + File.separator + "destinations.json";
+        String resourceName = "MidiControl/desks/" + deskModel.toLowerCase(Locale.ROOT) + "/destinations.json";
 
         try (InputStream is =
                 ChannelMapLoader.class.getClassLoader().getResourceAsStream(resourceName)) {

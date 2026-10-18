@@ -1,13 +1,20 @@
-apply plugin: 'java'
-apply plugin: 'jacoco'
-apply plugin: 'war'
+plugins {
+    
+    id 'java'
+    id 'jacoco'
+    id 'org.springframework.boot' version '3.5.6'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    providedCompile 'jakarta.platform:jakarta.jakartaee-web-api:10.0.0'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket'
+
     // Align all JUnit modules
     testImplementation platform('org.junit:junit-bom:5.10.2')
 
@@ -19,11 +26,28 @@ dependencies {
     // Runtime engine + launcher (must be explicit!)
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
     implementation group: 'com.google.zxing', name: 'javase', version:'3.5.1'
     implementation 'com.google.zxing:core:3.5.1'
+}
+
+tasks.named('processResources') {
+    from('src/main/webapp') {
+        into 'static'
+        exclude 'WEB-INF/**'
+        exclude 'META-INF/**'
+    }
+}
+
+tasks.named('jar') {
+    enabled = false
+}
+
+springBoot {
+    mainClass = 'MidiControl.MidiControlApplication'
 }
 
 java {
