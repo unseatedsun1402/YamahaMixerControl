@@ -41,6 +41,7 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
                     case "mix" -> "kMix";
                     case "aux" -> "kAUX";
                     case "stereo" -> "kStereo";
+                    case "edit" -> "kInput";
                     default -> null;
                 };
 

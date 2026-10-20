@@ -31,7 +31,7 @@ public class NrpnRegistry {
             NrpnMapping[] loaded = gson.fromJson(new InputStreamReader(input), NrpnMapping[].class);
             replace(List.of(loaded));
 
-            logger.info("Loaded " + loaded.length + " NRPN mappings from classpath.");
+            logger.info(String.format("Loaded %d  NRPN mappings from classpath.",loaded.length));
         } catch (Exception e) {
             logger.severe("Failed to load NRPN mappings from classpath: " + e.getMessage());
         }
@@ -49,12 +49,12 @@ public class NrpnRegistry {
     public synchronized void replace(List<NrpnMapping> newMappings) {
         mappings.clear();
         mappings.addAll(newMappings);
-        logger.info("NRPN registry replaced with " + newMappings.size() + " mappings.");
+        logger.info(String.format("NRPN registry replaced with %d mappings",newMappings.size()));
     }
 
     public synchronized void merge(List<NrpnMapping> moreMappings) {
         mappings.addAll(moreMappings);
-        logger.info("Merged " + moreMappings.size() + " NRPN mappings (total now " + mappings.size() + ").");
+        logger.info(String.format("Merged %d NRPN mappings (total now %d ).",moreMappings.size(),mappings.size()));
     }
 
     public synchronized void clear() {
