@@ -15,6 +15,7 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.SysexMessage;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -32,6 +33,14 @@ import MidiControl.Server.Rehydration.RehydrationManager;
 import MidiControl.SysexUtils.SysexMapping;
 
 public class DiscoveryTest {
+    private ScheduledExecutorService timeoutScheduler;
+
+    @AfterEach
+    void shutDownTimeoutScheduler() {
+        if (timeoutScheduler != null) {
+            timeoutScheduler.shutdownNow();
+        }
+    }
 
     private static final class TestMidiDeviceInfo extends javax.sound.midi.MidiDevice.Info {
         private TestMidiDeviceInfo(String name, String vendor, String description, String version) {
@@ -150,7 +159,7 @@ public class DiscoveryTest {
             inst.updateValue(1);
         });
 
-        ScheduledExecutorService timeoutScheduler = Executors.newScheduledThreadPool(1);
+        timeoutScheduler = Executors.newScheduledThreadPool(1);
         RehydrationManager rehydrationManager = new RehydrationManager(router, registry, timeoutScheduler);
         rehydrationManager.injectNewRegistry(registry);
 

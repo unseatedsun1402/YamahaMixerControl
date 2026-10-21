@@ -206,6 +206,10 @@ public class MidiServer implements Runnable, UiModelService{
         if (livenessMonitor != null) {
             livenessMonitor.stopMonitoring();
         }
+        systemTelemetry.stop();
+        rehydrationManager.shutdown();
+        nameAssemblers.forEach(ChannelNameAssembler::shutdown);
+        nameAssemblers.clear();
         deviceManager.shutdown();
         MidiProcessingLoop.shutdown();
         logger.info("Shutdown finished");

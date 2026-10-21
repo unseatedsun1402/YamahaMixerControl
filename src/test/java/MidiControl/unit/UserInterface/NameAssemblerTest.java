@@ -7,6 +7,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import MidiControl.ContextModel.Context;
@@ -19,6 +20,14 @@ import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 
 public class NameAssemblerTest {
+    private ChannelNameAssembler assembler;
+
+    @AfterEach
+    void shutDownAssembler() {
+        if (assembler != null) {
+            assembler.shutdown();
+        }
+    }
 
     private ControlInstance makeControl(MockCanonicalRegistry reg,
                                         String group,
@@ -74,7 +83,7 @@ public class NameAssemblerTest {
         AtomicReference<String> result = new AtomicReference<>();
         CountDownLatch latch = new CountDownLatch(1);
 
-        new ChannelNameAssembler(ctx, reg, (id, name) -> {
+        assembler = new ChannelNameAssembler(ctx, reg, (id, name) -> {
             result.set(name);
             latch.countDown();
         });

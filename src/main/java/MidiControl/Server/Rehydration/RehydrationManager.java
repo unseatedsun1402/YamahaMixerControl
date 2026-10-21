@@ -83,6 +83,13 @@ public class RehydrationManager{
         this.scheduler = null;
     }
 
+    public synchronized void shutdown() {
+        stopControlLoop();
+        if (scheduler != null) {
+            scheduler.shutdownNow();
+        }
+    }
+
     public static void enableDebug(){
         debug = true;
     }

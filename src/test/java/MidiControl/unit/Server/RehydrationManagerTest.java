@@ -243,4 +243,18 @@ class RehydrationManagerTest {
         assertFalse(mgr.isPending("foo.bar.0"));
         assertEquals(1, listener.reset);
     }
+
+    @Test
+    void shutdown_stopsScheduler() {
+        ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(1);
+        RehydrationManager mgr = new RehydrationManager(
+            new FakeOutputRouter(),
+            new MockCanonicalRegistry(),
+            scheduler
+        );
+
+        mgr.shutdown();
+
+        assertTrue(scheduler.isShutdown());
+    }
 }

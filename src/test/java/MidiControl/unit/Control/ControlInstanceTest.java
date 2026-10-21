@@ -10,9 +10,15 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 public class ControlInstanceTest {
+    @AfterEach
+    void resetDebug() {
+        ControlInstance.disableDebug();
+    }
+
     @Test
     void testCreateAnInstance(){
         String testID = "Group.Test.1";
