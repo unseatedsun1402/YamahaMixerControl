@@ -88,7 +88,7 @@ public class ControlInstance {
 
     public void addListener(ControlListener listener) {
         listeners.put(listener.hashCode(), listener);
-        if(debug)logger.info(String.format("Created a new listener @%d for %s @%d",
+        if(debug)logger.fine(String.format("Created a new listener @%d for %s @%d",
          listener.hashCode(), this.canonicalId,this.hashCode()));
     }
 
@@ -150,7 +150,7 @@ public class ControlInstance {
 
         for (ControlListener l : listeners.values()) {
             l.onControlChanged(this, value);
-            if(debug) logger.info(String.format("UPDATE CONTROLINST %s @%d -> VAL %d listener @%d",this.canonicalId, this.hashCode(),value,l.hashCode()));
+            if(debug) logger.fine(String.format("UPDATE CONTROLINST %s @%d -> VAL %d listener @%d",this.canonicalId, this.hashCode(),value,l.hashCode()));
         }
 
         return this.value;

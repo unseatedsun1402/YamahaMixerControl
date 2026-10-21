@@ -376,6 +376,9 @@ public class MidiServer implements Runnable, UiModelService{
         }
 
         discoveryEngine = new ContextDiscoveryEngine(newRegistry);
+        if (bankFactory != null) {
+            bankFactory.setDiscoveryEngine(discoveryEngine);
+        }
         logger.info(String.format("Rebuilt discovery engine on registry reload"));
 
         reloadContextIndex();
