@@ -15,12 +15,16 @@ import MidiControl.UserInterface.DTO.UiBankDTO;
 
 public class UiBankFactory{
 
-    private final ContextDiscoveryEngine discoveryEngine;
+    private volatile ContextDiscoveryEngine discoveryEngine;
     private final CanonicalRegistry registry;
 
     public UiBankFactory(ContextDiscoveryEngine discoveryEngine, MidiServer server) {
         this.discoveryEngine = discoveryEngine;
         this.registry = server.getCanonicalRegistry();
+    }
+
+    public void setDiscoveryEngine(ContextDiscoveryEngine discoveryEngine) {
+        this.discoveryEngine = discoveryEngine;
     }
 
     public List<String> sortContextIds(List<Context> contexts) {

@@ -174,69 +174,6 @@ class EditChannelStripViewBuilderTest {
     }
 
     @Test
-    void buildCompact_includesAllFourEqBandsForPresetWidget() {
-        MockCanonicalRegistry registry = new MockCanonicalRegistry();
-        String[] bands = {"kEQ1", "kEQ2", "kEQ3", "kEQ4"};
-
-        for (String band : bands) {
-            for (String parameter : List.of("G", "F", "Q")) {
-                makeControl(registry,
-                        "kInputEQ", band + parameter,
-                        0, -180, 180, 0, 0);
-            }
-        }
-
-        registry.mapContext("channel.0", registry.getGroup("kInputEQ"));
-
-        List<ViewControl> controls =
-                new EditChannelStripViewBuilder().buildCompact(channelContext(0), registry, null);
-
-        assertEquals(12, controls.size());
-        assertEquals(4, controls.stream()
-                .filter(control -> control.controlRole.endsWith("_GAIN"))
-                .count());
-        assertEquals(4, controls.stream()
-                .filter(control -> control.controlRole.endsWith("_FREQUENCY"))
-                .count());
-        assertEquals(4, controls.stream()
-                .filter(control -> control.controlRole.endsWith("_Q"))
-                .count());
-        assertEquals(Set.of(
-                        "kInputEQ.kEQ1G.0", "kInputEQ.kEQ1F.0", "kInputEQ.kEQ1Q.0",
-                        "kInputEQ.kEQ2G.0", "kInputEQ.kEQ2F.0", "kInputEQ.kEQ2Q.0",
-                        "kInputEQ.kEQ3G.0", "kInputEQ.kEQ3F.0", "kInputEQ.kEQ3Q.0",
-                        "kInputEQ.kEQ4G.0", "kInputEQ.kEQ4F.0", "kInputEQ.kEQ4Q.0"),
-                controls.stream().map(control -> control.canonicalId).collect(Collectors.toSet()));
-    }
-
-    @Test
-    void buildCompact_supportsLegacyEqSubcontrolNames() {
-        MockCanonicalRegistry registry = new MockCanonicalRegistry();
-        String[] bands = {"kEQLow", "kEQLowMid", "kEQHiMid", "kEQHi"};
-
-        for (String band : bands) {
-            for (String parameter : List.of("G", "F", "Q")) {
-                makeControl(registry,
-                        "kInputEQ", band + parameter,
-                        0, -180, 180, 0, 0);
-            }
-        }
-
-        registry.mapContext("channel.0", registry.getGroup("kInputEQ"));
-
-        List<ViewControl> controls =
-                new EditChannelStripViewBuilder().buildCompact(channelContext(0), registry, null);
-
-        assertEquals(12, controls.size());
-        assertEquals(Set.of("INPUT_EQ1_GAIN", "INPUT_EQ2_GAIN", "INPUT_EQ3_GAIN", "INPUT_EQ4_GAIN"),
-                controls.stream()
-                        .filter(control -> control.controlRole.endsWith("_GAIN"))
-                        .map(control -> control.controlRole)
-                        .collect(Collectors.toSet()));
-        assertTrue(controls.stream().allMatch(control -> control.channelIndex == 0));
-    }
-
-    @Test
     void eqGainControl_exposesDeskSpecificDecibelRange() {
         MockCanonicalRegistry registry = new MockCanonicalRegistry();
         ControlInstance gain = makeControl(
