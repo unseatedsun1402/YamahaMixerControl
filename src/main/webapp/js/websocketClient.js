@@ -107,7 +107,7 @@ export class WebSocketClient {
     if (!this.sessionType) return true;
 
     if (this.sessionType === "settings") {
-      if (type === "meter-update") return false;
+      if (type === "meter-update" || type === "meter-batch") return false;
     }
 
     if (this.sessionType === "control") {
@@ -200,6 +200,25 @@ export class WebSocketClient {
       case "meter-update":
         this._emit("meter-update", enrichedPayload);
         break;
+
+      case "meter-batch": {
+        const updates = msg.payload?.updates;
+        if (!Array.isArray(updates)) {
+          console.error("[WebSocketClient] Invalid meter batch payload", {
+            payload: msg.payload,
+            sequence
+          });
+          break;
+        }
+
+        for (const update of updates) {
+          this._emit("meter-update", {
+            ...update,
+            __meta: enrichedPayload.__meta
+          });
+        }
+        break;
+      }
 
       case "error":
         this._emit("error", enrichedPayload);

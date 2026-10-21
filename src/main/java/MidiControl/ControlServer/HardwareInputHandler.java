@@ -35,8 +35,11 @@ public class HardwareInputHandler {
     }
 
     public static MeterBroadcaster setMeterBroadcaster(MeterBroadcaster testHook){
+        MeterBroadcaster previous = meterBroadcaster;
+        MeterSimpleParser.removeListener(previous);
+        meterBroadcaster = testHook;
         MeterSimpleParser.addListener(testHook);
-        return meterBroadcaster = testHook;
+        return previous;
     }
 
     public HardwareInputHandler(NrpnParser parser, NrpnRegistry registry) {

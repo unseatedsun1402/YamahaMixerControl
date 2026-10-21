@@ -1,14 +1,35 @@
 package MidiControl.UserInterface.Meter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public final class MeterSimpleParser {
 
     private static final Logger logger = Logger.getLogger(MeterSimpleParser.class.getName());
     private static final List<MeterUpdateListener> listeners = new CopyOnWriteArrayList<>();
+    private static final long UPDATE_INTERVAL_MS = 200;
+    private static final Map<String, MeterDTO> eventBuffer = new LinkedHashMap<>(256);
+    private static final ScheduledExecutorService meterProcessor =
+            Executors.newSingleThreadScheduledExecutor(task -> {
+                Thread thread = new Thread(task, "MeterUpdateProcessor");
+                thread.setDaemon(true);
+                return thread;
+            });
+
+    static {
+        meterProcessor.scheduleWithFixedDelay(
+                MeterSimpleParser::processQueue,
+                UPDATE_INTERVAL_MS,
+                UPDATE_INTERVAL_MS,
+                TimeUnit.MILLISECONDS);
+    }
 
     public static void addListener(MeterUpdateListener l) { listeners.add(l); }
     public static void removeListener(MeterUpdateListener l) { listeners.remove(l); }
@@ -76,7 +97,7 @@ public final class MeterSimpleParser {
                         timestamp
                 );
 
-                notifyListeners(dto);
+                enqueueMeterEvent(dto);
             }
 
             return meters;
@@ -97,10 +118,27 @@ public final class MeterSimpleParser {
                (msg[msg.length - 1] & 0xFF) == 0xF7;
     }
 
-    private static void notifyListeners(MeterDTO dto) {
-        for (MeterUpdateListener l : listeners) {
+    private static void enqueueMeterEvent(MeterDTO dto){
+        String key = dto.category + ":" + dto.source + ":" + dto.offset;
+        synchronized (eventBuffer) {
+            eventBuffer.remove(key);
+            eventBuffer.put(key, dto);
+        }
+    }
+
+    private static void processQueue(){
+        List<MeterDTO> pending;
+        synchronized (eventBuffer) {
+            if (eventBuffer.isEmpty()) {
+                return;
+            }
+            pending = new ArrayList<>(eventBuffer.values());
+            eventBuffer.clear();
+        }
+
+        for (MeterUpdateListener listener : listeners) {
             try {
-                l.onMeterUpdate(dto);
+                listener.onMeterUpdates(pending);
             } catch (Throwable t) {
                 logger.warning("Meter listener threw: " + t.getMessage());
             }
