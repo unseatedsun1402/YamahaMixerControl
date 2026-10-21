@@ -20,6 +20,9 @@ import com.google.gson.JsonObject;
 import javax.sound.midi.SysexMessage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -107,10 +110,15 @@ public class SendSysexChangeTest {
     @Test
     void testMeterBroadcast() throws Exception {
 
-        List<String> broadcasts = new ArrayList<>();
+        List<String> broadcasts = new CopyOnWriteArrayList<>();
+        CountDownLatch broadcastReceived = new CountDownLatch(1);
         MeterBroadcaster fakeBroadcaster = new MeterBroadcaster(){
-            @Override public void onMeterUpdate(MidiControl.UserInterface.Meter.MeterDTO dto) {
-                broadcasts.add(dto.toJson());
+            @Override public void onMeterUpdates(
+                    List<MidiControl.UserInterface.Meter.MeterDTO> updates) {
+                for (var dto : updates) {
+                    broadcasts.add(dto.toJson());
+                }
+                broadcastReceived.countDown();
             }
         };
 
@@ -120,20 +128,26 @@ public class SendSysexChangeTest {
 
         MidiServer server = new MidiServer(registry);
 
-        HardwareInputHandler.setMeterBroadcaster(fakeBroadcaster);
+        MeterBroadcaster previousBroadcaster =
+                HardwareInputHandler.setMeterBroadcaster(fakeBroadcaster);
+        try {
+            byte[] faderMsg = {
+                (byte) 0xF0, (byte) 0x43, (byte) 0x10, (byte) 0x3E,
+                (byte) 0x1A, (byte) 0x21, (byte) 0x00, (byte) 0x0,
+                (byte) 0x0, (byte) 0x00,(byte) 0x14, (byte) 0xF7
+            };
 
-        byte[] faderMsg = {
-            (byte) 0xF0, (byte) 0x43, (byte) 0x10, (byte) 0x3E,
-            (byte) 0x1A, (byte) 0x21, (byte) 0x00, (byte) 0x0,
-            (byte) 0x0, (byte) 0x00,(byte) 0x14, (byte) 0xF7
-        };
+            SysexMessage msg = MidiTestUtils.createSysexMessage(faderMsg);
 
-        SysexMessage msg = MidiTestUtils.createSysexMessage(faderMsg);
+            server.addtoinputqueue(msg);
+            server.processIncomingMidiForTest();
 
-        server.addtoinputqueue(msg);
-        server.processIncomingMidiForTest();
-
-        assertFalse(broadcasts.isEmpty(), "Expected at least one broadcast message");
+            assertTrue(broadcastReceived.await(2, TimeUnit.SECONDS),
+                    "Expected queued meter update to be broadcast");
+            assertFalse(broadcasts.isEmpty(), "Expected at least one broadcast message");
+        } finally {
+            HardwareInputHandler.setMeterBroadcaster(previousBroadcaster);
+        }
     }
 
     @Test
