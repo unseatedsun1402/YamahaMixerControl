@@ -32,8 +32,16 @@ public class MidiIOManager {
     public MidiIOManager(MidiServer server) {
         this.server = server;
         Settings settings = new ServerSettings();
-        boolean inOk  = trySetInputDevice(settings.getInputDeviceIndex());
-        boolean outOk = trySetOutputDevice(settings.getOutputDeviceIndex());
+        int inputDeviceIndex = settings.getInputDeviceIndex();
+        int outputDeviceIndex = settings.getOutputDeviceIndex();
+
+        if (inputDeviceIndex < 0 && outputDeviceIndex < 0) {
+            logger.info("No previously saved MIDI ports; devices remain closed");
+            return;
+        }
+
+        boolean inOk = inputDeviceIndex < 0 || trySetInputDevice(inputDeviceIndex);
+        boolean outOk = outputDeviceIndex < 0 || trySetOutputDevice(outputDeviceIndex);
         if (inOk && outOk) logger.info("Loaded previous midi ports from settings");
         else logger.warning("loading settings failed: " + settings.toJson());
         logger.info("MidiIOManger available");
@@ -236,6 +244,9 @@ public class MidiIOManager {
             sendEngine.stop();
             sendEngine = null;
         }
+        if (midiOut != null && midiOut.isOpen()) {
+            midiOut.close();
+        }
 
         try {
             MidiDevice device = MidiDeviceUtils.getDevice(index);
@@ -261,13 +272,14 @@ public class MidiIOManager {
     }
 
     private boolean openInputDevice(int index) {
+        MidiDevice device = null;
         try {
             if (midiIn != null) {
                 midiIn.close();
                 logger.info("Closed previous input device and transmitter.");
             }
 
-            MidiDevice device = MidiDeviceUtils.getDevice(index);
+            device = MidiDeviceUtils.getDevice(index);
             logger.info("Opening input device: " + device.getDeviceInfo().getName());
             device.open();
 
@@ -281,9 +293,13 @@ public class MidiIOManager {
             }
 
             logger.warning("Device is output-only: " + index);
+            device.close();
             return false;
 
         } catch (MidiUnavailableException e) {
+            if (device != null && device.isOpen()) {
+                device.close();
+            }
             logger.warning("Failed to open input device: " + e.getMessage());
             return false;
         }

@@ -9,6 +9,7 @@ import MidiControl.SysexUtils.SysexParser;
 import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,7 +22,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.awaitility.Awaitility.*;
 
 public class NameAssemblerFunctional01V96iTest {
+    private final List<ChannelNameAssembler> assemblers = new ArrayList<>();
 
+    @AfterEach
+    public void shutDownAssemblers() {
+        assemblers.forEach(ChannelNameAssembler::shutdown);
+        assemblers.clear();
+    }
+
+    private ChannelNameAssembler assemblersAdd(ChannelNameAssembler assembler) {
+        assemblers.add(assembler);
+        return assembler;
+    }
 
     private byte[] buildNameSysex(int subControlindex, int channel, int ascii) {
 
@@ -64,7 +76,7 @@ public class NameAssemblerFunctional01V96iTest {
 
         AtomicReference<String> lastName = new AtomicReference<>();
 
-        new ChannelNameAssembler(nameContext, registry, (id, name) -> lastName.set(name));
+        assemblers.add(new ChannelNameAssembler(nameContext, registry, (id, name) -> lastName.set(name)));
 
         SysexMessage sysex = new SysexMessage();
         SysexMessage sysex1 = new SysexMessage();
@@ -120,9 +132,9 @@ public class NameAssemblerFunctional01V96iTest {
 
         for (Context c : nameContexts) {
             testAssemblers.add(
-                new ChannelNameAssembler(c, registry,
+                assemblersAdd(new ChannelNameAssembler(c, registry,
                 (id, name) -> emittedNames.put(id, name))
-            );
+            ));
         }
 
         int len = buildNameSysex(0, 0, 'K').length;
@@ -170,7 +182,7 @@ public class NameAssemblerFunctional01V96iTest {
             .orElseThrow();
 
         AtomicReference<String> result = new AtomicReference<>();
-        ChannelNameAssembler test = new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name));
+        ChannelNameAssembler test = assemblersAdd(new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name)));
 
         int len = buildNameSysex(0, 0, 'K').length;
 
@@ -205,7 +217,7 @@ public class NameAssemblerFunctional01V96iTest {
             .orElseThrow();
 
         AtomicReference<String> result = new AtomicReference<>();
-        ChannelNameAssembler test = new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name));
+        ChannelNameAssembler test = assemblersAdd(new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name)));
 
         int len = buildNameSysex(0, 0, 'K').length;
 
@@ -241,7 +253,7 @@ public class NameAssemblerFunctional01V96iTest {
             .orElseThrow();
 
         AtomicReference<String> result = new AtomicReference<>();
-        new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name));
+        assemblersAdd(new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name)));
 
         int len = buildNameSysex(0, 0, 'K').length;
 
@@ -281,8 +293,8 @@ public class NameAssemblerFunctional01V96iTest {
 
         Map<String,String> results = new ConcurrentHashMap<>();
         for (Context c : nameContexts) {
-            testAssemblers.add(new ChannelNameAssembler(c, registry,
-                (id,name)->results.put(id, name)));
+            testAssemblers.add(assemblersAdd(new ChannelNameAssembler(c, registry,
+                (id,name)->results.put(id, name))));
         }
         
         int len = buildNameSysex(0, 0, 'K').length;
@@ -322,7 +334,7 @@ public class NameAssemblerFunctional01V96iTest {
             .orElseThrow();
 
         AtomicReference<String> result = new AtomicReference<>();
-        new ChannelNameAssembler(ctx0, registry, (id,name)->result.set(name));
+        assemblersAdd(new ChannelNameAssembler(ctx0, registry, (id,name)->result.set(name)));
 
         int len = buildNameSysex(0, 0, 0xFF).length;
 
@@ -353,7 +365,7 @@ public class NameAssemblerFunctional01V96iTest {
             .orElseThrow();
 
         List<String> events = new ArrayList<>();
-        new ChannelNameAssembler(ctx0, registry, (id,name)->events.add(name));
+        assemblersAdd(new ChannelNameAssembler(ctx0, registry, (id,name)->events.add(name)));
 
         int len = buildNameSysex(0, 0, 'K').length;
 

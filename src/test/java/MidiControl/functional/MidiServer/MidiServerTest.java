@@ -7,6 +7,7 @@ import MidiControl.Mocks.MockMidiOut;
 import MidiControl.Server.MidiServer;
 import MidiControl.TestUtilities.MidiTestUtils;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -17,11 +18,26 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.ShortMessage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Tag("functional")
 public class MidiServerTest {
+    private final List<MidiServer> servers = new ArrayList<>();
+
+    private MidiServer createServer() {
+        MidiServer server = new MidiServer();
+        servers.add(server);
+        return server;
+    }
+
+    @AfterEach
+    void shutdownServers() {
+        servers.forEach(MidiServer::shutdown);
+        servers.clear();
+    }
+
 
     @Test
     void testInputReceiverReceivesMessage() throws Exception {
@@ -41,7 +57,7 @@ public class MidiServerTest {
 
     @Test
     void testSendMidiMessagesDispatchesToOutput() {
-        MidiServer server = new MidiServer();
+        MidiServer server = createServer();
 
         MockMidiOut mockOutput = new MockMidiOut();
         server.getMidiDeviceManager().setMidiOutForTest(mockOutput);
@@ -62,7 +78,7 @@ public class MidiServerTest {
     @Test
     void testIncomingMidiParsingDoesNotThrow() throws InvalidMidiDataException {
         ShortMessage msg = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 99, 1);
-        MidiServer server = new MidiServer();
+        MidiServer server = createServer();
         server.addtoinputqueue(msg);
         assertDoesNotThrow(server::run, "Processing incoming MIDI should not throw exceptions");
     }
@@ -75,24 +91,28 @@ public class MidiServerTest {
         MidiDevice device = MidiSystem.getMidiDevice(infos[0]);
 
         if (device.getMaxTransmitters() == 0) {
-            MidiServer server = new MidiServer();
+            MidiServer server = createServer();
+            boolean wasOpen = device.isOpen();
 
             assertDoesNotThrow(
                 () -> server.getMidiDeviceManager().trySetInputDevice(0),
             "Should throw for invalid device index");
+            if (!wasOpen) {
+                assertFalse(device.isOpen(), "An output-only device must be closed after input setup fails");
+            }
         }
     }
 
     @Test
     void testProcessIncomingMidiHandlesEmptyBuffer() {
-        MidiServer server = new MidiServer();
+        MidiServer server = createServer();
         assertDoesNotThrow(server::run, "Processing with empty buffer should not throw");
     }
 
     @Test
     void testInputQueueHelperAddsMessages() throws Exception {
         ShortMessage msg = MidiTestUtils.createControlChange(0, 99, 1);
-        MidiServer server = new MidiServer();
+        MidiServer server = createServer();
         int before = server.getInputBufferSize();
         server.addtoinputqueue(msg);
         int after = server.getInputBufferSize();
