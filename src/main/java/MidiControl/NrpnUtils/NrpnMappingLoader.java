@@ -30,7 +30,7 @@ public class NrpnMappingLoader {
                      NrpnMappingLoader.class.getClassLoader().getResourceAsStream(resourceName)) {
 
             if (is == null) {
-                throw new RuntimeException("NRPN resource not found: " + resourceName);
+                throw new RuntimeException(String.format("NRPN resource not found: %s", resourceName));
             }
 
             InputStreamReader reader = new InputStreamReader(is);
@@ -39,7 +39,7 @@ public class NrpnMappingLoader {
             return validateList(parsed, resourceName);
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load NRPN mappings from " + resourceName, e);
+            throw new RuntimeException(String.format("Failed to load NRPN mappings from %s",resourceName), e);
         }
     }
 
@@ -58,11 +58,11 @@ public class NrpnMappingLoader {
                     all.addAll(mappings);
                     logger.info("Loaded NRPN file: " + file.getFileName());
                 } catch (Exception ex) {
-                    logger.warning("Failed to load NRPN file: " + file + " → " + ex.getMessage());
+                    logger.warning(String.format("Failed to load NRPN file: %s -> %s",file, ex.getMessage()));
                 }
             }
         } catch (Exception ex) {
-            logger.warning("Failed to scan NRPN directory: " + dir + " → " + ex.getMessage());
+            logger.warning(String.format("Failed to scan NRPN directory: %s -> %s", dir, ex.getMessage()));
         }
 
         return all;

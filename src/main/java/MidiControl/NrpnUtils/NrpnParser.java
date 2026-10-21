@@ -1,7 +1,5 @@
 package MidiControl.NrpnUtils;
 
-import java.util.logging.Logger;
-
 import javax.sound.midi.ShortMessage;
 
 public class NrpnParser {
@@ -15,8 +13,6 @@ public class NrpnParser {
     private boolean hasLsb = false;
     private boolean hasValueMsb = false;
     private boolean hasValueLsb = false;
-
-    private static Logger logger = Logger.getLogger(NrpnParser.class.getName());
 
     /**
      * Parse a CC ShortMessage and return a complete NRPN event if available.
@@ -65,8 +61,6 @@ public class NrpnParser {
             }
 
             default -> {
-                // If we receive ANY other CC and we have a pending NRPN (MSB+LSB+valueMSB),
-                // emit it immediately as a 7-bit NRPN.
                 if (hasMsb && hasLsb && hasValueMsb) {
                     NrpnMessage result = buildMessage();
                     reset();
@@ -75,8 +69,6 @@ public class NrpnParser {
             }
         }
 
-        // If we have MSB+LSB+valueMSB but no LSB yet, do NOT emit yet.
-        // We wait to see if CC 38 arrives next.
         return null;
     }
 
