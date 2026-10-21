@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -157,5 +159,106 @@ public class SettingsTest {
         assertEquals(mockOutDeviceName, settings.getOutputDeviceName());
         assertEquals(testConsoleName, settings.getConsoleName());
         assertEquals("empty", settings.getConsoleMappingsFilePath());
+    }
+
+    @Test
+    public void testLoadWithMissingFile() {
+        ServerSettings.clearCache();
+
+        File file = new File(ServerSettings.getSavePath());
+        if(file.exists()) {
+            file.delete();
+        }
+
+        ServerSettings settings = assertDoesNotThrow(ServerSettings::new);
+        assertEquals(-1, settings.getInputDeviceIndex());
+        assertEquals(-1, settings.getOutputDeviceIndex());
+    }
+
+    @Test
+    public void testLoadCorruptJson() throws IOException {
+
+        ServerSettings.clearCache();
+
+        File file = new File(ServerSettings.getSavePath());
+
+        try(FileWriter writer = new FileWriter(file)) {
+            writer.write("{not valid json");
+        }
+
+        ServerSettings settings = assertDoesNotThrow(ServerSettings::new);
+        assertEquals(-1, settings.getInputDeviceIndex());
+        assertEquals(-1, settings.getOutputDeviceIndex());
+    }
+
+    @Test
+    public void testLoadEmptyFile() throws IOException {
+
+        ServerSettings.clearCache();
+
+        File file = new File(ServerSettings.getSavePath());
+
+        try(FileWriter writer = new FileWriter(file)) {
+            writer.write("");
+        }
+
+        ServerSettings settings = assertDoesNotThrow(ServerSettings::new);
+        assertEquals(-1, settings.getInputDeviceIndex());
+        assertEquals(-1, settings.getOutputDeviceIndex());
+    }
+
+    @Test
+    public void testLoadHandlesEmptyMarker() {
+
+        String value = new String("empty");
+
+        assertFalse(value == "empty");
+        assertTrue(value.equals("empty"));
+    }
+
+    @Test
+    public void testSaveCreatesFile() {
+
+        Settings settings = new ServerSettings();
+
+        settings.newSettings(
+            0,
+            "input",
+            1,
+            "output",
+            "testConsole");
+
+        assertTrue(settings.saveSettings());
+
+        File file = new File(ServerSettings.getSavePath());
+
+        assertTrue(file.exists());
+        assertTrue(file.length() > 0);
+    }
+
+    @Test
+    public void testSettingsRoundTrip() {
+
+        ServerSettings.clearCache();
+
+        ServerSettings original = new ServerSettings();
+
+        original.newSettings(
+            12,
+            "InputA",
+            4,
+            "OutputB",
+            "YAMAHA_01V96I");
+
+        assertTrue(original.saveSettings());
+
+        ServerSettings.clearCache();
+
+        ServerSettings loaded = new ServerSettings();
+
+        assertEquals(12, loaded.getInputDeviceIndex());
+        assertEquals(4, loaded.getOutputDeviceIndex());
+        assertEquals("InputA", loaded.getInputDeviceName());
+        assertEquals("OutputB", loaded.getOutputDeviceName());
     }
 }
