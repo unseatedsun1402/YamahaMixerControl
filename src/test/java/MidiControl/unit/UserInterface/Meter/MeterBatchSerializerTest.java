@@ -1,4 +1,4 @@
-package MidiControl.UserInterface.Meter;
+package MidiControl.unit.UserInterface.Meter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -6,9 +6,17 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.google.gson.JsonParser;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import MidiControl.UserInterface.Meter.MeterBatchSerializer;
+import MidiControl.UserInterface.Meter.MeterCategory;
+import MidiControl.UserInterface.Meter.MeterDTO;
+import MidiControl.UserInterface.Meter.MeterSource;
 
 class MeterBatchSerializerTest {
+
+    private final Gson gson = new Gson();
 
     @Test
     void serializesMeterUpdatesAsOneBatchEnvelope() {
@@ -32,8 +40,8 @@ class MeterBatchSerializerTest {
                 true,
                 123456790L);
 
-        var message = JsonParser.parseString(
-                MeterBatchSerializer.toJson(List.of(update, nextUpdate))).getAsJsonObject();
+        JsonObject message = gson.fromJson(
+                MeterBatchSerializer.toJson(List.of(update, nextUpdate)), JsonObject.class);
 
         assertEquals("meter-batch", message.get("type").getAsString());
         var updates = message.getAsJsonObject("payload").getAsJsonArray("updates");
