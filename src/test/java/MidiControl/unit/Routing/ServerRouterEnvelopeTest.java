@@ -12,12 +12,17 @@ import MidiControl.Server.SubscriptionManager;
 import MidiControl.UserInterface.UiModelService;
 import MidiControl.UserInterface.DTO.UiModelDTO;
 import MidiControl.Controls.CanonicalRegistry;
+import MidiControl.Access.Authenticate;
+import MidiControl.Access.Authenticate.Role;
+import MidiControl.Access.RoleCredentialStore;
+import MidiControl.Routing.WebSocketEndpoint;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Mocks.FakeSession;
 import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.Mocks.MockMidiIOManager;
 
 import java.util.List;
+import java.util.Map;
 
 class MinimalUiModelService implements UiModelService {
 
@@ -41,6 +46,10 @@ public class ServerRouterEnvelopeTest {
         // Capture outgoing WebSocket messages
         StringBuilder captured = new StringBuilder();
         FakeSession session = new FakeSession("test-session");
+        session.getUserProperties().put(WebSocketEndpoint.CLIENT_IP_PROPERTY, "192.168.1.20");
+        session.getUserProperties().put(
+                WebSocketEndpoint.USER_AGENT_PROPERTY,
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/123.0 Safari/537.36");
 
         // FakeSession AsyncRemote sender
         session.setRemoteSender(captured::append);
@@ -59,11 +68,15 @@ public class ServerRouterEnvelopeTest {
         SubscriptionManager subs = new SubscriptionManager();
 
         // Router under test
+        Authenticate authenticate = new Authenticate(Map.of(
+                Role.GUEST,
+                new RoleCredentialStore.Credential(true, "", "", 0)));
         ServerRouter router = new ServerRouter(
             uiModels,
             subs,
             registry,
-            ioManager
+            ioManager,
+            authenticate
         );
 
         // Incoming WebSocket message that router must handle
@@ -78,7 +91,14 @@ public class ServerRouterEnvelopeTest {
         """;
 
         // Act
-        router.handleMessage(session, incoming);
+        String fingerprintSalt = "test-fingerprint-salt";
+        String token = authenticate.authenticateGuest(
+                new Authenticate.ClientFingerprint(fingerprintSalt, "192.168.1.20", "Chrome", "Windows")).token();
+        JsonObject authenticatedRequest = JsonParser.parseString(incoming).getAsJsonObject();
+        JsonObject requestPayload = authenticatedRequest.getAsJsonObject("payload");
+        requestPayload.addProperty("authToken", token);
+        requestPayload.addProperty("fingerprintSalt", fingerprintSalt);
+        router.handleMessage(session, authenticatedRequest.toString());
 
         // Assert outbound envelope was captured
         assertFalse(captured.isEmpty(), "Expected a response to be sent");

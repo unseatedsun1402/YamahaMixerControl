@@ -26,6 +26,10 @@ import com.google.gson.JsonParser;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class EmbeddedPatchEndpointsTest {
 
+    private static final String FINGERPRINT_SALT = "embedded-patch-test-salt";
+    private static final String USER_AGENT =
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/123.0.0.0 Safari/537.36";
+
     @LocalServerPort
     private int port;
 
@@ -42,12 +46,19 @@ class EmbeddedPatchEndpointsTest {
 
         try (SocketMessages socket = new SocketMessages(
                 URI.create("ws://localhost:" + port + "/MidiControl/endpoint"))) {
+            JsonObject authentication = socket.requestAndAwait("""
+                    {"type":"authenticate","payload":{"role":"guest","fingerprintSalt":"%s"}}
+                    """.formatted(FINGERPRINT_SALT), "authentication-result");
+            assertEquals("ok", authentication.get("status").getAsString());
+            String token = authentication.get("token").getAsString();
+
             JsonObject inputBank = socket.requestAndAwait("""
                     {"type":"get-ui-bank","payload":{"bankId":"bank.inputs"}}
                     """, "ui-bank");
             String inputContext = firstContext(inputBank);
 
-            JsonObject inputModel = socket.requestAndAwait(uiModelRequest(inputContext), "ui-model");
+            JsonObject inputModel = socket.requestAndAwait(
+                    uiModelRequest(inputContext, token), "ui-model");
             assertFalse(inputModel.getAsJsonArray("controls").isEmpty(),
                     "Input patch view should contain a selector control");
             assertMap(httpClient, "/MidiControl/source-map");
@@ -57,7 +68,8 @@ class EmbeddedPatchEndpointsTest {
                     """, "ui-bank");
             String outputContext = firstContext(outputBank);
 
-            JsonObject outputModel = socket.requestAndAwait(uiModelRequest(outputContext), "ui-model");
+            JsonObject outputModel = socket.requestAndAwait(
+                    uiModelRequest(outputContext, token), "ui-model");
             assertFalse(outputModel.getAsJsonArray("controls").isEmpty(),
                     "Output patch view should contain a selector control");
             assertMap(httpClient, "/MidiControl/dest-map");
@@ -70,10 +82,10 @@ class EmbeddedPatchEndpointsTest {
         return contexts.get(0).getAsString();
     }
 
-    private String uiModelRequest(String contextId) {
+    private String uiModelRequest(String contextId, String token) {
         return """
-                {"type":"get-ui-model","requestId":"patch-model","payload":{"contextId":"%s","uiType":"basic-patch-view"}}
-                """.formatted(contextId);
+                {"type":"get-ui-model","requestId":"patch-model","payload":{"contextId":"%s","uiType":"basic-patch-view","authToken":"%s","fingerprintSalt":"%s"}}
+                """.formatted(contextId, token, FINGERPRINT_SALT);
     }
 
     private void assertMap(HttpClient client, String path) throws Exception {
@@ -100,6 +112,7 @@ class EmbeddedPatchEndpointsTest {
         SocketMessages(URI uri) {
             socket = HttpClient.newHttpClient()
                     .newWebSocketBuilder()
+                    .header("User-Agent", USER_AGENT)
                     .buildAsync(uri, new WebSocket.Listener() {
                         @Override
                         public void onOpen(WebSocket webSocket) {

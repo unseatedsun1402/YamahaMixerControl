@@ -22,6 +22,7 @@ public class FakeSession implements Session {
     private boolean open = true;
     private final String id;
     private Consumer<String> remoteSender = null;
+    private final Map<String, Object> userProperties = new java.util.concurrent.ConcurrentHashMap<>();
     public String lastSent = null;
 
     public FakeSession(String id) {
@@ -79,7 +80,7 @@ public class FakeSession implements Session {
     @Override public Map<String, List<String>> getRequestParameterMap() { throw new UnsupportedOperationException(); }
     @Override public String getQueryString() { throw new UnsupportedOperationException(); }
     @Override public Map<String, String> getPathParameters() { throw new UnsupportedOperationException(); }
-    @Override public Map<String, Object> getUserProperties() { throw new UnsupportedOperationException(); }
+    @Override public Map<String, Object> getUserProperties() { return userProperties; }
     @Override public void close() throws IOException { open = false; }
     @Override public RemoteEndpoint.Async getAsyncRemote() { throw new UnsupportedOperationException(); }
     @Override public jakarta.websocket.WebSocketContainer getContainer() { throw new UnsupportedOperationException(); }

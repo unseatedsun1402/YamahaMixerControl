@@ -11,7 +11,11 @@ import jakarta.websocket.OnOpen;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.Session;
+import jakarta.websocket.HandshakeResponse;
+import jakarta.websocket.server.HandshakeRequest;
+import jakarta.websocket.server.ServerEndpointConfig;
 import jakarta.websocket.server.ServerEndpoint;
+import jakarta.servlet.http.HttpSession;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +28,37 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-@ServerEndpoint(value = "/endpoint")
+@ServerEndpoint(value = "/endpoint", configurator = WebSocketEndpoint.ClientMetadataConfigurator.class)
 public class WebSocketEndpoint{
+
+    public static final String CLIENT_IP_PROPERTY = "MidiControl.clientIp";
+    public static final String USER_AGENT_PROPERTY = "MidiControl.userAgent";
+    public static final String HTTP_SESSION_CLIENT_IP = "MidiControl.clientIp";
+
+    public static class ClientMetadataConfigurator extends ServerEndpointConfig.Configurator {
+        @Override
+        public void modifyHandshake(
+                ServerEndpointConfig config,
+                HandshakeRequest request,
+                HandshakeResponse response) {
+            Object httpSession = request.getHttpSession();
+            String clientIp = "";
+            if (httpSession instanceof HttpSession servletSession) {
+                Object storedIp = servletSession.getAttribute(HTTP_SESSION_CLIENT_IP);
+                if (storedIp instanceof String value) {
+                    clientIp = value;
+                }
+            }
+
+            String userAgent = request.getHeaders()
+                    .getOrDefault("User-Agent", java.util.List.of())
+                    .stream()
+                    .findFirst()
+                    .orElse("");
+            config.getUserProperties().put(CLIENT_IP_PROPERTY, clientIp);
+            config.getUserProperties().put(USER_AGENT_PROPERTY, userAgent);
+        }
+    }
 
     private static final Set<Session> sessions = ConcurrentHashMap.newKeySet();
     private static final Logger logger = Logger.getLogger(WebSocketEndpoint.class.getName());

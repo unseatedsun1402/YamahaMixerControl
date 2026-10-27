@@ -1,6 +1,7 @@
 package MidiControl.Server;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -10,6 +11,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import MidiControl.ControlServer.GuiInputHandler;
+import MidiControl.Access.Authenticate;
+import MidiControl.Access.Authenticate.Role;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.ControlInstance;
 import MidiControl.MidiDeviceManager.CoalesceEngine;
@@ -43,6 +46,7 @@ public class ServerRouter {
     private final GuiInputHandler guiInputHandler;
     private final HardwareOutputRouter outputRouter;
     private final ServerRequestParser requestParser;
+    private final Authenticate authenticate;
 
     private int lastKeepAlive = 0;
     private static final Logger logger = Logger.getLogger(ServerRouter.class.getName());
@@ -59,10 +63,20 @@ public class ServerRouter {
                         CanonicalRegistry registry,
                         MidiIOManager ioManager)
     {
+        this(uiModels, subscriptions, registry, ioManager, new Authenticate());
+    }
+
+    public ServerRouter(UiModelService uiModels,
+                        SubscriptionManager subscriptions,
+                        CanonicalRegistry registry,
+                        MidiIOManager ioManager,
+                        Authenticate authenticate)
+    {
         this.uiModels = uiModels;
         this.subscriptions = subscriptions;
         this.registry = registry;
         this.ioManager = ioManager;
+        this.authenticate = authenticate;
         this.outputRouter = new HardwareOutputRouter(registry, this.ioManager);
         this.guiInputHandler = new GuiInputHandler(outputRouter);
         this.rehydrationService = null;
@@ -85,6 +99,34 @@ public class ServerRouter {
         String requestId = req.requestId();
         JsonObject payload = req.payload();
 
+        if ("get-authentication-options".equals(type)) {
+            sendAuthenticationOptions(session, requestId);
+            return;
+        }
+
+        if ("authenticate".equals(type)) {
+            handleAuthenticate(session, requestId, payload);
+            return;
+        }
+
+        Role role = authenticate.roleFor(
+                stringProperty(payload, "authToken"),
+                fingerprint(session, stringProperty(payload, "fingerprintSalt"))).orElse(null);
+        if (role == null) {
+            ServerResponses.error(session, requestId, "UNAUTHENTICATED",
+                    "Authenticate before sending requests.");
+            return;
+        }
+
+        String canonicalId = payload.has("canonicalId") && payload.get("canonicalId").isJsonPrimitive()
+                ? payload.get("canonicalId").getAsString()
+                : null;
+        if (!authenticate.isAllowed(role, type, canonicalId)) {
+            ServerResponses.error(session, requestId, "FORBIDDEN",
+                    "Your role is not allowed to make this change.");
+            return;
+        }
+
         switch (type) {
             case "get-ui-model" -> handleGetUiModel(session, requestId, payload);
             case "set-control-value" -> handleSetControlValue(session, requestId, payload);
@@ -106,6 +148,162 @@ public class ServerRouter {
                 "Unknown message type: " + type
             );
         }
+    }
+
+    private void handleAuthenticate(Session session, String requestId, JsonObject payload) {
+        Authenticate.ClientFingerprint fingerprint = fingerprint(
+                session,
+                payload.has("fingerprintSalt") && payload.get("fingerprintSalt").isJsonPrimitive()
+                        ? payload.get("fingerprintSalt").getAsString()
+                        : null);
+        if (payload.has("token") && payload.get("token").isJsonPrimitive()) {
+            sendAuthenticationResult(session, requestId,
+                    authenticate.authenticateToken(payload.get("token").getAsString(), fingerprint));
+            return;
+        }
+
+        if (payload.has("challengeId") && payload.get("challengeId").isJsonPrimitive()) {
+            String proof = payload.has("proof") && payload.get("proof").isJsonPrimitive()
+                    ? payload.get("proof").getAsString()
+                    : null;
+            sendAuthenticationResult(session, requestId,
+                    authenticate.completePasswordAuthentication(
+                            payload.get("challengeId").getAsString(),
+                            session.getId(),
+                            proof,
+                            fingerprint));
+            return;
+        }
+
+        String role = payload.has("role") && payload.get("role").isJsonPrimitive()
+                ? payload.get("role").getAsString()
+                : null;
+        if (!payload.has("fingerprintSalt") || !payload.get("fingerprintSalt").isJsonPrimitive()) {
+            sendAuthenticationResult(session, requestId,
+                    new Authenticate.AuthenticationResult(false, null, null, "Client fingerprint salt is missing."));
+            return;
+        }
+
+        if (!fingerprint.isComplete()) {
+            sendAuthenticationResult(session, requestId,
+                    new Authenticate.AuthenticationResult(
+                            false, null, null, "Required client metadata is unavailable."));
+            return;
+        }
+
+        if (Role.parse(role).orElse(null) == Role.GUEST) {
+            sendAuthenticationResult(session, requestId, authenticate.authenticateGuest(fingerprint));
+            return;
+        }
+
+        Authenticate.PasswordChallengeResult challenge =
+                authenticate.beginPasswordAuthentication(role, fingerprint.salt(), session.getId());
+        if (!challenge.successful()) {
+            sendAuthenticationResult(session, requestId,
+                    new Authenticate.AuthenticationResult(false, null, null, challenge.message()));
+            return;
+        }
+        sendPasswordChallenge(session, requestId, challenge);
+    }
+
+    private static Authenticate.ClientFingerprint fingerprint(Session session, String salt) {
+        Map<String, Object> properties = session.getUserProperties();
+        String ipAddress = stringProperty(properties, WebSocketEndpoint.CLIENT_IP_PROPERTY);
+        String userAgent = stringProperty(properties, WebSocketEndpoint.USER_AGENT_PROPERTY);
+        return new Authenticate.ClientFingerprint(
+                salt,
+                ipAddress,
+                browserFamily(userAgent),
+                operatingSystemFamily(userAgent));
+    }
+
+    private static String stringProperty(Map<String, Object> properties, String name) {
+        Object value = properties.get(name);
+        return value instanceof String string ? string : "";
+    }
+
+    private static String stringProperty(JsonObject object, String name) {
+        return object.has(name) && object.get(name).isJsonPrimitive()
+                ? object.get(name).getAsString()
+                : null;
+    }
+
+    private static String browserFamily(String userAgent) {
+        if (userAgent == null || userAgent.isBlank()) return "";
+        if (userAgent.contains("Edg/")) return "Edge";
+        if (userAgent.contains("OPR/")) return "Opera";
+        if (userAgent.contains("Firefox/")) return "Firefox";
+        if (userAgent.contains("Chrome/")) return "Chrome";
+        if (userAgent.contains("Safari/")) return "Safari";
+        return "Other";
+    }
+
+    private static String operatingSystemFamily(String userAgent) {
+        if (userAgent == null || userAgent.isBlank()) return "";
+        if (userAgent.contains("Android")) return "Android";
+        if (userAgent.contains("iPhone") || userAgent.contains("iPad") || userAgent.contains("iPod")) return "iOS";
+        if (userAgent.contains("Windows")) return "Windows";
+        if (userAgent.contains("Mac OS")) return "macOS";
+        if (userAgent.contains("CrOS")) return "ChromeOS";
+        if (userAgent.contains("Linux")) return "Linux";
+        return "Other";
+    }
+
+    private void sendAuthenticationResult(
+            Session session,
+            String requestId,
+            Authenticate.AuthenticationResult result) {
+        JsonObject responsePayload = new JsonObject();
+        responsePayload.addProperty("status", result.successful() ? "ok" : "error");
+        if (result.successful()) {
+            responsePayload.addProperty("role", result.role().name().toLowerCase(Locale.ROOT));
+            responsePayload.addProperty("token", result.token());
+        } else {
+            responsePayload.addProperty("message", result.message());
+        }
+
+        JsonObject response = new JsonObject();
+        response.addProperty("type", "authentication-result");
+        if (requestId != null) {
+            response.addProperty("requestId", requestId);
+        }
+        response.add("payload", responsePayload);
+        WebSocketEndpoint.send(session, response.toString());
+    }
+
+    private void sendPasswordChallenge(
+            Session session,
+            String requestId,
+            Authenticate.PasswordChallengeResult challenge) {
+        JsonObject responsePayload = new JsonObject();
+        responsePayload.addProperty("status", "challenge");
+        responsePayload.addProperty("role", challenge.role().name().toLowerCase(Locale.ROOT));
+        responsePayload.addProperty("challengeId", challenge.challengeId());
+        responsePayload.addProperty("passwordSalt", challenge.passwordSalt());
+        responsePayload.addProperty("iterations", challenge.iterations());
+
+        JsonObject response = new JsonObject();
+        response.addProperty("type", "authentication-result");
+        if (requestId != null) {
+            response.addProperty("requestId", requestId);
+        }
+        response.add("payload", responsePayload);
+        WebSocketEndpoint.send(session, response.toString());
+    }
+
+    private void sendAuthenticationOptions(Session session, String requestId) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("guest", authenticate.isRoleEnabled(Role.GUEST));
+        payload.addProperty("operator", authenticate.isRoleEnabled(Role.OPERATOR));
+        payload.addProperty("admin", authenticate.isRoleEnabled(Role.ADMIN));
+
+        JsonObject response = new JsonObject();
+        response.addProperty("type", "authentication-options");
+        if (requestId != null) {
+            response.addProperty("requestId", requestId);
+        }
+        response.add("payload", payload);
+        WebSocketEndpoint.send(session, response.toString());
     }
 
     private void handleSetDebugFlag(
