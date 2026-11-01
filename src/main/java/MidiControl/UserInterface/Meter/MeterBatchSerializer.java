@@ -2,11 +2,11 @@ package MidiControl.UserInterface.Meter;
 
 import java.util.List;
 
-final class MeterBatchSerializer {
+public final class MeterBatchSerializer {
 
     private MeterBatchSerializer() {}
 
-    static String toJson(List<MeterDTO> updates) {
+    public static String toJson(List<MeterDTO> updates) {
         StringBuilder json = new StringBuilder(32 + updates.size() * 96);
         json.append("{\"type\":\"meter-batch\",\"payload\":{\"updates\":[");
 

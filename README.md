@@ -23,6 +23,12 @@ with Ctrl+C; the MIDI server shuts down with the embedded web server.
 ## ===== Model Support =====
 Currently this has been tested on both the Yamaha 01V96i and the Yamaha M7CL
 for this to work make sure control change tx and rx are enabled and that the desk is set to NRPN mode for remote control and that **fader resolution is hi res**, _it used to be low_ but now I normalize these values in the program as this reduces the setup for the engineer/end user. The gui is using low res and then this is scaled up to be sent back to the mixer. I plan to support hi res later in the gui but in most contexts, remote mixing from a phone for in ear mixes this should be sufficient.
+## ===== M7CL SIL Simulator =====
+For software-in-the-loop meter testing without a physical desk, select
+**M7CL SIL Simulator** as both the MIDI input and output device in the settings
+page, choose **YAMAHA_M7CL** as the console type, and apply the settings. The
+simulator responds to M7CL meter SysEx requests and streams synthetic meter
+values through the same MIDI input path used for hardware.
 ## ===== Usage ======
 
 Load the index at http://<ip-address-of-server>:8080/MidiControl/settings.html
