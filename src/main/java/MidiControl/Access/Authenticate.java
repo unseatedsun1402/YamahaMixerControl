@@ -1,5 +1,8 @@
 package MidiControl.Access;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Locale;
@@ -7,7 +10,6 @@ import java.util.Optional;
 
 public class Authenticate {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-    private final CredentialStore credentialManager = new CredentialStore();
 
     public enum Role {
         GUEST,
@@ -37,9 +39,20 @@ public class Authenticate {
         }
     }
 
-    private static String createToken() {
+    public static String createSalt() {
         byte[] bytes = new byte[32];
         SECURE_RANDOM.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    public static Optional<byte[]> generateNewToken(String salt, String base_input) {
+        String hashInput = String.format("%s%s", salt == null ? "" : salt, base_input == null ? "" : base_input);
+
+        try {
+            MessageDigest hashMethod = MessageDigest.getInstance("SHA-256");
+            return Optional.of(hashMethod.digest(hashInput.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
+            return Optional.empty();
+        }
     }
 }
