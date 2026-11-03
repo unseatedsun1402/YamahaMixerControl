@@ -46,9 +46,7 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
                 };
 
                 
-        logger.info(
-            "Building " + contextId
-        );
+        logger.fine("Building " + contextId);
 
 
         if (prefix == null) {
@@ -58,19 +56,13 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
         String viewType =
                 "mix-bus-view";
 
-        String viewSuffix =
-                suffix != null
-                        ? suffix
-                        : contextId;
+        String viewSuffix =suffix != null? suffix: contextId;
         
         
-        List<ControlInstance> all =
-                new ArrayList<>();
+        List<ControlInstance> all = new ArrayList<>();
 
         for (ContextFilter filter : context.getFilters()) {
-        all.addAll(
-                registry.getInstancesForFilter(
-                        filter));
+                all.addAll(registry.getInstancesForFilter(filter));
         }
 
 
@@ -92,53 +84,53 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
 
         if (pan != null) {
             result.add(createControl(
-                    pan,
-                    "PAN",
-                    "bus.pan",
-                    "Pan",
-                    ControlType.SLIDER_HORIZONTAL,
-                    viewType,
-                    viewSuffix,
-                    "BUS_PAN",
-                    null));
+				pan,
+				"PAN",
+				"bus.pan",
+				"Pan",
+				ControlType.SLIDER_HORIZONTAL,
+				viewType,
+				viewSuffix,
+				"BUS_PAN",
+				null));
         }
 
         ControlInstance dynOn =
-                findFirst(
-                        all,
-                        prefix + "Comp",
-                        "kCompOn",
-                        prefix + "Dyn",
-                        "kDynaOn");
+			findFirst(
+				all,
+				prefix + "Comp",
+				"kCompOn",
+				prefix + "Dyn",
+				"kDynaOn");
 
         ControlInstance ratio =
-                findFirst(
-                        all,
-                        prefix + "Comp",
-                        "kCompRatio",
-                        prefix + "Dyn",
-                        "kDynaRatio");
+			findFirst(
+					all,
+					prefix + "Comp",
+					"kCompRatio",
+					prefix + "Dyn",
+					"kDynaRatio");
 
         ControlInstance threshold =
-                findFirst(
-                        all,
-                        prefix + "Comp",
-                        "kCompThreshold",
-                        prefix + "Dyn",
-                        "kDynaThreshold");
+			findFirst(
+					all,
+					prefix + "Comp",
+					"kCompThreshold",
+					prefix + "Dyn",
+					"kDynaThreshold");
 
 
         if (dynOn != null) {
             result.add(createControl(
-                    dynOn,
-                    "DYN2_ON",
-                    "input.dynamics",
-                    "DYN2 On",
-                    ControlType.TOGGLE,
-                    viewType,
-                    viewSuffix,
-                    "DYNAMICS2_ON",
-                    null));
+				dynOn,
+				"DYN2_ON",
+				"input.dynamics",
+				"DYN2 On",
+				ControlType.TOGGLE,
+				viewType,
+				viewSuffix,
+				"DYNAMICS2_ON",
+				null));
         }
 
         if (ratio != null) {
@@ -156,28 +148,28 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
 
         if (threshold != null) {
             result.add(createControl(
-                    threshold,
-                    "THRESHOLD",
-                    "input.dynamics",
-                    "Threshold",
-                    ControlType.SLIDER_HORIZONTAL,
-                    viewType,
-                    viewSuffix,
-                    "DYNAMICS2_THRESHOLD",
-                    null));
+				threshold,
+				"THRESHOLD",
+				"input.dynamics",
+				"Threshold",
+				ControlType.SLIDER_HORIZONTAL,
+				viewType,
+				viewSuffix,
+				"DYNAMICS2_THRESHOLD",
+				null));
         }
 
         if (dynOn != null) {
             result.add(createControl(
-                    dynOn,
-                    "DYN2_ON",
-                    "input.dynamics",
-                    "DYN2 On",
-                    ControlType.TOGGLE,
-                    viewType,
-                    viewSuffix,
-                    "DYNAMICS2_ON",
-                    null));
+				dynOn,
+				"DYN2_ON",
+				"input.dynamics",
+				"DYN2 On",
+				ControlType.TOGGLE,
+				viewType,
+				viewSuffix,
+				"DYNAMICS2_ON",
+				null));
         }
 
 
@@ -200,11 +192,11 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
     }
 
     private void addEqControls(
-            List<ViewControl> result,
-            List<ControlInstance> controls,
-            String prefix,
-            String viewType,
-            String viewSuffix
+		List<ViewControl> result,
+		List<ControlInstance> controls,
+		String prefix,
+		String viewType,
+		String viewSuffix
     ) {
         String[] legacyBandNames = {"kEQLow", "kEQLowMid", "kEQHiMid", "kEQHi"};
 
@@ -215,19 +207,19 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
 
             for (char parameter : new char[] {'G', 'F', 'Q'}) {
                 ControlInstance control = findFirst(
-                        controls,
-                        prefix + "EQ",
-                        canonicalPrefix + parameter,
-                        "kAUXEQ",
-                        legacyPrefix + parameter);
+					controls,
+					prefix + "EQ",
+					canonicalPrefix + parameter,
+					"kAUXEQ",
+					legacyPrefix + parameter);
 
                 if (control != null) {
                     result.add(MidiControl.Controls.Widgets.EQ.createEqBandControl(
-                            control,
-                            bandNumber,
-                            parameter,
-                            viewType,
-                            viewSuffix));
+						control,
+						bandNumber,
+						parameter,
+						viewType,
+						viewSuffix));
                 }
             }
         }
@@ -253,25 +245,16 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
         }
 
         private ControlInstance findFirst(
-                List<ControlInstance> instances,
-                String group1,
-                String sub1,
-                String group2,
-                String sub2) {
+			List<ControlInstance> instances,
+			String group1,
+			String sub1,
+			String group2,
+			String sub2) {
 
-                ControlInstance result =
-                        findInstance(
-                                instances,
-                                group1,
-                                sub1);
+                ControlInstance result = findInstance(instances,	group1, sub1);
 
-                if (result != null) {
-                return result;
-                }
+                if (result != null) {return result;}
 
-                return findInstance(
-                        instances,
-                        group2,
-                        sub2);
+                return findInstance(instances,group2,sub2);
         }
 }

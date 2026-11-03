@@ -78,6 +78,7 @@
     width: var(--mix-fader-thumb-width);
     height: var(--mix-fader-thumb-height);
     left: 50%;
+    top: var(--fader-position-y, 50%);
 
     transform: translate(-50%);
 
@@ -86,6 +87,18 @@
 
     z-index: 10;
     pointer-events: none; 
+}
+
+.fader-role-sof .fader-thumb {
+    background-image: url("assets/fader-thumb-blue.svg");
+}
+
+.fader-role-output .fader-thumb {
+    background-image: url("assets/fader-thumb-yellow.svg");
+}
+
+.fader-role-master .fader-thumb {
+    background-image: url("assets/fader-thumb-green.svg");
 }
 
 
