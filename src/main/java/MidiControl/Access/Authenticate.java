@@ -25,4 +25,21 @@ public class Authenticate {
             }
         }
     }
+
+    public record AuthenticationResult(boolean successful, Role role, String token, String message) {
+
+        private static AuthenticationResult success(Role role, String token) {
+            return new AuthenticationResult(true, role, token, "");
+        }
+
+        private static AuthenticationResult failure(String message) {
+            return new AuthenticationResult(false, null, null, message);
+        }
+    }
+
+    private static String createToken() {
+        byte[] bytes = new byte[32];
+        SECURE_RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
 }
