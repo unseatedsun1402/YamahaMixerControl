@@ -3,8 +3,22 @@ import { canonicalIdFor } from "./canonical.js";
 export function classifyControl(control) {
 
     const id = canonicalIdFor(control);
+    const logicId = control.logicId || "";
+    const uiGroup = control.uiGroup || "";
+    const controlRole = control.controlRole || "";
 
     // FADERS --------------------------------------------------
+    if (
+        controlRole === "INPUT_SEND_LEVEL" ||
+        uiGroup === "input.send.sof" ||
+        logicId.startsWith("SEND_")
+    ) return "fader-role-sof";
+    if (
+        controlRole === "BUS_FADER" &&
+        id.includes("StereoFader")
+    ) return "fader-role-master";
+    if (controlRole === "BUS_FADER" || uiGroup === "bus.fader")
+        return "fader-role-output";
     if (id.includes("InputFader")) return "fader-role-input";
     if (id.includes("OutFader")) return "fader-role-output";
     if (id.includes("DCAFader")) return "fader-role-dca";

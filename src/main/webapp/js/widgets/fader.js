@@ -1,6 +1,9 @@
 import { canonicalIdFor } from "../utils/canonical.js";
 import { classifyControl } from "../utils/classify.js";
 
+const PHONE_LANDSCAPE_QUERY =
+    "(orientation: landscape) and (max-width: 960px) and (max-height: 520px)";
+
 export function renderFader(control) {
 
     const wrapper = document.createElement("div");
@@ -26,30 +29,29 @@ export function renderFader(control) {
     input.disabled = control.readOnly;
     input.className = "fader real-input";
 
-    const thumbHeight = 40;
-
     function updateThumb() {
-
-        const min = Number(input.min);
-        const max = Number(input.max);
-        const val = Number(input.value);
-
-        const pct = 1 - ((val - min) / (max - min));
-
-        thumb.style.top =
-            `calc(${pct * 100}% - ${thumbHeight / 2}px)`;
+        setThumbPosition(
+            thumb,
+            Number(input.value),
+            Number(input.min),
+            Number(input.max)
+        );
     }
 
-    function setValueFromPointer(clientY) {
+    function setValueFromPointer(event) {
 
         const rect = wrapper.getBoundingClientRect();
 
-        let pct = (clientY - rect.top) / rect.height;
+        const horizontal = isPhoneLandscape();
+        let pct = horizontal
+            ? (event.clientX - rect.left) / rect.width
+            : (event.clientY - rect.top) / rect.height;
 
         pct = Math.max(0, Math.min(1, pct));
 
-        // invert so top = max, bottom = min
-        pct = 1 - pct;
+        if (!horizontal) {
+            pct = 1 - pct;
+        }
 
         const min = Number(input.min);
         const max = Number(input.max);
@@ -87,7 +89,7 @@ export function renderFader(control) {
 
         wrapper.setPointerCapture(e.pointerId);
 
-        setValueFromPointer(e.clientY);
+        setValueFromPointer(e);
 
         e.preventDefault();
     });
@@ -98,7 +100,7 @@ export function renderFader(control) {
             return;
         }
 
-        setValueFromPointer(e.clientY);
+        setValueFromPointer(e);
 
         e.preventDefault();
     });
@@ -125,6 +127,23 @@ export function renderFader(control) {
     return wrapper;
 }
 
+function isPhoneLandscape() {
+    return window.matchMedia(PHONE_LANDSCAPE_QUERY).matches;
+}
+
+function setThumbPosition(thumb, value, min, max) {
+    const pct = (value - min) / (max - min);
+
+    thumb.style.setProperty(
+        "--fader-position-x",
+        `clamp(25px, ${pct * 100}%, calc(100% - 25px))`
+    );
+    thumb.style.setProperty(
+        "--fader-position-y",
+        `calc(${(1 - pct) * 100}% - 20px)`
+    );
+}
+
 export function updateFader(el, value) {
 
     const input = el.querySelector("input[type=range]");
@@ -148,13 +167,7 @@ export function updateFader(el, value) {
 
     if (thumb) {
 
-        const thumbHeight = 40;
-
-        const pct =
-            1 - ((value - min) / (max - min));
-
-        thumb.style.top =
-            `calc(${pct * 100}% - ${thumbHeight / 2}px)`;
+        setThumbPosition(thumb, value, min, max);
     }
 
     

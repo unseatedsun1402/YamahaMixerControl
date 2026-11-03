@@ -16,8 +16,10 @@
         <button data-tab="configuration">Configuration</button>
         <button data-tab="diagnostics">Diagnostics</button>
         <button data-tab="patching" class="danger-zone">Patching</button>
-        <div id="desk-status" class="desk-dead">Waiting for desk status…</div>
-        <a href="/MidiControl/main.html">Back to Console</a>
+        <div id="desk-status" class="desk-dead" role="status" aria-live="polite">
+            Waiting for desk status…
+        </div>
+        <a href="/MidiControl/main.html" aria-label="Back to Console">Back to Console</a>
     </nav>
 </header>
 

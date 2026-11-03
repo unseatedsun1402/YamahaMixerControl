@@ -14,6 +14,19 @@ export function buildViewRibbonFromModel(
 
     panel.innerHTML = "";
 
+    const deskStatusElement = document.createElement("div");
+    deskStatusElement.id = "desk-status";
+    deskStatusElement.className = "desk-dead";
+    deskStatusElement.textContent = "Waiting for desk status…";
+    deskStatusElement.setAttribute("role", "status");
+    deskStatusElement.setAttribute("aria-live", "polite");
+    deskStatusElement.setAttribute(
+        "aria-label",
+        "Waiting for desk status"
+    );
+
+    panel.appendChild(deskStatusElement);
+
     // INPUT BUTTON
 
     const inputBtn =
@@ -172,12 +185,6 @@ export function buildViewRibbonFromModel(
         editBtn
     );
 
-    const deskStatusElement = document.createElement("div");
-    deskStatusElement.id = "desk-status";
-    deskStatusElement.className = "desk-dead";
-    deskStatusElement.textContent = "Waiting for desk status…";
-
-    panel.appendChild(deskStatusElement);
 }
 
 export function buildPatchRibbon(selectBank) {
