@@ -1,7 +1,6 @@
 package MidiControl.MidiDeviceManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
@@ -107,7 +106,7 @@ public class MidiIOManager {
     public MidiInput getMidiIn() { return midiIn; }
 
     private List<MidiDevice.Info> listDevices() {
-        return Arrays.asList(MidiSystem.getMidiDeviceInfo());
+        return List.of(MidiDeviceUtils.getDeviceInfos());
     }
 
     public List<MidiDeviceDTO> listDeviceDTOs() {
@@ -122,7 +121,7 @@ public class MidiIOManager {
             dto.vendor = info.getVendor();
             dto.version = info.getVersion();
             try {
-                MidiDevice device = MidiSystem.getMidiDevice(info);
+                MidiDevice device = MidiDeviceUtils.getDevice(info);
                 dto.canInput = (device.getMaxTransmitters() != 0);
                 dto.canOutput = (device.getMaxReceivers() != 0);
             } catch (Exception e) {

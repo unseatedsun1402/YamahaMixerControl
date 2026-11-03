@@ -3,6 +3,7 @@ package MidiControl.Server;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.gson.Gson;
@@ -44,7 +45,7 @@ public class ServerRouter {
     private final HardwareOutputRouter outputRouter;
     private final ServerRequestParser requestParser;
 
-    private int lastKeepAlive = 0;
+    private long lastMeterRefreshNanos;
     private static final Logger logger = Logger.getLogger(ServerRouter.class.getName());
     private final MidiIOManager ioManager;
     private CanonicalRegistry registry;
@@ -52,6 +53,8 @@ public class ServerRouter {
     private Settings serverSettings = new ServerSettings();
 
     private static final long TIMEOUT_MS = 10_000;
+    private static final long METER_REFRESH_INTERVAL_NANOS =
+            TimeUnit.MILLISECONDS.toNanos(TIMEOUT_MS);
     private static boolean debug = false;
 
     public ServerRouter(UiModelService uiModels,
@@ -94,7 +97,7 @@ public class ServerRouter {
             case "set-midi-device" -> handleSetMidiDevice(session, requestId, payload);
             case "apply-midi-settings" -> handleApplyMidiSettings(session, requestId, payload);
             case "save-midi-settings" -> handleSaveMidiSettings(session, requestId, payload);
-            case "meter-keep-alive" -> handleMeterKeepAlive(session, requestId, payload);
+            case "meter-keep-alive" -> handleMeterKeepAlive();
             case "request-channel-names" -> handleRequestChannelNames(session, requestId, payload);
             case "register-session" -> handleRegisterSession(session,requestId,payload);
             case "set-debug-flag" -> handleSetDebugFlag(session,requestId,payload);
@@ -138,10 +141,11 @@ public class ServerRouter {
         }
     }
 
-    private void handleMeterKeepAlive(Session session, String requestId, JsonObject payload) {
-        int messageTime = payload.get("timestamp").getAsInt();
-        
-        if ((messageTime - lastKeepAlive) > TIMEOUT_MS && rehydrationService != null) {
+    private synchronized void handleMeterKeepAlive() {
+        long now = System.nanoTime();
+        if ((now - lastMeterRefreshNanos) > METER_REFRESH_INTERVAL_NANOS
+                && rehydrationService != null) {
+            lastMeterRefreshNanos = now;
             NotifyClients.publish(
                 ServerEvent.warning("KEEP_ALIVE",
                     "Meter keep-alive timeout – forcing meter refresh")

@@ -16,8 +16,12 @@ import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.Mocks.FakeSession;
 import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.Mocks.MockMidiIOManager;
+import MidiControl.Routing.OutputRequestSender;
+import MidiControl.Server.StateRehydrationService;
+import MidiControl.Server.Rehydration.RehydrationManager;
 
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 class MinimalUiModelService implements UiModelService {
 
@@ -97,5 +101,54 @@ public class ServerRouterEnvelopeTest {
         assertTrue(payload.getAsJsonArray("controls").isEmpty());
 
         System.out.println("Outbound Envelope: " + json);
+    }
+
+    @Test
+    void meterKeepAliveSendsM7clRequestWithoutNarrowingClientTimestamp() {
+        MockCanonicalRegistry registry = new MockCanonicalRegistry();
+        registry.setDeskType("YAMAHA_M7CL");
+        CapturingOutputRouter outputRouter = new CapturingOutputRouter();
+        ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(1);
+        RehydrationManager rehydrationManager =
+                new RehydrationManager(outputRouter, registry, scheduler);
+        try {
+            MidiIOManager ioManager = new MockMidiIOManager(null);
+            ServerRouter router = new ServerRouter(
+                    new MinimalUiModelService(new UiModelDTO()),
+                    new SubscriptionManager(),
+                    registry,
+                    ioManager);
+            router.injectApp(new StateRehydrationService(rehydrationManager, ioManager));
+
+            FakeSession session = new FakeSession("meter-session");
+            String keepAlive = """
+                    {"type":"meter-keep-alive","payload":{"timestamp":1793573046169}}
+                    """;
+
+            router.handleMessage(session, keepAlive);
+            router.handleMessage(session, keepAlive);
+
+            assertEquals(1, outputRouter.sendCount);
+            assertArrayEquals(new byte[] {
+                    (byte) 0xF0, 0x43, 0x30, 0x3E, 0x11, 0x21,
+                    0x00, 0x00, 0x00, 0x00, 0x20, (byte) 0xF7
+            }, outputRouter.lastSent);
+        } finally {
+            rehydrationManager.shutdown();
+        }
+    }
+
+    private static final class CapturingOutputRouter implements OutputRequestSender {
+        private byte[] lastSent;
+        private int sendCount;
+
+        @Override
+        public void applyRequest(String canonicalId) {}
+
+        @Override
+        public void send(byte[] message) {
+            lastSent = message.clone();
+            sendCount++;
+        }
     }
 }
