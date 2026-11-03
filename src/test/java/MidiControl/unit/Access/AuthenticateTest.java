@@ -1,8 +1,13 @@
 package MidiControl.unit.Access;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -68,5 +73,29 @@ public class AuthenticateTest {
         assertFalse(testResult.successful());
         assertEquals(testMessage, testResult.message());
         assertEquals(null,testResult.role());
+    }
+
+    @Test
+    public void testGenerateTokenReturnsBytes() throws NoSuchAlgorithmException {
+        String baseInput = "";
+        Optional<byte[]> testBytes = Authenticate.generateNewToken(baseInput, baseInput);
+
+        var actual = testBytes.orElseThrow();
+        byte[] expectedBytes = MessageDigest.getInstance("SHA-256").digest(new byte[0]);
+
+        assertTrue(actual != null);
+        assertEquals(32, actual.length);
+        assertArrayEquals(expectedBytes, actual);
+    }
+
+    @Test
+    public void testGenerateSalt() throws NoSuchAlgorithmException {
+        String testSalt = "";
+        int base64paddedsize = 43;
+
+        testSalt = Authenticate.createSalt();
+
+        assertTrue(testSalt != "");
+        assertEquals(testSalt.length(),base64paddedsize);
     }
 }
