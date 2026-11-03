@@ -2,6 +2,7 @@ body {
     margin: 0;
     
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
 
     display: flex;
@@ -22,17 +23,19 @@ body {
 #strip-container {
     display: flex;
     flex-direction: row;
-    gap: 12px;
+    gap: var(--mix-strip-gap);
 
     
     flex: 1;
     min-height: 0;
 
-    padding: 8px;
+    padding: var(--mix-container-padding);
 
     overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 .channel-strip {
@@ -40,7 +43,7 @@ body {
     flex-direction: column;
     flex: 0 0 auto;
 
-    width: 220px;
+    width: var(--mix-strip-width);
     height: 100%;
     min-height: 0;
     min-width: 0;
@@ -48,7 +51,7 @@ body {
     overflow: hidden;
     box-sizing: border-box;
 
-    padding: 12px;
+    padding: var(--mix-strip-padding);
 
     background: #1b1b1b;
     border-radius: 8px;
@@ -63,12 +66,14 @@ body {
 }
 
 .strip-scroll-area {
-    flex: 0 1 auto;
+    flex: 1 1 auto;
     min-height: 0;
     min-width: 0;
 
     overflow-y: auto;
     padding-right: 4px;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
 
     scrollbar-width: none;
 }
@@ -94,8 +99,8 @@ body {
 
 
 .strip-fader-area {
-    flex: 0 0 35vh;
-    min-height: 240px;
+    flex: 0 0 var(--mix-fader-area-height);
+    min-height: 0;
     max-height: 450px;
 
     display: flex;
@@ -170,14 +175,11 @@ select {
 
 @media (max-width: 768px) {
     .channel-strip {
-        width: 140px;
-        flex: 0 0 140px;
+        flex-basis: var(--mix-strip-width);
     }
 
     #strip-container {
-        gap: 6px;
-        padding: 4px;
-        padding-bottom: 8px;;
+        padding-bottom: 8px;
     }
 
     .control-label {
@@ -188,7 +190,12 @@ select {
     input[type="range"] {
         width: 100%;
     }
-    
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+    .strip-fader-area {
+        max-height: 220px;
+    }
 }
 
 .global-alert {

@@ -4,8 +4,9 @@
 
     flex: 1 1 auto;
 
-    width: 32px;
-    min-height: 140px;
+    width: var(--mix-fader-hit-width);
+    height: var(--mix-fader-container-height);
+    min-height: var(--mix-fader-min-height);
 
     align-self: center;
 
@@ -74,8 +75,8 @@
 
 .fader-thumb {
     position: absolute;
-    width: 50px;
-    height: 40px;
+    width: var(--mix-fader-thumb-width);
+    height: var(--mix-fader-thumb-height);
     left: 50%;
 
     transform: translate(-50%);
@@ -151,10 +152,6 @@
 /* SMALL VIEWPORT ADAPTATION */
 
 @media (max-width: 768px) {
-    .fader-container {
-        height: clamp(120px, 22vh, 300px);
-    }
-
     .fader-block {
         margin: 0.5rem;
         min-width: 60px;
@@ -166,5 +163,15 @@
         font-size: 0.75rem;
         width: auto;
         text-align: center;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+    .fader-container {
+        height: auto;
+    }
+
+    .fader-label {
+        display: none;
     }
 }
