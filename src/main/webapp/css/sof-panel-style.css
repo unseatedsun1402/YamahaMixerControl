@@ -3,7 +3,7 @@
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
-    gap: 8px;
+    gap: var(--mix-nav-gap, 8px);
 }
 
 
@@ -55,7 +55,9 @@
 }
 
 .sof-btn {
+    box-sizing: border-box;
     padding: 8px 12px;
+    min-height: var(--mix-nav-button-height, 0);
     flex: 0 0 auto;
     background: #333;
     border: 1px solid #666;
@@ -86,9 +88,11 @@
 }
 
 .bank-btn {
+    box-sizing: border-box;
     flex: 0 0 auto;
 
     padding: 8px 12px;
+    min-height: var(--mix-nav-button-height, 0);
 
     background: #333;
     border: 1px solid #666;
@@ -104,6 +108,7 @@
 }
 
 #bank-selector {
+    gap: var(--mix-nav-gap, 8px);
     overflow-x: auto;
     overflow-y: hidden;
 

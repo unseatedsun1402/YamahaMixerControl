@@ -1,0 +1,47 @@
+:root {
+    --mix-strip-width: 220px;
+    --mix-strip-gap: 12px;
+    --mix-container-padding: 8px;
+    --mix-strip-padding: 12px;
+    --mix-fader-area-height: clamp(240px, 35vh, 450px);
+    --mix-fader-container-height: auto;
+    --mix-fader-min-height: 140px;
+    --mix-fader-hit-width: 44px;
+    --mix-fader-thumb-width: 50px;
+    --mix-fader-thumb-height: 40px;
+    --mix-nav-gap: 8px;
+    --mix-nav-button-height: 44px;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --mix-strip-width: 176px;
+        --mix-strip-gap: 8px;
+        --mix-container-padding: 6px;
+        --mix-strip-padding: 10px;
+        --mix-fader-area-height: clamp(220px, 32vh, 340px);
+        --mix-fader-container-height: clamp(120px, 22vh, 300px);
+        --mix-fader-min-height: 124px;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --mix-strip-width: 168px;
+        --mix-strip-gap: 6px;
+        --mix-container-padding: 4px;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+    :root {
+        --mix-strip-width: 176px;
+        --mix-strip-gap: 8px;
+        --mix-container-padding: 6px;
+        --mix-strip-padding: 10px;
+        --mix-fader-area-height: clamp(160px, 44vh, 210px);
+        --mix-fader-container-height: auto;
+        --mix-fader-min-height: 96px;
+        --mix-nav-button-height: 36px;
+    }
+}
