@@ -27,6 +27,7 @@ public class ServerSettings implements Settings{
 
     public String consoleMappingsPath;
     private String consoleName;
+    public String preferredHostAddress;
 
     public ServerSettings(){
         loadSettings();
@@ -113,6 +114,10 @@ public class ServerSettings implements Settings{
                 loadedSettings.has("consoleName")
                 ? loadedSettings.get("consoleName").getAsString() : null;
 
+            preferredHostAddress =
+                loadedSettings.has("preferredHostAddress")
+                ? loadedSettings.get("preferredHostAddress").getAsString() : null;
+
             consoleMappingsPath =
                 loadedSettings.has("consoleMappingsPath")
                 ? loadedSettings.get("consoleMappingsPath").getAsString() : null;
@@ -137,6 +142,12 @@ public class ServerSettings implements Settings{
 
     public String getConsoleName(){return (this.consoleName != null) ? this.consoleName : "empty";}
 
+    public String getPreferredHostAddress(){return preferredHostAddress;}
+
+    public void setPreferredHostAddress(String preferredHostAddress){
+        this.preferredHostAddress = preferredHostAddress;
+    }
+
     public void newSettings(int inputIndex,String inputName,int outputIndex,String outputName, String consoleName) {
     this.inputDeviceIndex = inputIndex;
     this.inputDeviceName = inputName;
@@ -158,8 +169,8 @@ public class ServerSettings implements Settings{
     } 
 
     logger.info(String.format("Saving settings: %s",toSave));
-    if(consoleName == null){
-        logger.warning("Cannot save setings - the console name is empty");
+    if(consoleName == null && preferredHostAddress == null){
+        logger.warning("Cannot save settings - console name and preferred host are empty");
         return false;
     }
 
@@ -200,7 +211,8 @@ public class ServerSettings implements Settings{
             +     "\"outputDeviceName\": \"" + outputDeviceName + "\","
             +     "\"outputDeviceIndex\": " + outputDeviceIndex + ","
             +     "\"consoleName\": \"" + consoleName + "\","
-            +     "\"consoleMappingsPath\": \"" + consoleMappingsPath + "\""
+            +     "\"consoleMappingsPath\": \"" + consoleMappingsPath + "\","
+            +     "\"preferredHostAddress\": \"" + preferredHostAddress + "\""
             + "}";
     }
 

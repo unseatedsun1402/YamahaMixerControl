@@ -48,6 +48,7 @@ window.wsClient = ws;
 ws.on("connected", () => {
   console.log("[Settings] Connected, requesting device list...");
   ws.requestMidiDevices();
+  loadServerInterfaceOptions();
   ws.setSessionType("settings");
   console.info(`[Settings] Registering session type ${ws.sessionType}`);
 });
@@ -219,6 +220,83 @@ function showStatus(text) {
   el.style.opacity = 1;
   setTimeout(() => el.style.opacity = 0, 2000);
 }
+
+async function loadServerInterfaceOptions() {
+  const select = document.getElementById("server-interface-select");
+  const applyButton = document.getElementById("apply-network-choice");
+  if (!select) return;
+
+  const url = new URL("get-server-ip", window.location.href);
+  url.searchParams.set("action", "list");
+
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const result = await response.json();
+    const options = Array.isArray(result?.payload) ? result.payload : [];
+
+    select.innerHTML = "";
+
+    if (!options.length) {
+      const none = document.createElement("option");
+      none.value = "";
+      none.textContent = "No LAN interfaces found";
+      select.appendChild(none);
+      if (applyButton) applyButton.disabled = true;
+      return;
+    }
+
+    options.forEach((optionData) => {
+      const option = document.createElement("option");
+      option.value = optionData.address || "";
+      option.textContent = optionData.preferred
+        ? `${optionData.address} (preferred)`
+        : optionData.address;
+      if (optionData.preferred) option.selected = true;
+      select.appendChild(option);
+    });
+
+    if (applyButton) applyButton.disabled = false;
+  }
+  catch (error) {
+    console.warn("[Settings] Failed to load interface list:", error);
+    select.innerHTML = "";
+    const fallback = document.createElement("option");
+    fallback.value = "";
+    fallback.textContent = "Unable to detect interfaces";
+    select.appendChild(fallback);
+    if (applyButton) applyButton.disabled = true;
+  }
+}
+
+async function applyServerInterfaceSelection() {
+  const select = document.getElementById("server-interface-select");
+  if (!select || !select.value) {
+    showStatus("No interface selected");
+    return;
+  }
+
+  const url = new URL("get-server-ip", window.location.href);
+  url.searchParams.set("action", "select");
+  url.searchParams.set("preferredHost", select.value);
+
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const result = await response.json();
+    const selected = result?.payload?.selected || select.value;
+    showStatus(`Serving on ${selected}`);
+    await loadServerInterfaceOptions();
+  }
+  catch (error) {
+    console.warn("[Settings] Failed to update interface selection:", error);
+    showStatus("Unable to save interface choice");
+  }
+}
+
+document.getElementById("apply-network-choice")?.addEventListener("click", applyServerInterfaceSelection);
 
 function updateTelemetry(data) {
     document.getElementById("telemetry-in").textContent =

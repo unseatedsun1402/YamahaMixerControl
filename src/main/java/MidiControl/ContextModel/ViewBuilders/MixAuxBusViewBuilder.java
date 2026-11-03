@@ -175,12 +175,6 @@ public class MixAuxBusViewBuilder implements ViewBuilder {
 
         addEqControls(result, all, prefix, viewType, viewSuffix);
 
-        System.out.println("controls = " + result.size());
-
-        for (ViewControl c : result) {
-        System.out.println(c.logicId);
-        }
-
         return result;
     }
 
