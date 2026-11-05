@@ -1,5 +1,5 @@
 {
-    "java.configuration.updateBuildConfiguration": "disabled",
+    "java.configuration.updateBuildConfiguration": "automatic",
     "java.debug.settings.onBuildFailureProceed": true,
     "log-tail.channel": "document",       //Configuring the log printout channel
     // make sure to update remote object with your server ssh details

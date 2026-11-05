@@ -6,7 +6,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+
+import com.google.gson.JsonObject;
+
+import jakarta.websocket.Session;
 
 public class Authenticate {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
@@ -54,5 +60,102 @@ public class Authenticate {
         } catch (NoSuchAlgorithmException e) {
             return Optional.empty();
         }
+    }
+
+    public static AuthenticationResult authenticateToken(CredentialStore directory, String token){
+        Optional<Authenticate.Role> maybeToken = directory.getTokenRole(token);
+        if(maybeToken.isPresent()){
+            return AuthenticationResult.success(maybeToken.get(),token);
+        }
+        return AuthenticationResult.failure("Token validation failed: reason unknown");
+    }
+
+    public static String createCredentialsAndStore(CredentialStore directory, Session session, Role role) {
+        Objects.requireNonNull(directory, "directory");
+        Objects.requireNonNull(role, "role");
+
+        JsonObject metadata = buildMetadata(session, createSalt());
+        byte[] tokenBytes = new byte[32];
+        SECURE_RANDOM.nextBytes(tokenBytes);
+        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
+        directory.storeBearerToken(token, role, metadata);
+        return token;
+    }
+
+    public static JsonObject buildMetadata(Session session, String salt) {
+        Objects.requireNonNull(session, "session");
+        Objects.requireNonNull(salt, "salt");
+
+        JsonObject metadata = new JsonObject();
+        Map<String, Object> properties = session.getUserProperties();
+        String userAgent = readProperty(properties, "userAgent");
+
+        metadata.addProperty("salt", salt);
+        metadata.addProperty("sessionId", session.getId());
+        metadata.addProperty("clientIp", readProperty(properties, "clientIp"));
+        metadata.addProperty("browser", detectBrowser(userAgent));
+        metadata.addProperty("os", detectOperatingSystem(userAgent));
+
+        return metadata;
+    }
+
+    private static String readProperty(Map<String, Object> properties, String key) {
+        Object value = properties == null ? null : properties.get(key);
+        if (value == null) {
+            return "unknown";
+        }
+
+        String text = value.toString().trim();
+        return text.isEmpty() ? "unknown" : text;
+    }
+
+    private static String detectBrowser(String userAgent) {
+        String normalized = userAgent.toLowerCase(Locale.ROOT);
+        if (normalized.contains("edg/")) {
+            return "Edge";
+        }
+        if (normalized.contains("opr/")) {
+            return "Opera";
+        }
+        if (normalized.contains("samsungbrowser/")) {
+            return "Samsung Internet";
+        }
+        if (normalized.contains("vivaldi/")) {
+            return "Vivaldi";
+        }
+        if (normalized.contains("chrome/") || normalized.contains("crios/")) {
+            return "Chrome";
+        }
+        if (normalized.contains("firefox/") || normalized.contains("fxios/")) {
+            return "Firefox";
+        }
+        if (normalized.contains("safari/")) {
+            return "Safari";
+        }
+        return "unknown";
+    }
+
+    private static String detectOperatingSystem(String userAgent) {
+        String normalized = userAgent.toLowerCase(Locale.ROOT);
+        if (normalized.contains("cros ")) {
+            return "ChromeOS";
+        }
+        if (normalized.contains("android")) {
+            return "Android";
+        }
+        if (normalized.contains("iphone") || normalized.contains("ipad")
+                || normalized.contains("ipod") || normalized.contains("cpu iphone")) {
+            return "iOS";
+        }
+        if (normalized.contains("windows")) {
+            return "Windows";
+        }
+        if (normalized.contains("mac os") || normalized.contains("macintosh")) {
+            return "macOS";
+        }
+        if (normalized.contains("linux")) {
+            return "Linux";
+        }
+        return "unknown";
     }
 }
