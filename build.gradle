@@ -14,6 +14,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.apache.tomcat.embed:tomcat-embed-websocket'
+    implementation 'org.jmdns:jmdns:3.5.10'
 
     // Align all JUnit modules
     testImplementation platform('org.junit:junit-bom:5.10.2')
@@ -44,6 +45,39 @@ tasks.named('processResources') {
 
 tasks.named('jar') {
     enabled = false
+}
+
+tasks.register('packageWindowsApp', Exec) {
+    dependsOn tasks.named('bootJar')
+
+    def appName = 'YamahaMixerControl'
+    def outputDirectory = layout.buildDirectory.dir("desktop/${appName}").get().asFile
+    def destinationDirectory = outputDirectory.parentFile
+    def jpackageExecutable = new File(System.getProperty('java.home'), 'bin/jpackage.exe')
+    def bootJarFile = tasks.named('bootJar').get().archiveFile.get().asFile
+
+    inputs.file(bootJarFile)
+    outputs.dir(outputDirectory)
+
+    doFirst {
+        if (!jpackageExecutable.isFile()) {
+            throw new GradleException(
+                    "jpackage was not found at ${jpackageExecutable}. Run this task with a JDK 18 or newer."
+            )
+        }
+        outputDirectory.deleteDir()
+    }
+
+    commandLine(
+            jpackageExecutable.absolutePath,
+            '--type', 'app-image',
+            '--name', appName,
+            '--input', bootJarFile.parentFile.absolutePath,
+            '--main-jar', bootJarFile.name,
+            '--main-class', 'org.springframework.boot.loader.launch.JarLauncher',
+            '--java-options', '-Djava.awt.headless=false',
+            '--dest', destinationDirectory.absolutePath
+    )
 }
 
 springBoot {

@@ -64,6 +64,21 @@ class EmbeddedPatchEndpointsTest {
         }
     }
 
+    @Test
+    void serverAddressEndpointUsesTheRunningServerPort() throws Exception {
+        HttpResponse<String> response = HttpClient.newHttpClient().send(
+                HttpRequest.newBuilder(uri("/MidiControl/get-server-ip")).GET().build(),
+                HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(200, response.statusCode());
+        JsonObject payload = JsonParser.parseString(response.body()).getAsJsonObject();
+        assertEquals("loc-request", payload.get("type").getAsString());
+        String address = payload.get("payload").getAsString();
+        assertTrue(address.startsWith("http://"));
+        assertTrue(address.contains(":" + port + "/MidiControl"),
+                "Address should use the embedded server's actual port");
+    }
+
     private String firstContext(JsonObject bank) {
         JsonArray contexts = bank.getAsJsonArray("contexts");
         assertTrue(contexts.size() > 0, "Patch bank should contain at least one context");
