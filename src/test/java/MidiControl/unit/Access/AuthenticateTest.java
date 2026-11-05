@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import MidiControl.Access.Authenticate;
+import MidiControl.Access.CredentialStore;
 
 @Tag("unit")
 public class AuthenticateTest {
@@ -97,5 +98,23 @@ public class AuthenticateTest {
 
         assertTrue(testSalt != "");
         assertEquals(testSalt.length(),base64paddedsize);
+    }
+
+    @Test
+    public void testAuthenticateSuccess() {
+        CredentialStore testDirectory = new CredentialStore();
+        String testToken = "test token";
+        Authenticate.Role testRole = Authenticate.Role.GUEST;
+        
+        testDirectory.storeBearerToken(testToken,testRole);
+        assertTrue(Authenticate.authenticateToken(testDirectory,testToken).successful());
+    }
+
+    @Test
+    public void testEmptyDirectoryReturnsFailureOnAuthenticate() {
+        CredentialStore testDirectory = new CredentialStore();
+        String testToken = "test token";
+        
+        assertFalse(Authenticate.authenticateToken(testDirectory,testToken).successful());
     }
 }

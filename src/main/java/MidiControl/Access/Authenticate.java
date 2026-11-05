@@ -55,4 +55,12 @@ public class Authenticate {
             return Optional.empty();
         }
     }
+
+    public static AuthenticationResult authenticateToken(CredentialStore directory, String token){
+        Optional<Authenticate.Role> maybeToken = directory.getTokenRole(token);
+        if(maybeToken.isPresent()){
+            return AuthenticationResult.success(maybeToken.get(),token);
+        }
+        return AuthenticationResult.failure("Token validation failed: reason unknown");
+    }
 }
