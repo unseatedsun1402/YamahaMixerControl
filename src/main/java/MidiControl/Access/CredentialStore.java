@@ -1,22 +1,39 @@
 package MidiControl.Access;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
+import com.google.gson.JsonObject;
+
 public class CredentialStore {
-    private final HashMap<String,Authenticate.Role> directory = new HashMap();
+    private record Credential(Authenticate.Role role, JsonObject metadata) {}
 
-    public void storeBearerToken(String token, Authenticate.Role role){
-        directory.put(token,role);
-        System.out.println(String.format("Stored %s for role %s",token,role));
+    private final Map<String, Credential> directory = new HashMap<>();
+
+    public void storeBearerToken(String token, Authenticate.Role role) {
+        storeBearerToken(token, role, new JsonObject());
     }
 
-    public boolean checkTokenExists(String token){
-        return directory.get(token) == null ? false : true;
+    public void storeBearerToken(String token, Authenticate.Role role, JsonObject metadata) {
+        Objects.requireNonNull(token, "token");
+        Objects.requireNonNull(role, "role");
+        Objects.requireNonNull(metadata, "metadata");
+        directory.put(token, new Credential(role, metadata.deepCopy()));
     }
 
-    public Optional<Authenticate.Role> getTokenRole(String token){
-        if (! checkTokenExists(token)) { return Optional.empty(); }
-        return Optional.of(directory.get(token));
+    public boolean checkTokenExists(String token) {
+        return directory.containsKey(token);
+    }
+
+    public Optional<Authenticate.Role> getTokenRole(String token) {
+        return Optional.ofNullable(directory.get(token)).map(Credential::role);
+    }
+
+    public Optional<JsonObject> getTokenMetadata(String token) {
+        return Optional.ofNullable(directory.get(token))
+                .map(Credential::metadata)
+                .map(JsonObject::deepCopy);
     }
 }
