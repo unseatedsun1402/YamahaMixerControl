@@ -158,4 +158,33 @@ public class Authenticate {
         }
         return "unknown";
     }
+
+    private static boolean checkTrusted(JsonObject metadata, Session session) {
+        String tokenbrowser = metadata.has("browser") ? metadata.get("browser").getAsString() : "unknown";
+        String tokenos = metadata.has("os") ? metadata.get("os").getAsString() : "unknown";
+        String tokenIpAddress = metadata.has("clientIp") ? metadata.get("clientIp").getAsString() : "unknown";
+        String tokensessionId = metadata.has("sessionId") ? metadata.get("sessionId").getAsString() : "unknown";
+
+        Map<String, Object> properties = session.getUserProperties();
+        String userAgent = readProperty(properties, "userAgent");
+
+        String sessionIpAddress = readProperty(properties, "clientIp");
+        String sessionos = detectOperatingSystem(userAgent);
+        String sessionbrowser = detectBrowser(userAgent);
+
+        int score = 0;
+
+        score += isKnownMatch(session.getId(), tokensessionId) ? 10 : 0;
+        score += isKnownMatch(sessionIpAddress, tokenIpAddress) ? 10 : 0;
+        score += isKnownMatch(sessionos, tokenos) ? 10 : 0;
+        score += isKnownMatch(sessionbrowser, tokenbrowser) ? 10 : 0;
+
+        return score >= 20;
+    }
+
+    private static boolean isKnownMatch(String sessionValue, String tokenValue) {
+        return !"unknown".equals(sessionValue)
+                && !"unknown".equals(tokenValue)
+                && Objects.equals(sessionValue, tokenValue);
+    }
 }
