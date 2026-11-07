@@ -165,6 +165,10 @@ public class GetServerIP extends HttpServlet {
         return "127.0.0.1";
     }
 
+    public String getServerIpAddress() {
+        return detectLanIp();
+    }
+
     private boolean isWireless(NetworkInterface nic) {
         String interfaceName = (
                 nic.getName() + " " + nic.getDisplayName()

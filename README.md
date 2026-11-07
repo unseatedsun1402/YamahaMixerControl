@@ -12,14 +12,25 @@ To build the executable:
 .\gradlew.bat clean bootJar
 ```
 
-Run it with:
+For a Windows desktop launcher (recommended for file-browser launches), run:
 
 ```powershell
-java -jar .\build\libs\YamahaMixerControl.jar
+.\gradlew.bat packageWindowsApp
 ```
 
-The application is available at http://127.0.0.1:8080/MidiControl. Stop it
-with Ctrl+C; the MIDI server shuts down with the embedded web server.
+Launch `.\build\desktop\YamahaMixerControl\YamahaMixerControl.exe`. Keep the
+entire `YamahaMixerControl` folder together when moving or distributing the
+application. The status window shows the network address and the
+`YamahaMixerControl.local` address when local network discovery is available.
+Use **Exit** (or close the window) to stop the server. On networks that block
+multicast DNS, use the displayed IP address instead.
+If the server port is already in use, the launcher shows a dialog identifying
+the port and advising you to close the other app.
+
+To run the executable JAR directly, use `java -jar
+.\build\libs\YamahaMixerControl.jar`; Windows will identify that process as
+Java rather than YamahaMixerControl. The server is available at
+http://127.0.0.1:8080/MidiControl and can also be stopped with Ctrl+C.
 ## ===== Model Support =====
 Currently this has been tested on both the Yamaha 01V96i and the Yamaha M7CL
 for this to work make sure control change tx and rx are enabled and that the desk is set to NRPN mode for remote control and that **fader resolution is hi res**, _it used to be low_ but now I normalize these values in the program as this reduces the setup for the engineer/end user. The gui is using low res and then this is scaled up to be sent back to the mixer. I plan to support hi res later in the gui but in most contexts, remote mixing from a phone for in ear mixes this should be sufficient.
