@@ -64,10 +64,11 @@ Change the users in the conf area users.xml of the unpacked folder to suit your 
 <img width="3244" height="2329" alt="image" src="https://github.com/user-attachments/assets/e28ab26d-b102-486f-9d09-49debce5a708" />
 above: default mix view
 
-<img width="1226" height="1046" alt="image" src="https://github.com/user-attachments/assets/df260c30-ef08-496e-b219-868ccefa6c9a" />
+<img width="1634" height="1429" alt="image" src="https://github.com/user-attachments/assets/30c6d8dc-2a28-4fef-ae25-39e5dcbdd1cf" />
 above: edit view
 
-<img width="3767" height="1772" alt="image" src="https://github.com/user-attachments/assets/4b0970f3-0190-4abd-b6a3-9011057d754a" />
+<img width="3760" height="1142" alt="image" src="https://github.com/user-attachments/assets/29b52e25-d4d2-4bbb-afc6-36b997d7ba71" />
+
 above: settings page
 
 <img width="1809" height="1065" alt="image" src="https://github.com/user-attachments/assets/6a58156c-f779-4ab8-97c5-1779122d3e18" />
