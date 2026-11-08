@@ -24,7 +24,10 @@
     }
 
     #view-ribbon #desk-status {
-        flex: 0 0 auto;
+        box-sizing: border-box;
+        width: 64px;
+        height: 24px;
+        flex: 0 0 64px;
         padding: 4px 8px;
         font-size: 0;
         line-height: 1;

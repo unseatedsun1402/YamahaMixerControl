@@ -5,6 +5,7 @@
     <title>Server Settings</title>
     <link rel="stylesheet" href="css/setting-style.css">
     <link rel="stylesheet" href="css/authentication.css">
+    <link rel="stylesheet" href="css/page-navigation.css">
     <script type="module" src="js/settings.js"></script>
 </head>
 
@@ -13,14 +14,17 @@
 <header class="page-header">
     <h1>MIDI Settings</h1>
 
-    <nav class="settings-tabs">
-        <button data-tab="configuration">Configuration</button>
-        <button data-tab="diagnostics">Diagnostics</button>
-        <button data-tab="patching" class="danger-zone">Patching</button>
+    <nav class="settings-tabs" aria-label="Settings and page navigation">
         <div id="desk-status" class="desk-dead" role="status" aria-live="polite">
             Waiting for desk status…
         </div>
-        <a href="/MidiControl/main.html" aria-label="Back to Console">Back to Console</a>
+        <button data-tab="configuration">Configuration</button>
+        <button data-tab="diagnostics">Diagnostics</button>
+        <button data-tab="patching" class="danger-zone">Patching</button>
+
+        <a class="page-nav-link" href="/MidiControl/main.html" aria-label="View Mixer">Mixer</a>
+        <a class="page-nav-link" href="/MidiControl/meters.html" aria-label="View Meters">Meters</a>
+        <a class="page-nav-link" href="/MidiControl/index.html" aria-label="View QR Codes">QR Codes</a>
     </nav>
 </header>
 
