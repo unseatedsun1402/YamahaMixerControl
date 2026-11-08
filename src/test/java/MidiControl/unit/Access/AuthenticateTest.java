@@ -171,4 +171,62 @@ public class AuthenticateTest {
         
         assertFalse(Authenticate.authenticateToken(testDirectory,testToken).successful());
     }
+
+    @Test
+    public void testCheckTrustedUsesStringValuesAndAcceptsTwoMatchingKnownValues()
+            throws ReflectiveOperationException {
+        JsonObject metadata = new JsonObject();
+        metadata.addProperty("sessionId", new String("session-123"));
+        metadata.addProperty("clientIp", new String("192.0.2.10"));
+        metadata.addProperty("os", "Linux");
+        metadata.addProperty("browser", "Firefox");
+
+        Session session = mock(Session.class);
+        when(session.getId()).thenReturn(new String("session-123"));
+        when(session.getUserProperties()).thenReturn(Map.of(
+                "clientIp", new String("192.0.2.10"),
+                "userAgent", "Mozilla/5.0 (Windows NT 10.0) Chrome/120.0"));
+
+        assertTrue(invokeCheckTrusted(metadata, session));
+    }
+
+    @Test
+    public void testCheckTrustedRejectsOnlyOneMatchingValue() throws ReflectiveOperationException {
+        JsonObject metadata = new JsonObject();
+        metadata.addProperty("sessionId", new String("session-123"));
+        metadata.addProperty("clientIp", "192.0.2.10");
+        metadata.addProperty("os", "Linux");
+        metadata.addProperty("browser", "Firefox");
+
+        Session session = mock(Session.class);
+        when(session.getId()).thenReturn(new String("session-123"));
+        when(session.getUserProperties()).thenReturn(Map.of(
+                "clientIp", "198.51.100.5",
+                "userAgent", "Mozilla/5.0 (Windows NT 10.0) Chrome/120.0"));
+
+        assertFalse(invokeCheckTrusted(metadata, session));
+    }
+
+    @Test
+    public void testCheckTrustedDoesNotCountUnknownValuesAsEvidence() throws ReflectiveOperationException {
+        JsonObject metadata = new JsonObject();
+        metadata.addProperty("sessionId", "stored-session");
+        metadata.addProperty("clientIp", "192.0.2.10");
+        metadata.addProperty("os", "unknown");
+        metadata.addProperty("browser", "unknown");
+
+        Session session = mock(Session.class);
+        when(session.getId()).thenReturn("current-session");
+        when(session.getUserProperties()).thenReturn(Map.of(
+                "clientIp", "198.51.100.5",
+                "userAgent", ""));
+
+        assertFalse(invokeCheckTrusted(metadata, session));
+    }
+
+    private boolean invokeCheckTrusted(JsonObject metadata, Session session) throws ReflectiveOperationException {
+        var method = Authenticate.class.getDeclaredMethod("checkTrusted", JsonObject.class, Session.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(null, metadata, session);
+    }
 }
