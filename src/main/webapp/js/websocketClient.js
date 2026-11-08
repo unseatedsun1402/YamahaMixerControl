@@ -149,6 +149,16 @@ export class WebSocketClient {
     for (const message of pending) {
       this.ws.send(JSON.stringify(message));
     }
+
+    requestMeters(category, source, startChannel, channelCount) {
+      const message = {
+        type: "request-meters",
+        requestId: `req-${++this.requestCounter}`,
+        payload: { category, source, startChannel, channelCount }
+      };
+
+      this._send(message);
+    }
   }
 
   sendAuthenticationToken(token) {

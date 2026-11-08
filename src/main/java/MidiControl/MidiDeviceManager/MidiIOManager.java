@@ -94,7 +94,6 @@ public class MidiIOManager {
 
     public void setThroughputProfile(ThroughputProfile profile) {
         ThroughputProfile current = this.getThroughputProfile();
-        if(profile == ThroughputProfile.SAFE_DIN)server.getRehydrationManager().delayMeterRequests();
         if (current == profile) return;
         this.throughput = profile;
         RehydrationManager.changeRehydrationDelay(profile.pollDelay);

@@ -22,6 +22,7 @@ public final class MeterSimpleParser {
                 thread.setDaemon(true);
                 return thread;
             });
+    private static volatile MeterRange requestedRange = new MeterRange(0, 128);
 
     static {
         meterProcessor.scheduleWithFixedDelay(
@@ -34,6 +35,16 @@ public final class MeterSimpleParser {
     public static void addListener(MeterUpdateListener l) { listeners.add(l); }
     public static void removeListener(MeterUpdateListener l) { listeners.remove(l); }
 
+    public static void setRequestedRange(int startChannel, int channelCount) {
+        if (startChannel < 0 || startChannel > 127) {
+            throw new IllegalArgumentException("startChannel must be 0..127");
+        }
+        if (channelCount < 1 || channelCount > 0x3FFF) {
+            throw new IllegalArgumentException("channelCount must be 1..16383");
+        }
+        requestedRange = new MeterRange(startChannel, channelCount);
+    }
+
     /**
      * Clean Yamaha meter parser with correct 7‑bit / 14‑bit support.
      */
@@ -45,7 +56,8 @@ public final class MeterSimpleParser {
             int model    = msg[4] & 0xFF;
             int category = msg[6] & 0xFF;
             int source   = msg[7] & 0xFF;
-            int start    = msg[8] & 0xFF;
+            int responseStart = msg[8] & 0x7F;
+            MeterRange range = requestedRange;
 
             // Determine Yamaha meter format based on model
             int bytesPer = MeterTools.bytesPerForModel(model);
@@ -59,7 +71,7 @@ public final class MeterSimpleParser {
                 return List.of();
 
             // How many meters contained?
-            int count = payloadLen / bytesPer;
+            int count = Math.min(payloadLen / bytesPer, range.channelCount());
             if (count <= 0)
                 return List.of();
 
@@ -88,11 +100,11 @@ public final class MeterSimpleParser {
 
                 MeterDTO dto = new MeterDTO(
                         rawInt,
-                        start + i,
-                        (int) Math.min(Integer.MAX_VALUE, centi),
+                        responseStart + i,
+                        toCentiDbInt(centi),
                         (byte) model,
                         MeterCategory.fromInt(category),
-                        MeterSource.fromInt(source),
+                        MeterSource.fromInt(source, model),
                         (bytesPer == 2),
                         timestamp
                 );
@@ -109,13 +121,22 @@ public final class MeterSimpleParser {
     }
 
     private static boolean isMeterMessage(byte[] msg) {
-        if (msg == null || msg.length < 10)
+        if (msg == null || msg.length < 11)
             return false;
 
         return (msg[0] & 0xFF) == 0xF0 &&
                (msg[1] & 0xFF) == 0x43 &&
+               (msg[2] & 0xF0) == 0x10 &&
+               (msg[3] & 0xFF) == 0x3E &&
+               ((msg[4] & 0xFF) == 0x1A || (msg[4] & 0xFF) == 0x0F) &&
                (msg[5] & 0xFF) == 0x21 &&
                (msg[msg.length - 1] & 0xFF) == 0xF7;
+    }
+
+    private static int toCentiDbInt(long centi) {
+        if (centi == Long.MIN_VALUE) return Integer.MIN_VALUE;
+        return (int) Math.max(Integer.MIN_VALUE + 1L,
+                Math.min(Integer.MAX_VALUE, centi));
     }
 
     private static void enqueueMeterEvent(MeterDTO dto){
@@ -144,4 +165,6 @@ public final class MeterSimpleParser {
             }
         }
     }
+
+    private record MeterRange(int startChannel, int channelCount) {}
 }

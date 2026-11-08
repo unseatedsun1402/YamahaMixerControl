@@ -22,7 +22,10 @@ import MidiControl.DeskDiscovery.DeskDiscovery.ProbeCallback;
 import MidiControl.Routing.OutputRequestSender;
 import MidiControl.SysexUtils.ModelNumbers;
 import MidiControl.SysexUtils.SysexMapping;
+import MidiControl.UserInterface.Meter.MeterCategory;
 import MidiControl.UserInterface.Meter.MeterRequest;
+import MidiControl.UserInterface.Meter.MeterSimpleParser;
+import MidiControl.UserInterface.Meter.MeterSource;
 
 public class RehydrationManager{
 
@@ -48,8 +51,8 @@ public class RehydrationManager{
     };
     private final RehydrationTelemetry telemetry = new RehydrationTelemetry(this);
 
-    private static byte[] cachedMeterRequest = null;
-    private static byte cachedModelNumber;
+    private MeterSelection meterSelection;
+    private byte meterSelectionModelNumber = -1;
 
     private static final long CONTROL_PERIOD_MS = 200;
     private ScheduledFuture<?> controlLoopFuture;
@@ -58,9 +61,6 @@ public class RehydrationManager{
     private static final long SAFE_DELAY_MS = 20;
     private static final long WARNING_RTT_MS = 60;
     private static final long CRITICAL_RTT_MS = 100;
-    private boolean meterRequestsDelayed = false;
-    private boolean meterRequestsDelayedWarning = false;
-
     private static volatile long effectiveDelayMs = BASE_DELAY_MS;
 
     private static boolean running = false;
@@ -268,34 +268,83 @@ public class RehydrationManager{
     }
 
     public synchronized void requestMeters() {
-        byte checkModelNumber = ModelNumbers.getModelByteByString(
-                registry.getDeskType()
-        );
-
-        if (checkModelNumber < 0 || checkModelNumber > 127) {
-            logger.warning("Cannot make a request, the model number is invalid " + checkModelNumber);
+        byte modelNumber = ModelNumbers.getMeterModelByteByString(registry.getDeskType());
+        if (modelNumber < 0 || modelNumber > 127) {
+            logger.warning("Cannot make a meter request for desk model " + registry.getDeskType());
             return;
         }
 
-        if (cachedMeterRequest == null || checkModelNumber != cachedModelNumber) {
-            cachedMeterRequest = buildRequestBytes(checkModelNumber).clone();
+        if (meterSelection == null || meterSelectionModelNumber != modelNumber) {
+            int defaultCount = modelNumber == 0x1A ? 32 : 48;
+            meterSelection = new MeterSelection(
+                    MeterCategory.INPUT.getCode(),
+                    MeterSource.CHANNEL.getCode(),
+                    0,
+                    defaultCount);
+            meterSelectionModelNumber = modelNumber;
         }
 
-        if(meterRequestsDelayedWarning){
-            logger.warning("Meter requests dropped while in safe mode");
-            meterRequestsDelayedWarning = false;
-        }
-        if(!meterRequestsDelayed){
-            outputRouter.send(cachedMeterRequest);
-        }
+        sendMeterRequest(modelNumber, meterSelection);
     }
 
-    private byte[] buildRequestBytes(byte modelNumber) {
-        cachedModelNumber = modelNumber;
-        MeterRequest request = new MeterRequest(0, modelNumber, 0x0, 0x0);
-        request.setChannelCount(32);
-        request.setStartChannel(0);
-        return request.toByteArray();
+    public synchronized void requestMeters(
+            int categoryCode,
+            int sourceCode,
+            int startChannel,
+            int channelCount) {
+        byte modelNumber = ModelNumbers.getMeterModelByteByString(registry.getDeskType());
+        if (modelNumber < 0 || modelNumber > 127) {
+            throw new IllegalStateException("Cannot make a meter request for desk model "
+                    + registry.getDeskType());
+        }
+
+        if (!MeterCategory.isSupportedForModel(modelNumber, categoryCode)
+                || !MeterSource.isSupportedForRequest(modelNumber, categoryCode, sourceCode)) {
+            throw new IllegalArgumentException("Unsupported meter category or source");
+        }
+
+        int maxChannels = maxChannelsFor(modelNumber, categoryCode);
+        if (startChannel < 0 || startChannel >= maxChannels) {
+            throw new IllegalArgumentException(
+                    "startChannel must be within 0.." + (maxChannels - 1));
+        }
+        if (channelCount < 1 || channelCount > maxChannels - startChannel) {
+            throw new IllegalArgumentException(
+                    "channelCount must be within 1.." + (maxChannels - startChannel));
+        }
+
+        meterSelection = new MeterSelection(
+                categoryCode, sourceCode, startChannel, channelCount);
+        meterSelectionModelNumber = modelNumber;
+        sendMeterRequest(modelNumber, meterSelection);
+    }
+
+    private void sendMeterRequest(byte modelNumber, MeterSelection selection) {
+        MeterRequest request = new MeterRequest(
+                0,
+                modelNumber,
+                selection.categoryCode(),
+                selection.sourceCode());
+        request.setStartChannel(selection.startChannel());
+        request.setChannelCount(selection.channelCount());
+        MeterSimpleParser.setRequestedRange(
+                selection.startChannel(), selection.channelCount());
+        outputRouter.send(request.toByteArray());
+    }
+
+    private static int maxChannelsFor(byte modelNumber, int categoryCode) {
+        if ((modelNumber & 0xFF) == 0x11 && categoryCode == 0x10) {
+            return 1;
+        }
+        return switch (categoryCode) {
+            case 0 -> (modelNumber & 0xFF) == 0x1A ? 32 : 48;
+            case 1, 2 -> 8;
+            case 4 -> 2;
+            case 5 -> 1;
+            case 6 -> 13;
+            default -> throw new IllegalArgumentException(
+                    "Meter category " + categoryCode + " is not available for range requests");
+        };
     }
 
     public static void changeRehydrationDelay(long newDelay){
@@ -377,20 +426,15 @@ public class RehydrationManager{
         effectiveDelayMs = BASE_DELAY_MS;
     }
 
-    public void delayMeterRequests() {
-        logger.info("Delaying meters until rehydration complete or else activated");
-        meterRequestsDelayed = true;
-        meterRequestsDelayedWarning = true;
-    }
-
-    public void activateMeterRequests(){
-        meterRequestsDelayed = false;
-        logger.info("Meters requests activated");
-    }
-
     public boolean getMeterRequestsActive(){
-        return !meterRequestsDelayed;
+        return true;
     }
+
+    private record MeterSelection(
+            int categoryCode,
+            int sourceCode,
+            int startChannel,
+            int channelCount) {}
 
     private static final class RehydrationState {
     final Map<Integer, ArrayDeque<ControlInstance>> queues;
@@ -463,8 +507,6 @@ public class RehydrationManager{
 
                 listener.onFinished();
                 running = false;
-
-                if (meterRequestsDelayed) activateMeterRequests();
 
                 stopControlLoop(); // stop pacing loop
                 throw new RuntimeException("STOP"); // minimal way to stop this fixed-rate task

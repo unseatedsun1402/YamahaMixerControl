@@ -37,8 +37,17 @@ public class StateRehydrationService implements RehydrationListener{
     }
 
     public void requestMeters() {
-        if(rehydrationManager.getMeterRequestsActive())NotifyClients.publish(ServerEvent.info("METERS", "Requesting meter refresh"));
+        NotifyClients.publish(ServerEvent.info("METERS", "Requesting meter refresh"));
         rehydrationManager.requestMeters();
+    }
+
+    public void requestMeters(
+            int categoryCode,
+            int sourceCode,
+            int startChannel,
+            int channelCount) {
+        rehydrationManager.requestMeters(
+                categoryCode, sourceCode, startChannel, channelCount);
     }
 
     @Override
@@ -52,13 +61,4 @@ public class StateRehydrationService implements RehydrationListener{
         NotifyClients.publish(ServerEvent.info("REHYDRATION", "Rehydration resetting"));
     }
 
-    @Override
-    public void activateMeterRequests() {
-        NotifyClients.publish(ServerEvent.info("REHYDRATION", "Meter Requests Active"));
-    }
-
-    @Override
-    public void delayMeterRequests() {
-        NotifyClients.publish(ServerEvent.info("REHYDRATION", "Meter requests delayed"));
-    }
 }

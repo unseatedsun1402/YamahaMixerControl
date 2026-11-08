@@ -200,7 +200,7 @@ public final class M7CLSimulatorMidiDevice implements MidiDevice {
         response[1] = 0x43;
         response[2] = (byte) (0x10 | request.channel());
         response[3] = 0x3E;
-        response[4] = (byte) request.model();
+        response[4] = 0x0F;
         response[5] = 0x21;
         response[6] = (byte) request.category();
         response[7] = (byte) request.source();

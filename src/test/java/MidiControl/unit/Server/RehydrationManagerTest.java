@@ -81,15 +81,9 @@ class RehydrationManagerTest {
     static class FakeListener implements RehydrationListener {
         int finished = 0;
         int reset = 0;
-        int activated = 0;
-        int delayed = 0;
 
         @Override public void onFinished() { finished++; }
         @Override public void onReset() { reset++; }
-        @Override
-        public void activateMeterRequests() { activated++; }
-        @Override
-        public void delayMeterRequests() { delayed++; }
     }
 
     // ---------------- Helpers ----------------

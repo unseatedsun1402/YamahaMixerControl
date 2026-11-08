@@ -46,6 +46,10 @@ public final class ServerResponses {
         JsonObject payload = new JsonObject();
         payload.addProperty("code", code);
         payload.addProperty("message", message);
-        send(session, EventObject.envelope(EventObject.Classification.ERROR,"error", Optional.of(requestId), payload));
+        send(session, EventObject.envelope(
+                EventObject.Classification.ERROR,
+                "error",
+                Optional.ofNullable(requestId),
+                payload));
     }
 }

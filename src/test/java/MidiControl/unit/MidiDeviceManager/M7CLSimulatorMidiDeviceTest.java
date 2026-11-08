@@ -73,8 +73,10 @@ class M7CLSimulatorMidiDeviceTest {
             assertNotNull(response, "Meter request should produce simulated meter SysEx");
             assertEquals(42, response.length);
             assertEquals(0x10, response[2] & 0xFF);
-            assertEquals(0x11, response[4] & 0xFF);
+            assertEquals(0x0F, response[4] & 0xFF);
             assertEquals(0x21, response[5] & 0xFF);
+            assertEquals(0x00, response[6] & 0xFF);
+            assertEquals(0x00, response[7] & 0xFF);
             assertEquals(0x00, response[8] & 0xFF);
             assertEquals(0xF7, response[response.length - 1] & 0xFF);
             for (int i = 9; i < response.length - 1; i++) {
