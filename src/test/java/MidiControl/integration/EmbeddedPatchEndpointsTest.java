@@ -113,9 +113,10 @@ class EmbeddedPatchEndpointsTest {
         private final WebSocket socket;
 
         SocketMessages(URI uri) {
+            URI connectionUri = URI.create(uri + "?connectionId=" + java.util.UUID.randomUUID());
             socket = HttpClient.newHttpClient()
                     .newWebSocketBuilder()
-                    .buildAsync(uri, new WebSocket.Listener() {
+                    .buildAsync(connectionUri, new WebSocket.Listener() {
                         @Override
                         public void onOpen(WebSocket webSocket) {
                             webSocket.request(1);

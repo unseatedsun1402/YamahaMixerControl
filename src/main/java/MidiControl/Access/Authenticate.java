@@ -62,6 +62,34 @@ public class Authenticate {
         }
     }
 
+    public static String generateChallengeToken(String salt, String passwordHash, String sessionId) {
+        Objects.requireNonNull(salt, "salt");
+        Objects.requireNonNull(passwordHash, "passwordHash");
+        Objects.requireNonNull(sessionId, "sessionId");
+
+        byte[] tokenBytes = generateNewToken(salt, passwordHash + sessionId)
+                .orElseThrow(() -> new IllegalStateException("SHA-256 is unavailable"));
+        StringBuilder token = new StringBuilder(tokenBytes.length * 2);
+        for (byte value : tokenBytes) {
+            token.append(String.format(Locale.ROOT, "%02x", value & 0xff));
+        }
+        return token.toString();
+    }
+
+    public static boolean verifyChallengeToken(
+            String salt,
+            String passwordHash,
+            String sessionId,
+            String suppliedToken) {
+        if (suppliedToken == null || !suppliedToken.matches("[0-9a-f]{64}")) {
+            return false;
+        }
+        String expectedToken = generateChallengeToken(salt, passwordHash, sessionId);
+        return MessageDigest.isEqual(
+                expectedToken.getBytes(StandardCharsets.US_ASCII),
+                suppliedToken.getBytes(StandardCharsets.US_ASCII));
+    }
+
     public static AuthenticationResult authenticateToken(CredentialStore directory, String token){
         Optional<Authenticate.Role> maybeToken = directory.getTokenRole(token);
         if(maybeToken.isPresent()){

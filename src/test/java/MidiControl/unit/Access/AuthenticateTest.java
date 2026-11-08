@@ -155,6 +155,29 @@ public class AuthenticateTest {
     }
 
     @Test
+    public void testChallengeTokenUsesPasswordHashSaltAndSessionId() {
+        String salt = "challenge-salt";
+        String passwordHash = "stored-password-hash";
+        String sessionId = "session-123";
+        String token = Authenticate.generateChallengeToken(salt, passwordHash, sessionId);
+        byte[] expectedBytes;
+        try {
+            expectedBytes = MessageDigest.getInstance("SHA-256")
+                    .digest((salt + passwordHash + sessionId).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        } catch (NoSuchAlgorithmException exception) {
+            throw new AssertionError(exception);
+        }
+        StringBuilder expectedToken = new StringBuilder();
+        for (byte value : expectedBytes) {
+            expectedToken.append(String.format("%02x", value & 0xff));
+        }
+
+        assertEquals(expectedToken.toString(), token);
+        assertTrue(Authenticate.verifyChallengeToken(salt, passwordHash, sessionId, token));
+        assertFalse(Authenticate.verifyChallengeToken(salt, passwordHash, "other-session", token));
+    }
+
+    @Test
     public void testAuthenticateSuccess() {
         CredentialStore testDirectory = new CredentialStore();
         String testToken = "test token";

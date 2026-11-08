@@ -1,6 +1,15 @@
 console.log(">>> websocketClient.js LOADED <<<");
 
 const debugFlag = true;
+const QUEUE_BEFORE_AUTHENTICATION = new Set([
+  "register-session",
+  "get-ui-model",
+  "get-ui-bank",
+  "subscribe-context",
+  "list-midi-devices",
+  "meter-keep-alive",
+  "request-channel-names"
+]);
 
 export class WebSocketClient {
   constructor(url) {
@@ -24,30 +33,39 @@ export class WebSocketClient {
       "midi-device-list": [],
       "telemetry": [],
       "server-event": [],
-      "REGISTRY_CHANGED": []
+      "REGISTRY_CHANGED": [],
+      "auth-challenge": [],
+      "auth-result": [],
+      "auth-status": []
     };
 
     this.requestCounter = 0;
     this.sessionType = null;
     this._lastSequence = undefined;
+    this.authenticated = false;
+    this._pendingMessages = [];
 
     console.info("[WebSocketClient] Initialized with URL:", url);
   }
 
   setSessionType(type) {
     this.sessionType = type;
-        this.ws.send(JSON.stringify({
-        type: "register-session",
-        payload: { sessionType: `${this.sessionType}` }
-    }));
+    this._send({
+      type: "register-session",
+      payload: { sessionType: `${this.sessionType}` }
+    });
   }
 
   connect() {
     console.info("[WebSocketClient] Connecting to:", this.url);
-    this.ws = new WebSocket(this.url);
+    const url = new URL(this.url);
+    url.searchParams.set("connectionId", this._createConnectionId());
+    this.ws = new WebSocket(url);
 
     this.ws.onopen = () => {
       console.info("[WebSocketClient] Connection opened");
+      this.authenticated = false;
+      this._pendingMessages = [];
       this._emit("connected");
 
       this.reconnectDelay = 1000;
@@ -55,6 +73,8 @@ export class WebSocketClient {
     };
 
     this.ws.onclose = () => {
+      this.authenticated = false;
+      this._pendingMessages = [];
       this._emit("disconnected");
       console.warn("[WebSocketClient] Connection closed");
 
@@ -99,6 +119,46 @@ export class WebSocketClient {
     for (const h of this.handlers[type]) {
       h(payload);
     }
+  }
+
+  _createConnectionId() {
+    if (globalThis.crypto?.randomUUID) {
+      return globalThis.crypto.randomUUID();
+    }
+    return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  _send(message) {
+    if (this.authenticated && this.ws?.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify(message));
+      return true;
+    }
+    if (!QUEUE_BEFORE_AUTHENTICATION.has(message.type)) {
+      console.warn("[WebSocketClient] Dropping request until authenticated:", message.type);
+      return false;
+    }
+    this._pendingMessages.push(message);
+    return true;
+  }
+
+  _setAuthenticated(authenticated) {
+    this.authenticated = authenticated;
+    if (!authenticated || this.ws?.readyState !== WebSocket.OPEN) return;
+    const pending = this._pendingMessages;
+    this._pendingMessages = [];
+    for (const message of pending) {
+      this.ws.send(JSON.stringify(message));
+    }
+  }
+
+  sendAuthenticationToken(token) {
+    if (this.ws?.readyState !== WebSocket.OPEN) {
+      throw new Error("WebSocket is not connected");
+    }
+    this.ws.send(JSON.stringify({
+      type: "authenticate",
+      payload: { token }
+    }));
   }
 
   // ------------------------------------------------------------
@@ -224,6 +284,20 @@ export class WebSocketClient {
         this._emit("error", enrichedPayload);
         break;
 
+      case "auth-challenge":
+        this._emit("auth-challenge", msg.payload || {});
+        break;
+
+      case "auth-result":
+        if (msg.payload?.authenticated) this._setAuthenticated(true);
+        this._emit("auth-result", msg.payload || {});
+        break;
+
+      case "auth-status":
+        if (msg.payload?.authenticated) this._setAuthenticated(true);
+        this._emit("auth-status", msg.payload || {});
+        break;
+
       case "ack":
         if (debugFlag) {
           console.debug("[WebSocketClient] ACK:", {
@@ -316,7 +390,7 @@ export class WebSocketClient {
     };
 
     console.debug("[WebSocketClient] Requesting UI model:", message);
-    this.ws.send(JSON.stringify(message));
+    this._send(message);
     return requestId;
   }
 
@@ -327,7 +401,7 @@ export class WebSocketClient {
     };
 
     console.debug("[WebSocketClient] Requesting UI bank:", message);
-    this.ws.send(JSON.stringify(message));
+    this._send(message);
   }
 
   subscribe(contextId) {
@@ -337,7 +411,7 @@ export class WebSocketClient {
     };
 
     console.debug("[WebSocketClient] Sending subscribe request:", message);
-    this.ws.send(JSON.stringify(message));
+    this._send(message);
   }
 
   sendControlChange(canonicalId, value) {
@@ -350,7 +424,7 @@ export class WebSocketClient {
       console.debug("[WebSocketClient] Sending control change:", message);
     }
 
-    this.ws.send(JSON.stringify(message));
+    this._send(message);
   }
 
   sendMeterKeepAlive() {
@@ -363,7 +437,7 @@ export class WebSocketClient {
       console.debug("[WebSocketClient] Sending meter keep alive");
     }
 
-    this.ws.send(JSON.stringify(message));
+    this._send(message);
   }
 
   requestMidiDevices() {
@@ -374,7 +448,7 @@ export class WebSocketClient {
     };
 
     console.info("[WebSocketClient] Requesting MIDI devices:", message);
-    this.ws.send(JSON.stringify(message));
+    this._send(message);
   }
 
   applyMidiSettings(settings) {
@@ -385,7 +459,7 @@ export class WebSocketClient {
     };
 
     console.info("[WebSocketClient] Applying MIDI settings:", message);
-    this.ws.send(JSON.stringify(message));
+    this._send(message);
   }
 
   saveMidiSettings(settings) {
@@ -396,7 +470,7 @@ export class WebSocketClient {
     };
 
     console.info("[WebSocketClient] Saving MIDI settings:", message);
-    this.ws.send(JSON.stringify(message));
+    this._send(message);
   }
 
   requestChannelNames() {
@@ -406,9 +480,8 @@ export class WebSocketClient {
       payload: { empty: true }
     };
 
-    const json = JSON.stringify(message);
-    this.ws.send(json);
-    console.info("[WebSocketClient] Requesting Channel Names", json);
+    this._send(message);
+    console.info("[WebSocketClient] Requesting Channel Names", message);
   }
   
   setDebugResolution(enabled) {
@@ -425,7 +498,7 @@ export class WebSocketClient {
           enabled
       );
 
-      this.ws.send(JSON.stringify(message));
+      this._send(message);
   }
 
   setCanonicalEvents(enabled) {
@@ -443,6 +516,6 @@ export class WebSocketClient {
           enabled
       );
 
-      this.ws.send(JSON.stringify(message));
+      this._send(message);
   }
 }

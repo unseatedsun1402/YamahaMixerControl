@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/widgets/dynamics-widget.css"/>
     <link rel="stylesheet" href="css/widgets/eq-widget.css"/>
     <link rel="stylesheet" href="css/mix-phone-landscape.css"/>
+    <link rel="stylesheet" href="css/authentication.css"/>
 
 
     <script type="module">
@@ -21,6 +22,7 @@
         import { buildViewRibbonFromModel } from './js/view-ribbon.js';
         import { updateChannelStripName } from './js/utils/channel-name.js';
         import { DeskStatusWidget } from "./js/widgets/liveness.js";
+        import { installAuthentication } from "./js/authentication.js";
         
         window.ribbonInitialised = false;
         window.lastBankContexts= [];
@@ -38,6 +40,7 @@
         const wsUrl = `ws://${location.host}/${contextPath}/endpoint`;
 
         const ws = new WebSocketClient(wsUrl);
+        installAuthentication(ws);
         var deskStatusWidget; 
 
         ws.on("connected", () => {
