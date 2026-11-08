@@ -21,6 +21,7 @@ public class FakeSession implements Session {
 
     private boolean open = true;
     private final String id;
+    private Map<String, List<String>> requestParameters = Map.of();
     private Consumer<String> remoteSender = null;
     public String lastSent = null;
 
@@ -31,6 +32,10 @@ public class FakeSession implements Session {
     // --- Test helper: inject a sender callback ---
     public void setRemoteSender(Consumer<String> sender) {
         this.remoteSender = sender;
+    }
+
+    public void setRequestParameters(Map<String, List<String>> parameters) {
+        this.requestParameters = parameters;
     }
 
     // --- Minimal BasicRemote stub ---
@@ -76,7 +81,7 @@ public class FakeSession implements Session {
 
     // Everything else can throw UnsupportedOperationException for now
     @Override public URI getRequestURI() { throw new UnsupportedOperationException(); }
-    @Override public Map<String, List<String>> getRequestParameterMap() { throw new UnsupportedOperationException(); }
+    @Override public Map<String, List<String>> getRequestParameterMap() { return requestParameters; }
     @Override public String getQueryString() { throw new UnsupportedOperationException(); }
     @Override public Map<String, String> getPathParameters() { throw new UnsupportedOperationException(); }
     @Override public Map<String, Object> getUserProperties() { throw new UnsupportedOperationException(); }

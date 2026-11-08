@@ -4,10 +4,12 @@ import { renderHiddenPatchControls } from "./widgets/patch-matrix.js";
 import { renderPatchMatrixOverlay } from "./widgets/patch-matrix.js";
 import { applyControlUpdate } from './partial-update.js';
 import { buildPatchRibbon } from "./view-ribbon.js";
+import { installAuthentication } from "./authentication.js";
 
 console.log(">>> settings.js LOADED <<<");
 
 const ws = new WebSocketClient(`ws://${location.host}/MidiControl/endpoint`);
+installAuthentication(ws);
 const SERVER_LOG_LIMIT = 50;
 const serverLogBuffer = [];
 
@@ -145,6 +147,10 @@ document.addEventListener("change", function (e) {
 
 
 document.getElementById("apply-settings").addEventListener("click", () => {
+  if (!ws.authenticated) {
+    showStatus("Authenticate before applying settings");
+    return;
+  }
   const inputDeviceId = parseInt(document.getElementById("midi-input-device").value, 10);
   const outputDeviceId = parseInt(document.getElementById("midi-output-device").value, 10);
   const consoleType = document.getElementById("console-type").value;
@@ -163,6 +169,10 @@ document.getElementById("apply-settings").addEventListener("click", () => {
 });
 
 document.getElementById("save-settings").addEventListener("click", () => {
+  if (!ws.authenticated) {
+    showStatus("Authenticate before saving settings");
+    return;
+  }
   const inputDeviceId = parseInt(document.getElementById("midi-input-device").value, 10);
   const outputDeviceId = parseInt(document.getElementById("midi-output-device").value, 10);
   const consoleType = document.getElementById("console-type").value;
@@ -297,6 +307,75 @@ async function applyServerInterfaceSelection() {
 }
 
 document.getElementById("apply-network-choice")?.addEventListener("click", applyServerInterfaceSelection);
+
+const passwordDialog = document.getElementById("system-password-dialog");
+const passwordForm = document.getElementById("system-password-form");
+const passwordInput = document.getElementById("system-password");
+const passwordConfirmInput = document.getElementById("system-password-confirm");
+const passwordStatus = document.getElementById("system-password-status");
+const passwordSubmitButton = document.getElementById("submit-system-password");
+const passwordDialogButton = document.getElementById("open-password-dialog");
+const passwordHelp = document.getElementById("password-setting-help");
+const normalizedHostname = window.location.hostname.replace(/^\[|\]$/g, "").toLowerCase();
+const isLocalSession = normalizedHostname === "localhost"
+    || normalizedHostname === "127.0.0.1"
+    || normalizedHostname === "::1";
+
+passwordDialogButton.disabled = !isLocalSession;
+passwordDialogButton.title = isLocalSession
+    ? ""
+    : "Open settings on the server computer using localhost to set a password";
+if (!isLocalSession) {
+    passwordHelp.textContent =
+        "Unavailable from this device. Open this page using localhost on the server computer to set a password.";
+}
+
+passwordDialogButton.addEventListener("click", () => {
+    passwordStatus.textContent = "";
+    passwordDialog.showModal();
+    passwordInput.focus();
+});
+
+document.getElementById("cancel-password-dialog").addEventListener("click", () => {
+    passwordDialog.close();
+});
+
+passwordDialog.addEventListener("close", () => {
+    passwordForm.reset();
+    passwordStatus.textContent = "";
+    passwordSubmitButton.disabled = false;
+});
+
+passwordForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (passwordInput.value !== passwordConfirmInput.value) {
+        passwordStatus.textContent = "The passwords do not match.";
+        passwordConfirmInput.focus();
+        return;
+    }
+
+    passwordSubmitButton.disabled = true;
+    passwordStatus.textContent = "Saving password…";
+    try {
+        const url = new URL("set-system-password", window.location.href);
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            cache: "no-store",
+            body: JSON.stringify({ password: passwordInput.value })
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || `HTTP ${response.status}`);
+        }
+
+        passwordDialog.close();
+        showStatus("System password set");
+    } catch (error) {
+        passwordStatus.textContent = error.message || "Unable to set system password.";
+        passwordSubmitButton.disabled = false;
+    }
+});
 
 function updateTelemetry(data) {
     document.getElementById("telemetry-in").textContent =

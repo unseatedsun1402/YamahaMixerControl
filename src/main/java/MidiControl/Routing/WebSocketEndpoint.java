@@ -1,6 +1,9 @@
 package MidiControl.Routing;
 
 import MidiControl.ContextModel.BankContext;
+import MidiControl.Access.Authenticate;
+import MidiControl.Access.PasswordManager;
+import MidiControl.Server.EventStream.EventObject;
 import MidiControl.Server.MidiServer;
 import MidiControl.Server.MidiServerListener;
 import MidiControl.Server.SubscriptionManager;
@@ -15,7 +18,10 @@ import jakarta.websocket.server.ServerEndpoint;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -28,6 +34,7 @@ import com.google.gson.JsonParser;
 public class WebSocketEndpoint{
 
     private static final Set<Session> sessions = ConcurrentHashMap.newKeySet();
+    private static final Map<Session, ConnectionState> connectionStates = new ConcurrentHashMap<>();
     private static final Logger logger = Logger.getLogger(WebSocketEndpoint.class.getName());
     private static final Gson gson = new Gson();
     private static boolean debug = false;
@@ -42,6 +49,22 @@ public class WebSocketEndpoint{
         new ConcurrentHashMap<>();
 
     private static final long LOG_DEBOUNCE_MS = 5000;
+    private static final int MAX_AUTHENTICATION_ATTEMPTS = 5;
+
+    private static final class ConnectionState {
+        private final boolean remote;
+        private final String salt;
+        private final String passwordHash;
+        private volatile boolean authenticated;
+        private int failedAttempts;
+
+        private ConnectionState(boolean remote, String salt, String passwordHash, boolean authenticated) {
+            this.remote = remote;
+            this.salt = salt;
+            this.passwordHash = passwordHash;
+            this.authenticated = authenticated;
+        }
+    }
 
     private static void warningDebounced(String key, String message) {
 
@@ -92,7 +115,52 @@ public class WebSocketEndpoint{
         server = (MidiServer) MidiServerListener.CONTEXT.getAttribute("midiServer");
         subscriptions = server.getSubscriptionManager();
 
-        sessions.add(session);
+        String connectionId = null;
+        try {
+            java.util.List<String> values = session.getRequestParameterMap().get("connectionId");
+            if (values != null && !values.isEmpty()) {
+                connectionId = values.get(0);
+            }
+        } catch (UnsupportedOperationException exception) {
+            logger.warning("WebSocket session does not expose handshake parameters; requiring authentication");
+        }
+
+        boolean remote = !isLoopbackAddress(WebSocketPeerAddressRegistry.consume(connectionId));
+        if (!remote) {
+            connectionStates.put(session, new ConnectionState(false, null, null, true));
+            sessions.add(session);
+            sendAuthenticationMessage(session, "auth-status", true, false);
+            return;
+        }
+
+        try {
+            Optional<String> passwordHash = PasswordManager.getStoredPasswordHash();
+            if (passwordHash.isEmpty()) {
+                connectionStates.put(session, new ConnectionState(true, null, null, true));
+                sessions.add(session);
+                sendAuthenticationMessage(session, "auth-status", true, false);
+                return;
+            }
+
+            String salt = Authenticate.createSalt();
+            connectionStates.put(session, new ConnectionState(true, salt, passwordHash.get(), false));
+            sessions.add(session);
+            JsonObject challenge = new JsonObject();
+            challenge.addProperty("salt", salt);
+            challenge.addProperty("sessionId", session.getId());
+            sendAuthenticationMessage(session, "auth-challenge", challenge);
+        } catch (java.io.IOException exception) {
+            logger.severe("Unable to load system password hash for remote authentication: " + exception.getMessage());
+            connectionStates.put(session, new ConnectionState(true, null, null, false));
+            sessions.add(session);
+            sendAuthenticationMessage(session, "auth-result", false, true);
+            try {
+                session.close();
+            } catch (java.io.IOException closeException) {
+                logger.warning("Unable to close session after authentication setup failed: "
+                        + closeException.getMessage());
+            }
+        }
     }
 
     @OnMessage
@@ -102,13 +170,26 @@ public class WebSocketEndpoint{
             JsonElement root = JsonParser.parseString(message);
 
             if (!root.isJsonObject()) {
-                errorDebounced("json-message","Invalid message (not an object): " + message);
+                errorDebounced("json-message","Invalid WebSocket message (not an object)");
                 return;
             }
 
             JsonObject json = root.getAsJsonObject();
 
             String type = json.get("type").getAsString();
+
+            if ("authenticate".equals(type)) {
+                JsonElement payload = json.get("payload");
+                handleAuthentication(session, payload != null && payload.isJsonObject()
+                        ? payload.getAsJsonObject()
+                        : null);
+                return;
+            }
+
+            ConnectionState state = connectionStates.get(session);
+            if (state == null || !state.authenticated) {
+                return;
+            }
 
             switch (type) {
 
@@ -139,14 +220,93 @@ public class WebSocketEndpoint{
         }
     }
 
+    private void handleAuthentication(Session session, JsonObject payload) {
+        ConnectionState state = connectionStates.get(session);
+        if (state == null || !state.remote || state.authenticated || state.salt == null) {
+            sendAuthenticationMessage(session, "auth-result", false, false);
+            return;
+        }
+
+        String token = payload != null && payload.has("token") && payload.get("token").isJsonPrimitive()
+                ? payload.get("token").getAsString()
+                : null;
+        boolean accepted = Authenticate.verifyChallengeToken(
+                state.salt,
+                state.passwordHash,
+                session.getId(),
+                token);
+        if (accepted) {
+            state.authenticated = true;
+            sendAuthenticationMessage(session, "auth-result", true, false);
+            return;
+        }
+
+        state.failedAttempts++;
+        sendAuthenticationMessage(session, "auth-result", false, false);
+        if (state.failedAttempts >= MAX_AUTHENTICATION_ATTEMPTS) {
+            try {
+                session.close();
+            } catch (java.io.IOException exception) {
+                logger.warning("Unable to close session after failed authentication: " + exception.getMessage());
+            }
+        }
+    }
+
+    private static void sendAuthenticationMessage(
+            Session session,
+            String type,
+            boolean accepted,
+            boolean unavailable) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("authenticated", accepted);
+        payload.addProperty("passwordRequired", !accepted);
+        if (unavailable) {
+            payload.addProperty("message", "System password is unavailable");
+        }
+        sendAuthenticationMessage(session, type, payload);
+    }
+
+    private static void sendAuthenticationMessage(Session session, String type, JsonObject payload) {
+        String message = EventObject.envelope(
+                EventObject.Classification.RESPONSE,
+                type,
+                Optional.empty(),
+                payload).toString();
+        try {
+            sendWithTimeout(session, message);
+        } catch (Exception exception) {
+            logger.warning("Failed to send authentication response: " + exception.getMessage());
+        }
+    }
+
+    private static boolean isLoopbackAddress(String remoteAddress) {
+        if (remoteAddress == null || remoteAddress.isBlank()) {
+            return false;
+        }
+        try {
+            return InetAddress.getByName(remoteAddress).isLoopbackAddress();
+        } catch (UnknownHostException exception) {
+            return false;
+        }
+    }
+
     @OnClose
     public void onClose(Session session) {
         subscriptions.removeSession(session);
         sessions.remove(session);
+        connectionStates.remove(session);
     }
 
     public static void send(Session session, String message) {
         lastSent = message;
+        if (session == null) {
+            return;
+        }
+        ConnectionState state = connectionStates.get(session);
+        if ((state == null && sessions.contains(session))
+                || (state != null && !state.authenticated)) {
+            return;
+        }
         try {
             sendWithTimeout(session,message);
             }
@@ -158,7 +318,10 @@ public class WebSocketEndpoint{
     public static void broadcast(String message) {
         lastSent = message;
         for (Session s : sessions) {
-            sendWithTimeout(s,message);
+            ConnectionState state = connectionStates.get(s);
+            if (state == null || state.authenticated) {
+                sendWithTimeout(s,message);
+            }
         }
     }
 
@@ -191,5 +354,6 @@ public class WebSocketEndpoint{
 
     public static void addTestSession(Session testSession){
         sessions.add(testSession);
+        connectionStates.put(testSession, new ConnectionState(false, null, null, true));
     }
 }

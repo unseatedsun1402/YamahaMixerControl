@@ -114,6 +114,35 @@ a:hover {
     margin-bottom: var(--space-xl);
 }
 
+.settings-card button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+#system-password-dialog {
+    color: var(--color-text);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-bg-card-border);
+    border-radius: var(--radius-md);
+    min-width: min(320px, calc(100vw - 64px));
+    padding: var(--space-lg);
+}
+
+#system-password-dialog::backdrop {
+    background: rgb(0 0 0 / 60%);
+}
+
+#system-password-dialog h2 {
+    font-size: 18px;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+}
+
 .settings-card h2 {
     font-size: 18px;
     margin-bottom: var(--space-md);

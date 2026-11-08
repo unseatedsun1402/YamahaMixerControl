@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Server Settings</title>
     <link rel="stylesheet" href="css/setting-style.css">
+    <link rel="stylesheet" href="css/authentication.css">
     <script type="module" src="js/settings.js"></script>
 </head>
 
@@ -57,6 +58,16 @@
 
                 <button id="apply-network-choice" class="apply-button">
                     Use Selected Interface
+                </button>
+            </section>
+
+            <section class="settings-card">
+                <h2>System Password</h2>
+                <p id="password-setting-help">
+                    Set a system password from the server computer using localhost.
+                </p>
+                <button id="open-password-dialog" type="button" disabled>
+                    Set System Password
                 </button>
             </section>
 
@@ -310,6 +321,27 @@
     </section>
 
 </main>
+
+<dialog id="system-password-dialog">
+    <form id="system-password-form" method="post" action="set-system-password">
+        <h2>Set System Password</h2>
+        <label>
+            Password
+            <input id="system-password" name="password" type="password"
+                   autocomplete="new-password" maxlength="1024" required>
+        </label>
+        <label>
+            Confirm password
+            <input id="system-password-confirm" name="password-confirm" type="password"
+                   autocomplete="new-password" maxlength="1024" required>
+        </label>
+        <p id="system-password-status" role="status" aria-live="polite"></p>
+        <div class="dialog-actions">
+            <button type="button" id="cancel-password-dialog">Cancel</button>
+            <button type="submit" id="submit-system-password">Set Password</button>
+        </div>
+    </form>
+</dialog>
 
 <script>
 document.querySelectorAll('.settings-tabs button').forEach(btn => {

@@ -2,15 +2,18 @@ package MidiControl;
 
 import MidiControl.ContextModel.PatchViewBuilder;
 import MidiControl.Routing.WebSocketEndpoint;
+import MidiControl.Routing.WebSocketPeerAddressFilter;
 import MidiControl.Server.MidiServerListener;
 import MidiControl.Server.ServerStatusWindow;
 import MidiControl.Server.StartupFailureMessage;
 import MidiControl.Services.GetServerIP;
 import MidiControl.Services.LocalServiceDiscovery;
+import MidiControl.Services.SetSystemPasswordServlet;
 import jakarta.servlet.http.HttpServlet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -103,6 +106,20 @@ public class MidiControlApplication {
     @Bean
     ServletRegistrationBean<GetServerIP> getServerIpServlet() {
         return new ServletRegistrationBean<>(new GetServerIP(), "/get-server-ip");
+    }
+
+    @Bean
+    ServletRegistrationBean<SetSystemPasswordServlet> setSystemPasswordServlet() {
+        return new ServletRegistrationBean<>(new SetSystemPasswordServlet(), "/set-system-password");
+    }
+
+    @Bean
+    FilterRegistrationBean<WebSocketPeerAddressFilter> webSocketPeerAddressFilter() {
+        FilterRegistrationBean<WebSocketPeerAddressFilter> registration =
+                new FilterRegistrationBean<>(new WebSocketPeerAddressFilter());
+        registration.addUrlPatterns("/endpoint");
+        registration.setOrder(1);
+        return registration;
     }
 
     @Bean

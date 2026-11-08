@@ -4,6 +4,7 @@ import MidiControl.Mocks.FakeSession;
 import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.Mocks.MockMidiIOManager;
 import MidiControl.Routing.WebSocketEndpoint;
+import MidiControl.Routing.WebSocketPeerAddressRegistry;
 import MidiControl.Server.MidiServer;
 import MidiControl.Server.MidiServerListener;
 import MidiControl.Server.ServerRouter;
@@ -25,6 +26,8 @@ import org.junit.jupiter.api.*;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,6 +49,17 @@ class WebSocketEndpointTest {
 
     private static void clearStaticSessions() throws Exception {
         getStaticSessions().clear();
+        Field f = WebSocketEndpoint.class.getDeclaredField("connectionStates");
+        f.setAccessible(true);
+        ((Map<?, ?>) f.get(null)).clear();
+    }
+
+    private static FakeSession localSession(String id) {
+        FakeSession session = new FakeSession(id);
+        String connectionId = UUID.randomUUID().toString();
+        WebSocketPeerAddressRegistry.register(connectionId, "127.0.0.1");
+        session.setRequestParameters(Map.of("connectionId", List.of(connectionId)));
+        return session;
     }
 
     /** ContextDiscoveryEngine that returns a deterministic list (no real discovery). */
@@ -130,9 +144,8 @@ class WebSocketEndpointTest {
         FakeSession s1 = new FakeSession("1");
         FakeSession s2 = new FakeSession("2");
 
-        Set<Session> sessions = getStaticSessions();
-        sessions.add(s1);
-        sessions.add(s2);
+        WebSocketEndpoint.addTestSession(s1);
+        WebSocketEndpoint.addTestSession(s2);
 
         WebSocketEndpoint.broadcast("All");
 
@@ -173,7 +186,7 @@ class WebSocketEndpointTest {
         MidiServerListener.CONTEXT = ctx;
 
         WebSocketEndpoint endpoint = new WebSocketEndpoint();
-        FakeSession session = new FakeSession("abc");
+        FakeSession session = localSession("abc");
 
         // Act
         endpoint.onOpen(session);
@@ -197,7 +210,7 @@ class WebSocketEndpointTest {
         MidiServerListener.CONTEXT = ctx;
 
         WebSocketEndpoint endpoint = new WebSocketEndpoint();
-        FakeSession session = new FakeSession("abc");
+        FakeSession session = localSession("abc");
 
         endpoint.onOpen(session);
 
@@ -265,7 +278,7 @@ class WebSocketEndpointTest {
         MidiServerListener.CONTEXT = ctx;
 
         WebSocketEndpoint endpoint = new WebSocketEndpoint();
-        FakeSession session = new FakeSession("s1");
+        FakeSession session = localSession("s1");
         endpoint.onOpen(session);
 
         String incoming = """
@@ -303,7 +316,7 @@ class WebSocketEndpointTest {
         MidiServerListener.CONTEXT = ctx;
 
         WebSocketEndpoint endpoint = new WebSocketEndpoint();
-        FakeSession session = new FakeSession("s1");
+        FakeSession session = localSession("s1");
         endpoint.onOpen(session);
 
         String incoming = """
