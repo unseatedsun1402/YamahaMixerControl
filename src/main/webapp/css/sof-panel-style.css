@@ -67,6 +67,12 @@
     font-size: 0.9rem;
 }
 
+.page-nav-link.sof-btn {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
 .sof-btn:hover {
     background: #444;
 }

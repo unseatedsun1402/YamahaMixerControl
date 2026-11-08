@@ -340,7 +340,10 @@ button:hover {
 
     .page-header nav #desk-status {
         order: -1;
-        flex: 0 0 auto;
+        box-sizing: border-box;
+        width: 64px;
+        height: 24px;
+        flex: 0 0 64px;
         padding: 4px 8px;
         font-size: 0;
         line-height: 1;
@@ -371,13 +374,23 @@ button:hover {
         white-space: nowrap;
     }
 
-    .page-header nav > a {
+    .page-header nav > a.page-nav-link {
         flex: 0 0 auto;
         font-size: 0;
     }
 
-    .page-header nav > a::after {
+    .page-header nav > a[aria-label="Back to Console"]::after {
         content: "Console";
+        font-size: 0.75rem;
+    }
+
+    .page-header nav > a[aria-label="View Meters"]::after {
+        content: "Meters";
+        font-size: 0.75rem;
+    }
+
+    .page-header nav > a[aria-label="QR Codes"]::after {
+        content: "QR";
         font-size: 0.75rem;
     }
 

@@ -79,6 +79,29 @@ class EmbeddedPatchEndpointsTest {
                 "Address should use the embedded server's actual port");
     }
 
+    @Test
+    void mainAndMeterPagesLinkToSettingsAndEachOther() throws Exception {
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpResponse<String> main = httpClient.send(
+                HttpRequest.newBuilder(uri("/MidiControl/main.html")).GET().build(),
+                HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> meters = httpClient.send(
+                HttpRequest.newBuilder(uri("/MidiControl/meters.html")).GET().build(),
+                HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> ribbon = httpClient.send(
+                HttpRequest.newBuilder(uri("/MidiControl/js/view-ribbon.js")).GET().build(),
+                HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(200, main.statusCode());
+        assertTrue(main.body().contains("view-ribbon"));
+        assertEquals(200, ribbon.statusCode());
+        assertTrue(ribbon.body().contains("settingsLink.href = \"/MidiControl/settings.html\""));
+        assertTrue(ribbon.body().contains("metersLink.href = \"/MidiControl/meters.html\""));
+        assertEquals(200, meters.statusCode());
+        assertTrue(meters.body().contains("href=\"/MidiControl/settings.html\""));
+        assertTrue(meters.body().contains("href=\"/MidiControl/main.html\""));
+    }
+
     private String firstContext(JsonObject bank) {
         JsonArray contexts = bank.getAsJsonArray("contexts");
         assertTrue(contexts.size() > 0, "Patch bank should contain at least one context");

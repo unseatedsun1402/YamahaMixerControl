@@ -1,3 +1,16 @@
+  .desk-alive,
+  .desk-dead {
+    box-sizing: border-box;
+    display: block;
+    width: 15rem;
+    height: 2.25rem;
+    flex: 0 0 15rem;
+    line-height: 1.5;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
   .desk-alive {
     background: #d4ffd4;
     color: #006600;

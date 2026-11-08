@@ -27,6 +27,18 @@ export function buildViewRibbonFromModel(
 
     panel.appendChild(deskStatusElement);
 
+    const settingsLink = document.createElement("a");
+    settingsLink.className = "sof-btn page-nav-link";
+    settingsLink.href = "/MidiControl/settings.html";
+    settingsLink.textContent = "SETTINGS";
+    panel.appendChild(settingsLink);
+
+    const metersLink = document.createElement("a");
+    metersLink.className = "sof-btn page-nav-link";
+    metersLink.href = "/MidiControl/meters.html";
+    metersLink.textContent = "METERS";
+    panel.appendChild(metersLink);
+
     // INPUT BUTTON
 
     const inputBtn =
