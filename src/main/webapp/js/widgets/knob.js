@@ -7,8 +7,16 @@ export function renderKnob(control) {
     const wrapper = document.createElement("div");
     
     const roleClass = classifyControl(control);
+    wrapper.classList.add("rotary-knob");
     if (roleClass) wrapper.classList.add(roleClass);
-    wrapper.className = "rotary-knob";
+    if (roleClass === "knob-role-send") {
+        const sendMatch = control.canonicalId?.match(/k(?:AUX|Mix)(\d+)Level/i);
+        const sendNumber = Number(sendMatch?.[1]);
+        if (Number.isInteger(sendNumber) && sendNumber > 0) {
+            const sendBank = Math.floor(((sendNumber - 1) % 16) / 4) + 1;
+            wrapper.classList.add(`knob-send-bank-${sendBank}`);
+        }
+    }
 
     const knob = document.createElement("div");
     knob.className = "knob-dial";

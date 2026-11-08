@@ -63,6 +63,9 @@ export function updateStrip(stripEl, model) {
 
         const section = document.createElement("div");
         section.className = "section";
+        if (controls.some(control => control.type === "KNOB")) {
+            section.classList.add("section-knob-grid");
+        }
 
         const title = document.createElement("div");
         title.className = "section-title";

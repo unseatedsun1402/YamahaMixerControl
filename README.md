@@ -12,6 +12,16 @@ To build the executable:
 .\gradlew.bat clean bootJar
 ```
 
+For a local mixer UI preview, run:
+
+```bat
+tools\start-mixer-preview.cmd
+```
+
+The script reuses a responding preview on port 18080 or starts the app headlessly
+with Gradle and prints the local `main.html` URL. Keep the terminal open while
+using the preview.
+
 For a Windows desktop launcher (recommended for file-browser launches), run:
 
 ```powershell

@@ -1,49 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Scan to Access</title>
   <link rel="stylesheet" href="css/index-style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
 <body>
-  <h1 style="text-align: center;">Scan to Access Mixer Pages</h1>
-
-  <div class="qr-grid" style="text-align:center">
-
-    <div class="qr-item">
-
-      <div class="qr-row">
-        <a href="main.html">
-          <div id="qr-main"></div>
-          <label>main.html</label>
-        </a>
-      </div>
-
-      <div class="qr-row">
-        <a href="settings.html">
-          <div id="qr-settings"></div>
-          <label>settings.html</label>
-        </a>
-
-        <a href="meters.html">
-          <div id="qr-meters"></div>
-          <label>meters.html</label>
-        </a>
-
-        <a href="bus.html">
-          <div id="qr-bus"></div>
-          <label>buses.html</label>
-        </a>
-
-        <!-- <a href="sendsOnFader.html">
-          <div id="qr-sends"></div>
-          <label>sends.html</label>
-        </a> -->
-      </div>
+  <header class="page-header">
+    <div>
+      <p class="page-kicker">Yamaha Mixer Control</p>
+      <h1>Scan to Access Mixer Pages</h1>
     </div>
+    <a class="page-nav-link" href="main.html">Back to Console</a>
+  </header>
 
-  </div>
+  <main class="qr-grid" aria-label="Mixer page QR codes">
+    <a class="qr-card" href="main.html">
+      <span class="qr-code" id="qr-main" aria-hidden="true"></span>
+      <span class="qr-label">Mixer</span>
+      <span class="qr-description">Main console controls</span>
+    </a>
+
+    <a class="qr-card" href="settings.html">
+      <span class="qr-code" id="qr-settings" aria-hidden="true"></span>
+      <span class="qr-label">Settings</span>
+      <span class="qr-description">MIDI and server settings</span>
+    </a>
+
+    <a class="qr-card" href="meters.html">
+      <span class="qr-code" id="qr-meters" aria-hidden="true"></span>
+      <span class="qr-label">Meters</span>
+      <span class="qr-description">Metering display</span>
+    </a>
+
+    <a class="qr-card" href="bus.html">
+      <span class="qr-code" id="qr-bus" aria-hidden="true"></span>
+      <span class="qr-label">Buses</span>
+      <span class="qr-description">Bus controls</span>
+    </a>
+  </main>
 
   <script>
     // Fetch the server base URL from your servlet
@@ -55,12 +53,10 @@
         const data = JSON.parse(txt);
         const base = data.payload;
 
-        // Generate QR codes using the dynamic base
-        new QRCode(document.getElementById("qr-main"), base + "/main.html");
-        new QRCode(document.getElementById("qr-settings"), base + "/settings.html");
-        new QRCode(document.getElementById("qr-meters"), base + "/meters.html");
-        new QRCode(document.getElementById("qr-bus"), base + "/bus.html");
-        new QRCode(document.getElementById("qr-sends"), base + "/sendsOnFader.html");
+        const pages = ["main", "settings", "meters", "bus"];
+        pages.forEach(page => {
+          new QRCode(document.getElementById(`qr-${page}`), `${base}/${page}.html`);
+        });
       })
       .catch(err => console.error("QR init failed: "+ err));
   </script>

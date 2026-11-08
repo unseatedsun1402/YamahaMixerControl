@@ -58,8 +58,14 @@
 
     #bank-selector .bank-btn {
         min-height: 32px;
-        padding: 4px 8px;
+        padding: 4px 3px;
         font-size: 0.75rem;
+    }
+
+    .bank-mode-controls .bank-mode-btn {
+        min-height: 30px;
+        padding: 4px 2px;
+        font-size: 0.6rem;
     }
 
     #strip-container {

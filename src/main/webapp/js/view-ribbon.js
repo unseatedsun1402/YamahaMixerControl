@@ -1,8 +1,6 @@
 export function buildViewRibbonFromModel(
     model,
-    handleSofSelection,
-    selectInputMode,
-    selectOutputMode
+    handleSofSelection
 ) {
 
     const panel =
@@ -28,64 +26,16 @@ export function buildViewRibbonFromModel(
     panel.appendChild(deskStatusElement);
 
     const settingsLink = document.createElement("a");
-    settingsLink.className = "sof-btn page-nav-link";
+    settingsLink.className = "sof-btn soft-key page-nav-link";
     settingsLink.href = "/MidiControl/settings.html";
     settingsLink.textContent = "SETTINGS";
     panel.appendChild(settingsLink);
 
     const metersLink = document.createElement("a");
-    metersLink.className = "sof-btn page-nav-link";
+    metersLink.className = "sof-btn soft-key page-nav-link";
     metersLink.href = "/MidiControl/meters.html";
     metersLink.textContent = "METERS";
     panel.appendChild(metersLink);
-
-    // INPUT BUTTON
-
-    const inputBtn =
-        document.createElement(
-            "button"
-        );
-
-    inputBtn.className =
-        "sof-btn off";
-
-    inputBtn.textContent =
-        "INPUT";
-
-    inputBtn.addEventListener(
-        "click",
-        () => {
-            selectInputMode();
-        }
-    );
-
-    panel.appendChild(
-        inputBtn
-    );
-
-    // OUTPUT BUTTON
-
-    const outputBtn =
-        document.createElement(
-            "button"
-        );
-
-    outputBtn.className =
-        "sof-btn off";
-
-    outputBtn.textContent =
-        "OUTPUT";
-
-    outputBtn.addEventListener(
-        "click",
-        () => {
-            selectOutputMode();
-        }
-    );
-
-    panel.appendChild(
-        outputBtn
-    );
 
     // SOF BUTTONS
 
@@ -152,15 +102,21 @@ export function buildViewRibbonFromModel(
                 "button"
             );
 
-        btn.className =
-            "sof-btn";
-
-        btn.textContent =
-            sendId;
+        const sendNumber = Number(sendId.replace(/\D+/g, ""));
+        const sendBank = Math.floor(((sendNumber - 1) % 16) / 4) + 1;
+        btn.className = `sof-btn soft-key sof-send-btn sof-send-bank-${sendBank}`;
+        btn.textContent = sendId;
+        btn.setAttribute("aria-pressed", "false");
+        btn.dataset.send = sendId.toLowerCase();
 
         btn.addEventListener(
             "click",
             () => {
+                panel.querySelectorAll(".sof-send-btn").forEach(sendButton => {
+                    const isActive = sendButton === btn;
+                    sendButton.classList.toggle("active", isActive);
+                    sendButton.setAttribute("aria-pressed", String(isActive));
+                });
                 handleSofSelection(
                     sendId.toLowerCase()
                 );
@@ -179,7 +135,7 @@ export function buildViewRibbonFromModel(
         );
 
     editBtn.className =
-        "edit-btn off";
+        "sof-btn soft-key edit-btn off";
 
     editBtn.textContent =
         "EDIT";

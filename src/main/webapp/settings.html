@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Server Settings</title>
+    <link rel="stylesheet" href="css/page-navigation.css">
     <link rel="stylesheet" href="css/setting-style.css">
     <link rel="stylesheet" href="css/authentication.css">
-    <link rel="stylesheet" href="css/page-navigation.css">
     <script type="module" src="js/settings.js"></script>
 </head>
 
@@ -18,9 +18,9 @@
         <div id="desk-status" class="desk-dead" role="status" aria-live="polite">
             Waiting for desk status…
         </div>
-        <button data-tab="configuration">Configuration</button>
-        <button data-tab="diagnostics">Diagnostics</button>
-        <button data-tab="patching" class="danger-zone">Patching</button>
+        <button data-tab="configuration" aria-selected="true">Configuration</button>
+        <button data-tab="diagnostics" aria-selected="false">Diagnostics</button>
+        <button data-tab="patching" class="danger-zone" aria-selected="false">Patching</button>
 
         <a class="page-nav-link" href="/MidiControl/main.html" aria-label="View Mixer">Mixer</a>
         <a class="page-nav-link" href="/MidiControl/meters.html" aria-label="View Meters">Meters</a>
@@ -351,6 +351,9 @@
 document.querySelectorAll('.settings-tabs button').forEach(btn => {
     btn.onclick = () => {
         const tab = btn.dataset.tab;
+        document.querySelectorAll('.settings-tabs button').forEach(tabButton => {
+            tabButton.setAttribute('aria-selected', String(tabButton === btn));
+        });
         document.querySelectorAll('.settings-tab').forEach(t => {
             t.hidden = (t.id !== `tab-${tab}`);
         });
