@@ -41,6 +41,7 @@ To run the executable JAR directly, use `java -jar
 .\build\libs\YamahaMixerControl.jar`; Windows will identify that process as
 Java rather than YamahaMixerControl. The server is available at
 http://127.0.0.1:8080/MidiControl and can also be stopped with Ctrl+C.
+
 ## ===== Model Support =====
 
 Currently this has been tested on both the Yamaha 01V96i and the Yamaha M7CL. These models are supported because they have a well-documented MIDI control layout and a consistent set of control change (CC) numbers. However, it's important to note that not all MIDI devices use the same parameter numbers, and many devices have non-registered parameter numbers that are not standardized.
@@ -64,6 +65,7 @@ level of control through this system albeit unsupported and unknown behaviour.
 The reason we only support a few models is because we have to manually and procedurally understand the control layout of each device. This involves identifying the local controls that are similar to the ones in the supported models and unifying them under a universal API. This process is time-consuming and requires a deep understanding of the MIDI protocol and the specific control layouts of each device.
 
 ## ===== M7CL SIL Simulator =====
+
 For software-in-the-loop meter testing without a physical desk, select
 **M7CL SIL Simulator** as both the MIDI input and output device in the settings
 page, choose **YAMAHA_M7CL** as the console type, and apply the settings. The
@@ -100,6 +102,7 @@ A password can be set in the settings area only from the machine running the ser
 The localhost interface / 127.0.0.1 will not be password challenged, if a user has access to the server they have full access to the desk, but I imagine given the length of midi cables they have access to the physical desk anyway.
 
 ## ====== SCREENSHOTS ======
+
 <img width="2808" height="2324" alt="Screenshot 2026-11-09 231543" src="https://github.com/user-attachments/assets/6f7bef24-8642-4e87-b330-e6bc200da47a" />
 <img width="2805" height="1503" alt="image" src="https://github.com/user-attachments/assets/1f27a2fb-ae9e-4635-b837-3b488591b683" />
 
@@ -119,7 +122,8 @@ above: settings page
 <img width="3836" height="733" alt="Screenshot 2026-11-09 231647" src="https://github.com/user-attachments/assets/ccd853dd-fa1b-4bda-a8ea-c2d49e743952" />
 
 above: navigation page
-# Pipeline stress checks
+
+## Pipeline stress checks
 
 Run the opt-in MIDI and WebSocket backpressure checks with:
 
