@@ -80,17 +80,24 @@ I built this around serving multiple clients at once which is something that isn
 Change the users in the conf area users.xml of the unpacked folder to suit your own needs. The mix pages are username and password protected to stop musicians from changing other peoples mixes, this can be disabled though if you take the page out of the auth group in the conf files.
 
 ## ====== SCREENSHOTS ======
-<img width="3244" height="2329" alt="image" src="https://github.com/user-attachments/assets/e28ab26d-b102-486f-9d09-49debce5a708" />
+<img width="2808" height="2324" alt="Screenshot 2026-11-09 231543" src="https://github.com/user-attachments/assets/6f7bef24-8642-4e87-b330-e6bc200da47a" />
+<img width="2805" height="1503" alt="image" src="https://github.com/user-attachments/assets/1f27a2fb-ae9e-4635-b837-3b488591b683" />
+
+
 above: default mix view
 
-<img width="1634" height="1429" alt="image" src="https://github.com/user-attachments/assets/30c6d8dc-2a28-4fef-ae25-39e5dcbdd1cf" />
-above: edit view
+<img width="869" height="1058" alt="Screenshot 2026-11-09 153442" src="https://github.com/user-attachments/assets/0e8d18b0-6c9a-496f-bda2-68aa67f5aa8e" />
+<img width="1674" height="1114" alt="Screenshot 2026-11-09 153006" src="https://github.com/user-attachments/assets/cfb9ddaf-96af-4e6b-a5dc-7ca172c09662" />
 
-<img width="3760" height="1142" alt="image" src="https://github.com/user-attachments/assets/29b52e25-d4d2-4bbb-afc6-36b997d7ba71" />
+
+above: meter view (phone/desktop layouts use different meter mechanisms to fit the screen size and shape)
+
+<img width="3829" height="1541" alt="Screenshot 2026-11-09 231632" src="https://github.com/user-attachments/assets/e76fa101-3084-478d-9c4f-4c6ae99ec711" />
 
 above: settings page
 
-<img width="1809" height="1065" alt="image" src="https://github.com/user-attachments/assets/6a58156c-f779-4ab8-97c5-1779122d3e18" />
+<img width="3836" height="733" alt="Screenshot 2026-11-09 231647" src="https://github.com/user-attachments/assets/ccd853dd-fa1b-4bda-a8ea-c2d49e743952" />
+
 above: navigation page
 # Pipeline stress checks
 
