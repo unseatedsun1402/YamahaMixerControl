@@ -41,10 +41,31 @@ To run the executable JAR directly, use `java -jar
 .\build\libs\YamahaMixerControl.jar`; Windows will identify that process as
 Java rather than YamahaMixerControl. The server is available at
 http://127.0.0.1:8080/MidiControl and can also be stopped with Ctrl+C.
+
 ## ===== Model Support =====
-Currently this has been tested on both the Yamaha 01V96i and the Yamaha M7CL
-for this to work make sure control change tx and rx are enabled and that the desk is set to NRPN mode for remote control and that **fader resolution is hi res**, _it used to be low_ but now I normalize these values in the program as this reduces the setup for the engineer/end user. The gui is using low res and then this is scaled up to be sent back to the mixer. I plan to support hi res later in the gui but in most contexts, remote mixing from a phone for in ear mixes this should be sufficient.
+
+Currently this has been tested on both the Yamaha 01V96i and the Yamaha M7CL. These models are supported because they have a well-documented MIDI control layout and a consistent set of control change (CC) numbers. However, it's important to note that not all MIDI devices use the same parameter numbers, and many devices have non-registered parameter numbers that are not standardized.
+
+### Non-Registered Parameter Numbers
+
+In MIDI, there are two types of control change (CC) numbers: registered and non-registered. Registered CC numbers are standardized and are used by most MIDI devices. Non-registered CC numbers, on the other hand, are not standardized and can vary between manufacturers and models. These numbers are often used for custom controls or for controls that are not part of the standard MIDI specification.
+
+Because of the lack of standardization for non-registered CC numbers, it is not feasible to support all possible MIDI devices with this application. Instead, we have chosen to focus on a few specific models that have a well-documented control layout and a consistent set of CC numbers. This allows us to provide a more reliable and consistent user experience.
+
+### Supported Models
+
+- Yamaha 01V96i
+- Yamaha M7CL
+
+These models are supported because they have a well-documented MIDI control layout and a consistent set of CC numbers. The application has been tested with these models and is known to work with them. Becuase Yamaha internally is mostly consistent with the NRPN numbers it is likely that most Yamaha Desks through the NRPN will have some
+level of control through this system albeit unsupported and unknown behaviour.
+
+### Why We Support Only a Few Models
+
+The reason we only support a few models is because we have to manually and procedurally understand the control layout of each device. This involves identifying the local controls that are similar to the ones in the supported models and unifying them under a universal API. This process is time-consuming and requires a deep understanding of the MIDI protocol and the specific control layouts of each device.
+
 ## ===== M7CL SIL Simulator =====
+
 For software-in-the-loop meter testing without a physical desk, select
 **M7CL SIL Simulator** as both the MIDI input and output device in the settings
 page, choose **YAMAHA_M7CL** as the console type, and apply the settings. The
@@ -81,6 +102,7 @@ A password can be set in the settings area only from the machine running the ser
 The localhost interface / 127.0.0.1 will not be password challenged, if a user has access to the server they have full access to the desk, but I imagine given the length of midi cables they have access to the physical desk anyway.
 
 ## ====== SCREENSHOTS ======
+
 <img width="2808" height="2324" alt="Screenshot 2026-11-09 231543" src="https://github.com/user-attachments/assets/6f7bef24-8642-4e87-b330-e6bc200da47a" />
 <img width="2805" height="1503" alt="image" src="https://github.com/user-attachments/assets/1f27a2fb-ae9e-4635-b837-3b488591b683" />
 
@@ -100,7 +122,8 @@ above: settings page
 <img width="3836" height="733" alt="Screenshot 2026-11-09 231647" src="https://github.com/user-attachments/assets/ccd853dd-fa1b-4bda-a8ea-c2d49e743952" />
 
 above: navigation page
-# Pipeline stress checks
+
+## Pipeline stress checks
 
 Run the opt-in MIDI and WebSocket backpressure checks with:
 
