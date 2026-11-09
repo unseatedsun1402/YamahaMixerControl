@@ -61,7 +61,7 @@ sets the active stream for all clients; keepalive refreshes reuse that
 selection. Meter updates continue during state rehydration.
 ## ===== Usage ======
 
-Load the index at http://<ip-address-of-server>:8080/MidiControl/settings.html
+Load the index at http://\<ip-address-of-server\>:8080/MidiControl/settings.html
 and use the selectors to assign the input and output interfaces of the server
 to the Yamaha desk.
 
@@ -77,7 +77,8 @@ You can either edit the channels.json resource in the webapps/MidiControl area o
 
 I built this around serving multiple clients at once which is something that isn't possible with any of the first party older Yamaha Desks like the M7Cl or the LS9. There is no app from Yamaha for the 01V, or 01V96 V1/V2/V2i
 
-Change the users in the conf area users.xml of the unpacked folder to suit your own needs. The mix pages are username and password protected to stop musicians from changing other peoples mixes, this can be disabled though if you take the page out of the auth group in the conf files.
+A password can be set in the settings area only from the machine running the server using the localhost which will then challenge anyone going to the page to enter the password to gain access to the rest of the features.
+The localhost interface / 127.0.0.1 will not be password challenged, if a user has access to the server they have full access to the desk, but I imagine given the length of midi cables they have access to the physical desk anyway.
 
 ## ====== SCREENSHOTS ======
 <img width="2808" height="2324" alt="Screenshot 2026-11-09 231543" src="https://github.com/user-attachments/assets/6f7bef24-8642-4e87-b330-e6bc200da47a" />
