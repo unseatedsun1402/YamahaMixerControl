@@ -53,7 +53,7 @@ public class ChannelNameAssembler implements ControlListener {
                                 ChannelNameListener listener) {
         if (deskLifeName == "") {
             deskLifeName = registry.getDeskType();
-            logger.info(String.format("Building assemblers for desk %s registry #%d",deskLifeName,registry.hashCode()));
+            if(debug)logger.fine(String.format("Building assemblers for desk %s registry #%d",deskLifeName,registry.hashCode()));
         }
 
         this.codec = selectCodec(registry.getDeskType());
@@ -114,7 +114,7 @@ public class ChannelNameAssembler implements ControlListener {
                 contextInstances.add(inst);
                 channelMap.put(inst, CanonicalName);
 
-                logger.fine("ATTACH " + inst.getCanonicalId() + " -> " + CanonicalName);
+                if(debug)logger.fine("ATTACH " + inst.getCanonicalId() + " -> " + CanonicalName);
             }
         }
 
@@ -146,12 +146,12 @@ public class ChannelNameAssembler implements ControlListener {
             String ctx = channelMap.get(instance);
 
             if (assembled == null) {
-                logger.info("[SKIP] " + ctx + " null");
+                if(debug)logger.fine("[SKIP] " + ctx + " null");
                 return;
             }
 
             if (assembled.isBlank()) {
-                logger.info("[SKIP] " + ctx + " blank");
+                if(debug)logger.fine("[SKIP] " + ctx + " blank");
                 return;
             }
 
@@ -173,13 +173,13 @@ public class ChannelNameAssembler implements ControlListener {
 
         List<Integer> values = extractValues(instances);
 
-        if (debug) logger.info("[AGG] " + ctx + " values=" + values);
+        if (debug) logger.fine("[AGG] " + ctx + " values=" + values);
 
         if (codec == null) return "";
 
         String decoded = codec.decode(values);
 
-        if (debug) logger.info("[DEC] " + ctx + " -> [" + decoded + "]");
+        if (debug) logger.fine("[DEC] " + ctx + " -> [" + decoded + "]");
 
         return decoded;
     }

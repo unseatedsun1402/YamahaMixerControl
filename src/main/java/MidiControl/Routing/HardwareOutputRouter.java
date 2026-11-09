@@ -106,4 +106,9 @@ public class HardwareOutputRouter implements OutputRequestSender{
     public void send(byte[] message) {
         this.ioManager.sendAsync(message);
     }
+
+    @Override
+    public void sendPriority(byte[] message) {
+        this.ioManager.sendPriorityAsync(message);
+    }
 }

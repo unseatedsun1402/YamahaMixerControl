@@ -122,12 +122,7 @@ public class OutputContextDiscoverer implements ContextDiscoverer {
                 logger.info(String.format("has sc %s", sub.getName()));
             }
 
-            logger.info(
-                "No subcontrols starting with "
-                + family.getSubPrefix()
-                + " in "
-                + family.getGroupName()
-            );
+            logger.info(String.format("No subcontrols starting with %s in %s"+ family.getSubPrefix(), family.getGroupName()));
 
             return;
         }
@@ -142,8 +137,6 @@ public class OutputContextDiscoverer implements ContextDiscoverer {
                 .sorted(Map.Entry.comparingByKey())
                 .collect(Collectors.toList())) {
 
-            logger.info("Group " + entry.getKey());
-
             List<SubControl> slotSubs = entry.getValue();
 
             slotSubs.sort(
@@ -155,13 +148,6 @@ public class OutputContextDiscoverer implements ContextDiscoverer {
             );
 
             for (SubControl sc : slotSubs) {
-
-                logger.info(
-                    "Processing "
-                    + sc.getName()
-                    + " startIndex="
-                    + globalIdx
-                );
 
                 addContextsForSubControl(
                     sc,

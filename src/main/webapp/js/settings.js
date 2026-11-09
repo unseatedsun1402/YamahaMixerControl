@@ -12,6 +12,7 @@ const ws = new WebSocketClient(`ws://${location.host}/MidiControl/endpoint`);
 installAuthentication(ws);
 const SERVER_LOG_LIMIT = 50;
 const serverLogBuffer = [];
+window.addEventListener("beforeunload", saveLogsToLocalStorage);
 
 const serverLog = document.getElementById("server-log");
 const deskStatusWidget = new DeskStatusWidget(document.getElementById("desk-status"));
@@ -453,27 +454,30 @@ function appendTelemetryLog(data) {
 }
 
 function handleServerEvent(event) {
-  const time = new Date(event.timestamp).toLocaleTimeString();
+    const time = new Date(event.timestamp).toLocaleTimeString();
+    const line = {
+        level: event.level,
+        text: `[${time}] [${event.category}] ${event.message}`
+    };
 
-  const line = {
-    level: event.level,
-    text: `[${time}] [${event.category}] ${event.message}`
-  };
+    if (event.category === "LIVENESS") {
+        deskStatusWidget.update(event);
+    }
 
-  if (event.category === "LIVENESS") {
-    deskStatusWidget.update(event);
-  }
+    serverLogBuffer.push(line);
+    if (serverLogBuffer.length > SERVER_LOG_LIMIT) {
+        serverLogBuffer.shift(); // Remove the oldest log
+    }
 
-  serverLogBuffer.push(line);
-  if (serverLogBuffer.length > SERVER_LOG_LIMIT) {
-    serverLogBuffer.shift();
-  }
+    renderServerLog();
 
-  renderServerLog();
+    if (event.level === "ERROR") {
+        showGlobalAlert(line.text);
+    }
+}
 
-  if (event.level === "ERROR") {
-    showGlobalAlert(line.text);
-  }
+function saveLogsToLocalStorage() {
+    localStorage.setItem("serverLogs", JSON.stringify(serverLogBuffer));
 }
 
 function handleRegistryChanged(payload) {
@@ -521,16 +525,18 @@ function resetTelemetryDisplay() {
 
 
 function renderServerLog() {
-  serverLog.innerHTML = "";
+    const log = document.getElementById("server-log");
+    log.innerHTML = ""; // Clear the log
 
-  for (const entry of serverLogBuffer) {
-    const div = document.createElement("div");
-    div.className = `server-log-line ${entry.level}`;
-    div.textContent = entry.text;
-    serverLog.appendChild(div);
-  }
+    serverLogBuffer.forEach(logEntry => {
+        const logLine = document.createElement("div");
+        logLine.textContent = logEntry.text;
+        log.appendChild(logLine);
+    });
 
-  serverLog.scrollTop = serverLog.scrollHeight;
+    while (log.children.length > SERVER_LOG_LIMIT) {
+        log.removeChild(log.children[0]);
+    }
 }
 
 
@@ -580,3 +586,15 @@ function getMapEndpoint(bankId) {
             return "source-map";
     }
 }
+
+window.addEventListener("load", () => {
+    const savedLogs = localStorage.getItem("serverLogs");
+    if (savedLogs) {
+        try {
+            serverLogBuffer = JSON.parse(savedLogs);
+            renderServerLog();
+        } catch (e) {
+            console.warn("Failed to load saved logs:", e);
+        }
+    }
+});

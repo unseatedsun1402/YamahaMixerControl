@@ -4,6 +4,8 @@ import MidiControl.ContextModel.BankContext;
 import MidiControl.Access.Authenticate;
 import MidiControl.Access.PasswordManager;
 import MidiControl.Server.EventStream.EventObject;
+import MidiControl.Server.Protocol.NotifyClients;
+import MidiControl.Server.Protocol.ServerEvent;
 import MidiControl.Server.MidiServer;
 import MidiControl.Server.MidiServerListener;
 import MidiControl.Server.SubscriptionManager;
@@ -13,11 +15,10 @@ import MidiControl.UserInterface.DTO.UiBankDTO;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnClose;
-import jakarta.websocket.SendHandler;
-import jakarta.websocket.SendResult;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -25,8 +26,6 @@ import java.util.Set;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
 import com.google.gson.Gson;
@@ -39,18 +38,17 @@ public class WebSocketEndpoint{
 
     private static final Set<Session> sessions = ConcurrentHashMap.newKeySet();
     private static final Map<Session, ConnectionState> connectionStates = new ConcurrentHashMap<>();
-    private static final Map<Session, MeterDeliveryState> meterDeliveryStates =
+    private static final Map<Session, OutboundDeliveryState> outboundDeliveryStates =
             new ConcurrentHashMap<>();
     private static final Logger logger = Logger.getLogger(WebSocketEndpoint.class.getName());
     private static final Gson gson = new Gson();
     private static boolean debug = false;
     private static final long TIMEOUT = 3000;
+    private static final int MAX_PENDING_MESSAGES = 256;
     public static String lastSent;
 
     private MidiServer server;
     private SubscriptionManager subscriptions;
-    private static Map<Integer,Boolean> sessionLocks = new ConcurrentHashMap<>();
-
     private static final Map<String, Long> logTimes =
         new ConcurrentHashMap<>();
 
@@ -72,10 +70,11 @@ public class WebSocketEndpoint{
         }
     }
 
-    private static final class MeterDeliveryState {
-        private final AtomicReference<String> pendingMessage = new AtomicReference<>();
-        private final AtomicBoolean sending = new AtomicBoolean();
-        private volatile boolean failed;
+    private static final class OutboundDeliveryState {
+        private final ArrayDeque<String> pendingMessages = new ArrayDeque<>();
+        private String pendingMeterMessage;
+        private boolean sending;
+        private boolean failed;
     }
 
     private static void warningDebounced(String key, String message) {
@@ -123,7 +122,6 @@ public class WebSocketEndpoint{
 
     @OnOpen
     public void onOpen(Session session) {
-
         server = (MidiServer) MidiServerListener.CONTEXT.getAttribute("midiServer");
         subscriptions = server.getSubscriptionManager();
 
@@ -142,6 +140,13 @@ public class WebSocketEndpoint{
             connectionStates.put(session, new ConnectionState(false, null, null, true));
             sessions.add(session);
             sendAuthenticationMessage(session, "auth-status", true, false);
+            NotifyClients.publish(
+                ServerEvent.info(
+                    "ACCESS",
+                    String.format("Session %s  is connected", session.getId()),
+                    jsonDetails("Connection established")
+                )
+            );
             return;
         }
 
@@ -151,6 +156,13 @@ public class WebSocketEndpoint{
                 connectionStates.put(session, new ConnectionState(true, null, null, true));
                 sessions.add(session);
                 sendAuthenticationMessage(session, "auth-status", true, false);
+                NotifyClients.publish(
+                    ServerEvent.info(
+                        "ACCESS",
+                        String.format("Session %s  is connected", session.getId()),
+                        jsonDetails("Connection established")
+                    )
+                );
                 return;
             }
 
@@ -168,6 +180,13 @@ public class WebSocketEndpoint{
             sendAuthenticationMessage(session, "auth-result", false, true);
             try {
                 session.close();
+                NotifyClients.publish(
+                    ServerEvent.info(
+                        "ACCESS",
+                        String.format("Session %s  was rejected", session.getId()),
+                        jsonDetails("Authentication failed")
+                    )
+                );
             } catch (java.io.IOException closeException) {
                 logger.warning("Unable to close session after authentication setup failed: "
                         + closeException.getMessage());
@@ -284,11 +303,7 @@ public class WebSocketEndpoint{
                 type,
                 Optional.empty(),
                 payload).toString();
-        try {
-            sendWithTimeout(session, message);
-        } catch (Exception exception) {
-            logger.warning("Failed to send authentication response: " + exception.getMessage());
-        }
+        queueMessage(session, message);
     }
 
     private static boolean isLoopbackAddress(String remoteAddress) {
@@ -307,7 +322,14 @@ public class WebSocketEndpoint{
         subscriptions.removeSession(session);
         sessions.remove(session);
         connectionStates.remove(session);
-        meterDeliveryStates.remove(session);
+        outboundDeliveryStates.remove(session);
+        NotifyClients.publish(
+            ServerEvent.info(
+                "ACCESS",
+                String.format("Session %s  was closed", session.getId()),
+                jsonDetails("Connection closed")
+            )
+        );
     }
 
     public static void send(Session session, String message) {
@@ -320,12 +342,7 @@ public class WebSocketEndpoint{
                 || (state != null && !state.authenticated)) {
             return;
         }
-        try {
-            sendWithTimeout(session,message);
-            }
-        catch (Exception e) {
-            logger.warning("Failed to send message: " + e.getMessage());
-        }
+        queueMessage(session, message);
     }
 
     public static void broadcast(String message) {
@@ -333,7 +350,7 @@ public class WebSocketEndpoint{
         for (Session s : sessions) {
             ConnectionState state = connectionStates.get(s);
             if (state == null || state.authenticated) {
-                sendWithTimeout(s,message);
+                queueMessage(s, message);
             }
         }
     }
@@ -346,88 +363,113 @@ public class WebSocketEndpoint{
                 continue;
             }
 
-            MeterDeliveryState delivery = meterDeliveryStates.computeIfAbsent(
-                    session, ignored -> new MeterDeliveryState());
-            if (!delivery.failed) {
-                delivery.pendingMessage.set(message);
-                sendNextMeterUpdate(session, delivery);
+            OutboundDeliveryState delivery = outboundDeliveryStates.computeIfAbsent(
+                    session, ignored -> new OutboundDeliveryState());
+            boolean startSending;
+            synchronized (delivery) {
+                if (delivery.failed) {
+                    continue;
+                }
+                delivery.pendingMeterMessage = message;
+                startSending = !delivery.sending;
+                if (startSending) {
+                    delivery.sending = true;
+                }
+            }
+            if (startSending) {
+                sendNextMessage(session, delivery);
             }
         }
     }
 
-    private static void sendNextMeterUpdate(Session session, MeterDeliveryState delivery) {
-        if (delivery.failed || !session.isOpen()
-                || !delivery.sending.compareAndSet(false, true)) {
-            return;
-        }
-
-        String message = delivery.pendingMessage.getAndSet(null);
-        if (message == null) {
-            delivery.sending.set(false);
-            if (delivery.pendingMessage.get() != null) {
-                sendNextMeterUpdate(session, delivery);
+    private static void queueMessage(Session session, String message) {
+        OutboundDeliveryState delivery = outboundDeliveryStates.computeIfAbsent(
+                session, ignored -> new OutboundDeliveryState());
+        boolean startSending;
+        synchronized (delivery) {
+            if (delivery.failed) {
+                return;
             }
+            if (delivery.pendingMessages.size() >= MAX_PENDING_MESSAGES) {
+                delivery.failed = true;
+                delivery.pendingMessages.clear();
+                delivery.pendingMeterMessage = null;
+                logger.severe("Stopping WebSocket sends for session " + session.getId()
+                        + " because its outbound queue exceeded " + MAX_PENDING_MESSAGES
+                        + " messages");
+                return;
+            }
+            delivery.pendingMessages.addLast(message);
+            startSending = !delivery.sending;
+            if (startSending) {
+                delivery.sending = true;
+            }
+        }
+        if (startSending) {
+            sendNextMessage(session, delivery);
+        }
+    }
+
+    private static void sendNextMessage(Session session, OutboundDeliveryState delivery) {
+        String message;
+        synchronized (delivery) {
+            if (delivery.failed) {
+                delivery.sending = false;
+                return;
+            }
+            message = delivery.pendingMessages.pollFirst();
+            if (message == null) {
+                message = delivery.pendingMeterMessage;
+                delivery.pendingMeterMessage = null;
+            }
+            if (message == null) {
+                delivery.sending = false;
+                return;
+            }
+        }
+        if (!session.isOpen()) {
+            failDelivery(session, delivery, "WebSocket session is closed");
             return;
         }
 
         try {
             session.getAsyncRemote().setSendTimeout(TIMEOUT);
-            session.getAsyncRemote().sendText(message, new SendHandler() {
-                @Override
-                public void onResult(SendResult result) {
-                    delivery.sending.set(false);
-                    if (!result.isOK()) {
-                        delivery.failed = true;
-                        warningDebounced(
-                                "meter-send-" + session.getId(),
-                                "Stopping meter updates for an unresponsive WebSocket session "
-                                        + session.getId() + ": " + result.getException());
-                        return;
-                    }
-                    if (delivery.pendingMessage.get() != null) {
-                        sendNextMeterUpdate(session, delivery);
-                    }
+            session.getAsyncRemote().sendText(message, result -> {
+                if (!result.isOK()) {
+                    failDelivery(session, delivery,
+                            "WebSocket send failed: " + result.getException());
+                    return;
                 }
+                sendNextMessage(session, delivery);
             });
         } catch (RuntimeException exception) {
-            delivery.sending.set(false);
+            failDelivery(session, delivery, "WebSocket send failed: " + exception.getMessage());
+        }
+    }
+
+    private static void failDelivery(
+            Session session,
+            OutboundDeliveryState delivery,
+            String reason) {
+        synchronized (delivery) {
             delivery.failed = true;
-            warningDebounced(
-                    "meter-send-" + session.getId(),
-                    "Stopping meter updates for an unresponsive WebSocket session "
-                            + session.getId() + ": " + exception.getMessage());
+            delivery.sending = false;
+            delivery.pendingMessages.clear();
+            delivery.pendingMeterMessage = null;
         }
-    }
-
-    private static void sendWithTimeout(Session session, String message){
-        long timeout = System.currentTimeMillis() + TIMEOUT;
-        while (System.currentTimeMillis()<timeout){
-            if (session.isOpen()) {
-                if(!lockSession(session)) continue;
-                try {
-                    session.getBasicRemote().sendText(message);
-                    Thread.sleep(0, 100);
-                    unlockSession(session);
-                    return;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                unlockSession(session);
-            }
-        }
-        logger.warning("Could not send message before timeout "+message);
-    }
-
-    private static boolean lockSession(Session session){
-         return (sessionLocks.putIfAbsent(session.hashCode(), false) == null ? true : false);
-    }
-
-    private static boolean unlockSession(Session session){
-        return sessionLocks.remove(session.hashCode());
+        warningDebounced(
+                "websocket-send-" + session.getId(),
+                "Stopping WebSocket sends for session " + session.getId() + ": " + reason);
     }
 
     public static void addTestSession(Session testSession){
         sessions.add(testSession);
         connectionStates.put(testSession, new ConnectionState(false, null, null, true));
+    }
+
+    private JsonObject jsonDetails(String message) {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("details", message);
+        return obj;
     }
 }

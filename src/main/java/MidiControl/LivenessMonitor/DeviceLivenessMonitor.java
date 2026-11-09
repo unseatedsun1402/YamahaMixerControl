@@ -48,41 +48,49 @@ public class DeviceLivenessMonitor{
     private class LivenessCheckTask extends TimerTask {
         @Override
         public void run() {
-            if(deskModelProvider.getDeskType().isEmpty()) {logger.warning("Desk type is empty"); return;}
-            if(debug)logger.fine(String.format("Checking liveness of %s",deskModelProvider.getDeskType()));
-            boolean isAlive = deskDiscovery.probeForLiveness(deskModelProvider.getDeskType());
-            if (isAlive) {
-                if(debug)logger.fine("Still alive");
-                NotifyClients.publish(
-                    ServerEvent.info(
-                        "LIVENESS",
-                        String.format("Desk %s  is connected", deskModelProvider.getDeskType()),
-                        isConnectedObject(true)
-                    )
-                );
-                if(!everConnected) everConnected = true;
-                if(consecutiveFailures > 0) consecutiveFailures = 0;
-                return;
-            }
-            logger.warning("Not connected");
-            consecutiveFailures ++;
-            if (consecutiveFailures >= FAILURE_THRESHOLD) {
-                long now = System.currentTimeMillis();
-                if (now - lastRecoveryTime > COOLDOWN_MS) {
-                    logger.warning("Liveness threshold exceeded - triggering MIDI subsystem reset");
-                    ioManager.resetMidiSubsystem();
-                    lastRecoveryTime = now;
-                }
-                consecutiveFailures = 0;
-            }
+            checkLiveness();
+        }
+    }
+
+    void checkLiveness() {
+        String deskType = deskModelProvider.getDeskType();
+        if (deskType.isEmpty()) {
+            logger.warning("Desk type is empty");
+            return;
+        }
+        if (debug) logger.fine(String.format("Checking liveness of %s", deskType));
+        boolean isAlive = deskDiscovery.probeForLiveness(deskType);
+        if (isAlive) {
+            if (debug) logger.fine("Still alive");
             NotifyClients.publish(
-                ServerEvent.warning(
+                ServerEvent.info(
                     "LIVENESS",
-                    String.format("Desk %s  is not connected", deskModelProvider.getDeskType()),
-                    isConnectedObject(false)
+                    String.format("Desk %s  is connected", deskType),
+                    isConnectedObject(true)
                 )
             );
+            if (!everConnected) everConnected = true;
+            if (consecutiveFailures > 0) consecutiveFailures = 0;
+            return;
         }
+        logger.warning("Not connected");
+        consecutiveFailures++;
+        if (consecutiveFailures >= FAILURE_THRESHOLD) {
+            long now = System.currentTimeMillis();
+            if (now - lastRecoveryTime > COOLDOWN_MS) {
+                logger.warning("Liveness threshold exceeded - triggering MIDI subsystem reset");
+                ioManager.resetMidiSubsystem();
+                lastRecoveryTime = now;
+            }
+            consecutiveFailures = 0;
+        }
+        NotifyClients.publish(
+            ServerEvent.warning(
+                "LIVENESS",
+                String.format("Desk %s  is not connected", deskType),
+                isConnectedObject(false)
+            )
+        );
     }
 
     public void injectNewRegistry(CanonicalRegistry newRegistry) {
