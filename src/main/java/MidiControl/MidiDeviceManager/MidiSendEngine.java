@@ -32,9 +32,11 @@ public class MidiSendEngine implements MidiIngressListener {
 
     private static final Logger logger = Logger.getLogger(MidiSendEngine.class.getName());
     private static volatile boolean debug = false;
+    private static final int PRIORITY_QUEUE_CAPACITY = 64;
 
     private final MidiOutput midiOut;
 
+    private final ArrayBlockingQueue<byte[]> priorityLane;
     private final ArrayBlockingQueue<byte[]> normalLane;
     private final ArrayBlockingQueue<byte[]> realtimeLane;
 
@@ -65,6 +67,7 @@ public class MidiSendEngine implements MidiIngressListener {
 
     public MidiSendEngine(MidiOutput out, int queueCapacity, int sysexCapacity) {
         this.midiOut = out;
+        this.priorityLane = new ArrayBlockingQueue<>(PRIORITY_QUEUE_CAPACITY);
         this.normalLane = new ArrayBlockingQueue<>(queueCapacity);
         this.realtimeLane = new ArrayBlockingQueue<>(64);
         this.telemetry = new MidiTelemetry(this);
@@ -112,6 +115,13 @@ public class MidiSendEngine implements MidiIngressListener {
         return normalLane.offer(msg);
     }
 
+    public boolean offerPriority(byte[] msg) {
+        if (isRealtime(msg)) {
+            return realtimeLane.offer(msg);
+        }
+        return priorityLane.offer(msg);
+    }
+
     public void start() {
         if (!running.compareAndSet(false, true)) return;
         worker.execute(this::runLoop);
@@ -122,6 +132,7 @@ public class MidiSendEngine implements MidiIngressListener {
         worker.shutdownNow();
         lastNonRealtimeSendNs = 0L;
         realtimeLane.clear();
+        priorityLane.clear();
         normalLane.clear();
         synchronized (sysexLock) {
             pendingSysex.clear();
@@ -148,11 +159,15 @@ public class MidiSendEngine implements MidiIngressListener {
     private byte[] pollNext() throws InterruptedException {
         byte[] rt = realtimeLane.poll();
         if (rt != null) return rt;
+        byte[] priority = priorityLane.poll();
+        if (priority != null) return priority;
         byte[] sx = pollCoalescedSysex();
         if (sx != null) return sx;
         byte[] normal = normalLane.poll(250, TimeUnit.MICROSECONDS);
         if (normal != null) return normal;
-        return realtimeLane.poll();
+        rt = realtimeLane.poll();
+        if (rt != null) return rt;
+        return priorityLane.poll();
     }
 
     private byte[] pollCoalescedSysex() {
@@ -333,6 +348,13 @@ public class MidiSendEngine implements MidiIngressListener {
             int remaining = pendingSysexCapacity - pendingSysex.size();
             if (remaining <= 0) return 0;
             return (int) ((remaining * 100L) / pendingSysexCapacity);
+        }
+    }
+
+    public int getQueuedMessageCount() {
+        int queued = priorityLane.size() + normalLane.size() + realtimeLane.size();
+        synchronized (sysexLock) {
+            return queued + pendingSysex.size();
         }
     }
 }

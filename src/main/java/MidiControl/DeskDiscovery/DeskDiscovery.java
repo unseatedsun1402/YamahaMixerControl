@@ -251,7 +251,11 @@ public class DeskDiscovery {
 
     public boolean probeForLiveness(String deskModel) {
         SysexMapping mapping = deskProfileMap.get(deskModel);
-        mapping = registry.resolveCanonicalId(buildCanonicalIdFromMapping(mapping,0)).getSysex();
+        if (mapping == null) return false;
+        ControlInstance instance = registry.resolveCanonicalId(
+                buildCanonicalIdFromMapping(mapping, 0));
+        if (instance == null) return false;
+        mapping = instance.getSysex();
         if (mapping == null) return false;
 
         DeskDiscoveryResult result =

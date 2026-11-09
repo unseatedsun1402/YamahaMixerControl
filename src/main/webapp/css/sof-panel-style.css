@@ -40,11 +40,11 @@
     -webkit-overflow-scrolling: touch;
 
     gap: 8px;
-    background: #222;
-    border-bottom: 2px solid #444;
-    border: 1px solid #888;
-    padding: 10px;
-    font-family: sans-serif;
+    background: var(--mix-color-toolbar);
+    border-bottom: 2px solid var(--mix-color-display-blue-bright);
+    border: 1px solid var(--mix-color-strip-border);
+    padding: 6px 8px;
+    font-family: var(--mix-font-interface);
 
     display: inline-flex;
     flex-direction: row;
@@ -54,17 +54,39 @@
     box-sizing: border-box;
 }
 
-.sof-btn {
+.soft-key {
     box-sizing: border-box;
-    padding: 8px 12px;
-    min-height: var(--mix-nav-button-height, 0);
     flex: 0 0 auto;
-    background: #333;
-    border: 1px solid #666;
-    color: #eee;
+    min-height: 48px;
+    padding: 5px 8px;
+    background: linear-gradient(160deg, var(--mix-color-button-hover), var(--mix-color-button) 58%, var(--mix-color-strip-inset));
+    border: 1px solid var(--mix-color-strip-border);
+    border-bottom: 3px solid var(--mix-color-strip-inset);
+    border-radius: 3px;
+    color: var(--mix-color-text);
+    font-family: var(--mix-font-readout);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.015em;
+    text-shadow: 0 1px 1px var(--mix-color-bank-shadow);
+    transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+}
+
+.sof-btn {
     cursor: pointer;
-    border-radius: 4px;
-    font-size: 0.9rem;
+}
+
+.soft-key:hover {
+    background: linear-gradient(160deg, var(--mix-color-button-hover), var(--mix-color-button));
+}
+
+.soft-key:active {
+    transform: translateY(1px);
+}
+
+.soft-key:focus-visible {
+    outline: 2px solid var(--mix-color-display-blue-bright);
+    outline-offset: 2px;
 }
 
 .page-nav-link.sof-btn {
@@ -73,61 +95,124 @@
     text-decoration: none;
 }
 
-.sof-btn:hover {
-    background: #444;
+.sof-send-btn {
+    background: linear-gradient(160deg, var(--mix-send-color), var(--mix-send-color) 58%, var(--mix-send-color-dark));
+    border-color: var(--mix-send-color);
+    border-bottom-color: var(--mix-send-color-dark);
+    color: white;
 }
 
-.sof-btn.off {
-    background: #550000;
-    border-color: #992222;
+.sof-send-btn:hover {
+    background: linear-gradient(160deg, var(--mix-send-color), var(--mix-send-color) 58%, var(--mix-send-color-dark));
+    filter: brightness(1.12);
+}
+
+.sof-send-btn.active {
+    outline: 2px solid var(--mix-color-focus);
+    outline-offset: -3px;
+    box-shadow: 0 0 8px var(--mix-send-halo);
+}
+
+.sof-send-bank-1 {
+    --mix-send-color: var(--mix-color-knob-send-pink);
+    --mix-send-color-dark: var(--mix-color-send-pink-dark);
+    --mix-send-halo: var(--mix-color-send-halo-pink);
+}
+
+.sof-send-bank-2 {
+    --mix-send-color: var(--mix-color-knob-send-blue);
+    --mix-send-color-dark: var(--mix-color-send-blue-dark);
+    --mix-send-halo: var(--mix-color-send-halo-blue);
+}
+
+.sof-send-bank-3 {
+    --mix-send-color: var(--mix-color-knob-send-aqua);
+    --mix-send-color-dark: var(--mix-color-send-aqua-dark);
+    --mix-send-halo: var(--mix-color-send-halo-aqua);
+}
+
+.sof-send-bank-4 {
+    --mix-send-color: var(--mix-color-knob-send-purple);
+    --mix-send-color-dark: var(--mix-color-send-purple-dark);
+    --mix-send-halo: var(--mix-color-send-halo-purple);
+}
+
+.sof-btn.off,
+.edit-btn.off {
+    background: var(--mix-color-off);
+    border-color: var(--mix-color-off-border);
+    border-bottom-color: var(--mix-color-strip-inset);
 }
 
 #bank-selector {
     display: flex;
-    flex-direction: row;
-    gap: 8px;
-    overflow-x: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 8px 6px;
+    background: var(--mix-color-toolbar);
+    border-right: 1px solid var(--mix-color-strip-border);
+}
 
-    padding: 8px;
-    background: #1f1f1f;
-    border-bottom: 1px solid #444;
+.bank-mode-controls {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 5px;
+}
+
+.bank-selector-divider {
+    height: 2px;
+    flex: 0 0 2px;
+    margin: 3px 2px;
+    background: var(--mix-color-strip-border);
 }
 
 .bank-btn {
-    box-sizing: border-box;
-    flex: 0 0 auto;
-
-    padding: 8px 12px;
-    min-height: var(--mix-nav-button-height, 0);
-
-    background: #333;
-    border: 1px solid #666;
-    border-radius: 4px;
-
-    color: white;
+    min-height: 48px;
+    width: 100%;
     cursor: pointer;
 }
 
+.bank-mode-btn {
+    min-height: 40px;
+    padding-inline: 3px;
+    font-size: 0.68rem;
+}
+
 .bank-btn.active {
-    background: #0066aa;
-    border-color: #3399ff;
+    background: linear-gradient(160deg, var(--mix-color-focus), var(--mix-color-bank-active-bottom));
+    border-color: var(--mix-color-focus);
+    border-bottom-color: var(--mix-color-bank-active-bottom);
+    color: var(--mix-color-strip-inset);
+    text-shadow: none;
+}
+
+.bank-mode-btn.active {
+    border-color: var(--mix-color-display-blue-bright);
+    border-bottom-color: var(--mix-color-display-blue);
+    background: linear-gradient(160deg, var(--mix-color-display-blue-bright), var(--mix-color-display-blue));
+    color: white;
+    text-shadow: 0 1px 1px var(--mix-color-bank-shadow);
+}
+
+.bank-btn:focus-visible {
+    outline: 2px solid var(--mix-color-display-blue-bright);
+    outline-offset: 2px;
 }
 
 #bank-selector {
-    gap: var(--mix-nav-gap, 8px);
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--mix-color-strip-border) transparent;
 }
 
 #bank-selector:hover {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,0.25) transparent;
+    scrollbar-color: var(--mix-color-text-dim) transparent;
 }
 
 #bank-selector::-webkit-scrollbar {
-    height: 6px;
+    width: 6px;
 }
 
 #bank-selector::-webkit-scrollbar-track {
@@ -135,10 +220,10 @@
 }
 
 #bank-selector::-webkit-scrollbar-thumb {
-    background: transparent;
+    background: var(--mix-color-strip-border);
     border-radius: 4px;
 }
 
 #bank-selector:hover::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.25);
+    background: var(--mix-color-text-dim);
 }

@@ -63,13 +63,24 @@ public class MidiIOManager {
     }
 
     public void sendAsync(byte[] data) {
+        enqueue(data, false);
+    }
+
+    public void sendPriorityAsync(byte[] data) {
+        enqueue(data, true);
+    }
+
+    private void enqueue(byte[] data, boolean priority) {
         if (midiOut == null || sendEngine == null) {
             logger.warning("Attempted to send MIDI before output device was set.");
             return;
         }
         if(debug) logger.info(String.format("Outputing on %s - %s",getMidiOutName(),Format.bytesToHex(data)));
-        if (!sendEngine.offer(data)) {
-            logger.warning("Send queue full; message dropped or consider coalescing.");
+        boolean accepted = priority ? sendEngine.offerPriority(data) : sendEngine.offer(data);
+        if (!accepted) {
+            logger.warning(priority
+                    ? "Priority MIDI queue full; priority message dropped."
+                    : "Send queue full; message dropped or consider coalescing.");
         }
     }
 

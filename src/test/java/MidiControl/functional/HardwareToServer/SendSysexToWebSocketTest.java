@@ -1,5 +1,6 @@
 package MidiControl.functional.HardwareToServer;
 
+import MidiControl.Mocks.FakeSession;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
@@ -44,10 +45,13 @@ public class SendSysexToWebSocketTest {
 
         private final String id;
         private final StringBuilder sink;
+        private final FakeSession asyncSession;
 
         CapturingSession(String id, StringBuilder sink) {
             this.id = id;
             this.sink = sink;
+            asyncSession = new FakeSession(id);
+            asyncSession.setRemoteSender(sink::append);
         }
 
         @Override
@@ -174,7 +178,7 @@ public class SendSysexToWebSocketTest {
         }
         @Override
         public Async getAsyncRemote() {
-            throw new UnsupportedOperationException("Unimplemented method 'getAsyncRemote'");
+            return asyncSession.getAsyncRemote();
         }
         @Override
         public void close() throws IOException {

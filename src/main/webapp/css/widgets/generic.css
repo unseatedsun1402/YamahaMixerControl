@@ -1,35 +1,63 @@
 .section {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--mix-control-gap);
 
-    margin-bottom: 12px;
-    padding-bottom: 8px;
+    margin-bottom: 8px;
+    padding: 6px 5px 8px;
 
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--mix-color-section-border);
+    background: var(--mix-color-section-wash);
 }
 
 .section-title {
-    margin-bottom: 4px;
+    margin: -6px -5px 3px;
+    padding: 5px 7px;
 
-    color: #aaa;
-    font-size: 0.8rem;
+    border-left: 3px solid var(--mix-color-focus);
+    background: var(--mix-color-section-heading);
+    color: var(--mix-color-text);
+    font-family: var(--mix-font-readout);
+    font-size: 0.68rem;
     font-weight: bold;
+    letter-spacing: 0.045em;
     text-transform: uppercase;
+}
+
+.section-knob-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--mix-control-gap) 4px;
+}
+
+.section-knob-grid > .section-title,
+.section-knob-grid > .control:not(.control-knob),
+.section-knob-grid > .eq-widget,
+.section-knob-grid > .dynamics-widget {
+    grid-column: 1 / -1;
 }
 
 .control {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
+    min-width: 0;
 
     text-align: center;
 }
 
 .control-label {
-    color: #ccc;
-    font-size: 0.8rem;
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--mix-color-text-muted);
+    font-family: var(--mix-font-readout);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .rotary-knob {
@@ -39,8 +67,8 @@
     align-items: center;
     justify-content: center;
 
-    width: 48px;
-    height: 48px;
+    width: var(--mix-knob-size);
+    height: var(--mix-knob-size);
 
     cursor: grab;
     touch-action: none;
@@ -48,7 +76,7 @@
 }
 
 .rotary-knob:hover {
-    background-color: #2a2a2a;
+    background-color: var(--mix-color-knob-hover);
     border-radius: 50%;
 }
 
@@ -62,43 +90,52 @@
     width: 100%;
     height: 100%;
 
-    background: #333;
-    border: 2px solid #666;
+    background:
+        radial-gradient(circle at 34% 26%, var(--mix-color-knob-metal-light) 0%, var(--mix-color-knob-metal) 42%, var(--mix-color-knob-shadow) 80%, var(--mix-color-strip-inset) 100%);
+    border: 2px solid var(--mix-color-knob-rim);
     border-radius: 50%;
 
     transform-origin: 50% 50%;
 
-    box-shadow: inset 0 0 4px rgba(0,0,0,0.6);
+    box-shadow:
+        inset 0 1px 2px var(--mix-color-knob-shadow-light),
+        inset 0 -3px 5px var(--mix-color-knob-shadow-dark),
+        0 1px 2px var(--mix-color-knob-shadow-bottom);
+}
+
+.knob-dial::after {
+    content: none;
 }
 
 .knob-value {
     position: absolute;
-    top: 10%;
-    left: 45%;
+    z-index: 1;
+    top: calc(50% - var(--mix-knob-marker-orbit) - 3.5px);
+    left: calc(50% - 1px);
+    width: 2px;
+    height: 7px;
 
-    width: 4px;
-    height: 18px;
+    background: var(--mix-color-knob-indicator);
+    border-radius: 1px;
+    box-shadow: 0 0 1px var(--mix-color-strip-inset);
 
-    background: #4da3ff;
-    border-radius: 2px;
-
-    transform-origin: 50% 100%;
+    transform-origin: 50% calc(50% + var(--mix-knob-marker-orbit));
     transition: transform 0.1s ease;
 }
 
 .knob-value.updated {
-    background-color: #7fc2ff;
+    background-color: var(--mix-color-focus);
 }
 
 .toggle-control {
     width: 100%;
     padding: 8px;
 
-    background: #333;
-    border: 1px solid #555;
-    border-radius: 4px;
+    background: var(--mix-color-button);
+    border: 1px solid var(--mix-color-strip-border);
+    border-radius: 2px;
 
-    color: #eee;
+    color: var(--mix-color-text);
     font-size: 0.9rem;
     text-align: center;
 
@@ -110,14 +147,15 @@
     width: 100%;
     padding: 8px 10px;
 
-    background: #2a2a2a;
-    border: 1px solid #555;
-    border-bottom: 4px solid #444;
+    background: var(--mix-color-button);
+    border: 1px solid var(--mix-color-strip-border);
+    border-bottom: 3px solid var(--mix-color-strip-inset);
 
-    border-radius: 4px;
+    border-radius: 2px;
 
-    color: #ddd;
+    color: var(--mix-color-text);
     cursor: pointer;
+    font-family: var(--mix-font-readout);
 
     transition:
         background 0.15s,
@@ -126,13 +164,13 @@
 }
 
 .toggle-button.active {
-    background: #3b2d2d;
+    background: var(--mix-color-button-active);
 
-    border-color: #ff6136;
-    border-bottom-color: #ff6136;
+    border-color: var(--mix-color-button-active-border);
+    border-bottom-color: var(--mix-color-button-active-border);
 
     box-shadow:
-        0 0 12px rgba(239,68,68,0.25);
+        inset 0 1px 0 var(--mix-color-button-inset-highlight);
 }
 
 .slider-container {
@@ -154,8 +192,8 @@
     width: 100%;
     height: 8px;
 
-    background: #222;
-    border: 1px solid #444;
+    background: var(--mix-color-strip-inset);
+    border: 1px solid var(--mix-color-strip-border);
     border-radius: 4px;
 
     overflow: hidden;
@@ -170,7 +208,7 @@
     height: 100%;
     width: 0;
 
-    background: #4da3ff;
+    background: var(--mix-color-display-blue-bright);
 }
 
 .slider-thumb {

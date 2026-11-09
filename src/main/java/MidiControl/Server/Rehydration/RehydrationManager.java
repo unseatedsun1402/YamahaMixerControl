@@ -178,7 +178,7 @@ public class RehydrationManager{
         ci.addListener(tmpListener);
 
         if(debug)logger.fine(String.format("PROBE: sending probe for control instance=%d channel %d", ci.hashCode(), midi_channel));
-        outputRouter.send(probe);
+        outputRouter.sendPriority(probe);
 
         scheduler.schedule(() -> {
             if (pending.remove(canonicalId) != null) {

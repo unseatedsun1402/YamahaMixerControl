@@ -8,19 +8,37 @@ body {
     display: flex;
     flex-direction: column;
 
-    background-color: #555;
-    font-family: sans-serif;
+    background-color: var(--mix-color-canvas);
+    color: var(--mix-color-text);
+    font-family: var(--mix-font-interface);
 }
 
 
 #ui-root {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: var(--mix-bank-rail-width) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+        "ribbon ribbon"
+        "banks strips";
     flex: 1;
+    min-width: 0;
+    min-height: 0;
+}
+
+#view-ribbon {
+    grid-area: ribbon;
+    min-width: 0;
+}
+
+#bank-selector {
+    grid-area: banks;
+    min-width: 0;
     min-height: 0;
 }
 
 #strip-container {
+    grid-area: strips;
     display: flex;
     flex-direction: row;
     gap: var(--mix-strip-gap);
@@ -30,6 +48,8 @@ body {
     min-height: 0;
 
     padding: var(--mix-container-padding);
+    background:
+        linear-gradient(180deg, var(--mix-color-toolbar), var(--mix-color-canvas));
 
     overflow-x: auto;
     overflow-y: hidden;
@@ -53,11 +73,13 @@ body {
 
     padding: var(--mix-strip-padding);
 
-    background: #1b1b1b;
-    border-radius: 8px;
-    color: #eee;
+    background:
+        linear-gradient(180deg, var(--mix-color-strip-raised), var(--mix-color-strip));
+    border: 1px solid var(--mix-color-strip-border);
+    border-radius: 3px;
+    color: var(--mix-color-text);
 
-    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    box-shadow: inset 0 1px 0 var(--mix-color-strip-highlight), 0 2px 6px var(--mix-color-strip-shadow);
 }
 
 .strip-top {
@@ -122,21 +144,31 @@ body {
     margin-top: 10px;
     padding-top: 10px;
 
-    border-top: 1px solid #333;
+    border-top: 1px solid var(--mix-color-section-border);
 }
 
 .context-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    min-height: 28px;
+    margin-bottom: 6px;
+    padding: 3px 6px;
+    border-bottom: 1px solid var(--mix-color-strip-border);
+    background: var(--mix-color-display-blue);
+    color: var(--mix-color-text);
+    font-family: var(--mix-font-readout);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.025em;
 }
 
 .led-meter {
     width: 14px;
     height: 14px;
 
-    background: #222;
-    border: 1px solid #444;
+    background: var(--mix-color-strip-inset);
+    border: 1px solid var(--mix-color-strip-border);
     border-radius: 50%;
 
     box-shadow:
@@ -147,7 +179,7 @@ body {
 
 
 .send-widget .toggle-button.active {
-    border-bottom-color: #3b82f6;
+    border-bottom-color: var(--mix-color-send-active);
 }
 
 
@@ -155,21 +187,23 @@ select {
     width: 100%;
     padding: 6px;
 
-    background: #222;
-    border: 1px solid #444;
-    border-radius: 4px;
+    background: var(--mix-color-strip-inset);
+    border: 1px solid var(--mix-color-strip-border);
+    border-radius: 2px;
 
-    color: #eee;
+    color: var(--mix-color-text);
+    font-family: var(--mix-font-readout);
 }
 
 .string-display {
     padding: 6px;
 
-    background: #222;
-    border: 1px solid #444;
-    border-radius: 4px;
+    background: var(--mix-color-strip-inset);
+    border: 1px solid var(--mix-color-strip-border);
+    border-radius: 2px;
 
-    color: #eee;
+    color: var(--mix-color-text);
+    font-family: var(--mix-font-readout);
     text-align: center;
 }
 
@@ -179,7 +213,7 @@ select {
     }
 
     #strip-container {
-        padding-bottom: 8px;
+        padding-bottom: var(--mix-container-padding);
     }
 
     .control-label {
@@ -202,7 +236,7 @@ select {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: #b00020;
+  background: var(--mix-color-alert);
   color: white;
   padding: 12px 16px;
   border-radius: 6px;

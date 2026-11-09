@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/sof-panel-style.css"/>
     <link rel="stylesheet" href="css/fader-style.css"/>
     <link rel="stylesheet" href="css/widgets/generic.css"/>
+    <link rel="stylesheet" href="css/control-colors.css"/>
     <link rel="stylesheet" href="css/widgets/dynamics-widget.css"/>
     <link rel="stylesheet" href="css/widgets/eq-widget.css"/>
     <link rel="stylesheet" href="css/mix-phone-landscape.css"/>
@@ -32,6 +33,7 @@
         window.currentBank = 0;
         window.channelsPerBank = 8;
         window.currentView = "basic-input-view";
+        window.currentDomain = "input";
         window.channelMeters = new Map();
 
         
@@ -63,6 +65,7 @@
         function selectOutputMode() {
 
             window.currentDomain = "output";
+            updateModeButtonState();
             window.currentView = "basic-master-view";
             
             window.currentBank = 0;
@@ -75,6 +78,7 @@
         function selectInputMode() {
 
             window.currentDomain ="input";
+            updateModeButtonState();
             window.currentView ="basic-input-view";
             
             window.currentBank = 0;
@@ -97,6 +101,12 @@
         function loadBank(bankIndex) {
             window.currentBank = bankIndex;    
             console.log("Loading bank", bankIndex);
+
+            document.querySelectorAll("#bank-selector .bank-btn[data-bank-index]").forEach(button => {
+                const isActive = Number(button.dataset.bankIndex) === bankIndex;
+                button.classList.toggle("active", isActive);
+                button.setAttribute("aria-pressed", String(isActive));
+            });
 
             const start = bankIndex * window.channelsPerBank;
             const end = start + window.channelsPerBank;
@@ -122,6 +132,28 @@
 
             container.innerHTML = "";
 
+            const modeControls = document.createElement("div");
+            modeControls.className = "bank-mode-controls";
+            for (const [domain, label, selectMode] of [
+                ["input", "INPUT", selectInputMode],
+                ["output", "OUTPUT", selectOutputMode]
+            ]) {
+                const modeButton = document.createElement("button");
+                modeButton.type = "button";
+                modeButton.className = "soft-key bank-mode-btn";
+                modeButton.textContent = label;
+                modeButton.dataset.domain = domain;
+                modeButton.setAttribute("aria-pressed", "false");
+                modeButton.addEventListener("click", selectMode);
+                modeControls.appendChild(modeButton);
+            }
+            container.appendChild(modeControls);
+
+            const divider = document.createElement("div");
+            divider.className = "bank-selector-divider";
+            divider.setAttribute("aria-hidden", "true");
+            container.appendChild(divider);
+
             const banks =
                 Math.ceil(
                     window.allContexts.length /
@@ -131,19 +163,33 @@
             for (let i = 0; i < banks; i++) {
 
                 const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "soft-key bank-btn";
+                btn.dataset.bankIndex = String(i);
 
-                const start = (i * 8) + 1;
+                const start = (i * window.channelsPerBank) + 1;
                 const end = Math.min(
-                    start + 7,
+                    start + window.channelsPerBank - 1,
                     window.allContexts.length
                 );
 
                 btn.textContent = `${start}-${end}`;
+                btn.setAttribute("aria-label", `Channels ${start} through ${end}`);
+                btn.setAttribute("aria-pressed", String(i === window.currentBank));
 
                 btn.onclick = () => loadBank(i);
 
                 container.appendChild(btn);
             }
+            updateModeButtonState();
+        }
+
+        function updateModeButtonState() {
+            document.querySelectorAll("#bank-selector .bank-mode-btn").forEach(button => {
+                const isActive = button.dataset.domain === window.currentDomain;
+                button.classList.toggle("active", isActive);
+                button.setAttribute("aria-pressed", String(isActive));
+            });
         }
         
         ws.on("ui-bank", (bank) => {
@@ -180,9 +226,7 @@
             if (!window.ribbonInitialised) {
                 buildViewRibbonFromModel(
                     model,
-                    handleViewSelection,
-                    selectInputMode,
-                    selectOutputMode
+                    handleViewSelection
                 );
                 window.ribbonInitialised = true;
             }

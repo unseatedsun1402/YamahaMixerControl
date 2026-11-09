@@ -1,8 +1,86 @@
 :root {
-    --mix-strip-width: 220px;
-    --mix-strip-gap: 12px;
+    --mix-color-canvas: #101520;
+    --mix-color-toolbar: #151d2b;
+    --mix-color-strip: #202a3c;
+    --mix-color-strip-raised: #2b374d;
+    --mix-color-strip-inset: #171f2d;
+    --mix-color-strip-border: #46536b;
+    --mix-color-section-border: #3a465c;
+    --mix-color-text: #f0f3f8;
+    --mix-color-text-muted: #b6c0d0;
+    --mix-color-text-dim: #8491a6;
+    --mix-color-qr-background: #fff;
+    --mix-color-display-blue: #164b8e;
+    --mix-color-display-blue-bright: #3184d4;
+    --mix-color-focus-glow: rgb(49 132 212 / 24%);
+    --mix-color-modal-backdrop: rgb(0 0 0 / 65%);
+    --mix-color-focus: #e5c852;
+    --mix-color-led: #52d1a2;
+    --mix-color-button: #39475d;
+    --mix-color-button-hover: #4a5b74;
+    --mix-color-button-active: #73502d;
+    --mix-color-button-active-border: #e3b64c;
+    --mix-color-bank-active-bottom: #9d8127;
+    --mix-color-bank-shadow: rgb(0 0 0 / 55%);
+    --mix-color-button-inset-highlight: rgb(255 255 255 / 15%);
+    --mix-color-led-off: #e16660;
+    --mix-color-led-off-glow: rgb(225 102 96 / 20%);
+    --mix-color-led-on-glow: rgb(82 209 162 / 24%);
+    --mix-color-strip-highlight: rgb(255 255 255 / 8%);
+    --mix-color-strip-shadow: rgb(0 0 0 / 35%);
+    --mix-color-section-wash: rgb(11 17 27 / 22%);
+    --mix-color-section-heading: rgb(13 23 39 / 62%);
+    --mix-color-knob-hover: rgb(255 255 255 / 5%);
+    --mix-color-knob-rim: #8290a4;
+    --mix-color-knob-gloss: rgb(255 255 255 / 38%);
+    --mix-color-knob-shadow-dark: rgb(13 20 31 / 75%);
+    --mix-color-knob-shadow-light: rgb(255 255 255 / 68%);
+    --mix-color-knob-send-pink: #e144a7;
+    --mix-color-knob-send-blue: #368bea;
+    --mix-color-knob-send-aqua: #28bfd0;
+    --mix-color-knob-send-purple: #9c76d3;
+    --mix-color-send-pink-dark: #9f2872;
+    --mix-color-send-blue-dark: #2058a4;
+    --mix-color-send-aqua-dark: #187b89;
+    --mix-color-send-purple-dark: #614892;
+    --mix-color-send-halo-pink: rgb(225 68 167 / 25%);
+    --mix-color-send-halo-blue: rgb(54 139 234 / 25%);
+    --mix-color-send-halo-aqua: rgb(40 191 208 / 25%);
+    --mix-color-send-halo-purple: rgb(156 118 211 / 25%);
+    --mix-color-send-active: #3b82f6;
+    --mix-color-off: #7b3535;
+    --mix-color-off-border: #d26961;
+    --mix-color-alert: #a83232;
+    --mix-color-warning-background: #643c32;
+    --mix-color-log-info: #9cdcfe;
+    --mix-color-log-warning: #ffcc00;
+    --mix-color-log-error: #ff6666;
+    --mix-color-fader-input-bg: #334;
+    --mix-color-fader-input-border: #556;
+    --mix-color-fader-output-bg: #2a332a;
+    --mix-color-fader-output-border: #4d664d;
+    --mix-color-fader-dca-bg: #332a2a;
+    --mix-color-fader-dca-border: #664d4d;
+    --mix-color-fader-group-bg: #33331d;
+    --mix-color-fader-group-border: #66663a;
+    --mix-color-knob-shadow: #59677d;
+    --mix-color-knob-shadow-bottom: rgb(0 0 0 / 60%);
+    --mix-color-knob-metal: #c9d1de;
+    --mix-color-knob-metal-light: #edf1f7;
+    --mix-color-knob-indicator: #f5f6fa;
+    --mix-color-knob-send: #cb5b9d;
+    --mix-color-knob-matrix: #48b6d2;
+    --mix-color-knob-eq: #58c7d2;
+    --mix-color-knob-dyn: #e77a5a;
+    --mix-color-knob-gain: #a994c9;
+    --mix-font-interface: Arial, "Helvetica Neue", sans-serif;
+    --mix-font-readout: "Arial Narrow", Arial, sans-serif;
+
+    --mix-strip-width: 184px;
+    --mix-strip-gap: 5px;
+    --mix-bank-rail-width: 78px;
     --mix-container-padding: 8px;
-    --mix-strip-padding: 12px;
+    --mix-strip-padding: 8px;
     --mix-fader-area-height: clamp(240px, 35vh, 450px);
     --mix-fader-container-height: auto;
     --mix-fader-min-height: 140px;
@@ -11,25 +89,32 @@
     --mix-fader-thumb-height: 40px;
     --mix-nav-gap: 8px;
     --mix-nav-button-height: 44px;
+    --mix-knob-size: 50px;
+    --mix-knob-marker-orbit: 16px;
+    --mix-control-gap: 6px;
 }
 
 @media (max-width: 768px) {
     :root {
-        --mix-strip-width: 176px;
-        --mix-strip-gap: 8px;
+        --mix-strip-width: 168px;
+        --mix-strip-gap: 4px;
+        --mix-bank-rail-width: 70px;
         --mix-container-padding: 6px;
-        --mix-strip-padding: 10px;
+        --mix-strip-padding: 7px;
         --mix-fader-area-height: clamp(220px, 32vh, 340px);
         --mix-fader-container-height: clamp(120px, 22vh, 300px);
         --mix-fader-min-height: 124px;
+        --mix-knob-size: 46px;
     }
 }
 
 @media (max-width: 480px) {
     :root {
-        --mix-strip-width: 168px;
+        --mix-strip-width: 156px;
         --mix-strip-gap: 6px;
+        --mix-bank-rail-width: 62px;
         --mix-container-padding: 4px;
+        --mix-strip-padding: 6px;
     }
 }
 
@@ -43,5 +128,7 @@
         --mix-fader-container-height: auto;
         --mix-fader-min-height: 96px;
         --mix-nav-button-height: 36px;
+        --mix-knob-size: 48px;
+        --mix-knob-marker-orbit: 15px;
     }
 }

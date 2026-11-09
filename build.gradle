@@ -109,5 +109,20 @@ sourceSets {
 }
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'stress'
+    }
+}
+
+tasks.register('stressTest', Test) {
+    description = 'Runs opt-in MIDI send pipeline stress tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'stress'
+    }
+    testLogging {
+        showStandardStreams = true
+    }
 }

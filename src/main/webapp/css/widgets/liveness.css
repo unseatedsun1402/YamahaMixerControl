@@ -1,28 +1,66 @@
-  .desk-alive,
-  .desk-dead {
+.desk-alive,
+.desk-dead {
     box-sizing: border-box;
-    display: block;
-    width: 15rem;
-    height: 2.25rem;
-    flex: 0 0 15rem;
-    line-height: 1.5;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: min(15rem, 24vw);
+    min-width: 9rem;
+    height: 40px;
+    flex: 0 1 15rem;
+    padding: 7px 10px;
     overflow: hidden;
-    white-space: nowrap;
+    border: 1px solid var(--mix-color-strip-border);
+    border-bottom-width: 3px;
+    border-radius: 3px;
+    background: linear-gradient(160deg, var(--mix-color-button-hover), var(--mix-color-button) 58%, var(--mix-color-strip-inset));
+    color: var(--mix-color-text-muted);
+    font-family: var(--mix-font-readout);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.015em;
+    line-height: 1.2;
     text-overflow: ellipsis;
-  }
+    white-space: nowrap;
+}
 
-  .desk-alive {
-    background: #d4ffd4;
-    color: #006600;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-weight: bold;
-  }
+.desk-alive::before,
+.desk-dead::before {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 9px;
+    border: 1px solid var(--mix-color-strip-inset);
+    border-radius: 50%;
+    background: var(--mix-color-led);
+    content: "";
+}
 
-  .desk-dead {
-    background: #ffe0e0;
-    color: #990000;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-weight: bold;
-  }
+.desk-alive {
+    border-bottom-color: var(--mix-color-led);
+    color: var(--mix-color-text);
+}
+
+.desk-alive::before {
+    box-shadow: 0 0 8px var(--mix-color-led-on-glow);
+}
+
+.desk-dead {
+    border-bottom-color: var(--mix-color-led-off);
+}
+
+.desk-dead::before {
+    background: var(--mix-color-led-off);
+    box-shadow: 0 0 8px var(--mix-color-led-off-glow);
+}
+
+@media (max-width: 640px) {
+    .desk-alive,
+    .desk-dead {
+        width: 40px;
+        min-width: 40px;
+        flex: 0 0 40px;
+        justify-content: center;
+        padding: 0;
+        font-size: 0;
+    }
+}

@@ -12,6 +12,16 @@ To build the executable:
 .\gradlew.bat clean bootJar
 ```
 
+For a local mixer UI preview, run:
+
+```bat
+tools\start-mixer-preview.cmd
+```
+
+The script reuses a responding preview on port 18080 or starts the app headlessly
+with Gradle and prints the local `main.html` URL. Keep the terminal open while
+using the preview.
+
 For a Windows desktop launcher (recommended for file-browser launches), run:
 
 ```powershell
@@ -82,3 +92,23 @@ above: settings page
 
 <img width="1809" height="1065" alt="image" src="https://github.com/user-attachments/assets/6a58156c-f779-4ab8-97c5-1779122d3e18" />
 above: navigation page
+# Pipeline stress checks
+
+Run the opt-in MIDI and WebSocket backpressure checks with:
+
+```powershell
+.\gradlew.bat stressTest
+```
+
+The MIDI matrix prints attempted, accepted, rejected, sent, pending, and peak
+queue counts for SAFE_DIN and FAST_USB across short/SysEx-sized messages and
+synthetic output delays. It also reports the producer rate actually achieved
+by the test host; it does not connect to or certify a physical console.
+Liveness probes remain active during rehydration and use a bounded priority
+send lane, ahead of queued normal readback requests. A probe cannot interrupt a
+MIDI message already being sent, and it still observes the configured transport
+pacing.
+
+The WebSocket check holds a fake client send open, floods meter updates, then
+fills the reliable-message queue. This shows the effect of meter coalescing
+separately from reliable event backlog.

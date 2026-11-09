@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,6 +52,9 @@ class WebSocketEndpointTest {
     private static void clearStaticSessions() throws Exception {
         getStaticSessions().clear();
         Field f = WebSocketEndpoint.class.getDeclaredField("connectionStates");
+        f.setAccessible(true);
+        ((Map<?, ?>) f.get(null)).clear();
+        f = WebSocketEndpoint.class.getDeclaredField("outboundDeliveryStates");
         f.setAccessible(true);
         ((Map<?, ?>) f.get(null)).clear();
     }
@@ -152,6 +157,69 @@ class WebSocketEndpointTest {
         assertEquals("All", WebSocketEndpoint.lastSent);
         assertEquals("All", s1.lastSent);
         assertEquals("All", s2.lastSent);
+    }
+
+    @Test
+    void concurrentSendsAreSerializedPerSession() throws Exception {
+        FakeSession session = new FakeSession("serialized");
+        session.setDeferAsyncSendCompletion(true);
+        WebSocketEndpoint.addTestSession(session);
+
+        CountDownLatch ready = new CountDownLatch(2);
+        CountDownLatch start = new CountDownLatch(1);
+        Thread first = new Thread(() -> sendAfterSignal(session, "first", ready, start));
+        Thread second = new Thread(() -> sendAfterSignal(session, "second", ready, start));
+        first.start();
+        second.start();
+
+        assertTrue(ready.await(1, TimeUnit.SECONDS));
+        start.countDown();
+        first.join(1000);
+        second.join(1000);
+
+        assertFalse(first.isAlive());
+        assertFalse(second.isAlive());
+        assertEquals(1, session.getSentMessages().size(),
+                "Only one async write may be in flight for a session");
+
+        session.completeNextAsyncSend();
+        assertEquals(2, session.getSentMessages().size(),
+                "The queued write should start after the first write completes");
+        session.completeNextAsyncSend();
+    }
+
+    @Test
+    void meterUpdatesCoalesceBehindReliableMessages() throws Exception {
+        FakeSession session = new FakeSession("meter-coalesce");
+        session.setDeferAsyncSendCompletion(true);
+        WebSocketEndpoint.addTestSession(session);
+
+        WebSocketEndpoint.broadcastMeterUpdates("meter-1");
+        WebSocketEndpoint.broadcastMeterUpdates("meter-2");
+        WebSocketEndpoint.broadcastMeterUpdates("meter-3");
+        WebSocketEndpoint.broadcast("reliable");
+
+        assertEquals(List.of("meter-1"), session.getSentMessages());
+        session.completeNextAsyncSend();
+        assertEquals(List.of("meter-1", "reliable"), session.getSentMessages());
+        session.completeNextAsyncSend();
+        assertEquals(List.of("meter-1", "reliable", "meter-3"), session.getSentMessages());
+        session.completeNextAsyncSend();
+    }
+
+    private static void sendAfterSignal(
+            FakeSession session,
+            String message,
+            CountDownLatch ready,
+            CountDownLatch start) {
+        ready.countDown();
+        try {
+            if (start.await(1, TimeUnit.SECONDS)) {
+                WebSocketEndpoint.send(session, message);
+            }
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     // -------------------------
