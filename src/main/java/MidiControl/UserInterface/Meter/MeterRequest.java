@@ -5,11 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Builds a SysEx meter request:
- * F0 43 3n DIGITAL_MIXER model 21 category source start countH countL [offsets...] F7
+ * Builds a Yamaha meter request:
+ * F0 43 3n 3E model 21 category mp sc ch cl [offsets...] F7
  *
  * - request byte is 0x30 | (channel & 0x0F)
- * - DIGITAL_MIXER (0x3E) is emitted before model
+ * - model is 0x1A for the 01V96i and 0x11 for the M7CL; 0x21 selects meter data
+ * - source is the meter-point selector (mp), startChannel is sc, and channelCount is ch/cl
  * - startChannel: 0..126 = channel index, 127 = all channels
  * - channelCount: 1..0x3FFF (14-bit) encoded as two 7-bit bytes (high, low)
  * - offsets: optional tail bytes appended after count bytes (single offsets or vector pairs)
@@ -62,7 +63,7 @@ public final class MeterRequest {
      * Set the channel count (1..0x3FFF). This is encoded as two 7-bit bytes.
      */
     public MeterRequest setChannelCount(int count) {
-        if (count < 0 || count > 0x3FFF) throw new IllegalArgumentException("channelCount must be 0..16383 (14-bit)");
+        if (count < 1 || count > 0x3FFF) throw new IllegalArgumentException("channelCount must be 1..16383 (14-bit)");
         this.channelCount = count;
         return this;
     }
@@ -100,12 +101,11 @@ public final class MeterRequest {
     /**
      * Build the SysEx byte array.
      * Structure:
-     * F0, 43, (0x30|channel), DIGITAL_MIXER, model, 21, category, source,
-     * startChannel, countH, countL, [offsets...], F7
+     * F0, 43, (0x30|channel), DIGITAL_MIXER, model, 21, category,
+     * source, startChannel, countH, countL, [offsets...], F7
      */
     public byte[] toByteArray() {
-        // base bytes before offsets: 11 bytes (indices 0..10), terminator adds 1 -> 12
-        int len = 12; // 12 = header+fields+count bytes+terminator
+        int len = 12 + offsets.size();
         byte[] out = new byte[len];
         int i = 0;
         out[i++] = SYSEX_START;
@@ -121,6 +121,9 @@ public final class MeterRequest {
         int countL = channelCount & 0x7F;
         out[i++] = (byte)countH;
         out[i++] = (byte)countL;
+        for (byte offset : offsets) {
+            out[i++] = offset;
+        }
         out[i++] = SYSEX_END;
 
         return out;

@@ -34,6 +34,8 @@ import MidiControl.UserInterface.UiModelService;
 import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 import MidiControl.UserInterface.ChannelName.ChannelNameBroadcaster;
 import MidiControl.UserInterface.DTO.UiModelDTO;
+import MidiControl.UserInterface.Meter.MeterCategory;
+import MidiControl.UserInterface.Meter.MeterSource;
 import jakarta.websocket.Session;
 
 public class ServerRouter {
@@ -97,6 +99,7 @@ public class ServerRouter {
             case "set-midi-device" -> handleSetMidiDevice(session, requestId, payload);
             case "apply-midi-settings" -> handleApplyMidiSettings(session, requestId, payload);
             case "save-midi-settings" -> handleSaveMidiSettings(session, requestId, payload);
+            case "request-meters" -> handleRequestMeters(session, requestId, payload);
             case "meter-keep-alive" -> handleMeterKeepAlive();
             case "request-channel-names" -> handleRequestChannelNames(session, requestId, payload);
             case "register-session" -> handleRegisterSession(session,requestId,payload);
@@ -152,7 +155,69 @@ public class ServerRouter {
             );
             rehydrationService.requestMeters();
         }
+    }
 
+    private void handleRequestMeters(Session session, String requestId, JsonObject payload) {
+        if (rehydrationService == null) {
+            ServerResponses.error(
+                    session, requestId, "METERS_UNAVAILABLE", "Meter service is unavailable");
+            return;
+        }
+
+        try {
+            int categoryCode = parseMeterCategory(payload);
+            int sourceCode = parseMeterSource(payload);
+            int startChannel = payload.get("startChannel").getAsInt();
+            int channelCount = payload.get("channelCount").getAsInt();
+            rehydrationService.requestMeters(
+                    categoryCode, sourceCode, startChannel, channelCount);
+            if (requestId != null) {
+                ServerResponses.ackOk(session, requestId);
+            }
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            ServerResponses.error(
+                    session, requestId, "INVALID_METER_REQUEST", exception.getMessage());
+        } catch (NullPointerException exception) {
+            ServerResponses.error(
+                    session,
+                    requestId,
+                    "INVALID_METER_REQUEST",
+                    "category, source, startChannel, and channelCount are required");
+        }
+    }
+
+    private static int parseMeterCategory(JsonObject payload) {
+        if (!payload.has("category")) {
+            throw new IllegalArgumentException("category is required");
+        }
+        var value = payload.get("category");
+        MeterCategory category = value.isJsonPrimitive()
+                && value.getAsJsonPrimitive().isNumber()
+                ? MeterCategory.fromInt(value.getAsInt())
+                : MeterCategory.fromName(value.getAsString());
+        if (category == MeterCategory.UNKNOWN || category == MeterCategory.DISABLE) {
+            throw new IllegalArgumentException("Unsupported meter category");
+        }
+        return category.getCode();
+    }
+
+    private static int parseMeterSource(JsonObject payload) {
+        if (!payload.has("source")) {
+            throw new IllegalArgumentException("source is required");
+        }
+        var value = payload.get("source");
+        if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber()) {
+            int source = value.getAsInt();
+            if (source >= 0 && source <= 127) {
+                return source;
+            }
+        } else {
+            MeterSource source = MeterSource.fromName(value.getAsString());
+            if (source != MeterSource.UNKNOWN) {
+                return source.getCode();
+            }
+        }
+        throw new IllegalArgumentException("Unsupported meter source");
     }
 
     private void handleGetUiModel(Session session, String requestId, JsonObject payload) {

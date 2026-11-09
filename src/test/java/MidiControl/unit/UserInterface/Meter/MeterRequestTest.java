@@ -15,14 +15,14 @@ public class MeterRequestTest {
     @Tag("Unit")
     @Test
     public void meterRequestDefaultToByteArray() {
-        MeterRequest req = new MeterRequest(0, 0x01, 0x02, 0x03);
+        MeterRequest req = new MeterRequest(0, 0x1A, 0x02, 0x03);
 
         byte[] expected = new byte[] {
             (byte) 0xF0,
             (byte) 0x43,
             (byte) 0x30,
             (byte) 0x3E,
-            (byte) 0x01,
+            (byte) 0x1A,
             (byte) 0x21,
             (byte) 0x02,
             (byte) 0x03,
@@ -34,6 +34,19 @@ public class MeterRequestTest {
 
         assertArrayEquals(expected, req.toByteArray());
         assertEquals(12, req.toByteArray().length);
+    }
+
+    @Tag("Unit")
+    @Test
+    public void meterRequestUsesM7clRequestHeader() {
+        MeterRequest req = new MeterRequest(0, 0x11, 0x00, 0x02)
+                .setStartChannel(4)
+                .setChannelCount(24);
+
+        assertArrayEquals(new byte[] {
+            (byte) 0xF0, 0x43, 0x30, 0x3E, 0x11, 0x21,
+            0x00, 0x02, 0x04, 0x00, 0x18, (byte) 0xF7
+        }, req.toByteArray());
     }
 
     @Tag("Unit")
@@ -54,6 +67,7 @@ public class MeterRequestTest {
     @Test
     public void meterRequestSetStartChannel() {
         MeterRequest req = new MeterRequest(1, 0x01, 0x02, 0x03).setStartChannel(127);
+        assertEquals((byte) 0x03, req.toByteArray()[7]);
         assertEquals((byte) 0x7F, req.toByteArray()[8]);
     }
 
@@ -113,13 +127,16 @@ public class MeterRequestTest {
 
     @Tag("Unit")
     @Test
-    public void meterRequestOffsetsDoNotAffectOutputWithCurrentImplementation() {
+    public void meterRequestOffsetsAppendBeforeSysExTerminator() {
         MeterRequest base = new MeterRequest(0, 0x01, 0x02, 0x03);
         MeterRequest withOffsets = new MeterRequest(0, 0x01, 0x02, 0x03)
                 .addOffsets(10, 20, 30)
                 .addVector(40, 50);
 
-        assertArrayEquals(base.toByteArray(), withOffsets.toByteArray());
-        assertEquals(12, withOffsets.toByteArray().length);
+        assertNotEquals(base.toByteArray().length, withOffsets.toByteArray().length);
+        assertEquals(17, withOffsets.toByteArray().length);
+        assertEquals((byte) 10, withOffsets.toByteArray()[11]);
+        assertEquals((byte) 50, withOffsets.toByteArray()[15]);
+        assertEquals((byte) 0xF7, withOffsets.toByteArray()[16]);
     }
 }

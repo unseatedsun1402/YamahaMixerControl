@@ -40,6 +40,15 @@ For software-in-the-loop meter testing without a physical desk, select
 page, choose **YAMAHA_M7CL** as the console type, and apply the settings. The
 simulator responds to M7CL meter SysEx requests and streams synthetic meter
 values through the same MIDI input path used for hardware.
+
+Meter clients can select the shared meter stream with a WebSocket request:
+`requestMeters("INPUT", "IN_PRE_HPF", 0, 48)` for the M7CL. The arguments are
+category, meter point/source, zero-based start channel, and channel count. M7CL
+input meter points include `IN_PRE_HPF`, `IN_PRE_EQ`, `IN_POST_DYN2`,
+`IN_DYN1_GR`, and `ALL_POINT`; 01V96i input sources include `CHANNEL`, `EQ_OUT`,
+`COMP_OUT`, `COMP_GR`, `GATE_OUT`, `GATE_GR`, and `ALL`. The last client request
+sets the active stream for all clients; keepalive refreshes reuse that
+selection. Meter updates continue during state rehydration.
 ## ===== Usage ======
 
 Load the index at http://<ip-address-of-server>:8080/MidiControl/settings.html

@@ -13,6 +13,8 @@ import MidiControl.UserInterface.DTO.UiBankDTO;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnClose;
+import jakarta.websocket.SendHandler;
+import jakarta.websocket.SendResult;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 
@@ -23,6 +25,8 @@ import java.util.Set;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
 import com.google.gson.Gson;
@@ -35,6 +39,8 @@ public class WebSocketEndpoint{
 
     private static final Set<Session> sessions = ConcurrentHashMap.newKeySet();
     private static final Map<Session, ConnectionState> connectionStates = new ConcurrentHashMap<>();
+    private static final Map<Session, MeterDeliveryState> meterDeliveryStates =
+            new ConcurrentHashMap<>();
     private static final Logger logger = Logger.getLogger(WebSocketEndpoint.class.getName());
     private static final Gson gson = new Gson();
     private static boolean debug = false;
@@ -64,6 +70,12 @@ public class WebSocketEndpoint{
             this.passwordHash = passwordHash;
             this.authenticated = authenticated;
         }
+    }
+
+    private static final class MeterDeliveryState {
+        private final AtomicReference<String> pendingMessage = new AtomicReference<>();
+        private final AtomicBoolean sending = new AtomicBoolean();
+        private volatile boolean failed;
     }
 
     private static void warningDebounced(String key, String message) {
@@ -295,6 +307,7 @@ public class WebSocketEndpoint{
         subscriptions.removeSession(session);
         sessions.remove(session);
         connectionStates.remove(session);
+        meterDeliveryStates.remove(session);
     }
 
     public static void send(Session session, String message) {
@@ -322,6 +335,67 @@ public class WebSocketEndpoint{
             if (state == null || state.authenticated) {
                 sendWithTimeout(s,message);
             }
+        }
+    }
+
+    public static void broadcastMeterUpdates(String message) {
+        lastSent = message;
+        for (Session session : sessions) {
+            ConnectionState state = connectionStates.get(session);
+            if (state != null && !state.authenticated) {
+                continue;
+            }
+
+            MeterDeliveryState delivery = meterDeliveryStates.computeIfAbsent(
+                    session, ignored -> new MeterDeliveryState());
+            if (!delivery.failed) {
+                delivery.pendingMessage.set(message);
+                sendNextMeterUpdate(session, delivery);
+            }
+        }
+    }
+
+    private static void sendNextMeterUpdate(Session session, MeterDeliveryState delivery) {
+        if (delivery.failed || !session.isOpen()
+                || !delivery.sending.compareAndSet(false, true)) {
+            return;
+        }
+
+        String message = delivery.pendingMessage.getAndSet(null);
+        if (message == null) {
+            delivery.sending.set(false);
+            if (delivery.pendingMessage.get() != null) {
+                sendNextMeterUpdate(session, delivery);
+            }
+            return;
+        }
+
+        try {
+            session.getAsyncRemote().setSendTimeout(TIMEOUT);
+            session.getAsyncRemote().sendText(message, new SendHandler() {
+                @Override
+                public void onResult(SendResult result) {
+                    delivery.sending.set(false);
+                    if (!result.isOK()) {
+                        delivery.failed = true;
+                        warningDebounced(
+                                "meter-send-" + session.getId(),
+                                "Stopping meter updates for an unresponsive WebSocket session "
+                                        + session.getId() + ": " + result.getException());
+                        return;
+                    }
+                    if (delivery.pendingMessage.get() != null) {
+                        sendNextMeterUpdate(session, delivery);
+                    }
+                }
+            });
+        } catch (RuntimeException exception) {
+            delivery.sending.set(false);
+            delivery.failed = true;
+            warningDebounced(
+                    "meter-send-" + session.getId(),
+                    "Stopping meter updates for an unresponsive WebSocket session "
+                            + session.getId() + ": " + exception.getMessage());
         }
     }
 

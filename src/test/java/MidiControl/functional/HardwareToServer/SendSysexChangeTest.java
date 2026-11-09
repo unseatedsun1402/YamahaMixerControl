@@ -133,8 +133,8 @@ public class SendSysexChangeTest {
         try {
             byte[] faderMsg = {
                 (byte) 0xF0, (byte) 0x43, (byte) 0x10, (byte) 0x3E,
-                (byte) 0x1A, (byte) 0x21, (byte) 0x00, (byte) 0x0,
-                (byte) 0x0, (byte) 0x00,(byte) 0x14, (byte) 0xF7
+                (byte) 0x1A, (byte) 0x21, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x14, (byte) 0xF7
             };
 
             SysexMessage msg = MidiTestUtils.createSysexMessage(faderMsg);

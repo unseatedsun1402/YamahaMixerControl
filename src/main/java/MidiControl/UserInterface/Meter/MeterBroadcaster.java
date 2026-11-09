@@ -17,7 +17,7 @@ public class MeterBroadcaster implements MeterUpdateListener{
     private void broadcast(String json) {
         try {
             if (debug){logger.fine("Broadcasting update");}
-            WebSocketEndpoint.broadcast(json);
+            WebSocketEndpoint.broadcastMeterUpdates(json);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Exception thrown broadcasting the update: " + json, e);
         }

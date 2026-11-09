@@ -49,18 +49,9 @@ public class MeterToolsTest {
         assertEquals("0.00 dB", MeterTools.formatCentiDb(0));
     }
 
-    @Test void testMixerLookupValueWidth(){
-        int expected,actual;
-
-        int Y01VByte = 0x1E;
-        expected = 1;
-        actual = MeterTools.bytesPerForModel(Y01VByte);
-        assertEquals(expected, actual);
-        
-        int YM7CByte = 0x1A;
-        expected = 2;
-        actual = MeterTools.bytesPerForModel(YM7CByte);
-        assertEquals(expected, actual);
+    @Test void testMeterResponseIdentifierSelectsValueWidth(){
+        assertEquals(2, MeterTools.bytesPerForModel(0x1A));
+        assertEquals(1, MeterTools.bytesPerForModel(0x0F));
     }
 
     @Test

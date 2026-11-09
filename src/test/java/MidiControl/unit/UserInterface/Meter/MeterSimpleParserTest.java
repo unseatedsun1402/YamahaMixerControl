@@ -19,6 +19,7 @@ class MeterSimpleParserTest {
         LinkedBlockingQueue<MeterDTO> updates = new LinkedBlockingQueue<>();
         MeterUpdateListener listener = updates::add;
         MeterSimpleParser.addListener(listener);
+        MeterSimpleParser.setRequestedRange(126, 1);
 
         try {
             MeterSimpleParser.parse(meterMessage(10));
@@ -45,10 +46,22 @@ class MeterSimpleParserTest {
         }
     }
 
+    @Test
+    void parses01v96iMetersAs14BitValuesAtRequestedStartChannel() {
+        MeterSimpleParser.setRequestedRange(4, 1);
+        byte[] response = {
+                (byte) 0xF0, 0x43, 0x10, 0x3E, 0x1A, 0x21,
+                0x00, 0x00, 0x04, 0x00, 0x14, (byte) 0xF7
+        };
+
+        assertEquals(1, MeterSimpleParser.parse(response).size());
+        assertEquals(20, MeterSimpleParser.parse(response).get(0));
+    }
+
     private byte[] meterMessage(int value) {
         return new byte[] {
-                (byte) 0xF0, 0x43, 0x30, 0x3E, 0x01, 0x21,
-                0x04, 0x05, 0x7E, (byte) value, (byte) 0xF7
+                (byte) 0xF0, 0x43, 0x10, 0x3E, 0x0F, 0x21,
+                0x00, 0x00, 0x7E, (byte) value, (byte) 0xF7
         };
     }
 }
