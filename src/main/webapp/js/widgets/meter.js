@@ -2,9 +2,10 @@ console.log(">>> Meter.js LOADED <<<");
 
 function normaliseRawValue(raw, is14Bit) {
     const is14 = (is14Bit === true || is14Bit === "true");
-    const max = is14 ? 4368 : 127;
-    const normalised = Math.floor((raw / max) * 15);
-    return Math.min(Math.max(normalised, 0), 15);
+    // The 7-bit dB scale tops out at 111, not the MIDI value limit of 127.
+    const max = is14 ? 4368 : 111;
+    const normalised = Math.floor((raw / max) * 16);
+    return Math.min(Math.max(normalised, 0), 16);
 }
 
 function throttle(updateFn, interval = 100) {

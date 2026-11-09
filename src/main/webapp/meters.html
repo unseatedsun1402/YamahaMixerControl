@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/meter-style.css"/>
     <link rel="stylesheet" href="css/page-navigation.css"/>
+    <link rel="stylesheet" href="css/soft-key-style.css"/>
     <script type="module">
         import { WebSocketClient } from './js/websocketClient.js';
         import { createFifteenSegmentMeter } from './js/widgets/meter.js';
@@ -59,8 +60,8 @@
 <body>
     <div id="meter-panel-root" class="meter-panel">
         <nav class="meter-page-navigation" aria-label="Page navigation">
-            <a href="/MidiControl/settings.html" aria-label="Open Settings">Settings</a>
-            <a href="/MidiControl/main.html" aria-label="Back to Console">Mixer</a>
+            <a class="page-nav-link soft-key sof-btn" href="/MidiControl/settings.html" aria-label="Open Settings">Settings</a>
+            <a class="page-nav-link soft-key sof-btn" href="/MidiControl/main.html" aria-label="Back to Console">Mixer</a>
         </nav>
         <div id="meter-placeholder">No meter data received yet…</div>
     </div>

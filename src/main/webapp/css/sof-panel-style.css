@@ -1,3 +1,5 @@
+@import url("soft-key-style.css");
+
 #view-ribbon {
     display: flex;
     flex-wrap: nowrap;
@@ -52,47 +54,6 @@
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
-}
-
-.soft-key {
-    box-sizing: border-box;
-    flex: 0 0 auto;
-    min-height: 48px;
-    padding: 5px 8px;
-    background: linear-gradient(160deg, var(--mix-color-button-hover), var(--mix-color-button) 58%, var(--mix-color-strip-inset));
-    border: 1px solid var(--mix-color-strip-border);
-    border-bottom: 3px solid var(--mix-color-strip-inset);
-    border-radius: 3px;
-    color: var(--mix-color-text);
-    font-family: var(--mix-font-readout);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.015em;
-    text-shadow: 0 1px 1px var(--mix-color-bank-shadow);
-    transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
-}
-
-.sof-btn {
-    cursor: pointer;
-}
-
-.soft-key:hover {
-    background: linear-gradient(160deg, var(--mix-color-button-hover), var(--mix-color-button));
-}
-
-.soft-key:active {
-    transform: translateY(1px);
-}
-
-.soft-key:focus-visible {
-    outline: 2px solid var(--mix-color-display-blue-bright);
-    outline-offset: 2px;
-}
-
-.page-nav-link.sof-btn {
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
 }
 
 .sof-send-btn {
