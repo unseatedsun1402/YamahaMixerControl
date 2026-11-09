@@ -14,7 +14,7 @@ public final class MeterSimpleParser {
 
     private static final Logger logger = Logger.getLogger(MeterSimpleParser.class.getName());
     private static final List<MeterUpdateListener> listeners = new CopyOnWriteArrayList<>();
-    private static final long UPDATE_INTERVAL_MS = 200;
+    private static final long UPDATE_INTERVAL_MS = 333;
     private static final Map<String, MeterDTO> eventBuffer = new LinkedHashMap<>(256);
     private static final ScheduledExecutorService meterProcessor =
             Executors.newSingleThreadScheduledExecutor(task -> {
