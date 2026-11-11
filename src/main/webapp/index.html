@@ -36,6 +36,12 @@
       <span class="qr-description">Metering display</span>
     </a>
 
+    <a class="qr-card" href="channel-detail.html">
+      <span class="qr-code" id="qr-channel-detail" aria-hidden="true"></span>
+      <span class="qr-label">Channel Detail</span>
+      <span class="qr-description">Advanced single-channel editor</span>
+    </a>
+
     <a class="qr-card" href="bus.html">
       <span class="qr-code" id="qr-bus" aria-hidden="true"></span>
       <span class="qr-label">Buses</span>
@@ -53,7 +59,7 @@
         const data = JSON.parse(txt);
         const base = data.payload;
 
-        const pages = ["main", "settings", "meters", "bus"];
+        const pages = ["main", "channel-detail", "settings", "meters", "bus"];
         pages.forEach(page => {
           new QRCode(document.getElementById(`qr-${page}`), `${base}/${page}.html`);
         });

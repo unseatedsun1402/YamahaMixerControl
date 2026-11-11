@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "command": "python3 .github/hooks/block-node-commands.py",
+        "windows": "python .github/hooks/block-node-commands.py",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}

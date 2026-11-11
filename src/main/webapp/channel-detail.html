@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Channel Detail</title>
+
+    <link rel="stylesheet" href="css/mix-vars.css"/>
+    <link rel="stylesheet" href="css/basic-view-style.css"/>
+    <link rel="stylesheet" href="css/sof-panel-style.css"/>
+    <link rel="stylesheet" href="css/fader-style.css"/>
+    <link rel="stylesheet" href="css/widgets/generic.css"/>
+    <link rel="stylesheet" href="css/control-colors.css"/>
+    <link rel="stylesheet" href="css/widgets/liveness.css"/>
+    <link rel="stylesheet" href="css/widgets/dynamics-widget.css"/>
+    <link rel="stylesheet" href="css/widgets/eq-widget.css"/>
+    <link rel="stylesheet" href="css/mix-phone-landscape.css"/>
+    <link rel="stylesheet" href="css/authentication.css"/>
+    <link rel="stylesheet" href="css/page-navigation.css"/>
+    <link rel="stylesheet" href="css/channel-detail-style.css"/>
+    <link rel="stylesheet" href="css/widgets/channel-detail-visualizations.css"/>
+
+    <script type="module">
+        import { WebSocketClient } from './js/websocketClient.js';
+        import { renderChannelDetail } from './js/channel-detail-renderer.js';
+        import { applyControlUpdate } from './js/partial-update.js';
+        import { DeskStatusWidget } from "./js/widgets/liveness.js";
+        import { installAuthentication } from "./js/authentication.js";
+
+        window.allContexts = [];
+        window.currentBank = 0;
+        window.channelsPerBank = 8;
+        window.currentDomain = "input";
+        window.channelMeters = new Map();
+        window.selectedContextId = null;
+        let deskStatusWidget = null;
+
+        const DETAIL_VIEW = "channel-detail-view";
+
+        console.log(">>> Channel Detail UI bootstrap running <<<");
+
+        const contextPath = window.location.pathname.split('/')[1];
+        const wsUrl = `ws://${location.host}/${contextPath}/endpoint`;
+
+        const ws = new WebSocketClient(wsUrl);
+        installAuthentication(ws);
+
+        // ---- Connection lifecycle ----
+
+        ws.on("connected", () => {
+            console.info("[Detail] Connected — requesting bank.inputs…");
+            ws.requestBank("bank.inputs");
+            ws.sendMeterKeepAlive();
+
+            if (!ws.keepAliveInterval) {
+                ws.keepAliveInterval = setInterval(() => {
+                    ws.sendMeterKeepAlive();
+                }, 10000);
+            }
+            ws.setSessionType("control");
+        });
+
+        // ---- Mode switching ----
+
+        function selectInputMode() {
+            window.currentDomain = "input";
+            updateModeButtonState();
+            window.currentBank = 0;
+            ws.requestBank("bank.inputs");
+        }
+
+        function selectOutputMode() {
+            window.currentDomain = "output";
+            updateModeButtonState();
+            window.currentBank = 0;
+            ws.requestBank("bank.mixes");
+        }
+
+        // ---- Bank loading ----
+
+        function loadBank(bankIndex) {
+            window.currentBank = bankIndex;
+
+            document
+                .querySelectorAll("#bank-selector .bank-btn[data-bank-index]")
+                .forEach(button => {
+                    const isActive = Number(button.dataset.bankIndex) === bankIndex;
+                    button.classList.toggle("active", isActive);
+                    button.setAttribute("aria-pressed", String(isActive));
+                });
+
+            const start = bankIndex * window.channelsPerBank;
+            const end = start + window.channelsPerBank;
+            const visibleContexts = window.allContexts.slice(start, end);
+
+            for (const ctxId of visibleContexts) {
+                ws.subscribe(ctxId);
+            }
+
+            buildChannelSelector(visibleContexts);
+
+            if (visibleContexts.length > 0) {
+                selectChannel(visibleContexts[0]);
+            } else {
+                document.getElementById("detail-panel").innerHTML = "";
+                window.selectedContextId = null;
+            }
+
+            ws.requestChannelNames();
+        }
+
+        // ---- Channel selector ----
+
+        function contextLabel(ctxId) {
+            const parts = ctxId.split(".");
+            if (parts.length < 2) return ctxId;
+            const family = parts[0];
+            const idx = parseInt(parts[parts.length - 1]);
+
+            if (family === "channel") return `CH ${idx + 1}`;
+            if (family === "stereo")  return "St LR";
+            return `${family.charAt(0).toUpperCase()}${family.slice(1)} ${idx + 1}`;
+        }
+
+        function buildChannelSelector(contexts) {
+            const selector = document.getElementById("channel-selector");
+            if (!selector) return;
+            selector.innerHTML = "";
+
+            for (const ctxId of contexts) {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "soft-key channel-select-btn";
+                btn.dataset.contextId = ctxId;
+                btn.textContent = contextLabel(ctxId);
+                btn.setAttribute("aria-label", `Select ${ctxId}`);
+                btn.addEventListener("click", () => selectChannel(ctxId));
+                selector.appendChild(btn);
+            }
+        }
+
+        function selectChannel(contextId) {
+            window.selectedContextId = contextId;
+
+            document.querySelectorAll(".channel-select-btn").forEach(btn => {
+                const isActive = btn.dataset.contextId === contextId;
+                btn.classList.toggle("active", isActive);
+                btn.setAttribute("aria-pressed", String(isActive));
+            });
+
+            ws.requestUiModel(contextId, DETAIL_VIEW);
+        }
+
+        // ---- Bank selector rail (same pattern as main.html) ----
+
+        function buildBankSelector() {
+            const container = document.getElementById("bank-selector");
+            container.innerHTML = "";
+
+            const modeControls = document.createElement("div");
+            modeControls.className = "bank-mode-controls";
+            for (const [domain, label, selectMode] of [
+                ["input", "INPUT", selectInputMode],
+                ["output", "OUTPUT", selectOutputMode]
+            ]) {
+                const modeButton = document.createElement("button");
+                modeButton.type = "button";
+                modeButton.className = "soft-key bank-mode-btn";
+                modeButton.textContent = label;
+                modeButton.dataset.domain = domain;
+                modeButton.setAttribute("aria-pressed", "false");
+                modeButton.addEventListener("click", selectMode);
+                modeControls.appendChild(modeButton);
+            }
+            container.appendChild(modeControls);
+
+            const divider = document.createElement("div");
+            divider.className = "bank-selector-divider";
+            divider.setAttribute("aria-hidden", "true");
+            container.appendChild(divider);
+
+            const banks = Math.ceil(
+                window.allContexts.length / window.channelsPerBank
+            );
+            for (let i = 0; i < banks; i++) {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "soft-key bank-btn";
+                btn.dataset.bankIndex = String(i);
+
+                const start = (i * window.channelsPerBank) + 1;
+                const end = Math.min(
+                    start + window.channelsPerBank - 1,
+                    window.allContexts.length
+                );
+                btn.textContent = `${start}-${end}`;
+                btn.setAttribute("aria-label", `Channels ${start} through ${end}`);
+                btn.setAttribute("aria-pressed", String(i === window.currentBank));
+                btn.onclick = () => loadBank(i);
+                container.appendChild(btn);
+            }
+            updateModeButtonState();
+        }
+
+        function updateModeButtonState() {
+            document
+                .querySelectorAll("#bank-selector .bank-mode-btn")
+                .forEach(button => {
+                    const isActive = button.dataset.domain === window.currentDomain;
+                    button.classList.toggle("active", isActive);
+                    button.setAttribute("aria-pressed", String(isActive));
+                });
+        }
+
+        // ---- Ribbon ----
+
+        function buildRibbon() {
+            const ribbon = document.getElementById("view-ribbon");
+            if (!ribbon) return;
+            ribbon.innerHTML = "";
+
+            const deskStatus = document.createElement("div");
+            deskStatus.id = "desk-status";
+            deskStatus.className = "desk-dead";
+            deskStatus.textContent = "Waiting for desk status…";
+            deskStatus.setAttribute("role", "status");
+            deskStatus.setAttribute("aria-live", "polite");
+            ribbon.appendChild(deskStatus);
+
+            const mainLink = document.createElement("a");
+            mainLink.className = "sof-btn soft-key page-nav-link";
+            mainLink.href = "/MidiControl/main.html";
+            mainLink.textContent = "CONSOLE";
+            ribbon.appendChild(mainLink);
+
+            const settingsLink = document.createElement("a");
+            settingsLink.className = "sof-btn soft-key page-nav-link";
+            settingsLink.href = "/MidiControl/settings.html";
+            settingsLink.textContent = "SETTINGS";
+            ribbon.appendChild(settingsLink);
+
+            const metersLink = document.createElement("a");
+            metersLink.className = "sof-btn soft-key page-nav-link";
+            metersLink.href = "/MidiControl/meters.html";
+            metersLink.textContent = "METERS";
+            ribbon.appendChild(metersLink);
+        }
+
+        // ---- WebSocket event handlers ----
+
+        ws.on("ui-bank", (bank) => {
+            window.allContexts = bank.contexts;
+            for (const ctxId of bank.contexts) {
+                ws.subscribe(ctxId);
+            }
+            buildBankSelector();
+            loadBank(0);
+        });
+
+        ws.on("ui-model", (model) => {
+            console.log("[Detail] UI model received:", model.contextId);
+            renderChannelDetail(model);
+
+            if (!deskStatusWidget) {
+                const el = document.getElementById("desk-status");
+                if (el) deskStatusWidget = new DeskStatusWidget(el);
+            }
+        });
+
+        ws.on("control-update", (payload) => {
+            applyControlUpdate(payload);
+        });
+
+        ws.on("meter-update", (payload) => {
+            const ctxId = `channel.${payload.offset}`;
+            const meter = window.channelMeters?.get(ctxId)
+                ?? window.channelMeters?.get(window.selectedContextId);
+            if (meter) {
+                meter.update(
+                    payload.value,
+                    payload.dB,
+                    payload.is14Bit,
+                    payload.offset
+                );
+            }
+        });
+
+        ws.on("name-update", (payload) => {
+            const fromContext = payload["context-id"];
+            if (!fromContext || !window.selectedContextId) return;
+
+            const selectedParts = window.selectedContextId.split(".");
+            if (selectedParts.length < 2) return;
+            const selectedFamily = selectedParts[0];
+            const selectedIdx = selectedParts[selectedParts.length - 1];
+
+            if (fromContext.includes(selectedFamily)
+                    && fromContext.endsWith(selectedIdx)) {
+                const titleEl = document.querySelector(".detail-title");
+                if (titleEl && payload.name) {
+                    titleEl.textContent = payload.name;
+                }
+            }
+        });
+
+        ws.on("error", (err) => {
+            console.error("[Detail] Error from server:", err);
+        });
+
+        ws.on("REGISTRY_CHANGED", (payload) => {
+            console.info("[Detail] Registry changed:", payload);
+        });
+
+        ws.on("server-event", (event) => {
+            if (event.category === "LIVENESS" && deskStatusWidget) {
+                deskStatusWidget.update(event);
+            }
+        });
+
+        // ---- Boot ----
+
+        buildRibbon();
+        ws.connect();
+        window.wsClient = ws;
+    </script>
+</head>
+
+<body>
+    <div id="ui-root">
+        <div id="view-ribbon"></div>
+        <div id="bank-selector"></div>
+        <div id="detail-container">
+            <div id="channel-selector"></div>
+            <div id="detail-panel"></div>
+        </div>
+    </div>
+</body>
+
+</html>
