@@ -8,6 +8,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import MidiControl.UserInterface.Meter.MeterDTO;
 import MidiControl.UserInterface.Meter.MeterSimpleParser;
@@ -57,15 +59,16 @@ class MeterSimpleParserTest {
         assertEquals(20, MeterSimpleParser.parse(response).get(0));
     }
 
-    @Test
-    void parsesM7clAllPointsWithoutTreatingPointsAsChannels() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {0x0F, 0x11})
+    void parsesM7clAllPointsWithoutTreatingPointsAsChannels(int model) throws Exception {
         LinkedBlockingQueue<MeterDTO> updates = new LinkedBlockingQueue<>();
         MeterUpdateListener listener = updates::add;
         MeterSimpleParser.reset();
         MeterSimpleParser.addListener(listener);
         try {
             byte[] response = {
-                (byte) 0xF0, 0x43, 0x10, 0x3E, 0x0F, 0x21, 0, 0x7F, 3,
+                (byte) 0xF0, 0x43, 0x10, 0x3E, (byte) model, 0x21, 0, 0x7F, 3,
                 1, 2, 3, 4, 5, 6, 7, 8, 9, (byte) 0xF7
             };
             assertEquals(9, MeterSimpleParser.parse(response).size());
@@ -92,6 +95,9 @@ class MeterSimpleParserTest {
         }));
         assertNull(MeterSimpleParser.parse(new byte[] {
             (byte) 0xF0, 0x43, 0x10, 0x3E, 0x0F, 0x21, 0x10, 0, 0, 1, 2, 3, 4, (byte) 0xF7
+        }));
+        assertNull(MeterSimpleParser.parse(new byte[] {
+            (byte) 0xF0, 0x43, 0x10, 0x3E, 0x11, 0x21, 0x10, 0, 0, 1, 2, 3, 4, (byte) 0xF7
         }));
     }
 

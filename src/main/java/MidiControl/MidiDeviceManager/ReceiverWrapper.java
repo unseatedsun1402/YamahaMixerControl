@@ -2,6 +2,7 @@ package MidiControl.MidiDeviceManager;
 
 import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.SysexUtils.SysexParser;
+import MidiControl.UserInterface.Meter.MeterDiagnostics;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,6 +66,7 @@ public class ReceiverWrapper implements MidiOutput {
                 SysexMessage sysex = new SysexMessage();
                 sysex.setMessage(data, data.length);
                 receiver.send(sysex, -1);
+                MeterDiagnostics.requestSent(device.getDeviceInfo().getName(), data);
 
                 if (debug) {
                     logger.fine("Sent SysEx: " + SysexParser.bytesToHex(data));

@@ -15,8 +15,10 @@ The parser's 333 ms scheduled task only batches received updates for the GUI;
 it does not send MIDI requests. Browser throttling or network delays can still
 interrupt a stream before the next keep-alive.
 
-M7CL requests use model byte `11`; the documented meter responses use `0F`.
-The 01V96i uses `1A` for both. The M7CL all-channel selector is start `7F`
+M7CL requests use model byte `11`. A datasheet response example uses `0F`,
+but the tested M7CL sent responses with `11`; the parser accepts both and the
+simulator uses the observed hardware value. The 01V96i uses `1A` for both.
+The M7CL all-channel selector is start `7F`
 with count `00 00`; the response starts at channel `00`. Its input all-point
 response contains nine values per channel. The simulator tests cover the
 datasheet's example message lengths and selectors, not physical hardware.
@@ -43,3 +45,19 @@ log. Liveness reports the selected desk as disconnected until both ports are
 available, without repeatedly resetting an incomplete device pair. Select
 working ports again after resolving a port-open failure; a successful profile
 switch alone does not mean MIDI communication is working.
+
+The M7CL trace also showed repeated liveness-triggered MIDI resets during
+rehydration. Liveness now starts once discovery finishes, uses the discovered
+MIDI channel, and reads that channel from the actual SysEx response. Whether
+this prevents resets during a real desk's rehydration still needs hardware
+verification.
+
+## Temporary hardware diagnostics
+
+The server log currently includes `[METER-DIAG]` entries for queued requests,
+requests handed to the MIDI output, sampled incoming SysEx, parsed meter values,
+and broadcast batches. Incoming and decoded samples are limited to one per five
+seconds; incoming messages show at most 64 bytes. Other sampled Yamaha SysEx may
+include channel names or settings, so review the log before sharing it. These
+diagnostics are intended for the M7CL hardware investigation and can be removed
+afterward.

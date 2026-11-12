@@ -2,6 +2,7 @@ package MidiControl.unit.MidiDeviceManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -51,7 +52,7 @@ class MeterSimulatorProtocolTest {
             assertNotNull(response);
             assertEquals(10 + values, response.length);
             assertEquals(0x13, response[2] & 0xFF);
-            assertEquals(0x0F, response[4] & 0xFF);
+            assertEquals(0x11, response[4] & 0xFF);
             assertEquals(category, response[6] & 0xFF);
             assertEquals(source, response[7] & 0xFF);
             assertEquals(responseStart, response[8] & 0xFF);
@@ -112,7 +113,37 @@ class MeterSimulatorProtocolTest {
             MeterDTO update = updates.poll(2, TimeUnit.SECONDS);
             assertNotNull(update);
             assertEquals(4, update.offset);
-            assertEquals(m7cl ? 0x0F : 0x1A, update.model & 0xFF);
+            assertEquals(m7cl ? 0x11 : 0x1A, update.model & 0xFF);
+        } finally {
+            MeterSimpleParser.removeListener(listener);
+            MeterSimpleParser.reset();
+        }
+    }
+
+    @Test
+    void capturedM7clResponseReachesMeterListener() throws Exception {
+        byte[] response = {
+            (byte) 0xF0, 0x43, 0x10, 0x3E, 0x11, 0x21, 0, 0, 0,
+            0, 0x19, 2, 2, 2, 0x19, 2, 4, 0, 3, 2, 2, 3, 2, 2, 2,
+            3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 3, 3, 2, 2, 3,
+            3, 3, 2, 3, 3, 3, 4, 3, 2, 2, 5, 5, 3, 3, (byte) 0xF7
+        };
+        var updates = new LinkedBlockingQueue<MeterDTO>();
+        MeterUpdateListener listener = updates::add;
+        MeterSimpleParser.reset();
+        MeterSimpleParser.addListener(listener);
+        try {
+            SysexMessage message = new SysexMessage();
+            message.setMessage(response, response.length);
+            assertNull(new HardwareInputHandler(new NrpnParser(), new NrpnRegistry()).handle(message));
+            for (int channel = 0; channel < 48; channel++) {
+                MeterDTO update = updates.poll(2, TimeUnit.SECONDS);
+                assertNotNull(update, "Missing meter for channel " + channel);
+                assertEquals(channel, update.offset);
+                assertEquals(0x11, update.model & 0xFF);
+                assertEquals("IN_PRE_HPF", update.source);
+                if (channel == 1) assertEquals(0x19, update.value);
+            }
         } finally {
             MeterSimpleParser.removeListener(listener);
             MeterSimpleParser.reset();

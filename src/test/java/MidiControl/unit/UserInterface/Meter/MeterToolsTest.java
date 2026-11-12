@@ -52,6 +52,7 @@ public class MeterToolsTest {
     @Test void testMeterResponseIdentifierSelectsValueWidth(){
         assertEquals(2, MeterTools.bytesPerForModel(0x1A));
         assertEquals(1, MeterTools.bytesPerForModel(0x0F));
+        assertEquals(1, MeterTools.bytesPerForModel(0x11));
     }
 
     @Test

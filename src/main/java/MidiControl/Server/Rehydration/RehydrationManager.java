@@ -23,6 +23,7 @@ import MidiControl.Routing.OutputRequestSender;
 import MidiControl.SysexUtils.ModelNumbers;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.UserInterface.Meter.MeterCategory;
+import MidiControl.UserInterface.Meter.MeterDiagnostics;
 import MidiControl.UserInterface.Meter.MeterRequest;
 import MidiControl.UserInterface.Meter.MeterSimpleParser;
 import MidiControl.UserInterface.Meter.MeterSource;
@@ -159,6 +160,7 @@ public class RehydrationManager{
 
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicReference<ControlInstance> respondingInstance = new AtomicReference<>(null);
+        final AtomicInteger respondingChannel = new AtomicInteger(-1);
         final AtomicBoolean completed = new AtomicBoolean(false);
 
         pending.put(canonicalId, System.currentTimeMillis());
@@ -169,6 +171,10 @@ public class RehydrationManager{
         byte[] probe = mapping.buildRequestMessage(0, midi_channel);
 
         ControlListener tmpListener = (instance, newValue) -> {
+            int responseChannel = extractMidiChannel(instance.getLastSysex());
+            if (responseChannel != midi_channel) {
+                return;
+            }
             if (!completed.compareAndSet(false, true)) {
                 return;
             }
@@ -176,11 +182,14 @@ public class RehydrationManager{
             Long expected = pending.remove(canonicalId);
             long rtt = expected != null ? System.currentTimeMillis() - expected : 0;
 
-            totalRttMs.add(rtt);
-            completedRequests.incrementAndGet();
-            outstandingTransactions.decrementAndGet();
+            if (expected != null) {
+                totalRttMs.add(rtt);
+                completedRequests.incrementAndGet();
+                outstandingTransactions.decrementAndGet();
+            }
 
             respondingInstance.set(instance);
+            respondingChannel.set(responseChannel);
             latch.countDown();
         };
 
@@ -190,8 +199,10 @@ public class RehydrationManager{
         outputRouter.sendPriority(probe);
 
         scheduler.schedule(() -> {
-            if (pending.remove(canonicalId) != null) {
-                outstandingTransactions.decrementAndGet();
+            if (completed.compareAndSet(false, true)) {
+                if (pending.remove(canonicalId) != null) {
+                    outstandingTransactions.decrementAndGet();
+                }
                 incrementRequestTimeoutCounter();
                 latch.countDown();
                 callback.onProbeSuccess(null, -1);
@@ -207,10 +218,8 @@ public class RehydrationManager{
 
         ControlInstance result = respondingInstance.get();
         if (result != null) {
-            byte[] last = result.getLastSysex();
-            int resolvedChannel = extractMidiChannel(last);
             if(debug)logger.fine("Success on probe");
-            callback.onProbeSuccess(result, resolvedChannel);
+            callback.onProbeSuccess(result, respondingChannel.get());
         }
     }
 
@@ -345,7 +354,9 @@ public class RehydrationManager{
                 selection.sourceCode());
         request.setStartChannel(selection.startChannel());
         request.setChannelCount(selection.channelCount());
-        outputRouter.send(request.toByteArray());
+        byte[] message = request.toByteArray();
+        MeterDiagnostics.requestQueued(registry.getDeskType(), message);
+        outputRouter.send(message);
     }
 
     private static int maxChannelsFor(byte modelNumber, int categoryCode, int sourceCode) {

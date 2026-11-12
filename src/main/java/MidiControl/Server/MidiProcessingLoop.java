@@ -85,6 +85,8 @@ public class MidiProcessingLoop implements Runnable {
                 }
 
                 int eventValue = instance.extractValue(event);
+                instance.setLastSysex(event.getType() == CanonicalInputEvent.Type.SYSEX
+                        ? event.getSysexData() : new byte[0]);
                 instance.updateValue(eventValue);
 
                 if(debug){logger.fine("Updated " + instance.getCanonicalId() + " = " + eventValue);}

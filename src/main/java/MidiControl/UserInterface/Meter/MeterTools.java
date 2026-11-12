@@ -25,7 +25,6 @@ public final class MeterTools {
     }
 
     public static int bytesPerForModel(int modelByte) {
-        // Response identifiers are 0x1A for 01V96i (14-bit) and 0x0F for M7CL (7-bit).
         return ((modelByte & 0xFF) == 0x1A) ? 2 : 1;
     }
 

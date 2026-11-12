@@ -12,6 +12,7 @@ import MidiControl.NrpnUtils.NrpnParser;
 import MidiControl.NrpnUtils.NrpnRegistry;
 import MidiControl.UserInterface.Meter.MeterBroadcaster;
 import MidiControl.UserInterface.Meter.MeterSimpleParser;
+import MidiControl.SysexUtils.ModelNumbers;
 
 public class HardwareInputHandler {
 
@@ -94,7 +95,7 @@ public class HardwareInputHandler {
         if (msg == null || msg.length < 7) return false;
         return (msg[0] & 0xFF) == 0xF0
             && (msg[1] & 0xFF) == 0x43
-            && ((msg[4] & 0xFF) == 0x1A || (msg[4] & 0xFF) == 0x0F)
+            && ((msg[4] & 0xFF) == 0x1A || ModelNumbers.isM7clMeterResponse(msg[4]))
             && (msg[5] & 0xFF) == 0x21
             && (msg[msg.length - 1] & 0xFF) == 0xF7;
     }

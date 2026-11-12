@@ -268,9 +268,6 @@ public class MidiServer implements Runnable, UiModelService{
                 CanonicalRegistry newRegistry = new CanonicalRegistry(discoveredMappings, new SysexParser(discoveredMappings));
                 newRegistry.setDeskType(result.getModel());
                 onRegistryReloaded(newRegistry);
-                logger.info("Starting liveness monitor");
-                livenessMonitor = new DeviceLivenessMonitor(deskDiscovery,newRegistry, this.deviceManager);
-                livenessMonitor.startMonitoring();
             }
             else {
                 String deskType = "YAMAHA_01V96I";
@@ -283,6 +280,9 @@ public class MidiServer implements Runnable, UiModelService{
                 logger.info("Discovery failed to detect a valid desk response on the midi system\n"+
                     String.format("fallback %s", deskType));
             }
+            logger.info("Starting liveness monitor");
+            livenessMonitor = new DeviceLivenessMonitor(deskDiscovery, canonicalRegistry, this.deviceManager);
+            livenessMonitor.startMonitoring();
 
         } catch (Exception e) {
             logger.log(Level.SEVERE, "MidiServer thread crashed", e);
@@ -374,11 +374,6 @@ public class MidiServer implements Runnable, UiModelService{
             livenessMonitor.injectNewRegistry(newRegistry);
             logger.info(String.format("Injected registry to liveness monitor on registry reload"));
         }
-        else{
-            livenessMonitor = new DeviceLivenessMonitor(deskDiscovery,newRegistry, this.deviceManager);
-            livenessMonitor.startMonitoring();
-        }
-
         if(processingLoop != null){
             processingLoop.setCanonicalRegistry(newRegistry);
             logger.info("Updating processing loop");

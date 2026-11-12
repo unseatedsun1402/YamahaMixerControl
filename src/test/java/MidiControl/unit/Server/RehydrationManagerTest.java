@@ -8,6 +8,13 @@ import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.Routing.OutputRequestSender;
 import MidiControl.Server.Rehydration.RehydrationListener;
 import MidiControl.Server.Rehydration.RehydrationManager;
+import MidiControl.Server.MidiProcessingLoop;
+import MidiControl.ControlServer.HardwareInputHandler;
+import MidiControl.NrpnUtils.NrpnParser;
+import MidiControl.NrpnUtils.NrpnRegistry;
+import MidiControl.SysexUtils.SysexMappingLoader;
+import MidiControl.SysexUtils.SysexParser;
+import MidiControl.UserInterface.Frontend.GuiBroadcastListener;
 
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +23,11 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.sound.midi.MidiMessage;
+import javax.sound.midi.SysexMessage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -101,6 +113,45 @@ class RehydrationManagerTest {
     }
 
     // ---------------- Tests ----------------
+
+    @Test
+    void probeReadsMidiChannelFromProcessedSysex() {
+        var mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
+        ControlInstance fader = registry.resolveCanonicalId("kInputFader.kFader.0");
+        ConcurrentLinkedQueue<MidiMessage> input = new ConcurrentLinkedQueue<>();
+        MidiProcessingLoop loop = new MidiProcessingLoop(input,
+                new HardwareInputHandler(new NrpnParser(), new NrpnRegistry()), registry,
+                new GuiBroadcastListener((json, context) -> {}, id -> null));
+        FakeOutputRouter router = new FakeOutputRouter() {
+            @Override public void send(byte[] request) {
+                super.send(request);
+                try {
+                    for (int channel : new int[] {6, 7}) {
+                        byte[] bytes = fader.getSysex().buildChangeMessage(500, 0, channel);
+                        SysexMessage response = new SysexMessage();
+                        response.setMessage(bytes, bytes.length);
+                        input.add(response);
+                        loop.processIncomingMidi();
+                    }
+                } catch (javax.sound.midi.InvalidMidiDataException e) {
+                    throw new AssertionError(e);
+                }
+            }
+        };
+        ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(1);
+        RehydrationManager manager = new RehydrationManager(router, registry, scheduler);
+        try {
+            AtomicInteger detectedChannel = new AtomicInteger(-1);
+            manager.probe(fader.getCanonicalId(), 300, 7,
+                    (instance, channel) -> detectedChannel.set(channel));
+            assertEquals(7, router.lastSent[2] & 0x0F);
+            assertEquals(7, detectedChannel.get());
+            assertEquals(0, manager.getOutstandingRequests());
+        } finally {
+            manager.shutdown();
+        }
+    }
 
     @Test
     void request_callsOutputRouterApplyRequest() {

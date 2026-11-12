@@ -182,7 +182,7 @@ public final class M7CLSimulatorMidiDevice implements MidiDevice {
         response[1] = 0x43;
         response[2] = (byte) (0x10 | channel);
         response[3] = 0x3E;
-        response[4] = 0x0F;
+        response[4] = MODEL_NUMBER;
         response[5] = 0x21;
         response[6] = (byte) category;
         response[7] = (byte) source;

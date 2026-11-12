@@ -9,10 +9,12 @@ public class MockRehydrationManager extends RehydrationManager {
     public int respondChannel = -1;   // channel that should succeed
     public ControlInstance fakeInstance = new ControlInstance("", 0, null, null); // minimal stub
     public int probeCallCount = 0;
+    public String lastCanonicalId;
 
     @Override
     public void probe(String canonicalId, long timeoutMs, int midi_channel, ProbeCallback callback) {
         probeCallCount ++;
+        lastCanonicalId = canonicalId;
         fakeInstance = new ControlInstance(canonicalId,0,null,null);
         // Simulate async behaviour: only respond on the chosen channel
         if (midi_channel == respondChannel) {

@@ -33,6 +33,7 @@ public class MeterBroadcaster implements MeterUpdateListener{
         if (updates.isEmpty()) {
             return;
         }
+        MeterDiagnostics.broadcast(updates);
         broadcast(MeterBatchSerializer.toJson(updates));
     }
 }

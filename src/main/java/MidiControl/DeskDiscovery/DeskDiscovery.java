@@ -259,7 +259,7 @@ public class DeskDiscovery {
         if (mapping == null) return false;
 
         DeskDiscoveryResult result =
-            probeWithCanonicalId(deskModel, mapping, 0, 100,110);
+            probeWithCanonicalId(deskModel, mapping, mapping.getDeviceNumber(), 100,110);
 
         return result != null;
     }
@@ -271,7 +271,7 @@ public class DeskDiscovery {
 
         if(debug)logger.fine("Desk model probing "+deskModel);
 
-        String canonicalId = buildCanonicalIdFromMapping(mapping, channel);
+        String canonicalId = buildCanonicalIdFromMapping(mapping, 0);
 
         try {
             if(debug)logger.fine(String.format("Probing canonicalId=%s channel=%d",canonicalId,channel));

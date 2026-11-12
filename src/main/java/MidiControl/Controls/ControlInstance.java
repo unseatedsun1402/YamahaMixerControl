@@ -28,7 +28,7 @@ public class ControlInstance {
     private int priority = 3;
     private int canonMax = 1;
     private int canonMin = 0;
-    private byte[] lastSysex = {};
+    private volatile byte[] lastSysex = {};
 
     public static void enableDebug(){
         debug = true;

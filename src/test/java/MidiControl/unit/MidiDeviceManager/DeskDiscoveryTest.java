@@ -13,6 +13,9 @@ import MidiControl.MidiDeviceManager.MidiDeviceDTO;
 import MidiControl.Mocks.MockMidiIOManager;
 import MidiControl.Mocks.MockRehydrationManager;
 import MidiControl.Mocks.MockCanonicalRegistry;
+import MidiControl.Controls.CanonicalRegistry;
+import MidiControl.SysexUtils.SysexMappingLoader;
+import MidiControl.SysexUtils.SysexParser;
 
 public class DeskDiscoveryTest {
 
@@ -176,5 +179,23 @@ public class DeskDiscoveryTest {
         assertEquals(
                 "YAMAHA_01V96I",
                 result.getModel());
+        assertTrue(mockRehydration.lastCanonicalId.endsWith(".0"),
+                "The MIDI channel must not change the probed control index");
+    }
+
+    @Test
+    void livenessUsesTheDiscoveredMidiChannel() {
+        var mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
+        mappings.forEach(mapping -> mapping.setDeviceNumber(7));
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
+        MockRehydrationManager rehydration = new MockRehydrationManager();
+        rehydration.respondChannel = 7;
+        DeskDiscovery discovery = new DeskDiscovery();
+        discovery.setRehydrationManager(rehydration);
+        discovery.injectNewRegistry(registry);
+        discovery.discover();
+
+        assertTrue(discovery.probeForLiveness("YAMAHA_M7CL"));
+        assertEquals("kInputFader.kFader.0", rehydration.lastCanonicalId);
     }
 }

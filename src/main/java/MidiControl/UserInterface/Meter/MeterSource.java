@@ -1,5 +1,7 @@
 package MidiControl.UserInterface.Meter;
 
+import MidiControl.SysexUtils.ModelNumbers;
+
 public enum MeterSource {
     CHANNEL(0), EQ_OUT(1), COMP_OUT(2), COMP_GR(3),
     GATE_OUT(4), GATE_GR(5), ALL(127),
@@ -17,7 +19,7 @@ public enum MeterSource {
     }
 
     public static MeterSource fromInt(int i, int responseModelByte) {
-        if ((responseModelByte & 0xFF) == 0x0F) {
+        if (ModelNumbers.isM7clMeterResponse(responseModelByte)) {
             return switch (i) {
                 case 0 -> IN_PRE_HPF;
                 case 1 -> IN_PRE_ATT;

@@ -10,6 +10,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import MidiControl.SysexUtils.ModelNumbers;
+
 public final class MeterSimpleParser {
 
     private static final Logger logger = Logger.getLogger(MeterSimpleParser.class.getName());
@@ -67,7 +69,7 @@ public final class MeterSimpleParser {
                 logger.warning("Ignoring incomplete meter value");
                 return null;
             }
-            if (model == 0x0F && category == 0x10) {
+            if (ModelNumbers.isM7clMeterResponse(model) && category == 0x10) {
                 logger.warning("M7CL sigma clip bitmaps are not level meter values");
                 return null;
             }
@@ -75,7 +77,7 @@ public final class MeterSimpleParser {
                 logger.warning("01V96i all-point meter responses are not supported");
                 return null;
             }
-            int pointsPerChannel = model == 0x0F && category == 0 && source == 0x7F ? 9 : 1;
+            int pointsPerChannel = ModelNumbers.isM7clMeterResponse(model) && category == 0 && source == 0x7F ? 9 : 1;
             int count = payloadLen / bytesPer;
             if (count % pointsPerChannel != 0) {
                 logger.warning("Ignoring incomplete all-point meter response");
@@ -121,6 +123,7 @@ public final class MeterSimpleParser {
                 enqueueMeterEvent(dto);
             }
 
+            MeterDiagnostics.parsed(msg, meters);
             return meters;
 
         } catch (Throwable t) {
@@ -137,7 +140,7 @@ public final class MeterSimpleParser {
                (msg[1] & 0xFF) == 0x43 &&
                (msg[2] & 0xF0) == 0x10 &&
                (msg[3] & 0xFF) == 0x3E &&
-               ((msg[4] & 0xFF) == 0x1A || (msg[4] & 0xFF) == 0x0F) &&
+               ((msg[4] & 0xFF) == 0x1A || ModelNumbers.isM7clMeterResponse(msg[4])) &&
                (msg[5] & 0xFF) == 0x21 &&
                (msg[msg.length - 1] & 0xFF) == 0xF7;
     }

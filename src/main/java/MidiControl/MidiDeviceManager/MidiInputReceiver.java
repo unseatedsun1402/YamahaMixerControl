@@ -1,6 +1,7 @@
 package MidiControl.MidiDeviceManager;
 
 import MidiControl.SysexUtils.SysexParser;
+import MidiControl.UserInterface.Meter.MeterDiagnostics;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
@@ -50,6 +51,7 @@ public class MidiInputReceiver implements Receiver {
         }
 
         byte[] bytes = message.getMessage();
+        MeterDiagnostics.midiInput(bytes);
         ingressListener.onBytesReceived(bytes.length);
         inputBuffer.add(message);
 
