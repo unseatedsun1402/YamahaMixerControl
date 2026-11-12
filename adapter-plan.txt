@@ -1,0 +1,444 @@
+› # Feature: Hardware Client Framework (MIDI, OSC, Mackie MCU Control)
+  
+  ## Context
+  
+  This project already implements a Yamaha digital mixer integration layer that communicates with desks such as the Yamaha M7CL using MIDI NRPN and SysEx messages.
+  
+  The existing architecture works as follows:
+  
+  1. Incoming Yamaha NRPN and SysEx messages are decoded.
+  2. Mapping definitions convert protocol messages into internal control objects.
+  3. Internal control objects represent mixer state (faders, mutes, sends, pans, EQ parameters, scene controls, etc).
+  4. Control object changes are published through the application's event/update system.
+  5. A web API and browser\-based client consume these updates and provide a bidirectional remote mirror of the connected mixer.
+  6. Browser client changes are translated back into Yamaha NRPN/SysEx messages to update the desk.
+  
+  This architecture is already functioning correctly and should be treated as the source of truth.
+  
+  ---
+  
+  ## Goal
+  
+  Add support for hardware control surface clients and OSC clients without modifying the Yamaha protocol layer.
+  
+  Examples include:
+  
+  - Behringer X\-Touch
+  - Mackie MCU Control compatible surfaces
+  - Generic MIDI controllers
+  - OSC\-based controllers
+  - Future hardware control surfaces
+  
+  The implementation must reuse the existing internal control model so that all clients share the same mixer state.
+  
+  ---
+  
+  ## Architectural Requirements
+  
+  Do NOT create a second mixer model.
+  
+  Do NOT create direct Yamaha ↔ Mackie MCU mappings.
+  
+  Do NOT create Yamaha\-specific logic inside hardware client implementations.
+  
+  Instead implement a client adapter architecture:
+  
+  Yamaha Protocol → Internal Control Objects → Event Bus / State Layer → Client Adapters
+  
+  Client adapters both:
+  
+  - Receive state updates from the internal control layer.
+  - Publish control changes back into the internal control layer.
+  
+  All clients must therefore mirror each other automatically.
+  
+  Example:
+  
+  Yamaha Desk Fader Move → Internal Control Updated → Browser UI Updated → X\-Touch Motor Fader Updated → OSC Clients Updated
+  
+  X\-Touch Fader Move → Internal Control Updated → Yamaha NRPN Generated → Browser UI Updated → OSC Clients Updated
+  
+  ---
+  
+  ## New Components
+  
+  ### IControlClient
+  
+  Create a common client interface.
+  
+  Responsibilities:
+  
+  - Connect
+  - Disconnect
+  - Subscribe to control updates
+  - Publish control changes
+  - Report capabilities
+  - Report connection status
+  
+  Example client types:
+  
+  - WebClient
+  - OscClient
+  - Mackie MCUClient
+  - GenericMidiClient
+  
+  ---
+  
+  ### Hardware Client Manager
+  
+  Implement a manager responsible for:
+  
+  - Client registration
+  - Client lifecycle
+  - Connection management
+  - Broadcasting control updates
+  - Capability discovery
+  
+  The manager should not know Yamaha details.
+  
+  It should only operate on internal control objects.
+  
+  ---
+  
+  ### Mackie MCU Control Adapter
+  
+  Create an adapter capable of communicating with:
+  
+  - Behringer X\-Touch
+  - Mackie MCU Control Universal compatible devices
+  
+  Initial scope:
+  
+  - Motor faders
+  - Mute buttons
+  - Solo buttons
+  - Bank switching
+  - Channel selection
+  
+  Design the adapter to support future expansion.
+  
+  ---
+  
+  ### OSC Adapter
+  
+  Create an OSC client adapter.
+  
+  Requirements:
+  
+  - Configurable OSC server/client endpoints
+  - Bidirectional operation
+  - Subscribe to control updates
+  - Publish incoming OSC commands into control changes
+  
+  OSC paths should be configurable rather than hard\-coded.
+  
+  ---
+  
+  ## Settings UI
+  
+  Client connections must be configured through the existing Settings page.
+  
+  Add a new section:
+  
+  Hardware & Remote Clients
+  
+  Capabilities:
+  
+  - List configured clients
+  - Add client
+  - Remove client
+  - Enable/Disable client
+  - View connection status
+  
+  ### MIDI Client Configuration
+  
+  Fields:
+  
+  - Client Name
+  - MIDI Input Device
+  - MIDI Output Device
+  - Protocol Type
+  
+  Protocol Type examples:
+  
+  - Mackie MCU Control
+  - Generic MIDI
+  
+  ### OSC Client Configuration
+  
+  Phase 3 — OSC: 8. Add JavaOSC dependency to build.gradle. 9. OscClient + OscPathMap + OscProtocolDecoder/Encoder; OSC fields in the Add-Client dialog; persistence of
+  oscConfig.
+  
+  Phase 4 — generic MIDI and meters: 10. GenericMidiClient (parameterized codec); optional MeterUpdateListener opt-in for Mackie/OSC meter bridging.
+  
+  11. What does NOT change
+  
+  - MidiProcessingLoop, HardwareInputHandler, CanonicalInputEvent, CanonicalRegistry.resolve*, SysexParser, SysexRegistry, NativeSysex, NrpnParser, NrpnMapping, SysexMapping —
+  Yamaha protocol layer untouched.
+  - WebSocketEndpoint, SubscriptionManager, GuiBroadcastListener, WebSocketGuiBroadcaster, ServerRouter.handleSetControlValue, ServerRouter.handleMessage existing cases — web
+  client path untouched.
+  - MidiIOManager, MidiSendEngine, InputWrapper, ReceiverWrapper, MidiInputReceiver — Yamaha MIDI plumbing untouched; client MIDI uses parallel MidiPortPair instances.
+  - ServerSettings, settings.conf, ConfigDirectoryProvider — unchanged; new clients.conf is additive.
+  - MeterSimpleParser, MeterBroadcaster, MeterUpdateListener — unchanged; clients opt in as additional listeners.
+  
+  12. Risks / things to verify during implementation
+  
+  - Registry-reload listener survival across wholesale registry swap. The context-gatherer flagged that MidiServer.onRegistryReloaded builds a brand-new CanonicalRegistry; the
+  reload listener is attached to the original registry in the constructor. Verify that notifyReloadListeners fires on the in-place reloadMappings path (it does,
+  CanonicalRegistry.java line ~337) and that the new-registry path in MidiServer.run() calls onRegistryReloaded directly (it does). The manager must register on the initial
+  registry and re-register on each new registry it receives, since the new registry created in MidiServer.run() does not inherit the listener.
+  - Control type information. ControlType/ContextType are UI-layer enums, not stored on ControlInstance. A Mackie encoder that needs to know "is this a fader or a mute" must
+  infer from the group/subcontrol naming scheme (getGroup()/getSubcontrol()), as ControlSchema already does. Confirm the naming conventions for faders/mutes/solos/selects in
+  the mapping files before writing the encoder.
+  - Echo suppression correctness. The desk echoes a client-originated change back over MIDI → MidiProcessingLoop → updateValue (no thread-local origin) → dispatcher broadcasts
+  to all clients including the originator. This matches the web path's behavior (the desk echo is a confirmation, and broadcastControlUpdate only suppresses the immediate web
+  session, not the later echo). For motor faders this is harmless. Confirm during testing that re-entrant sends to the originating X-Touch don't cause jitter; if they do,
+  suppress by comparing the outgoing value to the last sent value per control.
+  - resolveCc is a stub (CanonicalRegistry.java returns null). Mackie uses Pitch Bend and CC, not NRPN/SysEx, so the Mackie decoder must resolve directly to canonical ids via
+  its own bank map — it does not rely on CanonicalRegistry.resolveCc. Generic MIDI similarly maps CC directly. No need to fix resolveCc.
+  - OSC listen-socket security. Document and enforce the loopback-only edit rule for non-loopback listen addresses (§9).
+  
+  ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  
+  This plan adds a HardwareClients package, one small edit to CanonicalRegistry.attachBroadcastListeners(), wiring in MidiServer, new WebSocket message cases in
+  ServerRouter/websocketClient.js, a new settings tab, a new clients.conf persistence file, and one new dependency (JavaOSC). It reuses ControlListener,
+  CanonicalRegistry.getAllInstances, HardwareOutputRouter.applyChange, OutputRequestSender, MidiDeviceUtils, InputWrapper/ReceiverWrapper, ConfigDirectoryProvider,
+  ServerEvent/NotifyClients, the MidiDeviceDTO→JsonArray serialization idiom, and the apply-then-persist settings pattern — all existing project patterns. The Yamaha protocol
+  layer and web client behavior are untouched.
+  
+  Want me to proceed with Phase 1 implementation, or refine any part of this plan first?
+
+
+Honestly, that's a surprisingly good plan.
+
+The biggest thing I like is that Kiro appears to have actually analysed your codebase rather than just regurgitated the architecture prompt. Evidence of that is all the project-specific references:
+
+MidiProcessingLoop
+CanonicalRegistry
+HardwareOutputRouter
+OutputRequestSender
+ServerRouter
+WebSocketEndpoint
+MeterSimpleParser
+ConfigDirectoryProvider
+
+Those aren't in your prompt, so it has clearly traced the existing paths and identified integration points.
+
+What I'd keep
+1. The client adapter architecture
+
+This is exactly right:
+
+Plain Text
+Yamaha
+↓
+Canonical Registry
+↓
+Control Events
+↓
+Client Manager
+↓
+MCU
+OSC
+Web
+Future
+
+That's the architecture I'd choose myself.
+
+2. Yamaha layer untouched
+
+This is absolutely critical.
+
+The second you start doing:
+
+Plain Text
+MCU -> Yamaha NRPN
+
+or
+
+Plain Text
+OSC -> Yamaha SysEx
+
+you've created three control models.
+
+Everything should go through:
+
+Plain Text
+ControlInstance
+CanonicalRegistry
+
+exactly as Kiro proposes.
+
+3. Clients.conf
+
+Very sensible.
+
+I would not pollute your existing Yamaha settings file with controller definitions.
+
+Keeping:
+
+Plain Text
+settings.conf
+
+for desk/server config
+
+and
+
+Plain Text
+clients.conf
+
+for attached surfaces
+
+is cleaner.
+
+What I'd change
+Don't call it MackieClient
+
+I'd rename:
+
+Java
+MackieClient
+
+to:
+
+Java
+McuClient
+
+or
+
+Java
+MackieControlClient
+
+because "Mackie" is the manufacturer whilst MCU is the protocol.
+
+Later you might support:
+
+Plain Text
+MCU
+HUI
+OSC
+Generic MIDI
+
+and the naming becomes clearer.
+
+Don't build Generic MIDI in Phase 1
+
+I'd actually delete Phase 4 entirely for now.
+
+You have 30 credits left.
+
+Focus on:
+
+Plain Text
+Phase 1: Client framework
+Phase 2: MCU/X-Touch
+Phase 3: OSC
+
+Then stop.
+
+Generic MIDI becomes an endless mapping rabbit hole.
+
+The X-Touch alone will teach you:
+
+banking
+motor faders
+feedback suppression
+button LEDs
+labels
+
+Once that works you'll know what abstraction is actually needed.
+
+Add "scribble strips" to Phase 2
+
+The plan says:
+
+Plain Text
+Motor faders
+Mute
+Solo
+Banking
+Selection
+
+I'd add:
+
+Plain Text
+Scribble strip labels
+
+immediately.
+
+For a mixer project that's enormously useful.
+
+Imagine:
+
+Plain Text
+CH1 Kick
+CH2 Snare
+CH3 Bass
+CH4 Vox
+
+appearing automatically.
+
+If your canonical controls already expose labels anywhere, that's low effort and high value.
+
+The smartest thing Kiro discovered
+
+This part:
+
+the new-registry path in MidiServer.run() calls onRegistryReloaded directly
+
+That's exactly the sort of thing humans miss.
+
+If the registry gets rebuilt after mapping reloads then your clients would silently stop receiving updates.
+
+The fact Kiro spotted that means the analysis phase was worth doing.
+
+One thing I'd add before implementation
+
+I'd ask Kiro for this specific design document:
+
+"Design the MCU banking strategy. Explain how Yamaha canonical controls map onto 8-channel Mackie banks, including faders, mutes, solos, and selected channel behaviour. Produce examples but do not write code."
+
+Because that's actually the hardest problem.
+
+Not:
+
+Plain Text
+How do I send MCU?
+
+That's easy.
+
+The hard part is:
+
+Plain Text
+What is MCU Channel 1 currently representing?
+
+Examples:
+
+Plain Text
+Input 1-8
+Input 9-16
+Mix 1-8
+Mix 9-16
+Matrices
+DCAs
+Stereo master
+
+The banking model determines whether the X-Touch feels natural or frustrating.
+
+If this were my project
+
+I'd spend the remaining work in this order:
+
+HardwareClientManager
+McuClient
+X-Touch detection
+Faders
+Mute/Solo LEDs
+Scribble strips
+Banking
+OSC
+Stop and test extensively
+
+I would not spend credits on Generic MIDI yet.
+
+The X-Touch is the real target. Once it's working, you'll have learned what the generic abstraction actually needs to be. Right now you'd just be guessing.
