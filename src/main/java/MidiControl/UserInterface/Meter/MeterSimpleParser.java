@@ -128,7 +128,7 @@ public final class MeterSimpleParser {
                (msg[1] & 0xFF) == 0x43 &&
                (msg[2] & 0xF0) == 0x10 &&
                (msg[3] & 0xFF) == 0x3E &&
-               ((msg[4] & 0xFF) == 0x1A || (msg[4] & 0xFF) == 0x0F) &&
+               ((msg[4] & 0xFF) == 0x1A || (msg[4] & 0xFF) == 0x0F || (msg[4] & 0xFF) == 0x11) &&
                (msg[5] & 0xFF) == 0x21 &&
                (msg[msg.length - 1] & 0xFF) == 0xF7;
     }
