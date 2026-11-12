@@ -1,0 +1,63 @@
+.detail-response-graph {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 4px 0 8px;
+    overflow: visible;
+    background: #111a28;
+    border: 1px solid var(--mix-color-strip-border);
+    border-radius: 3px;
+}
+
+.detail-response-graph .graph-grid {
+    stroke: rgb(182 192 208 / 18%);
+    stroke-width: 1;
+}
+
+.detail-response-graph .graph-axis {
+    stroke: #8491a6;
+    stroke-width: 1;
+}
+
+.detail-response-graph .graph-tick,
+.detail-response-graph .graph-label {
+    fill: var(--mix-color-text-muted);
+    font-family: var(--mix-font-readout);
+    font-size: 10px;
+}
+
+.detail-response-graph .graph-label {
+    font-size: 11px;
+}
+
+.detail-response-graph .eq-response-line {
+    fill: none;
+    stroke: #55b8ff;
+    stroke-width: 3;
+    vector-effect: non-scaling-stroke;
+}
+
+.detail-response-graph .compressor-response-line,
+.detail-response-graph .gate-response-line {
+    fill: none;
+    stroke: #f06b68;
+    stroke-width: 3;
+    vector-effect: non-scaling-stroke;
+}
+
+.detail-response-graph .gate-response-line {
+    stroke: #e2bd54;
+}
+
+.detail-response-graph .graph-bypass-line {
+    fill: none;
+    stroke: #77869b;
+    stroke-dasharray: 5 4;
+    stroke-width: 2;
+}
+
+.detail-response-graph .graph-threshold-marker {
+    fill: var(--mix-color-text);
+    stroke: #111a28;
+    stroke-width: 1;
+}
