@@ -31,6 +31,9 @@ import java.util.UUID;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -261,6 +264,49 @@ class WebSocketEndpointTest {
 
         // Assert: static set updated
         assertTrue(getStaticSessions().contains(session));
+    }
+
+    @Test
+    void routingExceptionIncludesContextAndReturnsRequestError() {
+        CanonicalRegistry reg = new MockCanonicalRegistry();
+        SubscriptionManager subs = new SubscriptionManager();
+        RuntimeException failure = new IllegalStateException("test failure");
+        ServerRouter router = new CapturingServerRouter(
+                new MinimalUiModelService(), subs, reg, new MockMidiIOManager(null)) {
+            @Override public void handleMessage(Session session, String message) { throw failure; }
+        };
+        MidiServer server = new WsTestServer(reg, subs, new BankCatalog(), null, router);
+        MidiControl.Mocks.MockServletContext ctx = new MidiControl.Mocks.MockServletContext();
+        ctx.setAttribute("midiServer", server);
+        MidiServerListener.CONTEXT = ctx;
+        WebSocketEndpoint endpoint = new WebSocketEndpoint();
+        FakeSession session = localSession("crash-session");
+        endpoint.onOpen(session);
+
+        List<LogRecord> records = new java.util.ArrayList<>();
+        Handler handler = new Handler() {
+            @Override public void publish(LogRecord record) { records.add(record); }
+            @Override public void flush() {}
+            @Override public void close() {}
+        };
+        Logger logger = Logger.getLogger(WebSocketEndpoint.class.getName());
+        logger.addHandler(handler);
+        try {
+            endpoint.onMessage("""
+                    {"type":"apply-midi-settings","requestId":"crash-id","payload":{}}
+                    """, session);
+            JsonObject response = JsonParser.parseString(session.lastSent).getAsJsonObject();
+            assertEquals("error", response.get("type").getAsString());
+            assertEquals("crash-id", response.get("requestId").getAsString());
+            assertEquals("REQUEST_FAILED", response.getAsJsonObject("payload").get("code").getAsString());
+            assertTrue(records.stream().anyMatch(record -> record.getThrown() == failure
+                    && record.getMessage().contains("apply-midi-settings")
+                    && record.getMessage().contains("crash-session")
+                    && record.getMessage().contains("crash-id")));
+        } finally {
+            logger.removeHandler(handler);
+            endpoint.onClose(session);
+        }
     }
 
     @Test

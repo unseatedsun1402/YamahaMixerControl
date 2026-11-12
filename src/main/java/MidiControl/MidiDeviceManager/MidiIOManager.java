@@ -3,6 +3,7 @@ package MidiControl.MidiDeviceManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.*;
 
@@ -14,10 +15,10 @@ import MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile;
 
 public class MidiIOManager {
 
-    private MidiOutput midiOut;
-    private MidiInput  midiIn;
-    private int        outPort;
-    private int        inPort;
+    private volatile MidiOutput midiOut;
+    private volatile MidiInput  midiIn;
+    private int        outPort = -1;
+    private int        inPort = -1;
     private MidiServer server;
     private final Logger logger = Logger.getLogger(MidiIOManager.class.getName());
     private TransportMode mode;
@@ -25,7 +26,7 @@ public class MidiIOManager {
 
     private final ArrayBlockingQueue<byte[]> sendQueue = new ArrayBlockingQueue<>(4096);
 
-    private MidiSendEngine sendEngine;
+    private volatile MidiSendEngine sendEngine;
     private volatile ThroughputProfile throughput = ThroughputProfile.SAFE_DIN;
 
     public MidiIOManager(MidiServer server) {
@@ -55,11 +56,12 @@ public class MidiIOManager {
         this.sendEngine.start();
     }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         logger.info("Shutting down MIDI devices.");
         if (sendEngine != null) sendEngine.stop();
-        if (midiIn != null && midiIn.isOpen()) midiIn.close();
-        if (midiOut != null && midiOut.isOpen()) midiOut.close();
+        sendEngine = null;
+        closeInputDevice();
+        closeOutputDevice();
     }
 
     public void sendAsync(byte[] data) {
@@ -71,12 +73,13 @@ public class MidiIOManager {
     }
 
     private void enqueue(byte[] data, boolean priority) {
-        if (midiOut == null || sendEngine == null) {
+        MidiSendEngine engine = sendEngine;
+        if (midiOut == null || engine == null) {
             logger.warning("Attempted to send MIDI before output device was set.");
             return;
         }
         if(debug) logger.info(String.format("Outputing on %s - %s",getMidiOutName(),Format.bytesToHex(data)));
-        boolean accepted = priority ? sendEngine.offerPriority(data) : sendEngine.offer(data);
+        boolean accepted = priority ? engine.offerPriority(data) : engine.offer(data);
         if (!accepted) {
             logger.warning(priority
                     ? "Priority MIDI queue full; priority message dropped."
@@ -84,13 +87,13 @@ public class MidiIOManager {
         }
     }
 
-    public boolean trySetOutputDevice(int index) {
+    public synchronized boolean trySetOutputDevice(int index) {
         boolean ok = openOutputDevice(index);
         if (ok) logger.info("The current output device is: " + outPort);
         return ok;
     }
 
-    public boolean trySetInputDevice(int index) {
+    public synchronized boolean trySetInputDevice(int index) {
         boolean ok = openInputDevice(index);
         if (ok) logger.info("The current input device is: " + inPort);
         return ok;
@@ -103,9 +106,8 @@ public class MidiIOManager {
         return this.mode = changeTo;
     }
 
-    public void setThroughputProfile(ThroughputProfile profile) {
-        ThroughputProfile current = this.getThroughputProfile();
-        if (current == profile) return;
+    public synchronized void setThroughputProfile(ThroughputProfile profile) {
+        if (throughput == profile) return;
         this.throughput = profile;
         RehydrationManager.changeRehydrationDelay(profile.pollDelay);
         if (sendEngine != null) sendEngine.setThroughputProfile(profile);
@@ -143,18 +145,17 @@ public class MidiIOManager {
         return list;
     }
 
-    public boolean hasValidDevices() {
+    public synchronized boolean hasValidDevices() {
         return midiIn != null && midiOut != null && midiIn.isOpen() && midiOut.isOpen();
     }
 
     public MidiSendEngine.ThroughputProfile getThroughputProfile(){
-        if (sendEngine == null) throw new IllegalStateException("MIDI output not initialised (sendEngine is null)");
-        return sendEngine.getThroughputProfile();
+        return throughput;
     }
 
     public CoalesceEngine getCoalesceEngine(){
-        if(sendEngine == null) return null;
-        return this.sendEngine.getCoalesceEngine();
+        MidiSendEngine engine = sendEngine;
+        return engine == null ? null : engine.getCoalesceEngine();
     }
 
     public RehydrationManager getRehydrationManager(){
@@ -189,16 +190,10 @@ public class MidiIOManager {
         }
 
         // Close input
-        if (midiIn != null && midiIn.isOpen()) {
-            midiIn.close();
-            midiIn = null;
-        }
+        closeInputDevice();
 
         // Close output
-        if (midiOut != null && midiOut.isOpen()) {
-            midiOut.close();
-            midiOut = null;
-        }
+        closeOutputDevice();
 
         // Clear ports
         inPort = -1;
@@ -219,6 +214,13 @@ public class MidiIOManager {
     public synchronized boolean resetMidiSubsystem() {
         int cachedInput  = inPort;
         int cachedOutput = outPort;
+
+        if (cachedInput < 0 || cachedOutput < 0) {
+            logger.warning(String.format(
+                    "MIDI reset skipped: no configured device pair (input=%d, output=%d)",
+                    cachedInput, cachedOutput));
+            return false;
+        }
 
         logger.warning(String.format(
             "Resetting MIDI subsystem (cached in=%d, out=%d)", cachedInput, cachedOutput
@@ -253,12 +255,17 @@ public class MidiIOManager {
             sendEngine.stop();
             sendEngine = null;
         }
-        if (midiOut != null && midiOut.isOpen()) {
-            midiOut.close();
-        }
+        closeOutputDevice();
+        outPort = -1;
 
+        MidiDevice device = null;
+        MidiDevice.Info info = null;
+        boolean wasOpen = false;
         try {
-            MidiDevice device = MidiDeviceUtils.getDevice(index);
+            info = MidiDeviceUtils.getInfo(index);
+            logger.info("Opening MIDI output index " + index + ": " + info.getName());
+            device = MidiDeviceUtils.getDevice(info);
+            wasOpen = device.isOpen();
             midiOut = new ReceiverWrapper(device);
             logger.info("Opening output device: " + midiOut.getDeviceInfo().getName());
             outPort = index;
@@ -275,21 +282,28 @@ public class MidiIOManager {
             return true;
 
         } catch (MidiUnavailableException e) {
-            logger.warning("Failed to open output device: " + e.getMessage());
+            if (device != null && !wasOpen && device.isOpen()) device.close();
+            logger.log(Level.WARNING, "Failed to open MIDI output index " + index
+                    + (info == null ? "" : " (" + info.getName() + ")"), e);
             return false;
         }
     }
 
     private boolean openInputDevice(int index) {
         MidiDevice device = null;
+        MidiDevice.Info info = null;
+        boolean wasOpen = false;
         try {
             if (midiIn != null) {
-                midiIn.close();
+                closeInputDevice();
                 logger.info("Closed previous input device and transmitter.");
             }
+            inPort = -1;
 
-            device = MidiDeviceUtils.getDevice(index);
-            logger.info("Opening input device: " + device.getDeviceInfo().getName());
+            info = MidiDeviceUtils.getInfo(index);
+            logger.info("Opening MIDI input index " + index + ": " + info.getName());
+            device = MidiDeviceUtils.getDevice(info);
+            wasOpen = device.isOpen();
             device.open();
 
             if (device.getMaxTransmitters() > 0 || device.getMaxTransmitters() == -1) {
@@ -302,15 +316,36 @@ public class MidiIOManager {
             }
 
             logger.warning("Device is output-only: " + index);
-            device.close();
+            if (!wasOpen) device.close();
             return false;
 
         } catch (MidiUnavailableException e) {
-            if (device != null && device.isOpen()) {
+            if (device != null && !wasOpen && device.isOpen()) {
                 device.close();
             }
-            logger.warning("Failed to open input device: " + e.getMessage());
+            logger.log(Level.WARNING, "Failed to open MIDI input index " + index
+                    + (info == null ? "" : " (" + info.getName() + ")"), e);
             return false;
         }
+
+    }
+
+    private boolean sharesDevice() {
+        return midiIn instanceof InputWrapper input && midiOut instanceof ReceiverWrapper output
+                && input.getDevice() == output.getDevice();
+    }
+
+    private void closeInputDevice() {
+        if (midiIn == null) return;
+        if (sharesDevice()) ((InputWrapper) midiIn).close(false);
+        else midiIn.close();
+        midiIn = null;
+    }
+
+    private void closeOutputDevice() {
+        if (midiOut == null) return;
+        if (sharesDevice()) ((ReceiverWrapper) midiOut).close(false);
+        else midiOut.close();
+        midiOut = null;
     }
 }

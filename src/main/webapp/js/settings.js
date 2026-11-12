@@ -12,6 +12,7 @@ const ws = new WebSocketClient(`ws://${location.host}/MidiControl/endpoint`);
 installAuthentication(ws);
 const SERVER_LOG_LIMIT = 50;
 const serverLogBuffer = [];
+const settingsRequests = new Map();
 window.addEventListener("beforeunload", saveLogsToLocalStorage);
 
 const serverLog = document.getElementById("server-log");
@@ -59,6 +60,30 @@ ws.on("connected", () => {
 ws.on("telemetry", updateTelemetry);
 ws.on("server-event", handleServerEvent)
 ws.on("REGISTRY_CHANGED", handleRegistryChanged);
+ws.on("ack", payload => {
+  const request = settingsRequests.get(payload.__meta?.requestId);
+  if (!request) return;
+  const { action, profile } = request;
+  settingsRequests.delete(payload.__meta.requestId);
+  const profileStatus = payload.mapping_status === "ok" ? `Switched to ${profile}; ` : "";
+  if (payload.mapping_status === "ok" && payload.midi_status === "ok"
+      && payload.input_status !== "error" && payload.output_status !== "error"
+      && (action !== "save" || payload.save_status === "ok")) {
+    showStatus(profileStatus + (action === "save" ? "settings saved" : "settings applied"));
+  } else {
+    const failed = [];
+    if (payload.input_status === "error") failed.push("input");
+    if (payload.output_status === "error") failed.push("output");
+    if (payload.mapping_status === "error") failed.push("desk profile");
+    if (action === "save" && payload.save_status === "error") failed.push("save");
+    showStatus(`${profileStatus}settings incomplete: ${failed.join(", ") || "request failed"}`);
+  }
+});
+ws.on("error", payload => {
+  if (settingsRequests.delete(payload.__meta?.requestId)) {
+    showStatus(payload.message || "Settings request failed");
+  }
+});
 
 ws.on("midi-device-list", (devices) => {
   console.log("[Settings] Received device list:", devices);
@@ -165,8 +190,13 @@ document.getElementById("apply-settings").addEventListener("click", () => {
     highprofile: document.getElementById("high-profile").checked
   };
 
-  ws.applyMidiSettings(settings);
-  showStatus("Settings applied");
+  const requestId = ws.applyMidiSettings(settings);
+  if (requestId) {
+    settingsRequests.set(requestId, { action: "apply", profile: consoleType });
+    showStatus("Applying settings…");
+  } else {
+    showStatus("Unable to send settings");
+  }
 });
 
 document.getElementById("save-settings").addEventListener("click", () => {
@@ -181,11 +211,19 @@ document.getElementById("save-settings").addEventListener("click", () => {
   const settings = {
     inputDeviceId,
     outputDeviceId,
-    consoleType
+    consoleType,
+    safeprofile: document.getElementById("safe-profile").checked,
+    mainprofile: document.getElementById("main-profile").checked,
+    highprofile: document.getElementById("high-profile").checked
   };
 
-  ws.saveMidiSettings(settings);
-  showStatus("Settings saved");
+  const requestId = ws.saveMidiSettings(settings);
+  if (requestId) {
+    settingsRequests.set(requestId, { action: "save", profile: consoleType });
+    showStatus("Saving settings…");
+  } else {
+    showStatus("Unable to send settings");
+  }
 });
 
 document.getElementById("rescan-devices").addEventListener("click", () => {
@@ -209,6 +247,7 @@ function populateDeviceDropdowns(devices) {
   });
 }
 
+let statusTimeout;
 function showStatus(text) {
   let el = document.getElementById("settings-status");
   if (!el) {
@@ -229,7 +268,8 @@ function showStatus(text) {
 
   el.textContent = text;
   el.style.opacity = 1;
-  setTimeout(() => el.style.opacity = 0, 2000);
+  clearTimeout(statusTimeout);
+  statusTimeout = setTimeout(() => el.style.opacity = 0, 2000);
 }
 
 async function loadServerInterfaceOptions() {
@@ -486,9 +526,6 @@ function handleRegistryChanged(payload) {
 
     const telemetryLog = document.getElementById("telemetry-log");
     if (telemetryLog) telemetryLog.innerHTML = "";
-
-    serverLogBuffer.length = 0;
-    renderServerLog();
 
     const tableBody = document.getElementById("mapping-table-body");
     if (tableBody) tableBody.innerHTML = "";

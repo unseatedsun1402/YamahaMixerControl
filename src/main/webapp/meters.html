@@ -7,9 +7,11 @@
     <link rel="stylesheet" href="css/meter-style.css"/>
     <link rel="stylesheet" href="css/page-navigation.css"/>
     <link rel="stylesheet" href="css/soft-key-style.css"/>
+    <link rel="stylesheet" href="css/authentication.css"/>
     <script type="module">
         import { WebSocketClient } from './js/websocketClient.js';
         import { createFifteenSegmentMeter } from './js/widgets/meter.js';
+        import { installAuthentication } from './js/authentication.js';
 
         console.log(">>> Meter Panel bootstrap running <<<");
 
@@ -20,6 +22,7 @@
         const contextPath = window.location.pathname.split('/')[1];
         const wsUrl = `ws://${location.host}/${contextPath}/endpoint`;
         const ws = new WebSocketClient(wsUrl);
+        installAuthentication(ws);
 
         ws.on("connected", () => {
             console.info("[Meter Panel] Connected to server");

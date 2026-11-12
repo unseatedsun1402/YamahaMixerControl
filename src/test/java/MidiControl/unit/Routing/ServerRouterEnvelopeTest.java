@@ -13,12 +13,16 @@ import MidiControl.UserInterface.UiModelService;
 import MidiControl.UserInterface.DTO.UiModelDTO;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.MidiDeviceManager.MidiIOManager;
+import MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile;
 import MidiControl.Mocks.FakeSession;
+import MidiControl.Routing.WebSocketEndpoint;
 import MidiControl.Mocks.MockCanonicalRegistry;
 import MidiControl.Mocks.MockMidiIOManager;
 import MidiControl.Routing.OutputRequestSender;
 import MidiControl.Server.StateRehydrationService;
 import MidiControl.Server.Rehydration.RehydrationManager;
+import MidiControl.SysexUtils.SysexMappingLoader;
+import MidiControl.SysexUtils.SysexParser;
 
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -133,6 +137,11 @@ public class ServerRouterEnvelopeTest {
                     (byte) 0xF0, 0x43, 0x30, 0x3E, 0x11, 0x21,
                     0x00, 0x00, 0x00, 0x00, 0x30, (byte) 0xF7
             }, outputRouter.lastSent);
+
+            router.setRegistry(registry);
+            router.handleMessage(session, keepAlive);
+            assertEquals(2, outputRouter.sendCount,
+                    "A registry reload must allow an immediate refresh");
         } finally {
             rehydrationManager.shutdown();
         }
@@ -169,6 +178,72 @@ public class ServerRouterEnvelopeTest {
             }, outputRouter.lastSent);
         } finally {
             rehydrationManager.shutdown();
+        }
+    }
+
+    @Test
+    void failedOutputStillSwitchesProfileAndReportsPartialFailure() throws Exception {
+        var mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, new SysexParser(mappings));
+        registry.setDeskType("YAMAHA_01V96I");
+        MidiIOManager io = new MidiIOManager() {
+            @Override public boolean trySetOutputDevice(int index) { return false; }
+            @Override public boolean trySetInputDevice(int index) { return true; }
+        };
+        ServerRouter router = new ServerRouter(
+                new MinimalUiModelService(new UiModelDTO()), new SubscriptionManager(), registry, io);
+        RehydrationManager manager =
+                new RehydrationManager(router.getOutputRouter(), registry, new ScheduledThreadPoolExecutor(1));
+        registry.addReloadListener(manager::injectNewRegistry);
+        FakeSession session = new FakeSession("failed-output");
+        FakeSession observer = new FakeSession("profile-observer");
+        WebSocketEndpoint.addTestSession(observer);
+        try {
+            router.injectApp(new StateRehydrationService(manager, io));
+            router.handleMessage(session, """
+                    {"type":"apply-midi-settings","requestId":"switch","payload":{
+                      "inputDeviceId":5,"outputDeviceId":4,"consoleType":"YAMAHA_M7CL",
+                      "safeprofile":false,"mainprofile":true,"highprofile":false
+                    }}
+                    """);
+
+            assertEquals("YAMAHA_M7CL", registry.getDeskType());
+            assertEquals(ThroughputProfile.FAST_USB, io.getThroughputProfile());
+            JsonObject ack = JsonParser.parseString(session.lastSent).getAsJsonObject();
+            assertEquals("switch", ack.get("requestId").getAsString());
+            assertEquals("ok", ack.getAsJsonObject("payload").get("mapping_status").getAsString());
+            assertEquals("ok", ack.getAsJsonObject("payload").get("input_status").getAsString());
+            assertEquals("error", ack.getAsJsonObject("payload").get("output_status").getAsString());
+            assertEquals("error", ack.getAsJsonObject("payload").get("midi_status").getAsString());
+            assertTrue(observer.getSentMessages().stream()
+                    .map(message -> JsonParser.parseString(message).getAsJsonObject())
+                    .anyMatch(event -> "REGISTRY_CHANGED".equals(event.get("type").getAsString())
+                            && "YAMAHA_M7CL".equals(event.getAsJsonObject("payload").get("profile").getAsString())));
+
+            byte[] fader = {
+                (byte) 0xF0, 0x43, 0x10, 0x3E, 0x11, 0x01, 0, 0x32, 0, 0,
+                0, 0, 0, 0, 0, 6, 0x72, (byte) 0xF7
+            };
+            var control = registry.resolveSysex(fader);
+            assertNotNull(control, "The logged M7CL fader response must resolve after the switch");
+            assertEquals("kInputFader.kFader.0", control.getCanonicalId());
+            assertEquals(882, control.getSysex().extractValue(fader));
+
+            router.handleMessage(session, """
+                    {"type":"save-midi-settings","requestId":"save","payload":{
+                      "inputDeviceId":5,"outputDeviceId":4,"consoleType":"YAMAHA_M7CL",
+                      "safeprofile":false,"mainprofile":true,"highprofile":false
+                    }}
+                    """);
+            JsonObject save = JsonParser.parseString(session.lastSent).getAsJsonObject();
+            assertEquals("save", save.get("requestId").getAsString());
+            assertEquals("error", save.getAsJsonObject("payload").get("save_status").getAsString());
+        } finally {
+            var sessions = WebSocketEndpoint.class.getDeclaredField("sessions");
+            sessions.setAccessible(true);
+            ((java.util.Set<?>) sessions.get(null)).remove(observer);
+            manager.shutdown();
+            io.shutdown();
         }
     }
 

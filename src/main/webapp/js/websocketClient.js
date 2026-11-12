@@ -26,6 +26,7 @@ export class WebSocketClient {
       "ui-bank": [],
       "control-update": [],
       "meter-update": [],
+      "ack": [],
       "name-update": [],
       "error": [],
       "connected": [],
@@ -299,6 +300,7 @@ export class WebSocketClient {
         break;
 
       case "ack":
+        this._emit("ack", enrichedPayload);
         if (debugFlag) {
           console.debug("[WebSocketClient] ACK:", {
             sequence,
@@ -469,7 +471,7 @@ export class WebSocketClient {
     };
 
     console.info("[WebSocketClient] Applying MIDI settings:", message);
-    this._send(message);
+    return this._send(message) ? message.requestId : null;
   }
 
   saveMidiSettings(settings) {
@@ -480,7 +482,7 @@ export class WebSocketClient {
     };
 
     console.info("[WebSocketClient] Saving MIDI settings:", message);
-    this._send(message);
+    return this._send(message) ? message.requestId : null;
   }
 
   requestChannelNames() {

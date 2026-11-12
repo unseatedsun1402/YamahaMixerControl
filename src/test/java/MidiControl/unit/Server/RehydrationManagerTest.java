@@ -251,4 +251,71 @@ class RehydrationManagerTest {
 
         assertTrue(scheduler.isShutdown());
     }
+
+    @Test
+    void profileReloadDiscardsOldMeterSelection() {
+        FakeOutputRouter router = new FakeOutputRouter();
+        MockCanonicalRegistry m7cl = new MockCanonicalRegistry();
+        m7cl.setDeskType("YAMAHA_M7CL");
+        MockCanonicalRegistry v96 = new MockCanonicalRegistry();
+        v96.setDeskType("YAMAHA_01V96I");
+        RehydrationManager manager = new RehydrationManager(router, m7cl, new NoOpScheduler());
+        try {
+            manager.requestMeters(0, 7, 47, 1);
+            manager.injectNewRegistry(v96);
+            manager.requestMeters();
+            assertArrayEquals(new byte[] {
+                (byte) 0xF0, 0x43, 0x30, 0x3E, 0x1A, 0x21,
+                0, 0, 0, 0, 32, (byte) 0xF7
+            }, router.lastSent);
+            manager.injectNewRegistry(m7cl);
+            manager.requestMeters();
+            assertEquals(0x11, router.lastSent[4]);
+            assertEquals(0, router.lastSent[7]);
+            assertEquals(48, router.lastSent[10]);
+        } finally {
+            manager.shutdown();
+        }
+    }
+
+    @Test
+    void registryReplacementDetachesOldControlListeners() {
+        ControlInstance oldControl = makeInstance("group", "control", 0, 1);
+        ControlInstance newControl = makeInstance("group", "control", 0, 1);
+        CanonicalRegistry oldRegistry = new MockCanonicalRegistry() {
+            @Override public Collection<ControlInstance> getAllInstances() { return List.of(oldControl); }
+        };
+        CanonicalRegistry newRegistry = new MockCanonicalRegistry() {
+            @Override public Collection<ControlInstance> getAllInstances() { return List.of(newControl); }
+        };
+        RehydrationManager manager =
+                new RehydrationManager(new FakeOutputRouter(), oldRegistry, new NoOpScheduler());
+        try {
+            manager.injectNewRegistry(newRegistry);
+            manager.request(oldControl.getCanonicalId());
+            oldControl.updateValue(1);
+            assertTrue(manager.isPending(oldControl.getCanonicalId()));
+            newControl.updateValue(1);
+            assertFalse(manager.isPending(oldControl.getCanonicalId()));
+        } finally {
+            manager.shutdown();
+        }
+    }
+
+    @Test
+    void meterRequestUsesDiscoveredMidiChannel() {
+        var mappings = MidiControl.Mocks.FakeSysexMapping.fakeSysexMapping();
+        mappings.get(0).setDeviceNumber(7);
+        CanonicalRegistry registry = new CanonicalRegistry(
+                mappings, new MidiControl.SysexUtils.SysexParser(mappings));
+        registry.setDeskType("YAMAHA_M7CL");
+        FakeOutputRouter output = new FakeOutputRouter();
+        RehydrationManager manager = new RehydrationManager(output, registry, new NoOpScheduler());
+        try {
+            manager.requestMeters();
+            assertEquals(0x37, output.lastSent[2] & 0xFF);
+        } finally {
+            manager.shutdown();
+        }
+    }
 }

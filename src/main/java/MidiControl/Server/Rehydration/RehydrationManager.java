@@ -31,6 +31,7 @@ public class RehydrationManager{
 
     private final OutputRequestSender outputRouter;
     private CanonicalRegistry registry;
+    private final Map<ControlInstance, ControlListener> registryListeners = new HashMap<>();
     private final ScheduledExecutorService scheduler;
 
     private final Map<String, Long> pending = new ConcurrentHashMap<>();
@@ -85,6 +86,7 @@ public class RehydrationManager{
 
     public synchronized void shutdown() {
         stopControlLoop();
+        detachListeners();
         if (scheduler != null) {
             scheduler.shutdownNow();
         }
@@ -96,12 +98,19 @@ public class RehydrationManager{
 
     private void attachListeners() {
         for (ControlInstance ci : registry.getAllInstances()) {
-            ci.addListener((instance, newValue) -> {
+            ControlListener listener = (instance, newValue) -> {
                 onControlUpdated(instance.getCanonicalId());
-            });
+            };
+            ci.addListener(listener);
+            registryListeners.put(ci, listener);
         }
 
         logger.info("Added rehydration listeners");
+    }
+
+    private void detachListeners() {
+        registryListeners.forEach(ControlInstance::removeListener);
+        registryListeners.clear();
     }
 
     public void request(String canonicalId) {
@@ -302,8 +311,12 @@ public class RehydrationManager{
                 || !MeterSource.isSupportedForRequest(modelNumber, categoryCode, sourceCode)) {
             throw new IllegalArgumentException("Unsupported meter category or source");
         }
+        if ((modelNumber == 0x11 && categoryCode == 0x10)
+                || (modelNumber == 0x1A && sourceCode == 0x7F)) {
+            throw new IllegalArgumentException("This meter response format is not supported by the GUI");
+        }
 
-        int maxChannels = maxChannelsFor(modelNumber, categoryCode);
+        int maxChannels = maxChannelsFor(modelNumber, categoryCode, sourceCode);
         if (startChannel < 0 || startChannel >= maxChannels) {
             throw new IllegalArgumentException(
                     "startChannel must be within 0.." + (maxChannels - 1));
@@ -321,27 +334,31 @@ public class RehydrationManager{
 
     private void sendMeterRequest(byte modelNumber, MeterSelection selection) {
         MeterRequest request = new MeterRequest(
-                0,
+                registry.getAllInstances().stream()
+                        .map(ControlInstance::getSysex)
+                        .filter(java.util.Objects::nonNull)
+                        .findFirst()
+                        .map(SysexMapping::getDeviceNumber)
+                        .orElse(0),
                 modelNumber,
                 selection.categoryCode(),
                 selection.sourceCode());
         request.setStartChannel(selection.startChannel());
         request.setChannelCount(selection.channelCount());
-        MeterSimpleParser.setRequestedRange(
-                selection.startChannel(), selection.channelCount());
         outputRouter.send(request.toByteArray());
     }
 
-    private static int maxChannelsFor(byte modelNumber, int categoryCode) {
+    private static int maxChannelsFor(byte modelNumber, int categoryCode, int sourceCode) {
         if ((modelNumber & 0xFF) == 0x11 && categoryCode == 0x10) {
             return 1;
         }
         return switch (categoryCode) {
-            case 0 -> (modelNumber & 0xFF) == 0x1A ? 32 : 48;
+            case 0 -> (modelNumber & 0xFF) == 0x1A
+                    ? (sourceCode == 2 || sourceCode == 3 ? 32 : 40) : 56;
             case 1, 2 -> 8;
             case 4 -> 2;
-            case 5 -> 1;
-            case 6 -> 13;
+            case 5 -> 10;
+            case 6 -> 4;
             default -> throw new IllegalArgumentException(
                     "Meter category " + categoryCode + " is not available for range requests");
         };
@@ -370,8 +387,12 @@ public class RehydrationManager{
         return telemetry;
     }
 
-    public void injectNewRegistry(CanonicalRegistry newRegistry) {
+    public synchronized void injectNewRegistry(CanonicalRegistry newRegistry) {
+        detachListeners();
         this.registry = newRegistry;
+        meterSelection = null;
+        meterSelectionModelNumber = -1;
+        MeterSimpleParser.reset();
         attachListeners();
     }
 

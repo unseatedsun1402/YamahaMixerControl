@@ -49,6 +49,15 @@ public class MeterRequestTest {
         }, req.toByteArray());
     }
 
+    @Test
+    void m7clAllChannelsUsesZeroCount() {
+        assertArrayEquals(new byte[] {
+            (byte) 0xF0, 0x43, 0x30, 0x3E, 0x11, 0x21,
+            0x00, 0x04, 0x7F, 0x00, 0x00, (byte) 0xF7
+        }, new MeterRequest(0, 0x11, 0, 4)
+                .setStartChannel(127).setChannelCount(0).toByteArray());
+    }
+
     @Tag("Unit")
     @Test
     public void meterRequestChannelEncoding() {

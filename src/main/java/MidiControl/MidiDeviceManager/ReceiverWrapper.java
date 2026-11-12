@@ -130,13 +130,21 @@ public class ReceiverWrapper implements MidiOutput {
     }
 
     public void close() {
+        close(true);
+    }
+
+    void close(boolean closeDevice) {
         if (receiver != null) {
             receiver.close();
         }
-        if (device.isOpen()) {
+        if (closeDevice && device.isOpen()) {
             device.close();
         }
-        logger.log(Level.INFO, "Closed receiver and MIDI device.");
+        logger.log(Level.INFO, closeDevice ? "Closed receiver and MIDI device." : "Closed receiver; shared device remains open.");
+    }
+
+    MidiDevice getDevice() {
+        return device;
     }
 
     public boolean isOpen() {

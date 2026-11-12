@@ -1,6 +1,7 @@
 package MidiControl.Server;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.sound.midi.MidiMessage;
@@ -16,7 +17,7 @@ public class MidiProcessingLoop implements Runnable {
     private final int HEARTBEAT_INTERVAL= 9960; //ms
     private final ConcurrentLinkedQueue<MidiMessage> inputBuffer;
     private final HardwareInputHandler inputHandler;
-    private CanonicalRegistry canonicalRegistry;
+    private volatile CanonicalRegistry canonicalRegistry;
     private final GuiBroadcastListener guiBroadcastListener;
 
     private static final Logger logger = Logger.getLogger(MidiProcessingLoop.class.getName());
@@ -91,8 +92,8 @@ public class MidiProcessingLoop implements Runnable {
                 guiBroadcastListener.onControlChanged(instance, eventValue);
 
             } catch (Exception ex) {
-                logger.warning("Error processing MIDI message: " + ex.getMessage());
-                ex.printStackTrace();
+                logger.log(Level.WARNING, "Error processing MIDI message for profile "
+                        + canonicalRegistry.getDeskType() + ": " + SysexParser.bytesToHex(msg.getMessage()), ex);
             }
         }
     }

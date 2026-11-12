@@ -12,7 +12,8 @@ import java.util.List;
  * - model is 0x1A for the 01V96i and 0x11 for the M7CL; 0x21 selects meter data
  * - source is the meter-point selector (mp), startChannel is sc, and channelCount is ch/cl
  * - startChannel: 0..126 = channel index, 127 = all channels
- * - channelCount: 1..0x3FFF (14-bit) encoded as two 7-bit bytes (high, low)
+ * - channelCount: 0..0x3FFF (14-bit) encoded as two 7-bit bytes (high, low);
+ *   zero is used with the M7CL all-channel selector
  * - offsets: optional tail bytes appended after count bytes (single offsets or vector pairs)
  *
  * All payload bytes (except F0 and F7) are validated as 7-bit (0..127).
@@ -60,10 +61,10 @@ public final class MeterRequest {
     }
 
     /**
-     * Set the channel count (1..0x3FFF). This is encoded as two 7-bit bytes.
+     * Set the channel count (0..0x3FFF). This is encoded as two 7-bit bytes.
      */
     public MeterRequest setChannelCount(int count) {
-        if (count < 1 || count > 0x3FFF) throw new IllegalArgumentException("channelCount must be 1..16383 (14-bit)");
+        if (count < 0 || count > 0x3FFF) throw new IllegalArgumentException("channelCount must be 0..16383 (14-bit)");
         this.channelCount = count;
         return this;
     }

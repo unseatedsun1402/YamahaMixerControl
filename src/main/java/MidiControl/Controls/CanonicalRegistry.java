@@ -344,6 +344,10 @@ public class CanonicalRegistry implements SourceAllInstances, DeskProvider {
         reloadListeners.add(l);
     }
 
+    public void removeReloadListener(RegistryReloadListener l) {
+        reloadListeners.remove(l);
+    }
+
     private void notifyReloadListeners() {
         logger.info("Registry reloaded - notifying listeners");
         for (RegistryReloadListener l : reloadListeners) {

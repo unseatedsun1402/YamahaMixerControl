@@ -39,6 +39,7 @@ import MidiControl.Server.EventStream.EventObject;
 import MidiControl.Server.Protocol.ServerEventSerializer;
 import MidiControl.Server.Rehydration.RehydrationManager;
 import MidiControl.SysexUtils.MappingFiles;
+import MidiControl.SysexUtils.RegistryReloadListener;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
@@ -70,6 +71,7 @@ public class MidiServer implements Runnable, UiModelService{
     private final BankCatalog bankCatalog = new BankCatalog();
     private final ServerRouter serverRouter;
     private CanonicalRegistry canonicalRegistry;
+    private final RegistryReloadListener registryReloadListener = this::onRegistryReloaded;
     private List<ChannelNameAssembler> nameAssemblers = new ArrayList<>();
     private GuiBroadcastListener guiBroadcastListener;
     private ContextDiscoveryEngine discoveryEngine;
@@ -91,7 +93,7 @@ public class MidiServer implements Runnable, UiModelService{
         this.canonicalRegistry =
                 new CanonicalRegistry(sysexMappings, new SysexParser(sysexMappings));
         
-        this.canonicalRegistry.addReloadListener(this::onRegistryReloaded);
+        this.canonicalRegistry.addReloadListener(registryReloadListener);
         this.viewBuilders = new ViewRegistry();
         this.uiFactory = null;
         // Safe fallback listener
@@ -354,7 +356,12 @@ public class MidiServer implements Runnable, UiModelService{
     private void onRegistryReloaded(CanonicalRegistry newRegistry) {
         logger.info("Performing discovery after registry reload");
 
+        if (canonicalRegistry != newRegistry) {
+            canonicalRegistry.removeReloadListener(registryReloadListener);
+            newRegistry.addReloadListener(registryReloadListener);
+        }
         canonicalRegistry = newRegistry;
+        serverRouter.setRegistry(newRegistry);
         logger.info("Replaced server canonical registry");
 
 

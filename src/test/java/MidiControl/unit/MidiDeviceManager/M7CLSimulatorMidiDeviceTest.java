@@ -23,7 +23,7 @@ import MidiControl.MidiDeviceManager.Simulator.M7CLSimulatorMidiDevice;
 class M7CLSimulatorMidiDeviceTest {
 
     @Test
-    void simulatorAppearsInMidiCatalogAndStreamsMeterSysEx() throws Exception {
+    void simulatorAppearsInMidiCatalogAndAnswersMeterSysEx() throws Exception {
         MidiDevice.Info[] infos = MidiDeviceUtils.getDeviceInfos();
         int simulatorIndex = -1;
         for (int i = 0; i < infos.length; i++) {
@@ -91,7 +91,10 @@ class M7CLSimulatorMidiDeviceTest {
             livenessProbe.setMessage(livenessProbeBytes, livenessProbeBytes.length);
             outputReceiver.send(livenessProbe, -1);
 
-            byte[] livenessResponse = received.poll(2, TimeUnit.SECONDS);
+            byte[] livenessResponse;
+            do {
+                livenessResponse = received.poll(2, TimeUnit.SECONDS);
+            } while (livenessResponse != null && (livenessResponse[5] & 0xFF) == 0x21);
             assertNotNull(livenessResponse, "M7CL liveness probe should receive a parameter response");
             assertEquals(18, livenessResponse.length);
             assertEquals(0x10, livenessResponse[2] & 0xFF);

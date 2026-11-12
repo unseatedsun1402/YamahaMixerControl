@@ -22,7 +22,6 @@ public final class MeterSimpleParser {
                 thread.setDaemon(true);
                 return thread;
             });
-    private static volatile MeterRange requestedRange = new MeterRange(0, 128);
 
     static {
         meterProcessor.scheduleWithFixedDelay(
@@ -35,14 +34,10 @@ public final class MeterSimpleParser {
     public static void addListener(MeterUpdateListener l) { listeners.add(l); }
     public static void removeListener(MeterUpdateListener l) { listeners.remove(l); }
 
-    public static void setRequestedRange(int startChannel, int channelCount) {
-        if (startChannel < 0 || startChannel > 127) {
-            throw new IllegalArgumentException("startChannel must be 0..127");
+    public static void reset() {
+        synchronized (eventBuffer) {
+            eventBuffer.clear();
         }
-        if (channelCount < 1 || channelCount > 0x3FFF) {
-            throw new IllegalArgumentException("channelCount must be 1..16383");
-        }
-        requestedRange = new MeterRange(startChannel, channelCount);
     }
 
     /**
@@ -57,8 +52,6 @@ public final class MeterSimpleParser {
             int category = msg[6] & 0xFF;
             int source   = msg[7] & 0xFF;
             int responseStart = msg[8] & 0x7F;
-            MeterRange range = requestedRange;
-
             // Determine Yamaha meter format based on model
             int bytesPer = MeterTools.bytesPerForModel(model);
 
@@ -70,8 +63,24 @@ public final class MeterSimpleParser {
             if (payloadLen <= 0)
                 return List.of();
 
-            // How many meters contained?
-            int count = Math.min(payloadLen / bytesPer, range.channelCount());
+            if (payloadLen % bytesPer != 0) {
+                logger.warning("Ignoring incomplete meter value");
+                return null;
+            }
+            if (model == 0x0F && category == 0x10) {
+                logger.warning("M7CL sigma clip bitmaps are not level meter values");
+                return null;
+            }
+            if (source == 0x7F && model == 0x1A) {
+                logger.warning("01V96i all-point meter responses are not supported");
+                return null;
+            }
+            int pointsPerChannel = model == 0x0F && category == 0 && source == 0x7F ? 9 : 1;
+            int count = payloadLen / bytesPer;
+            if (count % pointsPerChannel != 0) {
+                logger.warning("Ignoring incomplete all-point meter response");
+                return null;
+            }
             if (count <= 0)
                 return List.of();
 
@@ -100,11 +109,11 @@ public final class MeterSimpleParser {
 
                 MeterDTO dto = new MeterDTO(
                         rawInt,
-                        responseStart + i,
+                        responseStart + i / pointsPerChannel,
                         toCentiDbInt(centi),
                         (byte) model,
                         MeterCategory.fromInt(category),
-                        MeterSource.fromInt(source, model),
+                        MeterSource.fromInt(pointsPerChannel == 1 ? source : i % pointsPerChannel, model),
                         (bytesPer == 2),
                         timestamp
                 );
@@ -166,5 +175,4 @@ public final class MeterSimpleParser {
         }
     }
 
-    private record MeterRange(int startChannel, int channelCount) {}
 }

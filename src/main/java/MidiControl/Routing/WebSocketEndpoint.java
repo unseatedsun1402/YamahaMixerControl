@@ -4,6 +4,7 @@ import MidiControl.ContextModel.BankContext;
 import MidiControl.Access.Authenticate;
 import MidiControl.Access.PasswordManager;
 import MidiControl.Server.EventStream.EventObject;
+import MidiControl.Server.EventStream.ServerResponses;
 import MidiControl.Server.Protocol.NotifyClients;
 import MidiControl.Server.Protocol.ServerEvent;
 import MidiControl.Server.MidiServer;
@@ -27,6 +28,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -237,17 +239,20 @@ public class WebSocketEndpoint{
                     try {
                         server.getServerRouter().handleMessage(session, message); // inefficent to get the serverrouter each message, swap to a dynamic reference
                     } catch (Exception e) {
-                        warningDebounced(
-                            "process-message",
-                            "Failed to process message"
-                        );
+                        String requestId = json.has("requestId") && json.get("requestId").isJsonPrimitive()
+                                ? json.get("requestId").getAsString() : null;
+                        logger.log(Level.WARNING, "Failed to process WebSocket request type=" + type
+                                + " session=" + session.getId() + " requestId=" + requestId, e);
+                        ServerResponses.error(session, requestId, "REQUEST_FAILED",
+                                "The request failed; check the server log for details");
                     }
 
                     break;
             }
 
         } catch (Exception e) {
-            logger.severe("Failed to process message: " + e.getMessage());
+            logger.log(Level.WARNING, "Failed to process WebSocket message for session "
+                    + session.getId(), e);
         }
     }
 

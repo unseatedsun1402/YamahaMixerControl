@@ -48,15 +48,15 @@ public class ServerRouter {
     private final ServerRequestParser requestParser;
 
     private long lastMeterRefreshNanos;
+    private boolean meterRefreshSent;
     private static final Logger logger = Logger.getLogger(ServerRouter.class.getName());
     private final MidiIOManager ioManager;
     private CanonicalRegistry registry;
     private StateRehydrationService rehydrationService;
     private Settings serverSettings = new ServerSettings();
 
-    private static final long TIMEOUT_MS = 10_000;
     private static final long METER_REFRESH_INTERVAL_NANOS =
-            TimeUnit.MILLISECONDS.toNanos(TIMEOUT_MS);
+            TimeUnit.MILLISECONDS.toNanos(9_000);
     private static boolean debug = false;
 
     public ServerRouter(UiModelService uiModels,
@@ -146,18 +146,15 @@ public class ServerRouter {
 
     private synchronized void handleMeterKeepAlive() {
         long now = System.nanoTime();
-        if ((now - lastMeterRefreshNanos) > METER_REFRESH_INTERVAL_NANOS
+        if ((!meterRefreshSent || (now - lastMeterRefreshNanos) >= METER_REFRESH_INTERVAL_NANOS)
                 && rehydrationService != null) {
             lastMeterRefreshNanos = now;
-            NotifyClients.publish(
-                ServerEvent.warning("KEEP_ALIVE",
-                    "Meter keep-alive timeout – forcing meter refresh")
-            );
+            meterRefreshSent = true;
             rehydrationService.requestMeters();
         }
     }
 
-    private void handleRequestMeters(Session session, String requestId, JsonObject payload) {
+    private synchronized void handleRequestMeters(Session session, String requestId, JsonObject payload) {
         if (rehydrationService == null) {
             ServerResponses.error(
                     session, requestId, "METERS_UNAVAILABLE", "Meter service is unavailable");
@@ -171,6 +168,8 @@ public class ServerRouter {
             int channelCount = payload.get("channelCount").getAsInt();
             rehydrationService.requestMeters(
                     categoryCode, sourceCode, startChannel, channelCount);
+            lastMeterRefreshNanos = System.nanoTime();
+            meterRefreshSent = true;
             if (requestId != null) {
                 ServerResponses.ackOk(session, requestId);
             }
@@ -321,6 +320,7 @@ public class ServerRouter {
         ServerResponses.ackStatus(session, requestId, ok);
 
         if (ok) {
+            resetMeterRefresh();
             logger.info("Session[" + session.getId() + "] selected MIDI output device index " + index);
 
             NotifyClients.publish(
@@ -342,7 +342,11 @@ public class ServerRouter {
         }
     }
 
-    private boolean handleApplyMidiSettings(Session session, String requestId, JsonObject payload) {
+    private synchronized void handleApplyMidiSettings(Session session, String requestId, JsonObject payload) {
+        ServerResponses.ack(session, requestId, applyMidiSettings(payload));
+    }
+
+    private JsonObject applyMidiSettings(JsonObject payload) {
         logger.info("Applying new settings "+payload.toString());
         int newInput = payload.get("inputDeviceId").getAsInt();
         int newOutput = payload.get("outputDeviceId").getAsInt();
@@ -351,13 +355,23 @@ public class ServerRouter {
         boolean mainprofile = payload.get("mainprofile").getAsBoolean();
         boolean highprofile = payload.get("highprofile").getAsBoolean();
 
-        boolean outOk = ioManager.trySetOutputDevice(newOutput);
-        boolean inOk = ioManager.trySetInputDevice(newInput);
+        boolean outOk;
+        boolean inOk;
+        synchronized (ioManager) {
+            outOk = ioManager.trySetOutputDevice(newOutput);
+            inOk = ioManager.trySetInputDevice(newInput);
 
-        if (safeprofile) ioManager.setThroughputProfile(MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile.SAFE_DIN);
-        else if (mainprofile) ioManager.setThroughputProfile(MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile.FAST_USB);
-        else if (highprofile) ioManager.setThroughputProfile(MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile.FAST_RTP);
-        else ioManager.setThroughputProfile(MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile.SAFE_DIN);
+            if (safeprofile) ioManager.setThroughputProfile(MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile.SAFE_DIN);
+            else if (mainprofile) ioManager.setThroughputProfile(MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile.FAST_USB);
+            else if (highprofile) ioManager.setThroughputProfile(MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile.FAST_RTP);
+            else ioManager.setThroughputProfile(MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile.SAFE_DIN);
+        }
+        if (!inOk || !outOk) {
+            String message = String.format("MIDI devices unavailable: input index %d (%s), output index %d (%s)",
+                    newInput, inOk ? "open" : "failed", newOutput, outOk ? "open" : "failed");
+            logger.warning(message);
+            NotifyClients.publish(ServerEvent.error("MIDI", message));
+        }
         
         List<SysexMapping> newMappings = SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(mappingString));
         if (newMappings != null ){
@@ -394,27 +408,38 @@ public class ServerRouter {
         JsonObject p = new JsonObject();
         p.addProperty("type", "apply-settings");
         p.addProperty("midi_status", (inOk && outOk) ? "ok" : "error");
+        p.addProperty("input_status", inOk ? "ok" : "error");
+        p.addProperty("output_status", outOk ? "ok" : "error");
         p.addProperty("mapping_status", (newMappings != null) ? "ok" : "error");
-        ServerResponses.ack(session, requestId, p);
-
-        return ( inOk && outOk && (newMappings != null) );
+        return p;
     }
 
-    private void handleSaveMidiSettings(Session session, String requestId, JsonObject payload) {
+    private synchronized void handleSaveMidiSettings(Session session, String requestId, JsonObject payload) {
         logger.info("Saving settings "+payload.toString());
         int newInput = payload.get("inputDeviceId").getAsInt();
         int newOutput = payload.get("outputDeviceId").getAsInt();
         String consoleName = payload.get("consoleType").getAsString();
 
-        if(handleApplyMidiSettings(session, requestId, payload)){
-                serverSettings.newSettings(newInput,
-                ioManager.getMidiIn().getDeviceInfo().getName(),
-                newOutput,
-                ioManager.getMidiOut().getDeviceInfo().getName(),
-                consoleName);
-            serverSettings.saveSettings();
+        JsonObject result = applyMidiSettings(payload);
+        boolean saved = false;
+        if ("ok".equals(result.get("midi_status").getAsString())
+                && "ok".equals(result.get("mapping_status").getAsString())) {
+            serverSettings.newSettings(newInput,
+                    ioManager.getMidiIn().getDeviceInfo().getName(),
+                    newOutput,
+                    ioManager.getMidiOut().getDeviceInfo().getName(),
+                    consoleName);
+            saved = serverSettings.saveSettings();
+            if (!saved) {
+                logger.severe("Failed to save MIDI settings to disk");
+                NotifyClients.publish(ServerEvent.error("MIDI", "Failed to save MIDI settings to disk"));
+            }
         }
-        else{logger.warning("Failed to save settings, configuration not accepted: "+payload);}
+        else {
+            logger.warning("Failed to save settings, configuration not accepted: " + payload);
+        }
+        result.addProperty("save_status", saved ? "ok" : "error");
+        ServerResponses.ack(session, requestId, result);
     }
 
     private void handleRegisterSession(Session session, String requestId, JsonObject payload) {
@@ -425,5 +450,15 @@ public class ServerRouter {
 
     public HardwareOutputRouter getOutputRouter() {
         return outputRouter;
+    }
+
+    public synchronized void setRegistry(CanonicalRegistry registry) {
+        this.registry = registry;
+        outputRouter.setRegistry(registry);
+        meterRefreshSent = false;
+    }
+
+    private synchronized void resetMeterRefresh() {
+        meterRefreshSent = false;
     }
 }

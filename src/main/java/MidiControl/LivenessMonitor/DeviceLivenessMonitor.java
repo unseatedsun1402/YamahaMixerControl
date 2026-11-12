@@ -19,7 +19,7 @@ public class DeviceLivenessMonitor{
     private Timer timer;
     private static final long CHECK_INTERVAL = 5000; // 5 seconds
     private static final Logger logger = Logger.getLogger(DeviceLivenessMonitor.class.getName());
-    private DeskProvider deskModelProvider;
+    private volatile DeskProvider deskModelProvider;
     private static boolean debug = false;
     private int consecutiveFailures = 0;
     private static final int FAILURE_THRESHOLD = 3;
@@ -59,6 +59,13 @@ public class DeviceLivenessMonitor{
             return;
         }
         if (debug) logger.fine(String.format("Checking liveness of %s", deskType));
+        if (!ioManager.hasValidDevices()) {
+            consecutiveFailures = 0;
+            NotifyClients.publish(ServerEvent.warning(
+                    "LIVENESS", String.format("Desk %s  is not connected", deskType),
+                    isConnectedObject(false)));
+            return;
+        }
         boolean isAlive = deskDiscovery.probeForLiveness(deskType);
         if (isAlive) {
             if (debug) logger.fine("Still alive");

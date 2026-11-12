@@ -53,17 +53,25 @@ public class InputWrapper implements MidiInput {
 
   @Override
   public void close() {
+    close(true);
+  }
+
+  void close(boolean closeDevice) {
     if (transmitter != null) {
       transmitter.close();
     }
     if (inputReceiver != null) {
       inputReceiver.close();
     }
-    if (device.isOpen()) {
+    if (closeDevice && device.isOpen()) {
       device.close();
     }
     Logger.getLogger(InputWrapper.class.getName())
-        .log(Level.INFO, "Closed transmitter and device.");
+        .log(Level.INFO, closeDevice ? "Closed transmitter and device." : "Closed transmitter; shared device remains open.");
+  }
+
+  MidiDevice getDevice() {
+    return device;
   }
 
   public Transmitter getRawTransmitter() {
