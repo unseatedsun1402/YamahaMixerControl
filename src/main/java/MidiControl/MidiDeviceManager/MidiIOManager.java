@@ -15,7 +15,7 @@ import MidiControl.MidiDeviceManager.MidiSendEngine.ThroughputProfile;
 public class MidiIOManager {
 
     private MidiOutput midiOut;
-    private MidiInput  midiIn;
+    private volatile MidiInput  midiIn;
     private int        outPort;
     private int        inPort;
     private MidiServer server;
