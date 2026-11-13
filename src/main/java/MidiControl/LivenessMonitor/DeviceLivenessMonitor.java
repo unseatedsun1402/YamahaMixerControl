@@ -10,6 +10,7 @@ import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.Controls.DeskProvider;
 import MidiControl.DeskDiscovery.DeskDiscovery;
 import MidiControl.MidiDeviceManager.MidiIOManager;
+import MidiControl.MidiDeviceManager.MidiInput;
 import MidiControl.Server.Protocol.NotifyClients;
 import MidiControl.Server.Protocol.ServerEvent;
 
@@ -59,7 +60,8 @@ public class DeviceLivenessMonitor{
             return;
         }
         if (debug) logger.fine(String.format("Checking liveness of %s", deskType));
-        boolean isAlive = deskDiscovery.probeForLiveness(deskType);
+        boolean isAlive = hasRecentMidiInput() || deskDiscovery.probeForLiveness(deskType)
+                || hasRecentMidiInput();
         if (isAlive) {
             if (debug) logger.fine("Still alive");
             NotifyClients.publish(
@@ -91,6 +93,13 @@ public class DeviceLivenessMonitor{
                 isConnectedObject(false)
             )
         );
+    }
+
+    private boolean hasRecentMidiInput() {
+        // Incoming traffic alone does not verify the output path or the sender's identity.
+        MidiInput input = ioManager.getMidiIn();
+        return input != null && input.isOpen() && input.getInputReceiver() != null
+                && input.getInputReceiver().hasRecentInput(CHECK_INTERVAL);
     }
 
     public void injectNewRegistry(CanonicalRegistry newRegistry) {
