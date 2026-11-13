@@ -8,7 +8,7 @@ def generate_block(start_hex, canonical_prefix,
 
     Example:
         "007E"
-        "015E"
+        "00DE"
         "3C30"
     """
 
@@ -33,13 +33,13 @@ blocks = [
     # AUX LEVELS
 
     ("007E", "kInputAUX.kAUX1Level", 40),
-    ("015E", "kInputAUX.kAUX2Level", 40),
-    ("023E", "kInputAUX.kAUX3Level", 40),
-    ("031E", "kInputAUX.kAUX4Level", 40),
-    ("03FE", "kInputAUX.kAUX5Level", 40),
-    ("045E", "kInputAUX.kAUX6Level", 40),
-    ("053E", "kInputAUX.kAUX7Level", 40),
-    ("061E", "kInputAUX.kAUX8Level", 40),
+    ("00DE", "kInputAUX.kAUX2Level", 40),
+    ("013E", "kInputAUX.kAUX3Level", 40),
+    ("019E", "kInputAUX.kAUX4Level", 40),
+    ("01FE", "kInputAUX.kAUX5Level", 40),
+    ("025E", "kInputAUX.kAUX6Level", 40),
+    ("02BE", "kInputAUX.kAUX7Level", 40),
+    ("031E", "kInputAUX.kAUX8Level", 40),
 
     # INPUT FADER
 
@@ -47,7 +47,7 @@ blocks = [
 
     # INPUT PAN
 
-    ("0216", "kInputPan.kChannelPan", 40),
+    ("2096", "kInputChannelPan.kChannelPan", 40),
 
     # INPUT COMP THRESHOLD
 

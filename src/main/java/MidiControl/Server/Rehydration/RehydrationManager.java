@@ -57,7 +57,7 @@ public class RehydrationManager{
     private static final long CONTROL_PERIOD_MS = 200;
     private ScheduledFuture<?> controlLoopFuture;
 
-    private static long BASE_DELAY_MS = 4L;
+    private static long BASE_DELAY_MS = 6L;
     private static final long SAFE_DELAY_MS = 20;
     private static final long WARNING_RTT_MS = 60;
     private static final long CRITICAL_RTT_MS = 100;
