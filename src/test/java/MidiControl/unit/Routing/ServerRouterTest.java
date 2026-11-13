@@ -15,6 +15,9 @@ import MidiControl.Mocks.MockMidiOut;
 import MidiControl.Mocks.MockMidiServer;
 import MidiControl.Mocks.MockSubscriptionManager;
 import MidiControl.Server.ServerRouter;
+import MidiControl.Server.StateRehydrationService;
+import MidiControl.Server.Rehydration.RehydrationListener;
+import MidiControl.Server.Rehydration.RehydrationManager;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
@@ -295,5 +298,61 @@ public class ServerRouterTest {
         //m7cl will have controls that 01v96 has not and vice versa
         assertNull(registry.getGroup("kAUXToMatrix"));
         assertNotNull(registry.getGroup("kMixToMatrix"));
+    }
+
+    /** RehydrationManager subclass that records rehydrateAll() calls without needing a real registry/scheduler. */
+    private static class TrackingRehydrationManager extends RehydrationManager {
+        int rehydrateAllCallCount = 0;
+
+        @Override
+        public synchronized void rehydrateAll(RehydrationListener listener) {
+            rehydrateAllCallCount++;
+            listener.onFinished();
+        }
+    }
+
+    @Test
+    void testTriggerRehydration_NoServiceInjected_ReturnsError() {
+        Env env = makeEnv();
+
+        env.router.handleMessage(env.session, """
+            {"requestId": 1,"type":"trigger-rehydration","payload":{}}
+        """);
+
+        String msg = env.session.lastSent;
+        assertNotNull(msg, "Router did not send a response for trigger-rehydration");
+        assertEquals("error", typeOf(msg), msg);
+        assertEquals("REHYDRATION_UNAVAILABLE", payloadOf(msg).get("code").getAsString(), msg);
+    }
+
+    @Test
+    void testTriggerRehydration_StartsRehydration() {
+        Env env = makeEnv();
+        TrackingRehydrationManager rehydrationManager = new TrackingRehydrationManager();
+        env.router.injectApp(new StateRehydrationService(rehydrationManager, env.io));
+
+        env.router.handleMessage(env.session, """
+            {"requestId": 1,"type":"trigger-rehydration","payload":{}}
+        """);
+
+        assertEquals(1, rehydrationManager.rehydrateAllCallCount);
+        String msg = env.session.lastSent;
+        assertNotNull(msg, "Router did not send a response for trigger-rehydration");
+        assertEquals("ack", typeOf(msg), msg);
+        assertEquals("ok", payloadOf(msg).get("status").getAsString(), msg);
+    }
+
+    @Test
+    void testApplyMidiSettings_DoesNotTriggerRehydration() {
+        Env env = makeEnv();
+        TrackingRehydrationManager rehydrationManager = new TrackingRehydrationManager();
+        env.router.injectApp(new StateRehydrationService(rehydrationManager, env.io));
+
+        env.router.handleMessage(env.session, """
+            {"type": "apply-midi-settings", "requestId": "req-1", "payload": {"inputDeviceId":0,"outputDeviceId":0,"consoleType":"YAMAHA_M7CL","safeprofile":"true","mainprofile":"false","highprofile":"false"}}
+        """);
+
+        assertEquals(0, rehydrationManager.rehydrateAllCallCount,
+                "Applying settings must not automatically trigger rehydration");
     }
 }
