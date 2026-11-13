@@ -25,7 +25,9 @@ public class InputWrapper implements MidiInput {
     if (!device.isOpen()) {
       device.open();
       Logger.getLogger(InputWrapper.class.getName())
-          .log(Level.INFO, "Opened MIDI device for transmitter: "+device.getDeviceInfo().getName());
+          .log(
+              Level.INFO,
+              "Opened MIDI device for transmitter: " + device.getDeviceInfo().getName());
     }
 
     transmitter = device.getTransmitter();
@@ -77,6 +79,6 @@ public class InputWrapper implements MidiInput {
 
   @Override
   public MidiInputReceiver getInputReceiver() {
-      return (MidiInputReceiver) inputReceiver;
+    return inputReceiver;
   }
 }

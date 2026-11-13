@@ -6,8 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import MidiControl.NrpnUtils.*;
 
@@ -15,9 +18,7 @@ import MidiControl.NrpnUtils.NrpnMapping;
 
 public class NrpnMappingLoaderTest {
     @Test
-    void testLoadAllFromDirectory_LoadsValidJson() throws Exception {
-        Path tempDir = Files.createTempDirectory("nrpn-test");
-
+    void testLoadAllFromDirectory_LoadsValidJson(@TempDir Path tempDir) throws Exception {
         // Create two small JSON files
         String json1 = "[{\"msb\":\"1\",\"lsb\":\"0\",\"canonical_id\":\"test.a\"}]";
         String json2 = "[{\"msb\":\"2\",\"lsb\":\"0\",\"canonical_id\":\"test.b\"}]";
@@ -28,14 +29,12 @@ public class NrpnMappingLoaderTest {
         List<NrpnMapping> result = NrpnMappingLoader.loadAllFromDirectory(tempDir);
 
         assertEquals(2, result.size());
-        assertEquals("test.a", result.get(0).getCanonicalId());
-        assertEquals("test.b", result.get(1).getCanonicalId());
+        assertEquals(Set.of("test.a", "test.b"),
+                result.stream().map(NrpnMapping::getCanonicalId).collect(Collectors.toSet()));
     }
 
     @Test
-    void testLoadAllFromDirectory_ContinuesOnInvalidJson() throws Exception {
-        Path tempDir = Files.createTempDirectory("nrpn-test");
-
+    void testLoadAllFromDirectory_ContinuesOnInvalidJson(@TempDir Path tempDir) throws Exception {
         // Valid file
         String validJson = "[{\"msb\":\"1\",\"lsb\":\"0\",\"canonical_id\":\"ok\",\"value_mode\":0}]";
         Files.writeString(tempDir.resolve("good.json"), validJson);
@@ -60,9 +59,9 @@ public class NrpnMappingLoaderTest {
     }
 
     @Test
-    void testLoadSingleFile_SkipsInvalidMappings() throws Exception {
+    void testLoadSingleFile_SkipsInvalidMappings(@TempDir Path tempDir) throws Exception {
         // Create a temporary JSON file with missing required fields
-        Path temp = Files.createTempFile("nrpn-invalid", ".json");
+        Path temp = tempDir.resolve("nrpn-invalid.json");
 
         // Missing canonical_id
         String json = """

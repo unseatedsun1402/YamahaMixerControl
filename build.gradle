@@ -114,6 +114,51 @@ test {
     }
 }
 
+tasks.register('unitTest', Test) {
+    description = 'Runs unit tests (MidiControl.unit.*).'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        excludeTags 'stress'
+    }
+    include 'MidiControl/unit/**'
+}
+
+tasks.register('functionalTest', Test) {
+    description = 'Runs functional and integration tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        excludeTags 'stress'
+    }
+    include 'MidiControl/functional/**', 'MidiControl/integration/**'
+}
+
+// Basic javac lint (JDK built-in): any lint warning fails the build.
+tasks.register('lintJava') {
+    description = 'Compiles main and test sources with -Xlint and -Werror.'
+    group = 'verification'
+    dependsOn 'lintMainJava', 'lintTestJava'
+}
+
+tasks.register('lintMainJava', JavaCompile) {
+    source = sourceSets.main.java
+    classpath = sourceSets.main.compileClasspath
+    destinationDirectory = layout.buildDirectory.dir('lint/main')
+    options.annotationProcessorPath = sourceSets.main.annotationProcessorPath
+    options.compilerArgs += ['-Xlint:cast,deprecation,removal,unchecked,rawtypes,try,fallthrough,empty,dep-ann,overrides,static,varargs,finally', '-Werror']
+}
+
+tasks.register('lintTestJava', JavaCompile) {
+    source = sourceSets.test.java
+    classpath = sourceSets.test.compileClasspath + files(sourceSets.main.output)
+    destinationDirectory = layout.buildDirectory.dir('lint/test')
+    options.annotationProcessorPath = sourceSets.test.annotationProcessorPath
+    options.compilerArgs += ['-Xlint:cast,deprecation,removal,unchecked,rawtypes,try,fallthrough,empty,dep-ann,overrides,static,varargs,finally', '-Werror']
+}
+
 tasks.register('stressTest', Test) {
     description = 'Runs opt-in MIDI send pipeline stress tests.'
     group = 'verification'
