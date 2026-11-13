@@ -6,6 +6,7 @@ import javax.sound.midi.MidiUnavailableException;
 import java.util.Arrays;
 
 import MidiControl.MidiDeviceManager.Simulator.M7CLSimulatorMidiDevice;
+import MidiControl.MidiDeviceManager.Simulator.O1V96iSimulatorMidiDevice;
 
 public final class MidiDeviceUtils {
 
@@ -15,7 +16,9 @@ public final class MidiDeviceUtils {
 
   public static MidiDevice.Info[] getDeviceInfos() {
     MidiDevice.Info[] physicalInfos = MidiSystem.getMidiDeviceInfo();
-    MidiDevice.Info[] simulatorInfos = {M7CLSimulatorMidiDevice.getSimulatorInfo()};
+    MidiDevice.Info[] simulatorInfos = {
+        M7CLSimulatorMidiDevice.getSimulatorInfo(), O1V96iSimulatorMidiDevice.getSimulatorInfo()
+    };
     MidiDevice.Info[] infos = Arrays.copyOf(
         physicalInfos, physicalInfos.length + simulatorInfos.length);
     System.arraycopy(simulatorInfos, 0, infos, physicalInfos.length, simulatorInfos.length);
@@ -33,6 +36,9 @@ public final class MidiDeviceUtils {
   public static MidiDevice getDevice(MidiDevice.Info info) throws MidiUnavailableException {
     if (M7CLSimulatorMidiDevice.isSimulatorInfo(info)) {
       return new M7CLSimulatorMidiDevice();
+    }
+    if (O1V96iSimulatorMidiDevice.isSimulatorInfo(info)) {
+      return new O1V96iSimulatorMidiDevice();
     }
     return MidiSystem.getMidiDevice(info);
   }
