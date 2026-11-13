@@ -483,6 +483,17 @@ export class WebSocketClient {
     this._send(message);
   }
 
+  triggerRehydration() {
+    const message = {
+      type: "trigger-rehydration",
+      requestId: `req-${++this.requestCounter}`,
+      payload: {}
+    };
+
+    console.info("[WebSocketClient] Triggering desk rehydration:", message);
+    this._send(message);
+  }
+
   requestChannelNames() {
     const message = {
       type: "request-channel-names",

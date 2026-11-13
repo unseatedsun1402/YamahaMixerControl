@@ -99,6 +99,7 @@ public class ServerRouter {
             case "set-midi-device" -> handleSetMidiDevice(session, requestId, payload);
             case "apply-midi-settings" -> handleApplyMidiSettings(session, requestId, payload);
             case "save-midi-settings" -> handleSaveMidiSettings(session, requestId, payload);
+            case "trigger-rehydration" -> handleTriggerRehydration(session, requestId);
             case "request-meters" -> handleRequestMeters(session, requestId, payload);
             case "meter-keep-alive" -> handleMeterKeepAlive();
             case "request-channel-names" -> handleRequestChannelNames(session, requestId, payload);
@@ -377,20 +378,6 @@ public class ServerRouter {
             );
         }
 
-        if (ioManager.hasValidDevices()) {
-            if(rehydrationService == null){
-                logger.severe("App for rehydration is null - cannot rehydrate");
-                
-                NotifyClients.publish(
-                    ServerEvent.error(
-                        "STATE",
-                        "Rehydration service unavailable – system state not re-applied"
-                    )
-                );
-            }
-            else { rehydrationService.rehydrate(); }
-        }
-
         JsonObject p = new JsonObject();
         p.addProperty("type", "apply-settings");
         p.addProperty("midi_status", (inOk && outOk) ? "ok" : "error");
@@ -398,6 +385,23 @@ public class ServerRouter {
         ServerResponses.ack(session, requestId, p);
 
         return ( inOk && outOk && (newMappings != null) );
+    }
+
+    private void handleTriggerRehydration(Session session, String requestId) {
+        if (rehydrationService == null) {
+            ServerResponses.error(
+                    session, requestId, "REHYDRATION_UNAVAILABLE", "Rehydration service is unavailable");
+            return;
+        }
+        if (!ioManager.hasValidDevices()) {
+            ServerResponses.error(
+                    session, requestId, "REHYDRATION_UNAVAILABLE", "No valid MIDI devices are open");
+            return;
+        }
+
+        logger.info("Rehydration manually triggered from settings page");
+        rehydrationService.rehydrate();
+        ServerResponses.ackOk(session, requestId);
     }
 
     private void handleSaveMidiSettings(Session session, String requestId, JsonObject payload) {

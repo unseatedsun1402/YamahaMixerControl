@@ -192,6 +192,15 @@ document.getElementById("rescan-devices").addEventListener("click", () => {
   ws.requestMidiDevices();
 });
 
+document.getElementById("trigger-rehydration").addEventListener("click", () => {
+  if (!ws.authenticated) {
+    showStatus("Authenticate before syncing desk state");
+    return;
+  }
+  ws.triggerRehydration();
+  showStatus("Desk sync started");
+});
+
 function populateDeviceDropdowns(devices) {
   const inputSelect = document.getElementById("midi-input-device");
   const outputSelect = document.getElementById("midi-output-device");
