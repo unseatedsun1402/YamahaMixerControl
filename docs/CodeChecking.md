@@ -313,3 +313,18 @@ Run `isort .` again.
 - **Flake8** → linting and error detection  
 
 Run all three before committing to keep the codebase clean and consistent.
+
+---
+
+# 10. CI gates and fail-fast scripts
+
+`.github/workflows/ci.yml` runs on every pull request: **Lint** (Python `compileall -W error` and `./gradlew lintJava`, which is `javac -Xlint -Werror`), then **Unit tests** (`./gradlew unitTest`) and **Functional tests** (`./gradlew functionalTest`, includes `integration`).
+
+Run the same gates locally, stopping at the first failure:
+
+```
+scripts/fail-fast.sh        # or scripts\fail-fast.ps1
+scripts/fail-fast-fix.sh    # or scripts\fail-fast-fix.ps1  (formats changed Java files with tools/google-java-format.jar first; BASE_REF defaults to origin/main)
+```
+
+To block merging, mark the `Lint`, `Unit tests` and `Functional tests` checks as required in the branch protection rule (Settings → Branches).

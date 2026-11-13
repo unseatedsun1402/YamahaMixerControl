@@ -1,5 +1,10 @@
 package MidiControl.MidiDeviceManager;
 
+import MidiControl.SysexUtils.MappingFiles;
+import MidiControl.SystemTools.ConfigDirectoryProvider;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -7,233 +12,271 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
+public class ServerSettings implements Settings {
+  private static Logger logger = Logger.getLogger(ServerSettings.class.getName());
+  private static final String SETTINGS_DIR = "MidiControl";
+  private static String savePath;
+  private static String cache = null;
 
-import MidiControl.SysexUtils.MappingFiles;
-import MidiControl.SystemTools.ConfigDirectoryProvider;
+  public int inputDeviceIndex = -1;
+  public String inputDeviceName;
+  public int outputDeviceIndex = -1;
+  public String outputDeviceName;
 
-public class ServerSettings implements Settings{
-    private static Logger logger = Logger.getLogger(ServerSettings.class.getName());
-    private static final String SETTINGS_DIR="MidiControl";
-    private static String savePath;
-    private static String cache = null;
-  
-    public int inputDeviceIndex = -1;
-    public String inputDeviceName;
-    public int outputDeviceIndex = -1;
-    public String outputDeviceName;
+  public String consoleMappingsPath;
+  private String consoleName;
+  public String preferredHostAddress;
 
-    public String consoleMappingsPath;
-    private String consoleName;
-    public String preferredHostAddress;
+  public ServerSettings() {
+    loadSettings();
+  }
 
-    public ServerSettings(){
-        loadSettings();
+  static {
+    String configPath = ConfigDirectoryProvider.getConfigPath(SETTINGS_DIR);
+    String settingsName = "settings.conf";
+    savePath = configPath + "\\" + settingsName;
+    if (System.getProperty("os.name").toLowerCase().contains("win"))
+      savePath = configPath + "\\" + settingsName;
+    logger.info(String.format("Save path for settings.conf: %s", savePath));
+  }
+
+  public static String getSavePath() {
+    return savePath;
+  }
+
+  @Override
+  public String getSettings() {
+    if (cache != null) {
+      logger.fine("Cache hit " + cache);
+      return cache;
     }
-
-    static {
-        String configPath = ConfigDirectoryProvider.getConfigPath(SETTINGS_DIR);
-        String settingsName = "settings.conf";
-        savePath=configPath+"\\"+settingsName;
-        if(System.getProperty("os.name").toLowerCase().contains("win")) savePath=configPath+"\\"+settingsName;
-        logger.info(String.format("Save path for settings.conf: %s",savePath));
-    }
-
-    public static String getSavePath(){return savePath;}
-
-    @Override
-    public String getSettings(){
-        if(cache != null){logger.fine("Cache hit "+cache); return cache;}
-        logger.info(String.format("Reading settings from save path: %s",savePath));
-        try (BufferedReader reader = new BufferedReader(new FileReader(savePath))){
-            boolean reading = true;
-            String settings="";
-            String line;
-            while (reading){
-                line = reader.readLine();
-                if(line == null){break;}
-                settings+=line;
-            }
-            reader.close();
-            return settings;
+    logger.info(String.format("Reading settings from save path: %s", savePath));
+    try (BufferedReader reader = new BufferedReader(new FileReader(savePath))) {
+      boolean reading = true;
+      String settings = "";
+      String line;
+      while (reading) {
+        line = reader.readLine();
+        if (line == null) {
+          break;
         }
-        catch (IOException e){
-            logger.warning("Failed to open "+savePath);
-        }
-
-        return "empty";
+        settings += line;
+      }
+      return settings;
+    } catch (IOException e) {
+      logger.warning("Failed to open " + savePath);
     }
 
-    public void loadSettings() {
+    return "empty";
+  }
 
-        if(cache == null) {
-            String json = getSettings();
+  public void loadSettings() {
 
-            if("empty".equals(json)) {
-                logger.warning("Loading settings failed");
-                return;
-            }
+    if (cache == null) {
+      String json = getSettings();
 
-            if(json == null || json.trim().isEmpty()) {
-                logger.warning("Settings file is empty");
-                return;
-            }
+      if ("empty".equals(json)) {
+        logger.warning("Loading settings failed");
+        return;
+      }
 
-            cache = json;
-        }
+      if (json == null || json.trim().isEmpty()) {
+        logger.warning("Settings file is empty");
+        return;
+      }
 
-        try {
-
-            JsonObject loadedSettings =
-                new Gson().fromJson(cache, JsonObject.class);
-
-            if(loadedSettings == null) {
-                logger.warning("Settings file contains no JSON object");
-                return;
-            }
-
-            inputDeviceIndex =
-                loadedSettings.has("inputDeviceIndex")
-                ? loadedSettings.get("inputDeviceIndex").getAsInt() : -1;
-
-            outputDeviceIndex =
-                loadedSettings.has("outputDeviceIndex")
-                ? loadedSettings.get("outputDeviceIndex").getAsInt() : -1;
-
-            inputDeviceName =
-                loadedSettings.has("inputDeviceName")
-                ? loadedSettings.get("inputDeviceName").getAsString() : null;
-
-            outputDeviceName =
-                loadedSettings.has("outputDeviceName")
-                ? loadedSettings.get("outputDeviceName").getAsString() : null;
-
-            consoleName =
-                loadedSettings.has("consoleName")
-                ? loadedSettings.get("consoleName").getAsString() : null;
-
-            preferredHostAddress =
-                loadedSettings.has("preferredHostAddress")
-                ? loadedSettings.get("preferredHostAddress").getAsString() : null;
-
-            consoleMappingsPath =
-                loadedSettings.has("consoleMappingsPath")
-                ? loadedSettings.get("consoleMappingsPath").getAsString() : null;
-
-        } catch (Exception e) {
-
-            logger.warning(String.format("Failed to parse settings file: %s", e.getMessage()));
-
-            cache = null;
-        }
+      cache = json;
     }
 
-    public String getOutputDeviceName(){return (this.outputDeviceName != null) ? this.outputDeviceName : "empty";}
+    try {
 
-    public String getInputDeviceName(){return (this.inputDeviceName != null) ? this.inputDeviceName : "empty";}
+      JsonObject loadedSettings = new Gson().fromJson(cache, JsonObject.class);
 
-    public int getOutputDeviceIndex(){return (this.outputDeviceIndex != -1) ? this.outputDeviceIndex : -1;}
+      if (loadedSettings == null) {
+        logger.warning("Settings file contains no JSON object");
+        return;
+      }
 
-    public int getInputDeviceIndex(){return (this.inputDeviceIndex != -1) ? this.inputDeviceIndex : -1;}
+      inputDeviceIndex =
+          loadedSettings.has("inputDeviceIndex")
+              ? loadedSettings.get("inputDeviceIndex").getAsInt()
+              : -1;
 
-    public String getConsoleMappingsFilePath(){return (this.consoleMappingsPath != null) ? this.consoleMappingsPath : "empty";}
+      outputDeviceIndex =
+          loadedSettings.has("outputDeviceIndex")
+              ? loadedSettings.get("outputDeviceIndex").getAsInt()
+              : -1;
 
-    public String getConsoleName(){return (this.consoleName != null) ? this.consoleName : "empty";}
+      inputDeviceName =
+          loadedSettings.has("inputDeviceName")
+              ? loadedSettings.get("inputDeviceName").getAsString()
+              : null;
 
-    public String getPreferredHostAddress(){return preferredHostAddress;}
+      outputDeviceName =
+          loadedSettings.has("outputDeviceName")
+              ? loadedSettings.get("outputDeviceName").getAsString()
+              : null;
 
-    public void setPreferredHostAddress(String preferredHostAddress){
-        this.preferredHostAddress = preferredHostAddress;
+      consoleName =
+          loadedSettings.has("consoleName")
+              ? loadedSettings.get("consoleName").getAsString()
+              : null;
+
+      preferredHostAddress =
+          loadedSettings.has("preferredHostAddress")
+              ? loadedSettings.get("preferredHostAddress").getAsString()
+              : null;
+
+      consoleMappingsPath =
+          loadedSettings.has("consoleMappingsPath")
+              ? loadedSettings.get("consoleMappingsPath").getAsString()
+              : null;
+
+    } catch (Exception e) {
+
+      logger.warning(String.format("Failed to parse settings file: %s", e.getMessage()));
+
+      cache = null;
     }
+  }
 
-    public void newSettings(int inputIndex,String inputName,int outputIndex,String outputName, String consoleName) {
+  public String getOutputDeviceName() {
+    return (this.outputDeviceName != null) ? this.outputDeviceName : "empty";
+  }
+
+  public String getInputDeviceName() {
+    return (this.inputDeviceName != null) ? this.inputDeviceName : "empty";
+  }
+
+  public int getOutputDeviceIndex() {
+    return (this.outputDeviceIndex != -1) ? this.outputDeviceIndex : -1;
+  }
+
+  public int getInputDeviceIndex() {
+    return (this.inputDeviceIndex != -1) ? this.inputDeviceIndex : -1;
+  }
+
+  public String getConsoleMappingsFilePath() {
+    return (this.consoleMappingsPath != null) ? this.consoleMappingsPath : "empty";
+  }
+
+  public String getConsoleName() {
+    return (this.consoleName != null) ? this.consoleName : "empty";
+  }
+
+  public String getPreferredHostAddress() {
+    return preferredHostAddress;
+  }
+
+  public void setPreferredHostAddress(String preferredHostAddress) {
+    this.preferredHostAddress = preferredHostAddress;
+  }
+
+  public void newSettings(
+      int inputIndex, String inputName, int outputIndex, String outputName, String consoleName) {
     this.inputDeviceIndex = inputIndex;
     this.inputDeviceName = inputName;
     this.outputDeviceIndex = outputIndex;
     this.outputDeviceName = outputName;
     this.consoleName = consoleName;
-    String path = (MappingFiles.getFilePathByKey(consoleName) != null) ? MappingFiles.getFilePathByKey(consoleName) : "empty";
+    String path =
+        (MappingFiles.getFilePathByKey(consoleName) != null)
+            ? MappingFiles.getFilePathByKey(consoleName)
+            : "empty";
     this.consoleMappingsPath = path;
-    }
+  }
 
-    public boolean saveSettings() {
+  public boolean saveSettings() {
     String toSave = toJson();
-    try{
-        new Gson().fromJson(toSave,JsonObject.class);
-    }
-    catch (JsonSyntaxException e){
-        logger.severe(String.format("Settings json is invalid %e",e));
-        return false;
-    } 
-
-    logger.info(String.format("Saving settings: %s",toSave));
-    if(consoleName == null && preferredHostAddress == null){
-        logger.warning("Cannot save settings - console name and preferred host are empty");
-        return false;
+    try {
+      new Gson().fromJson(toSave, JsonObject.class);
+    } catch (JsonSyntaxException e) {
+      logger.severe(String.format("Settings json is invalid %e", e));
+      return false;
     }
 
-    if(evalSettings(toSave)){
-        logger.info("Settings have the same data, nothing new to write");
-        return true;
+    logger.info(String.format("Saving settings: %s", toSave));
+    if (consoleName == null && preferredHostAddress == null) {
+      logger.warning("Cannot save settings - console name and preferred host are empty");
+      return false;
     }
 
-    logger.info(String.format("Writing settings to %s",savePath));
-    
+    if (evalSettings(toSave)) {
+      logger.info("Settings have the same data, nothing new to write");
+      return true;
+    }
+
+    logger.info(String.format("Writing settings to %s", savePath));
+
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(savePath))) {
-        writer.write(toSave);
+      writer.write(toSave);
     } catch (IOException e) {
-        logger.severe("An io error occurred while writing to the settings file: " + e.getMessage());
-        return false;
+      logger.severe("An io error occurred while writing to the settings file: " + e.getMessage());
+      return false;
     }
 
     cache = null;
     String written = getSettings();
 
-    if(!toSave.equals(written)) {
-        logger.severe("Settings save verification failed");
-        logger.severe("Expected: " + toSave);
-        logger.severe("Actual  : " + written);
-        return false;
+    if (!toSave.equals(written)) {
+      logger.severe("Settings save verification failed");
+      logger.severe("Expected: " + toSave);
+      logger.severe("Actual  : " + written);
+      return false;
     }
 
     cache = toSave;
-    logger.info("Written new settings to: "+savePath);
+    logger.info("Written new settings to: " + savePath);
     return true;
+  }
+
+  public String toJson() {
+    return "{"
+        + "\"timestamp\": \""
+        + java.time.Instant.now()
+        + "\","
+        + "\"inputDeviceName\": \""
+        + inputDeviceName
+        + "\","
+        + "\"inputDeviceIndex\": "
+        + inputDeviceIndex
+        + ","
+        + "\"outputDeviceName\": \""
+        + outputDeviceName
+        + "\","
+        + "\"outputDeviceIndex\": "
+        + outputDeviceIndex
+        + ","
+        + "\"consoleName\": \""
+        + consoleName
+        + "\","
+        + "\"consoleMappingsPath\": \""
+        + consoleMappingsPath
+        + "\","
+        + "\"preferredHostAddress\": \""
+        + preferredHostAddress
+        + "\""
+        + "}";
+  }
+
+  public boolean evalSettings(String json) {
+    try {
+      Gson gson = new Gson();
+      JsonObject expected = gson.fromJson(json, JsonObject.class); // evaluate
+      JsonObject actual = gson.fromJson(getSettings(), JsonObject.class); // cache version
+      expected.remove("timestamp");
+      actual.remove("timestamp");
+      return expected.equals(actual);
+
+    } catch (Exception e) {
+      logger.warning(
+          "Json comparision check to see if current settings have changed has failed" + e);
+      return false;
     }
+  }
 
-    public String toJson() {
-        return "{"
-            +     "\"timestamp\": \"" + java.time.Instant.now() + "\","
-            +     "\"inputDeviceName\": \"" + inputDeviceName + "\","
-            +     "\"inputDeviceIndex\": " + inputDeviceIndex + ","
-            +     "\"outputDeviceName\": \"" + outputDeviceName + "\","
-            +     "\"outputDeviceIndex\": " + outputDeviceIndex + ","
-            +     "\"consoleName\": \"" + consoleName + "\","
-            +     "\"consoleMappingsPath\": \"" + consoleMappingsPath + "\","
-            +     "\"preferredHostAddress\": \"" + preferredHostAddress + "\""
-            + "}";
-    }
-
-
-    public boolean evalSettings(String json) {
-        try {
-            Gson gson = new Gson();
-            JsonObject expected = gson.fromJson(json, JsonObject.class);          //evaluate
-            JsonObject actual   = gson.fromJson(getSettings(), JsonObject.class); //cache version
-            expected.remove("timestamp");
-            actual.remove("timestamp");
-            return expected.equals(actual);
-
-        } catch (Exception e) {
-        logger.warning("Json comparision check to see if current settings have changed has failed" + e);
-        return false;
-        }
-    }
-
-    public static void clearCache(){
+  public static void clearCache() {
     cache = null;
     logger.info("Cache cleared manually");
-    }
+  }
 }

@@ -11,7 +11,8 @@ import org.junit.jupiter.api.Test;
 public class SysexMappingLoaderTest {
   @Test
   public void testLoadMappingsFromClasspath() {
-    List<SysexMapping> mappings = SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
+    List<SysexMapping> mappings =
+        SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
 
     // Basic sanity checks
     assertNotNull(mappings, "Mappings list should not be null");
@@ -37,8 +38,13 @@ public class SysexMappingLoaderTest {
   @Test
   public void testSysexMappingsLoad() {
     List<SysexMapping> mappings = SysexMappingLoader.loadAllMappings();
-    assertNotNull(mappings, "Mappings list should not be null");
-    assertFalse(mappings.isEmpty(), "Expected sysex mappings to be loaded");
+    List<SysexMapping> v96i =
+        SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
+    List<SysexMapping> m7cl =
+        SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
+    assertFalse(v96i.isEmpty(), "Expected 01V96i mappings");
+    assertFalse(m7cl.isEmpty(), "Expected M7CL mappings");
+    assertEquals(v96i.size() + m7cl.size(), mappings.size());
   }
 
   @Test
