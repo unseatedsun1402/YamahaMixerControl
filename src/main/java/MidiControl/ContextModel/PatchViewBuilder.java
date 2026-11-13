@@ -21,6 +21,15 @@ public class PatchViewBuilder implements ViewBuilder {
     private static String deskCache;
     private static List<ChannelSource> sourceCache = List.of();
     private static List<ChannelDestination> destCache = List.of();
+    private static volatile boolean debug = false;
+
+    public static void enableDebug(){
+        debug = true;
+    }
+
+    public static void disableDebug(){
+        debug = false;
+    }
 
     private static final Set<String> OUTPUT_GROUPS = Set.of(
         "kOmniOutput",
@@ -107,7 +116,7 @@ public class PatchViewBuilder implements ViewBuilder {
             return result;
         }
 
-        log.info(String.format(
+        if(debug)log.fine(String.format(
             "[PatchViewBuilder]   Control: group=%s sub=%s idx=%d",
             patchTarget.getGroup(),
             patchTarget.getSubcontrol(),
@@ -123,7 +132,7 @@ public class PatchViewBuilder implements ViewBuilder {
         String g = ci.getGroup();
         String s = ci.getSubcontrol();
 
-        log.info(String.format("Current type to check %s against %s.%s",type, g,s));
+        if(debug)log.fine(String.format("Current type to check %s against %s.%s",type, g,s));
 
         return switch (type) {
             case CHANNEL -> (

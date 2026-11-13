@@ -14,6 +14,7 @@ import MidiControl.Controls.SubControl;
 public class OutputContextDiscoverer implements ContextDiscoverer {
 
     private static final Logger logger = Logger.getLogger(OutputContextDiscoverer.class.getName());
+    private static volatile boolean debug = false;
 
     interface OutputFamily {
         String getGroupName();
@@ -21,6 +22,14 @@ public class OutputContextDiscoverer implements ContextDiscoverer {
         String getContextPrefix();
         String getLabelBase();
         String name(); // expose enum constant name
+    }
+
+    public static void enableDebug(){
+        debug = true;
+    }
+
+    public static void disableDebug(){
+        debug = false;
     }
 
     private enum YAMAHA_M7CL implements OutputFamily {
@@ -109,12 +118,14 @@ public class OutputContextDiscoverer implements ContextDiscoverer {
         logger.info("---- " + family.getGroupName() + " ----");
         logger.info("Matched " + subs.size() + " subcontrols");
 
-        for (SubControl sc : subs) {
-            logger.info(String.format(
-                "  %s (instances=%d)",
-                sc.getName(),
-                sc.getInstances().size()
-            ));
+        if(debug){
+            for (SubControl sc : subs) {
+                logger.fine(String.format(
+                    "  %s (instances=%d)",
+                    sc.getName(),
+                    sc.getInstances().size()
+                ));
+            }
         }
 
         if (subs.isEmpty()) {
