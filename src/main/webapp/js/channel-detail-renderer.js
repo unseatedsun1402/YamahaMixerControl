@@ -43,9 +43,9 @@ const SECTION_ORDER = [
     "channel.attenuation",
     "input.patch",
     "input.eq",
+    "input.bus-routing",
     "input.dynamics",
     "input.send",
-    "input.bus-routing",
     "input.fader",
     "bus.fader"
 ];
@@ -59,13 +59,11 @@ const COLUMN_GROUPS = {
         "input.pan",
         "bus.pan",
         "channel.attenuation",
-        "input.patch",
-        "input.dynamics"
+        "input.patch"
     ]),
-    center: new Set(["input.eq"]),
+    center: new Set(["input.eq", "input.dynamics", "input.bus-routing"]),
     right: new Set([
         "input.send",
-        "input.bus-routing",
         "input.fader",
         "bus.fader"
     ])
@@ -133,6 +131,11 @@ export function renderChannelDetail(model) {
         grouped[c.uiGroup].push(c);
     }
 
+    if (grouped["input.eq"] && grouped["channel.attenuation"]) {
+        grouped["input.eq"].push(...grouped["channel.attenuation"]);
+        delete grouped["channel.attenuation"];
+    }
+
     const groupNames = Object.keys(grouped).sort((a, b) => {
         const ai = SECTION_ORDER.indexOf(a);
         const bi = SECTION_ORDER.indexOf(b);
@@ -146,7 +149,8 @@ export function renderChannelDetail(model) {
 
         const section = document.createElement("div");
         section.className = "section detail-section";
-        if (controls.some(c => c.type === "KNOB")) {
+        section.dataset.group = groupName;
+        if (groupName !== "input.eq" && controls.some(c => c.type === "KNOB")) {
             section.classList.add("section-knob-grid");
         }
 
@@ -233,6 +237,16 @@ function enhanceCompositeWidgets(panel) {
 
         if (hasChannelOn) createChannelOnWidget(section);
         if (hasDynamics)  createDynamicsWidget(section);
-        if (hasEQ)        createEQWidget(section);
+        if (hasEQ) {
+            createEQWidget(section);
+            const attenuation = section.querySelector('[data-role="INPUT_ATTENUATION"]');
+            const heading = section.querySelector(".eq-widget h4");
+            if (attenuation && heading) {
+                const header = document.createElement("div");
+                header.className = "detail-eq-header";
+                heading.replaceWith(header);
+                header.append(heading, attenuation);
+            }
+        }
     });
 }
