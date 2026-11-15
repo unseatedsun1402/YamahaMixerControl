@@ -60,6 +60,20 @@
     white-space: nowrap;
 }
 
+.knob-with-readout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.knob-readout {
+    color: var(--mix-color-text);
+    font-family: var(--mix-font-readout);
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
 .rotary-knob {
     position: relative;
 
