@@ -175,7 +175,7 @@ export function createEQWidget(section) {
             max: readRangeValue(band.gain, "max", 180),
             value: readRangeValue(band.gain, "value", 0),
             readOnly: false,
-            canonicalId: band.gain.dataset.canonicalId
+            get canonicalId() { return band.gain.dataset.canonicalId; }
         });
 
         band.gain.addEventListener("control-update", event => {

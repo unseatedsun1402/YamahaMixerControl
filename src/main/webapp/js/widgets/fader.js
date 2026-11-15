@@ -78,6 +78,7 @@ export function renderFader(control) {
     updateThumb();
 
     let dragging = false;
+    wrapper.cancelInteraction = () => { dragging = false; };
 
     wrapper.addEventListener("pointerdown", (e) => {
 

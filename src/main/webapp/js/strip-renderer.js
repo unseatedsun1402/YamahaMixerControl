@@ -8,6 +8,7 @@ export function createStripElement(ctxId) {
     const strip = document.createElement("div");
     strip.className = "channel-strip";
     strip.dataset.contextId = ctxId;
+    strip.rebind = model => updateStrip(strip, model);
 
     // Header
     const header = document.createElement("div");
@@ -46,9 +47,33 @@ export function updateStrip(stripEl, model) {
 
     const scrollArea = stripEl.querySelector(".strip-scroll-area");
     const faderArea = stripEl.querySelector(".strip-fader-area");
+    const shape = JSON.stringify([
+        model.viewType,
+        model.controls.map(({ value, canonicalId, hwInstance, channelIndex, ...control }) => ({
+            ...control,
+            sendColor: control.type === "KNOB"
+                ? canonicalId?.match(/k(?:AUX|Mix)(\d+)Level/i)?.[1]
+                : undefined
+        }))
+    ]);
+    const refreshable = model.controls.every(control =>
+        ["FADER", "KNOB", "SLIDER_HORIZONTAL", "TOGGLE", "BUTTON", "SELECT", "DATA"]
+            .includes(control.type)
+    );
+
+    if (refreshable && stripEl.controlShape === shape) {
+        model.controls.forEach((control, index) => stripEl.controlElements[index].rebind(control));
+        stripEl.controlElements.forEach(wrapper => wrapper.refresh());
+        const preset = stripEl.querySelector(".eq-preset-select");
+        if (preset) preset.value = "";
+        const presetStatus = stripEl.querySelector(".eq-preset-status");
+        if (presetStatus) presetStatus.textContent = "";
+        return false;
+    }
 
     scrollArea.innerHTML = "";
     faderArea.innerHTML = "";
+    const controlElements = new Map();
 
     const grouped = {};
 
@@ -74,7 +99,9 @@ export function updateStrip(stripEl, model) {
         section.appendChild(title);
 
         for (const control of controls) {
-            section.appendChild(renderControl(control));
+            const wrapper = renderControl(control);
+            controlElements.set(control, wrapper);
+            section.appendChild(wrapper);
         }
 
         const containsFader =
@@ -85,5 +112,10 @@ export function updateStrip(stripEl, model) {
         } else {
             scrollArea.appendChild(section);
         }
+
     }
+
+    stripEl.controlShape = shape;
+    stripEl.controlElements = model.controls.map(control => controlElements.get(control));
+    return true;
 }

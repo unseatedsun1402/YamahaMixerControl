@@ -28,6 +28,7 @@ function addEqResponseGraph(section) {
     if (!widget) return;
 
     const graph = createGraph("eq-response-graph", "EQ frequency response");
+    graph.setAttribute("preserveAspectRatio", "none");
     widget.insertBefore(graph, widget.querySelector(".eq-preset-label"));
 
     const update = () => {
@@ -68,11 +69,15 @@ function addDynamicsGraphs(section) {
     const widget = section.querySelector(".dynamics-widget");
     if (!widget) return;
 
-    const gateGraph = createGraph("gate-response-graph", "Gate response");
+    const gateGraph = createGraph("gate-response-graph", "Gate response, input and output in decibels");
     const compressorGraph = createGraph(
         "compressor-response-graph",
-        "Compressor input and output response"
+        "Compressor response, input and output in decibels"
     );
+    for (const graph of [gateGraph, compressorGraph]) {
+        graph.setAttribute("viewBox", "44 12 544 148");
+        graph.setAttribute("preserveAspectRatio", "none");
+    }
     const titles = Array.from(widget.querySelectorAll("h4"));
     titles[0]?.after(gateGraph);
     titles[1]?.after(compressorGraph);

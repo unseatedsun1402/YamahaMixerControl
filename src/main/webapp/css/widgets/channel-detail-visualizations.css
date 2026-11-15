@@ -9,6 +9,24 @@
     border-radius: 3px;
 }
 
+.eq-response-graph {
+    max-height: 150px;
+}
+
+.gate-response-graph,
+.compressor-response-graph {
+    height: 64px;
+    margin: 0;
+    overflow: hidden;
+}
+
+.gate-response-graph .graph-tick,
+.gate-response-graph .graph-label,
+.compressor-response-graph .graph-tick,
+.compressor-response-graph .graph-label {
+    display: none;
+}
+
 .detail-response-graph .graph-grid {
     stroke: rgb(182 192 208 / 18%);
     stroke-width: 1;

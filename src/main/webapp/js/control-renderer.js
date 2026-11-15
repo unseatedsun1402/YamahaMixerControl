@@ -6,6 +6,7 @@ import { renderButton } from "./widgets/button.js";
 import { renderSelect } from "./widgets/select.js";
 import { renderStringDisplay } from "./widgets/stringDisplay.js";
 import { renderHorizontalSlider } from "./widgets/sliderHorizontal.js";
+import { updateControlValue } from "./partial-update.js";
 
 export function renderControl(control) {
     const wrapper = document.createElement("div");
@@ -20,6 +21,21 @@ export function renderControl(control) {
     wrapper.dataset.canonicalId = control.canonicalId;
     wrapper.dataset.type = control.type;
     wrapper.controlMeta = control;
+    wrapper.rebind = nextControl => {
+        Object.assign(control, nextControl);
+        wrapper.dataset.canonicalId = control.canonicalId;
+        if (control.channelIndex == null) {
+            delete wrapper.dataset.channel;
+        } else {
+            wrapper.dataset.channel = control.channelIndex;
+        }
+        if (control.type === "SELECT") {
+            wrapper.querySelector('[data-type="SELECT"]').dataset.canonicalId = control.canonicalId;
+        }
+    };
+    wrapper.refresh = () => {
+        if (control.type !== "BUTTON") updateControlValue(wrapper, control.value);
+    };
 
     wrapper.dataset.min = control.min;
     wrapper.dataset.max = control.max;

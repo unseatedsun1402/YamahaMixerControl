@@ -3559,194 +3559,194 @@
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.0",
-    "lsb": "0x68",
-    "msb": "0x33",
+    "lsb": "0x7E",
+    "msb": "0x28",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.1",
-    "lsb": "0x69",
-    "msb": "0x33",
+    "lsb": "0x7F",
+    "msb": "0x28",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.2",
-    "lsb": "0x6A",
-    "msb": "0x33",
+    "lsb": "0x00",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.3",
-    "lsb": "0x6B",
-    "msb": "0x33",
+    "lsb": "0x01",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.4",
-    "lsb": "0x6C",
-    "msb": "0x33",
+    "lsb": "0x02",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.5",
-    "lsb": "0x6D",
-    "msb": "0x33",
+    "lsb": "0x03",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.6",
-    "lsb": "0x6E",
-    "msb": "0x33",
+    "lsb": "0x04",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.7",
-    "lsb": "0x6F",
-    "msb": "0x33",
+    "lsb": "0x05",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.8",
-    "lsb": "0x70",
-    "msb": "0x33",
+    "lsb": "0x06",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.9",
-    "lsb": "0x71",
-    "msb": "0x33",
+    "lsb": "0x07",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.10",
-    "lsb": "0x72",
-    "msb": "0x33",
+    "lsb": "0x08",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.11",
-    "lsb": "0x73",
-    "msb": "0x33",
+    "lsb": "0x09",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.12",
-    "lsb": "0x74",
-    "msb": "0x33",
+    "lsb": "0x0A",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.13",
-    "lsb": "0x75",
-    "msb": "0x33",
+    "lsb": "0x0B",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.14",
-    "lsb": "0x76",
-    "msb": "0x33",
+    "lsb": "0x0C",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.15",
-    "lsb": "0x77",
-    "msb": "0x33",
+    "lsb": "0x0D",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.16",
-    "lsb": "0x78",
-    "msb": "0x33",
+    "lsb": "0x0E",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.17",
-    "lsb": "0x79",
-    "msb": "0x33",
+    "lsb": "0x0F",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.18",
-    "lsb": "0x7A",
-    "msb": "0x33",
+    "lsb": "0x10",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.19",
-    "lsb": "0x7B",
-    "msb": "0x33",
+    "lsb": "0x11",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.20",
-    "lsb": "0x7C",
-    "msb": "0x33",
+    "lsb": "0x12",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.21",
-    "lsb": "0x7D",
-    "msb": "0x33",
+    "lsb": "0x13",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.22",
-    "lsb": "0x7E",
-    "msb": "0x33",
+    "lsb": "0x14",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.23",
-    "lsb": "0x7F",
-    "msb": "0x33",
+    "lsb": "0x15",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.24",
-    "lsb": "0x00",
-    "msb": "0x34",
+    "lsb": "0x16",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.25",
-    "lsb": "0x01",
-    "msb": "0x34",
+    "lsb": "0x17",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.26",
-    "lsb": "0x02",
-    "msb": "0x34",
+    "lsb": "0x18",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.27",
-    "lsb": "0x03",
-    "msb": "0x34",
+    "lsb": "0x19",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.28",
-    "lsb": "0x04",
-    "msb": "0x34",
+    "lsb": "0x1A",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.29",
-    "lsb": "0x05",
-    "msb": "0x34",
+    "lsb": "0x1B",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.30",
-    "lsb": "0x06",
-    "msb": "0x34",
+    "lsb": "0x1C",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {
     "canonical_id": "kInputEQ.kEQLowG.31",
-    "lsb": "0x07",
-    "msb": "0x34",
+    "lsb": "0x1D",
+    "msb": "0x29",
     "value_mode": "NRPN_14BIT"
   },
   {

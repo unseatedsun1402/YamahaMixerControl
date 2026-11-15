@@ -20,7 +20,7 @@ public class ControlInstance {
 
     private final Map<Integer,ControlListener> listeners = new ConcurrentHashMap<>();
 
-    private int value;
+    private volatile int value;
     private final String canonicalId;
     private NrpnMapping nrpnMapping;
     private SysexMapping sysexMapping;

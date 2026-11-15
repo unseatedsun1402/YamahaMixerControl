@@ -17,7 +17,7 @@ public class HardwareOutputRouter implements OutputRequestSender {
     logger.info("OutputRouter debug enabled");
   }
 
-  private CanonicalRegistry registry;
+  private volatile CanonicalRegistry registry;
   private final MidiIOManager ioManager;
 
   public HardwareOutputRouter(CanonicalRegistry registry, MidiIOManager ioManager) {

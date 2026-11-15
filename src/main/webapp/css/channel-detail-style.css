@@ -130,6 +130,42 @@
     margin-right: 8px;
 }
 
+.detail-section[data-group="channel.mute-groups"],
+.detail-section[data-group="input.bus-routing"] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.detail-section[data-group="channel.mute-groups"] .section-title,
+.detail-section[data-group="input.bus-routing"] .section-title {
+    grid-column: 1 / -1;
+}
+
+.detail-section[data-group="channel.mute-groups"] .control-toggle,
+.detail-section[data-group="input.bus-routing"] .control-toggle {
+    display: flex;
+    width: 100%;
+    margin: 0;
+}
+
+.detail-section[data-group="channel.mute-groups"] .control-label,
+.detail-section[data-group="input.bus-routing"] .control-label {
+    display: none;
+}
+
+.detail-section[data-group="channel.mute-groups"] .toggle-button,
+.detail-section[data-group="input.bus-routing"] .toggle-button {
+    min-height: 36px;
+}
+
+.detail-eq-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
 .detail-section.section-knob-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -152,6 +188,48 @@
     width: 100%;
 }
 
+.detail-section[data-group="input.send"] {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.detail-section[data-group="input.send"] > .section-title {
+    grid-column: 1 / -1;
+}
+
+.detail-section[data-group="channel.mute-groups"],
+.detail-section[data-group="input.bus-routing"] {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.detail-section[data-group="channel.mute-groups"] > .section-title,
+.detail-section[data-group="input.bus-routing"] > .section-title {
+    grid-column: 1 / -1;
+}
+
+.detail-section[data-group="channel.mute-groups"] .control-toggle,
+.detail-section[data-group="input.bus-routing"] .control-toggle {
+    display: flex;
+    margin: 0;
+}
+
+.detail-section[data-group="channel.mute-groups"] .control-label,
+.detail-section[data-group="input.bus-routing"] .control-label,
+.detail-send .control-toggle .control-label {
+    display: none;
+}
+
+.detail-section[data-group="channel.mute-groups"] .toggle-button,
+.detail-section[data-group="input.bus-routing"] .toggle-button,
+.detail-send .toggle-button {
+    min-height: 32px;
+    padding: 4px;
+    font-size: 0.75rem;
+}
+
 .detail-send {
     display: flex;
     flex-wrap: wrap;
@@ -162,6 +240,11 @@
 
 .detail-send .control.control-knob {
     flex-basis: 100%;
+}
+
+.detail-send .control.control-toggle {
+    flex: 1 1 0;
+    margin: 0;
 }
 
 .detail-send-fixed .control.control-knob {
@@ -180,11 +263,60 @@
 }
 
 .detail-section .fader-container {
-    height: clamp(220px, 38vh, 420px);
+    height: clamp(160px, 20vh, 220px);
+}
+
+.detail-section .dynamics-widget {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+        "gate-title gate-on gate-on"
+        "gate-graph gate-graph gate-graph"
+        "comp-title comp-on ratio"
+        "comp-graph comp-graph comp-graph"
+        "threshold threshold threshold";
+    gap: 5px 8px;
+    align-items: center;
+}
+
+.detail-section .dynamics-widget h4 {
+    margin: 0;
+}
+
+.detail-section .dynamics-gate-title { grid-area: gate-title; }
+.detail-section .dynamics-gate-row { grid-area: gate-on; }
+.detail-section .gate-response-graph { grid-area: gate-graph; }
+.detail-section .dynamics-compressor-title { grid-area: comp-title; }
+.detail-section .dynamics-compressor-row { grid-area: comp-on; }
+.detail-section .dynamics-ratio-row { grid-area: ratio; }
+.detail-section .compressor-response-graph { grid-area: comp-graph; }
+.detail-section .dynamics-threshold-row { grid-area: threshold; }
+
+.detail-section .dynamics-toggle-row {
+    margin: 0;
+}
+
+.detail-section .dynamics-toggle-row .toggle-button {
+    min-height: 32px;
+    padding: 4px 8px;
 }
 
 .detail-column-center .detail-section {
     height: 100%;
+}
+
+@media (min-width: 1300px) {
+    .detail-column-left {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-content: start;
+        align-items: start;
+    }
+
+    .detail-column-left [data-group="channel.mute-groups"],
+    .detail-column-left [data-group="input.dynamics"] {
+        grid-column: 1 / -1;
+    }
 }
 
 @media (max-width: 1050px) {
@@ -194,9 +326,7 @@
 
     .detail-column-right {
         grid-column: 1 / -1;
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        align-items: start;
+        display: flex;
     }
 }
 
@@ -210,12 +340,30 @@
         display: flex;
     }
 
+    .detail-section[data-group="input.send"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .detail-column-center .detail-section {
         height: auto;
     }
 
     .detail-section .fader-container {
         height: clamp(180px, 30vh, 300px);
+    }
+
+    .detail-section[data-group="channel.mute-groups"] .toggle-button,
+    .detail-section[data-group="input.bus-routing"] .toggle-button,
+    .detail-send .toggle-button,
+    .detail-section .dynamics-toggle-row .toggle-button {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 700px), (orientation: landscape) and (max-height: 520px) {
+    .detail-section[data-group="channel.mute-groups"] .toggle-button,
+    .detail-section[data-group="input.bus-routing"] .toggle-button {
+        min-height: 44px;
     }
 }
 
@@ -226,8 +374,31 @@
     }
 }
 
+@media (pointer: coarse) {
+    .detail-section[data-group="channel.mute-groups"] .toggle-button,
+    .detail-section[data-group="input.bus-routing"] .toggle-button,
+    .detail-send .toggle-button,
+    .detail-section .dynamics-toggle-row .toggle-button {
+        min-height: 44px;
+    }
+}
+
 @media (orientation: landscape) and (max-height: 520px) {
     .detail-section .fader-container {
         height: clamp(120px, 28vh, 200px);
+    }
+}
+
+@media (orientation: landscape) and (max-width: 960px) and (max-height: 520px) {
+    .detail-section[data-group="channel.mute-groups"] .toggle-button,
+    .detail-section[data-group="input.bus-routing"] .toggle-button,
+    .detail-send .toggle-button,
+    .detail-section .dynamics-toggle-row .toggle-button {
+        min-height: 44px;
+    }
+
+    .detail-section .fader-container {
+        height: 48px;
+        min-height: 48px;
     }
 }

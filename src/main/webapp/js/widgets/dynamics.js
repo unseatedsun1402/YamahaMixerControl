@@ -41,6 +41,7 @@ export function createDynamicsWidget(section) {
     // GATE
 
     const gateTitle = document.createElement("h4");
+    gateTitle.className = "dynamics-gate-title";
     gateTitle.textContent = "Gate";
 
     const gateEnable = document.createElement("button");
@@ -70,6 +71,7 @@ export function createDynamicsWidget(section) {
     const compressorTitle =
         document.createElement("h4");
 
+    compressorTitle.className = "dynamics-compressor-title";
     compressorTitle.textContent =
         "Compressor";
 
@@ -189,8 +191,9 @@ export function createDynamicsWidget(section) {
 
             readOnly: false,
 
-            canonicalId:
-                threshold?.dataset.canonicalId
+            get canonicalId() {
+                return threshold?.dataset.canonicalId;
+            }
         });
 
     // INITIAL STATE FROM BACKING CONTROLS
@@ -281,7 +284,7 @@ export function createDynamicsWidget(section) {
         document.createElement("div");
 
     gateRow.className =
-        "dynamics-toggle-row";
+        "dynamics-toggle-row dynamics-gate-row";
 
     gateRow.appendChild(
         gateEnable
@@ -291,7 +294,7 @@ export function createDynamicsWidget(section) {
         document.createElement("div");
 
     compRow.className =
-        "dynamics-toggle-row";
+        "dynamics-toggle-row dynamics-compressor-row";
 
     compRow.appendChild(
         compEnable
@@ -301,7 +304,7 @@ export function createDynamicsWidget(section) {
         document.createElement("div");
 
     ratioRow.className =
-        "dynamics-toggle-row";
+        "dynamics-toggle-row dynamics-ratio-row";
 
     ratioRow.appendChild(
         ratioToggle
@@ -311,7 +314,7 @@ export function createDynamicsWidget(section) {
         document.createElement("div");
 
     thresholdRow.className =
-        "dynamics-row";
+        "dynamics-row dynamics-threshold-row";
 
     thresholdRow.append(
         thresholdLabel,

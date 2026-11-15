@@ -1,17 +1,5 @@
 package MidiControl.Server;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executors;
-import java.util.logging.Level;
- import java.util.logging.Logger;
-
-import javax.sound.midi.MidiMessage;
-
-import org.apache.commons.math3.exception.OutOfRangeException;
-
 import MidiControl.ContextModel.BankCatalog;
 import MidiControl.ContextModel.Context;
 import MidiControl.ContextModel.ContextDiscoveryEngine;
@@ -19,11 +7,11 @@ import MidiControl.ContextModel.ContextType;
 import MidiControl.ContextModel.ControlSchema;
 import MidiControl.ContextModel.PatchViewBuilder;
 import MidiControl.ContextModel.ViewBuilder;
-import MidiControl.ContextModel.ViewRegistry;
 import MidiControl.ContextModel.ViewBuilders.ChannelDetailViewBuilder;
 import MidiControl.ContextModel.ViewBuilders.InputChannelSendsOnFaderViewBuilder;
 import MidiControl.ContextModel.ViewBuilders.InputChannelStripViewBuilder;
 import MidiControl.ContextModel.ViewBuilders.MixAuxBusViewBuilder;
+import MidiControl.ContextModel.ViewRegistry;
 import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.DeskDiscovery.DeskDiscovery;
@@ -42,6 +30,7 @@ import MidiControl.SysexUtils.MappingFiles;
 import MidiControl.SysexUtils.SysexMapping;
 import MidiControl.SysexUtils.SysexMappingLoader;
 import MidiControl.SysexUtils.SysexParser;
+import MidiControl.Telemetry.SystemTelemetry;
 import MidiControl.UserInterface.ChannelName.ChannelNameAssembler;
 import MidiControl.UserInterface.DTO.UiModelDTO;
 import MidiControl.UserInterface.Frontend.GuiBroadcastListener;
@@ -50,361 +39,423 @@ import MidiControl.UserInterface.UiBankFactory;
 import MidiControl.UserInterface.UiContextIndex;
 import MidiControl.UserInterface.UiModelFactory;
 import MidiControl.UserInterface.UiModelService;
-import MidiControl.Telemetry.SystemTelemetry;
 import jakarta.annotation.PreDestroy;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.midi.MidiMessage;
+import org.apache.commons.math3.exception.OutOfRangeException;
 
-public class MidiServer implements Runnable, UiModelService{
-    private volatile boolean shutdownFlag = false;
-    private final ConcurrentLinkedQueue<MidiMessage> inputBuffer = new ConcurrentLinkedQueue<>();
-    private final NrpnRegistry nrpnRegistry = new NrpnRegistry();
-    private final NrpnParser nrpnParser = new NrpnParser();
-    private final HardwareInputHandler inputHandler = new HardwareInputHandler(nrpnParser, nrpnRegistry);
-    private final SystemTelemetry systemTelemetry;
-    private final MidiIOManager deviceManager = new MidiIOManager(this);
-    private final SubscriptionManager subscriptions;
-    private final ControlSchema schema;
-    private final ViewRegistry viewBuilders;
-    private UiContextIndex contextIndex;
-    private final UiModelFactory uiFactory;
-    private final UiBankFactory bankFactory;
-    private final BankCatalog bankCatalog = new BankCatalog();
-    private final ServerRouter serverRouter;
-    private CanonicalRegistry canonicalRegistry;
-    private List<ChannelNameAssembler> nameAssemblers = new ArrayList<>();
-    private GuiBroadcastListener guiBroadcastListener;
-    private ContextDiscoveryEngine discoveryEngine;
-    private static final GuiBroadcastListener NO_OP_LISTENER =
-            new GuiBroadcastListener((json, ctx) -> {}, canonicalId -> null);
-    private RehydrationManager rehydrationManager;
-    private DeskDiscovery deskDiscovery;
-    private DeviceLivenessMonitor livenessMonitor;
+public class MidiServer implements Runnable, UiModelService {
+  private volatile boolean shutdownFlag = false;
+  private final ConcurrentLinkedQueue<MidiMessage> inputBuffer = new ConcurrentLinkedQueue<>();
+  private final NrpnRegistry nrpnRegistry = new NrpnRegistry();
+  private final NrpnParser nrpnParser = new NrpnParser();
+  private final HardwareInputHandler inputHandler =
+      new HardwareInputHandler(nrpnParser, nrpnRegistry);
+  private final SystemTelemetry systemTelemetry;
+  private final MidiIOManager deviceManager = new MidiIOManager(this);
+  private final SubscriptionManager subscriptions;
+  private final ControlSchema schema;
+  private final ViewRegistry viewBuilders;
+  private UiContextIndex contextIndex;
+  private final UiModelFactory uiFactory;
+  private final UiBankFactory bankFactory;
+  private final BankCatalog bankCatalog = new BankCatalog();
+  private final ServerRouter serverRouter;
+  private volatile CanonicalRegistry canonicalRegistry;
+  private List<ChannelNameAssembler> nameAssemblers = new ArrayList<>();
+  private GuiBroadcastListener guiBroadcastListener;
+  private ContextDiscoveryEngine discoveryEngine;
+  private static final GuiBroadcastListener NO_OP_LISTENER =
+      new GuiBroadcastListener((json, ctx) -> {}, canonicalId -> null);
+  private RehydrationManager rehydrationManager;
+  private DeskDiscovery deskDiscovery;
+  private DeviceLivenessMonitor livenessMonitor;
 
-    private static final Logger logger = Logger.getLogger(MidiServer.class.getName());
-    private volatile MidiProcessingLoop processingLoop;
+  private static final Logger logger = Logger.getLogger(MidiServer.class.getName());
+  private volatile MidiProcessingLoop processingLoop;
 
-    // 1. Default constructor (used by ServletContextListener)
-    public MidiServer() {
+  // 1. Default constructor (used by ServletContextListener)
+  public MidiServer() {
 
-        List<SysexMapping> sysexMappings =
-                // SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
-                SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
-        this.canonicalRegistry =
-                new CanonicalRegistry(sysexMappings, new SysexParser(sysexMappings));
-        
-        this.canonicalRegistry.addReloadListener(this::onRegistryReloaded);
-        this.viewBuilders = new ViewRegistry();
-        this.uiFactory = null;
-        // Safe fallback listener
-        this.guiBroadcastListener = NO_OP_LISTENER;
+    List<SysexMapping> sysexMappings =
+        // SysexMappingLoader.loadMappingsFromResource("MidiControl/m7cl_sysex_mappings.json");
+        SysexMappingLoader.loadMappingsFromResource("MidiControl/01v96i_sysex_mappings.json");
+    this.canonicalRegistry = new CanonicalRegistry(sysexMappings, new SysexParser(sysexMappings));
 
-        this.subscriptions = new SubscriptionManager();
-        this.schema = new ControlSchema(canonicalRegistry);
-        
-        this.contextIndex = new UiContextIndex();
+    this.canonicalRegistry.addReloadListener(this::onRegistryReloaded);
+    this.viewBuilders = new ViewRegistry();
+    this.uiFactory = null;
+    // Safe fallback listener
+    this.guiBroadcastListener = NO_OP_LISTENER;
 
-        this.viewBuilders.addView(new InputChannelStripViewBuilder(), "basic-input-view");
-        this.viewBuilders.addView(new InputChannelSendsOnFaderViewBuilder(), "basic-sends-on-fader-view");
-        this.viewBuilders.addView(new MixAuxBusViewBuilder(), "basic-master-view");
-        this.viewBuilders.addView(new PatchViewBuilder(), "basic-patch-view");
-        this.viewBuilders.addView(new ChannelDetailViewBuilder(), "channel-detail-view");
+    this.subscriptions = new SubscriptionManager();
+    this.schema = new ControlSchema(canonicalRegistry);
 
-        this.systemTelemetry = new SystemTelemetry();
-        
-        this.guiBroadcastListener = new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
-        this.discoveryEngine = new ContextDiscoveryEngine(canonicalRegistry);
-        this.bankFactory = new UiBankFactory(discoveryEngine, this);
-        this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
-        this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(), this.canonicalRegistry, Executors.newSingleThreadScheduledExecutor());
-        systemTelemetry.registerRehydrationTelemetry(rehydrationManager.getRehydrationTelemetry());
-        initContextIndex();
-        serverRouter.injectApp(new StateRehydrationService(rehydrationManager, deviceManager));
-        logger.info("MidiServer: CanonicalRegistry initialized with SYSEX + NRPN mappings.");
-    }
+    this.contextIndex = new UiContextIndex();
 
-    public MidiServer(CanonicalRegistry registry) {
-        this.canonicalRegistry = registry;
-        this.viewBuilders = new ViewRegistry();
-        this.viewBuilders.addView(new InputChannelStripViewBuilder(),"basic-input-view");
-        this.uiFactory = null;
-        this.bankFactory = null;
-        this.guiBroadcastListener = NO_OP_LISTENER;
-        this.subscriptions = new SubscriptionManager();
-        this.schema = new ControlSchema(canonicalRegistry);
-        this.contextIndex = new UiContextIndex();
+    this.viewBuilders.addView(new InputChannelStripViewBuilder(), "basic-input-view");
+    this.viewBuilders.addView(
+        new InputChannelSendsOnFaderViewBuilder(), "basic-sends-on-fader-view");
+    this.viewBuilders.addView(new MixAuxBusViewBuilder(), "basic-master-view");
+    this.viewBuilders.addView(new PatchViewBuilder(), "basic-patch-view");
+    this.viewBuilders.addView(new ChannelDetailViewBuilder(), "channel-detail-view");
 
-        this.systemTelemetry = new SystemTelemetry();
+    this.systemTelemetry = new SystemTelemetry();
 
-        this.guiBroadcastListener = new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
-        this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
-        this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(),
+    this.guiBroadcastListener =
+        new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
+    this.discoveryEngine = new ContextDiscoveryEngine(canonicalRegistry);
+    this.bankFactory = new UiBankFactory(discoveryEngine, this);
+    this.serverRouter =
+        new ServerRouter(this, this.subscriptions, this.canonicalRegistry, this.deviceManager);
+    this.rehydrationManager =
+        new RehydrationManager(
+            serverRouter.getOutputRouter(),
             this.canonicalRegistry,
             Executors.newSingleThreadScheduledExecutor());
+    systemTelemetry.registerRehydrationTelemetry(rehydrationManager.getRehydrationTelemetry());
+    initContextIndex();
+    serverRouter.injectApp(new StateRehydrationService(rehydrationManager, deviceManager));
+    logger.info("MidiServer: CanonicalRegistry initialized with SYSEX + NRPN mappings.");
+  }
 
-    }
+  public MidiServer(CanonicalRegistry registry) {
+    this.canonicalRegistry = registry;
+    this.viewBuilders = new ViewRegistry();
+    this.viewBuilders.addView(new InputChannelStripViewBuilder(), "basic-input-view");
+    this.uiFactory = null;
+    this.bankFactory = null;
+    this.guiBroadcastListener = NO_OP_LISTENER;
+    this.subscriptions = new SubscriptionManager();
+    this.schema = new ControlSchema(canonicalRegistry);
+    this.contextIndex = new UiContextIndex();
 
-    // 3. Test/production constructor (registry + real listener)
-    public MidiServer(CanonicalRegistry registry, GuiBroadcastListener guiListener) {
-        this.canonicalRegistry = registry;
-        this.guiBroadcastListener = guiListener;
-        this.subscriptions = new SubscriptionManager();
-        this.schema = new ControlSchema(canonicalRegistry);
-        this.viewBuilders = new ViewRegistry();
-        this.viewBuilders.addView(new InputChannelStripViewBuilder(),"basic-input-view");
-        this.contextIndex = new UiContextIndex();
-        this.guiBroadcastListener = new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
-        this.serverRouter = new ServerRouter(this,this.subscriptions,this.canonicalRegistry,this.deviceManager);
-        this.uiFactory = null;
-        this.bankFactory = null;
+    this.systemTelemetry = new SystemTelemetry();
 
-        this.systemTelemetry = new SystemTelemetry();
-
-        this.rehydrationManager = new RehydrationManager(serverRouter.getOutputRouter(),
+    this.guiBroadcastListener =
+        new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
+    this.serverRouter =
+        new ServerRouter(this, this.subscriptions, this.canonicalRegistry, this.deviceManager);
+    this.rehydrationManager =
+        new RehydrationManager(
+            serverRouter.getOutputRouter(),
             this.canonicalRegistry,
             Executors.newSingleThreadScheduledExecutor());
-    }
+  }
 
-    public void setGuiBroadcastListener(GuiBroadcastListener listener) {this.guiBroadcastListener = listener;}
-    public MidiIOManager getMidiDeviceManager() {return this.deviceManager;}
-    public CanonicalRegistry getCanonicalRegistry() {return this.canonicalRegistry;}
-    public void setCanonicalRegistry(CanonicalRegistry registry) {this.canonicalRegistry = registry;}
-    public ConcurrentLinkedQueue<MidiMessage> getInputBuffer(){return this.inputBuffer;}
-    public void addtoinputqueue(MidiMessage msg) {inputBuffer.add(msg);}
-    public int getInputBufferSize() {return inputBuffer.size();}
-    public ControlSchema getControlSchema() {return this.schema;}
-    public Optional<ViewBuilder> getViewBuilder(String key) {return this.viewBuilders.getView(key);}
-    public UiContextIndex getContextIndex() {return this.contextIndex;}
-    public SubscriptionManager getSubscriptionManager() {return this.subscriptions;}
-    public void clearInputBuffer() {inputBuffer.clear();}
-    public SystemTelemetry getSystemTelemetry() {return this.systemTelemetry;}
-    
-    private void initNameAssemblers() {
-        List<Context> nameContexts = this.contextIndex.getAllContexts().stream()
+  // 3. Test/production constructor (registry + real listener)
+  public MidiServer(CanonicalRegistry registry, GuiBroadcastListener guiListener) {
+    this.canonicalRegistry = registry;
+    this.guiBroadcastListener = guiListener;
+    this.subscriptions = new SubscriptionManager();
+    this.schema = new ControlSchema(canonicalRegistry);
+    this.viewBuilders = new ViewRegistry();
+    this.viewBuilders.addView(new InputChannelStripViewBuilder(), "basic-input-view");
+    this.contextIndex = new UiContextIndex();
+    this.guiBroadcastListener =
+        new GuiBroadcastListener(new WebSocketGuiBroadcaster(subscriptions), contextIndex);
+    this.serverRouter =
+        new ServerRouter(this, this.subscriptions, this.canonicalRegistry, this.deviceManager);
+    this.uiFactory = null;
+    this.bankFactory = null;
+
+    this.systemTelemetry = new SystemTelemetry();
+
+    this.rehydrationManager =
+        new RehydrationManager(
+            serverRouter.getOutputRouter(),
+            this.canonicalRegistry,
+            Executors.newSingleThreadScheduledExecutor());
+  }
+
+  public void setGuiBroadcastListener(GuiBroadcastListener listener) {
+    this.guiBroadcastListener = listener;
+  }
+
+  public MidiIOManager getMidiDeviceManager() {
+    return this.deviceManager;
+  }
+
+  public CanonicalRegistry getCanonicalRegistry() {
+    return this.canonicalRegistry;
+  }
+
+  public void setCanonicalRegistry(CanonicalRegistry registry) {
+    this.canonicalRegistry = registry;
+  }
+
+  public ConcurrentLinkedQueue<MidiMessage> getInputBuffer() {
+    return this.inputBuffer;
+  }
+
+  public void addtoinputqueue(MidiMessage msg) {
+    inputBuffer.add(msg);
+  }
+
+  public int getInputBufferSize() {
+    return inputBuffer.size();
+  }
+
+  public ControlSchema getControlSchema() {
+    return this.schema;
+  }
+
+  public Optional<ViewBuilder> getViewBuilder(String key) {
+    return this.viewBuilders.getView(key);
+  }
+
+  public UiContextIndex getContextIndex() {
+    return this.contextIndex;
+  }
+
+  public SubscriptionManager getSubscriptionManager() {
+    return this.subscriptions;
+  }
+
+  public void clearInputBuffer() {
+    inputBuffer.clear();
+  }
+
+  public SystemTelemetry getSystemTelemetry() {
+    return this.systemTelemetry;
+  }
+
+  private void initNameAssemblers() {
+    List<Context> nameContexts =
+        this.contextIndex.getAllContexts().stream()
             .filter(c -> c.getContextType() == ContextType.NAME)
             .toList();
 
-        for(Context ctx : nameContexts){
-            if(ctx.getId() == null) {logger.warning("[iniNameAssemblers] Context given is null"); return;}
-            nameAssemblers.add(new ChannelNameAssembler(ctx,canonicalRegistry));
-        }
-        logger.info("Name assemblers initialised");
+    for (Context ctx : nameContexts) {
+      if (ctx.getId() == null) {
+        logger.warning("[iniNameAssemblers] Context given is null");
+        return;
+      }
+      nameAssemblers.add(new ChannelNameAssembler(ctx, canonicalRegistry));
     }
+    logger.info("Name assemblers initialised");
+  }
 
-    private void recreateNameAssemblers() {
-        nameAssemblers.forEach(ChannelNameAssembler::shutdown);
-        logger.info("Shutdown stale nameAssemblers");
-        nameAssemblers = new ArrayList<>();
-        List<Context> nameContexts = contextIndex.getByType(ContextType.NAME);
-        logger.info("Found "+nameContexts.size() + " name contexts to attach assemblers to");
-        for (Context ctx : nameContexts) {
-            if(ctx.getId() == null) {logger.warning("[RecreateNameAssemblers] Context given is null"); return;}
-            nameAssemblers.add(new ChannelNameAssembler(ctx, canonicalRegistry));
-        }
-        logger.info("Recreated name assemblers after registry reload");
+  private void recreateNameAssemblers() {
+    nameAssemblers.forEach(ChannelNameAssembler::shutdown);
+    logger.info("Shutdown stale nameAssemblers");
+    nameAssemblers = new ArrayList<>();
+    List<Context> nameContexts = contextIndex.getByType(ContextType.NAME);
+    logger.info("Found " + nameContexts.size() + " name contexts to attach assemblers to");
+    for (Context ctx : nameContexts) {
+      if (ctx.getId() == null) {
+        logger.warning("[RecreateNameAssemblers] Context given is null");
+        return;
+      }
+      nameAssemblers.add(new ChannelNameAssembler(ctx, canonicalRegistry));
     }
+    logger.info("Recreated name assemblers after registry reload");
+  }
 
-    @PreDestroy
-    public void shutdown() {
-        logger.info("Server is shutting down");
-        if (livenessMonitor != null) {
-            livenessMonitor.stopMonitoring();
-        }
-        systemTelemetry.stop();
-        rehydrationManager.shutdown();
-        nameAssemblers.forEach(ChannelNameAssembler::shutdown);
-        nameAssemblers.clear();
-        deviceManager.shutdown();
-        MidiProcessingLoop.shutdown();
-        logger.info("Shutdown finished");
+  @PreDestroy
+  public void shutdown() {
+    logger.info("Server is shutting down");
+    if (livenessMonitor != null) {
+      livenessMonitor.stopMonitoring();
     }
+    systemTelemetry.stop();
+    rehydrationManager.shutdown();
+    nameAssemblers.forEach(ChannelNameAssembler::shutdown);
+    nameAssemblers.clear();
+    deviceManager.shutdown();
+    MidiProcessingLoop.shutdown();
+    logger.info("Shutdown finished");
+  }
 
+  public void processIncomingMidiForTest() {
+    new MidiProcessingLoop(inputBuffer, inputHandler, canonicalRegistry, guiBroadcastListener)
+        .processIncomingMidi();
+  }
 
-    public void processIncomingMidiForTest() {
-        new MidiProcessingLoop(inputBuffer, inputHandler, canonicalRegistry, guiBroadcastListener)
-                .processIncomingMidi();
-    }
+  @Override
+  public void run() {
+    try {
+      logger.info("MidiServer thread started.");
+      processingLoop =
+          new MidiProcessingLoop(
+              inputBuffer, inputHandler, canonicalRegistry, guiBroadcastListener);
+      Thread processingThread = new Thread(processingLoop, "MidiProcessingThread");
 
-    @Override
-    public void run() {
-        try {
-            logger.info("MidiServer thread started.");
-            processingLoop=new MidiProcessingLoop(inputBuffer, inputHandler, canonicalRegistry, guiBroadcastListener);
-            Thread processingThread = new Thread(processingLoop,"MidiProcessingThread");
-
-            processingThread.setPriority(Thread.NORM_PRIORITY + 1);
-            processingThread.setUncaughtExceptionHandler((t, e) -> {
-                logger.log(Level.SEVERE, "Processing thread crashed: " + t.getName(), e);
-
-                WebSocketEndpoint.broadcast(
-                    EventObject.fromServerEvent(
-                        ServerEventSerializer.fatal(
-                            e,
-                            "PROCESSING",
-                            "Midi processing thread crashed: " + t.getName()
-                    )).getAsString()
-                );
-            });
-            processingThread.start();
-
-            deskDiscovery = new DeskDiscovery(deviceManager);
-            deskDiscovery.injectNewRegistry(canonicalRegistry);
-            DeskDiscoveryResult result = deskDiscovery.discoverDeskModel();
-
-            if (result != null) {
-                String deskModel = result.getModel();
-                logger.info(String.format("Detected valid desk %s", deskModel));
-
-                List<SysexMapping> discoveredMappings =
-                    SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(deskModel));
-
-                int midi_channel = result.midiChannel();
-                if (midi_channel != 0) {
-                    for (SysexMapping m : discoveredMappings) {
-                        m.setDeviceNumber(midi_channel);
-                    }
-                }
-                logger.info(String.format("Desk operating on midi channel %d",midi_channel));
-                CanonicalRegistry newRegistry = new CanonicalRegistry(discoveredMappings, new SysexParser(discoveredMappings));
-                newRegistry.setDeskType(result.getModel());
-                onRegistryReloaded(newRegistry);
-                logger.info("Starting liveness monitor");
-                livenessMonitor = new DeviceLivenessMonitor(deskDiscovery,newRegistry, this.deviceManager);
-                livenessMonitor.startMonitoring();
-            }
-            else {
-                String deskType = "YAMAHA_01V96I";
-                List<SysexMapping> defaultMappings =
-                    SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(deskType));
-                CanonicalRegistry newRegistry = new CanonicalRegistry(defaultMappings, new SysexParser(defaultMappings));
-                newRegistry.setDeskType(deskType);
-                onRegistryReloaded(newRegistry);
-
-                logger.info("Discovery failed to detect a valid desk response on the midi system\n"+
-                    String.format("fallback %s", deskType));
-            }
-
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "MidiServer thread crashed", e);
+      processingThread.setPriority(Thread.NORM_PRIORITY + 1);
+      processingThread.setUncaughtExceptionHandler(
+          (t, e) -> {
+            logger.log(Level.SEVERE, "Processing thread crashed: " + t.getName(), e);
 
             WebSocketEndpoint.broadcast(
-                ServerEventSerializer.fatal(
-                    e,
-                    "SERVER",
-                    "MidiServer main thread crashed"
-                ).getAsString()
-            );
+                EventObject.fromServerEvent(
+                        ServerEventSerializer.fatal(
+                            e, "PROCESSING", "Midi processing thread crashed: " + t.getName()))
+                    .getAsString());
+          });
+      processingThread.start();
+
+      deskDiscovery = new DeskDiscovery(deviceManager);
+      deskDiscovery.injectNewRegistry(canonicalRegistry);
+      DeskDiscoveryResult result = deskDiscovery.discoverDeskModel();
+
+      if (result != null) {
+        String deskModel = result.getModel();
+        logger.info(String.format("Detected valid desk %s", deskModel));
+
+        List<SysexMapping> discoveredMappings =
+            SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(deskModel));
+
+        int midi_channel = result.midiChannel();
+        if (midi_channel != 0) {
+          for (SysexMapping m : discoveredMappings) {
+            m.setDeviceNumber(midi_channel);
+          }
         }
+        logger.info(String.format("Desk operating on midi channel %d", midi_channel));
+        CanonicalRegistry newRegistry =
+            new CanonicalRegistry(discoveredMappings, new SysexParser(discoveredMappings));
+        newRegistry.setDeskType(result.getModel());
+        onRegistryReloaded(newRegistry);
+        logger.info("Starting liveness monitor");
+        livenessMonitor = new DeviceLivenessMonitor(deskDiscovery, newRegistry, this.deviceManager);
+        livenessMonitor.startMonitoring();
+      } else {
+        String deskType = "YAMAHA_01V96I";
+        List<SysexMapping> defaultMappings =
+            SysexMappingLoader.loadMappingsFromResource(MappingFiles.getFilePathByKey(deskType));
+        CanonicalRegistry newRegistry =
+            new CanonicalRegistry(defaultMappings, new SysexParser(defaultMappings));
+        newRegistry.setDeskType(deskType);
+        onRegistryReloaded(newRegistry);
+
+        logger.info(
+            "Discovery failed to detect a valid desk response on the midi system\n"
+                + String.format("fallback %s", deskType));
+      }
+
+    } catch (Exception e) {
+      logger.log(Level.SEVERE, "MidiServer thread crashed", e);
+
+      WebSocketEndpoint.broadcast(
+          ServerEventSerializer.fatal(e, "SERVER", "MidiServer main thread crashed").getAsString());
+    }
+  }
+
+  public ServerRouter getServerRouter() {
+    return this.serverRouter;
+  }
+
+  public UiBankFactory getUiBankFactory() {
+    return this.bankFactory;
+  }
+
+  public BankCatalog getBankCatalog() {
+    return this.bankCatalog;
+  }
+
+  public UiModelFactory getUiModelFactory() {
+    return this.uiFactory;
+  }
+
+  private void initContextIndex() {
+    contextIndex.addAll(discoveryEngine.discoverContexts());
+    initNameAssemblers();
+  }
+
+  private void reloadContextIndex() {
+    this.contextIndex = new UiContextIndex();
+    logger.info("Reloading Context Index");
+    contextIndex.addAll(discoveryEngine.discoverContexts());
+    this.guiBroadcastListener.reloadContextIndex(contextIndex);
+  }
+
+  @Override
+  public UiModelDTO buildUiModel(String contextId, String uiTypeRaw) {
+
+    String baseTypeTmp = uiTypeRaw;
+    String suffix = null;
+
+    int colonIndex = uiTypeRaw.indexOf(':');
+    if (colonIndex >= 0) {
+      baseTypeTmp = uiTypeRaw.substring(0, colonIndex);
+      suffix = uiTypeRaw.substring(colonIndex + 1);
     }
 
+    final String baseType = baseTypeTmp;
 
-    public ServerRouter getServerRouter() {
-        return this.serverRouter;
+    ViewBuilder builder =
+        viewBuilders
+            .getView(baseType)
+            .orElseThrow(() -> new IllegalArgumentException("Unknown uiType: " + baseType));
+
+    UiModelDTO model =
+        new UiModelFactory(canonicalRegistry, builder, contextIndex)
+            .buildUiModel(contextId, suffix);
+
+    return model;
+  }
+
+  private void onRegistryReloaded(CanonicalRegistry newRegistry) {
+    logger.info("Performing discovery after registry reload");
+
+    if (canonicalRegistry != newRegistry) {
+      newRegistry.addReloadListener(this::onRegistryReloaded);
+    }
+    canonicalRegistry = newRegistry;
+    serverRouter.setRegistry(newRegistry);
+    logger.info("Replaced server canonical registry");
+
+    if (deskDiscovery != null) {
+      deskDiscovery.injectNewRegistry(newRegistry);
+      logger.info(String.format("Injected registry to desk discovery on registry reload"));
     }
 
-    public UiBankFactory getUiBankFactory() {
-        return this.bankFactory;
+    if (livenessMonitor != null) {
+      livenessMonitor.injectNewRegistry(newRegistry);
+      logger.info(String.format("Injected registry to liveness monitor on registry reload"));
+    } else {
+      livenessMonitor = new DeviceLivenessMonitor(deskDiscovery, newRegistry, this.deviceManager);
+      livenessMonitor.startMonitoring();
     }
 
-    public BankCatalog getBankCatalog() {
-        return this.bankCatalog;
+    if (processingLoop != null) {
+      processingLoop.setCanonicalRegistry(newRegistry);
+      logger.info("Updating processing loop");
     }
 
-    public UiModelFactory getUiModelFactory() {
-        return this.uiFactory;
+    discoveryEngine = new ContextDiscoveryEngine(newRegistry);
+    if (bankFactory != null) {
+      bankFactory.setDiscoveryEngine(discoveryEngine);
     }
+    logger.info(String.format("Rebuilt discovery engine on registry reload"));
 
-    private void initContextIndex(){
-        contextIndex.addAll(discoveryEngine.discoverContexts());
-        initNameAssemblers();
+    reloadContextIndex();
+    logger.info(String.format("Reloaded context index on registry reload"));
+
+    rehydrationManager.injectNewRegistry(newRegistry);
+    logger.info(String.format("Injected registry to rehydrationManager on registry reload"));
+
+    recreateNameAssemblers();
+
+    String resource =
+        MidiControl.NrpnUtils.MappingFiles.getFilePathByKey(canonicalRegistry.getDeskType());
+
+    List<NrpnMapping> nrpnMappings = NrpnMappingLoader.loadFromResource(resource);
+
+    try {
+      this.canonicalRegistry.attachNrpnMappings(nrpnMappings);
+    } catch (OutOfRangeException e) {
+      logger.severe(e.toString());
     }
+  }
 
-    private void reloadContextIndex(){
-        this.contextIndex = new UiContextIndex();
-        logger.info("Reloading Context Index");
-        contextIndex.addAll(discoveryEngine.discoverContexts());
-        this.guiBroadcastListener.reloadContextIndex(contextIndex);
-    }
-
-    @Override
-    public UiModelDTO buildUiModel(String contextId, String uiTypeRaw) {
-
-        String baseTypeTmp = uiTypeRaw;
-        String suffix = null;
-
-        int colonIndex = uiTypeRaw.indexOf(':');
-        if (colonIndex >= 0) {
-            baseTypeTmp = uiTypeRaw.substring(0, colonIndex);
-            suffix = uiTypeRaw.substring(colonIndex + 1);
-        }
-
-        final String baseType = baseTypeTmp;
-
-        ViewBuilder builder = viewBuilders.getView(baseType)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Unknown uiType: " + baseType));
-
-        UiModelDTO model = new UiModelFactory(
-                canonicalRegistry,
-                builder,
-                contextIndex
-        ).buildUiModel(contextId,suffix);
-
-        return model;
-    }
-    
-    private void onRegistryReloaded(CanonicalRegistry newRegistry) {
-        logger.info("Performing discovery after registry reload");
-
-        canonicalRegistry = newRegistry;
-        logger.info("Replaced server canonical registry");
-
-
-        if(deskDiscovery != null){
-        deskDiscovery.injectNewRegistry(newRegistry);
-        logger.info(String.format("Injected registry to desk discovery on registry reload"));
-        }
-
-        if(livenessMonitor != null) {
-            livenessMonitor.injectNewRegistry(newRegistry);
-            logger.info(String.format("Injected registry to liveness monitor on registry reload"));
-        }
-        else{
-            livenessMonitor = new DeviceLivenessMonitor(deskDiscovery,newRegistry, this.deviceManager);
-            livenessMonitor.startMonitoring();
-        }
-
-        if(processingLoop != null){
-            processingLoop.setCanonicalRegistry(newRegistry);
-            logger.info("Updating processing loop");
-        }
-
-        discoveryEngine = new ContextDiscoveryEngine(newRegistry);
-        if (bankFactory != null) {
-            bankFactory.setDiscoveryEngine(discoveryEngine);
-        }
-        logger.info(String.format("Rebuilt discovery engine on registry reload"));
-
-        reloadContextIndex();
-        logger.info(String.format("Reloaded context index on registry reload"));
-
-        rehydrationManager.injectNewRegistry(newRegistry);
-        logger.info(String.format("Injected registry to rehydrationManager on registry reload"));
-
-        recreateNameAssemblers();
-
-        String resource = MidiControl.NrpnUtils.MappingFiles.getFilePathByKey(canonicalRegistry.getDeskType());
-
-        List<NrpnMapping> nrpnMappings =
-            NrpnMappingLoader.loadFromResource(resource);
-
-        try {
-            this.canonicalRegistry.attachNrpnMappings(nrpnMappings);
-        }
-        catch (OutOfRangeException e) {
-            logger.severe(e.toString());
-        }
-    }
-
-    public RehydrationManager getRehydrationManager() {
-        return this.rehydrationManager;
-    }
+  public RehydrationManager getRehydrationManager() {
+    return this.rehydrationManager;
+  }
 }

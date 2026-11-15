@@ -1,12 +1,24 @@
 package MidiControl.functional.MidiServer;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import MidiControl.Controls.CanonicalRegistry;
 import MidiControl.DeskDiscovery.DeskDiscovery;
+import MidiControl.LivenessMonitor.DeviceLivenessMonitor;
 import MidiControl.MidiDeviceManager.MidiIOManager;
 import MidiControl.MidiDeviceManager.MidiInputReceiver;
+import MidiControl.MidiDeviceManager.TransportMode;
+import MidiControl.Mocks.FakeSession;
 import MidiControl.Mocks.MockMidiOut;
+import MidiControl.Server.MidiProcessingLoop;
 import MidiControl.Server.MidiServer;
 import MidiControl.TestUtilities.MidiTestUtils;
 import java.util.ArrayList;
@@ -20,6 +32,7 @@ import javax.sound.midi.ShortMessage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
 
 @Tag("functional")
@@ -122,6 +135,80 @@ public class MidiServerTest {
     }
   }
 
+  @Test
+  void discoveredRegistryAndProfileReloadKeepBankModelsInSyncWithClientChanges() {
+    try (MockedConstruction<MidiIOManager> io = mockConstruction(MidiIOManager.class,
+            (mock, context) -> {
+              when(mock.getTransportMode()).thenReturn(TransportMode.NRPN);
+              when(mock.trySetInputDevice(anyInt())).thenReturn(true);
+              when(mock.trySetOutputDevice(anyInt())).thenReturn(true);
+            });
+        MockedConstruction<DeviceLivenessMonitor> liveness = mockConstruction(DeviceLivenessMonitor.class);
+        MockedConstruction<MidiProcessingLoop> processing = mockConstruction(MidiProcessingLoop.class)) {
+      MidiServer server = createServer();
+      CanonicalRegistry initial = server.getCanonicalRegistry();
+      server.run();
+      CanonicalRegistry discovered = server.getCanonicalRegistry();
+      assertNotSame(initial, discovered);
+      FakeSession session = new FakeSession("bank-state");
+
+      requestModel(server, session, "channel.0");
+      changeFader(server, session, 77);
+      requestModel(server, session, "channel.8");
+      assertEquals(77, faderValue(requestModel(server, session, "channel.0")));
+      assertEquals(77, discovered.resolveCanonicalId("kInputFader.kFader.0").getValue());
+      assertNotEquals(77, initial.resolveCanonicalId("kInputFader.kFader.0").getValue());
+
+      ArgumentCaptor<byte[]> messages = ArgumentCaptor.forClass(byte[].class);
+      verify(io.constructed().get(0), atLeastOnce()).sendAsync(messages.capture());
+      List<byte[]> expected = discovered.resolveCanonicalId("kInputFader.kFader.0").buildNrpnChange(77);
+      assertEquals(expected.size(), messages.getAllValues().size());
+      for (int i = 0; i < expected.size(); i++) {
+        assertArrayEquals(expected.get(i), messages.getAllValues().get(i));
+      }
+
+      clearInvocations(io.constructed().get(0));
+      server.getServerRouter().handleMessage(session, """
+          {"type":"apply-midi-settings","payload":{"inputDeviceId":0,"outputDeviceId":0,
+          "consoleType":"YAMAHA_M7CL","safeprofile":true,"mainprofile":false,"highprofile":false}}
+          """);
+      assertNotNull(server.getCanonicalRegistry().getGroup("kMixToMatrix"));
+      changeFader(server, session, 95);
+      requestModel(server, session, "channel.8");
+      assertEquals(95, faderValue(requestModel(server, session, "channel.0")));
+      messages = ArgumentCaptor.forClass(byte[].class);
+      verify(io.constructed().get(0), atLeastOnce()).sendAsync(messages.capture());
+      expected = server.getCanonicalRegistry().resolveCanonicalId("kInputFader.kFader.0")
+          .buildNrpnChange(95);
+      assertEquals(expected.size(), messages.getAllValues().size());
+      for (int i = 0; i < expected.size(); i++) {
+        assertArrayEquals(expected.get(i), messages.getAllValues().get(i));
+      }
+    }
+  }
+
+  private static void changeFader(MidiServer server, FakeSession session, int value) {
+    server.getServerRouter().handleMessage(session, """
+        {"type":"set-control-value","payload":{"canonicalId":"kInputFader.kFader.0","value":%d}}
+        """.formatted(value));
+  }
+
+  private static JsonObject requestModel(MidiServer server, FakeSession session, String context) {
+    server.getServerRouter().handleMessage(session, """
+        {"type":"get-ui-model","payload":{"contextId":"%s","uiType":"basic-input-view"}}
+        """.formatted(context));
+    return JsonParser.parseString(session.lastSent).getAsJsonObject().getAsJsonObject("payload");
+  }
+
+  private static int faderValue(JsonObject model) {
+    for (var element : model.getAsJsonArray("controls")) {
+      JsonObject control = element.getAsJsonObject();
+      if ("kInputFader.kFader.0".equals(control.get("canonicalId").getAsString())) {
+        return control.get("value").getAsInt();
+      }
+    }
+    throw new AssertionError("Fader not found in bank model");
+  }
   @Test
   void testInputQueueHelperAddsMessages() throws Exception {
     ShortMessage msg = MidiTestUtils.createControlChange(0, 99, 1);

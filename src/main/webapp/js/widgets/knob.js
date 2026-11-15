@@ -27,6 +27,17 @@ export function renderKnob(control) {
 
     wrapper.appendChild(knob);
 
+    let result = wrapper;
+    let readout = null;
+    if (control.controlRole === "INPUT_ATTENUATION") {
+        result = document.createElement("div");
+        result.className = "knob-with-readout";
+        readout = document.createElement("output");
+        readout.className = "knob-readout";
+        readout.setAttribute("aria-label", "Attenuation");
+        result.append(wrapper, readout);
+    }
+
     const needsNormalization = (control.max - control.min) > 127;
     const uiMin = 0;
     const uiMax = 127;
@@ -43,8 +54,15 @@ export function renderKnob(control) {
 
     let uiValue = toUiValue(control.value);
 
+<<<<<<< HEAD
+=======
     updateKnobVisual(uiValue);
+    wrapper.setRawValue = rawValue => {
+        control.value = rawValue;
+        uiValue = toUiValue(rawValue);
+    };
 
+>>>>>>> 2470060 (Reuse ui models and reduce loading of banks within console view plus nrpn fix for 01v eq lowG)
     function updateKnobVisual(val) {
         const angle = valueToAngle(val, uiMin, uiMax);
         valueArc.style.transform = `rotate(${angle}deg)`;
@@ -52,13 +70,25 @@ export function renderKnob(control) {
         setTimeout(() => valueArc.classList.remove("updated"), 80);
     }
 
+    function updateValue(raw) {
+        control.value = raw;
+        uiValue = toUiValue(raw);
+        updateKnobVisual(uiValue);
+        if (readout) {
+            const db = raw / 10;
+            readout.textContent = `${db > 0 ? "+" : ""}${db.toFixed(1)} dB`;
+        }
+    }
+
+    wrapper.updateValue = updateValue;
+    updateValue(control.value);
+
     knob.addEventListener("wheel", (e) => {
         e.preventDefault();
         const delta = e.deltaY < 0 ? 1 : -1;
         uiValue = clamp(uiValue + delta, uiMin, uiMax);
         const rawValue = fromUiValue(uiValue);
-        control.value = rawValue;
-        updateKnobVisual(uiValue);
+        updateValue(rawValue);
         const canonicalId = canonicalIdFor(control);
         window.wsClient?.sendControlChange(canonicalId, rawValue);
     });
@@ -81,27 +111,32 @@ export function renderKnob(control) {
         uiValue = clamp(startUiValue + deltaY * sensitivity, uiMin, uiMax);
         uiValue = Math.round(uiValue);
         const rawValue = fromUiValue(uiValue);
-        control.value = rawValue;
-        updateKnobVisual(uiValue);
+        updateValue(rawValue);
         const canonicalId = canonicalIdFor(control);
         window.wsClient?.sendControlChange(canonicalId, rawValue);
     }
 
     function endDrag() {
+        startY = null;
+        startUiValue = null;
         document.removeEventListener("pointermove", onDrag);
         document.removeEventListener("pointerup", endDrag);
     }
+    wrapper.cancelInteraction = endDrag;
 
     knob.addEventListener("dblclick", () => {
-        uiValue = Math.round((uiMin + uiMax) / 2);
-        const rawValue = fromUiValue(uiValue);
-        control.value = rawValue;
-        updateKnobVisual(uiValue);
+        if (control.readOnly) return;
+        const rawValue = control.defaultValue;
+        if (!Number.isInteger(rawValue) || rawValue < control.min || rawValue > control.max) {
+            console.error("Cannot reset knob with invalid default value:", control.canonicalId, rawValue);
+            return;
+        }
+        updateValue(rawValue);
         const canonicalId = canonicalIdFor(control);
         window.wsClient?.sendControlChange(canonicalId, rawValue);
     });
 
-    return wrapper;
+    return result;
 }
 
 export function updateKnob(el, rawValue) {
@@ -123,10 +158,11 @@ export function updateKnob(el, rawValue) {
 
     const angle = valueToAngle(uiValue, uiMin, uiMax);
     valueArc.style.transform = `rotate(${angle}deg)`;
+    knob.setRawValue?.(rawValue);
     
     el.dispatchEvent(
         new CustomEvent("control-update", {
-            detail: { rawValue }
+            detail: { value: rawValue, rawValue }
         })
     );
 }

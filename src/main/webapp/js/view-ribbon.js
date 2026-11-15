@@ -10,20 +10,9 @@ export function buildViewRibbonFromModel(
 
     if (!panel) return;
 
-    panel.innerHTML = "";
-
-    const deskStatusElement = document.createElement("div");
-    deskStatusElement.id = "desk-status";
-    deskStatusElement.className = "desk-dead";
-    deskStatusElement.textContent = "Waiting for desk status…";
-    deskStatusElement.setAttribute("role", "status");
-    deskStatusElement.setAttribute("aria-live", "polite");
-    deskStatusElement.setAttribute(
-        "aria-label",
-        "Waiting for desk status"
-    );
-
-    panel.appendChild(deskStatusElement);
+    const deskStatusElement = document.getElementById("desk-status");
+    panel.replaceChildren();
+    if (deskStatusElement) panel.appendChild(deskStatusElement);
 
     const settingsLink = document.createElement("a");
     settingsLink.className = "sof-btn soft-key page-nav-link";

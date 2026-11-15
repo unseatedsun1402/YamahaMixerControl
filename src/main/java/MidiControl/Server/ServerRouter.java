@@ -50,7 +50,7 @@ public class ServerRouter {
     private long lastMeterRefreshNanos;
     private static final Logger logger = Logger.getLogger(ServerRouter.class.getName());
     private final MidiIOManager ioManager;
-    private CanonicalRegistry registry;
+    private volatile CanonicalRegistry registry;
     private StateRehydrationService rehydrationService;
     private Settings serverSettings = new ServerSettings();
 
@@ -76,6 +76,11 @@ public class ServerRouter {
 
     public void injectApp(StateRehydrationService serv){
         this.rehydrationService = serv;
+    }
+
+    public void setRegistry(CanonicalRegistry registry) {
+        this.registry = registry;
+        outputRouter.setRegistry(registry);
     }
 
     public static void enableDebug(){

@@ -19,7 +19,7 @@
 
     <script type="module">
         import { WebSocketClient } from './js/websocketClient.js';
-        import { renderUiModel } from './js/new-ui-renderer.js';
+        import { renderUiModel, setStripContexts } from './js/new-ui-renderer.js';
         import { applyControlUpdate } from './js/partial-update.js';
         import { buildViewRibbonFromModel } from './js/view-ribbon.js';
         import { updateChannelStripName } from './js/utils/channel-name.js';
@@ -44,7 +44,8 @@
 
         const ws = new WebSocketClient(wsUrl);
         installAuthentication(ws);
-        var deskStatusWidget; 
+        const deskStatusWidget = new DeskStatusWidget(document.getElementById("desk-status"));
+        let pendingModels = new Map();
 
         ws.on("connected", () => {
             console.info("[Bootstrap] Connected — requesting bank.inputs…");
@@ -64,6 +65,8 @@
 
         function selectOutputMode() {
 
+            pendingModels.clear();
+            setStripContexts([]);
             window.currentDomain = "output";
             updateModeButtonState();
             window.currentView = "basic-master-view";
@@ -77,6 +80,8 @@
 
         function selectInputMode() {
 
+            pendingModels.clear();
+            setStripContexts([]);
             window.currentDomain ="input";
             updateModeButtonState();
             window.currentView ="basic-input-view";
@@ -115,13 +120,11 @@
                 window.allContexts.slice(start, end);
             console.log("Contexts", visibleContexts);
             
-            const stripContainer =
-                document.getElementById("strip-container");
-
-            stripContainer.innerHTML = "";
+            setStripContexts(visibleContexts);
+            pendingModels = new Map();
 
             for (const ctxId of visibleContexts) {
-                ws.requestUiModel(ctxId, window.currentView);
+                pendingModels.set(ctxId, ws.requestUiModel(ctxId, window.currentView));
             }
             ws.requestChannelNames();
         }
@@ -193,6 +196,11 @@
         }
         
         ws.on("ui-bank", (bank) => {
+            const expectedBank = window.currentDomain === "output" ? "bank.mixes" : "bank.inputs";
+            if (bank.contextId !== expectedBank) {
+                console.debug("[Bootstrap] Ignoring bank for inactive mode:", bank.contextId);
+                return;
+            }
 
             window.allContexts = bank.contexts;
 
@@ -222,6 +230,11 @@
         ws.on("ui-model", (model) => {
 
             console.log("UI MODEL RECEIVED", model.contextId);
+            if (pendingModels.get(model.contextId) !== model.__meta?.requestId) {
+                console.debug("[Bootstrap] Ignoring stale UI model:", model.contextId);
+                return;
+            }
+            pendingModels.delete(model.contextId);
 
             if (!window.ribbonInitialised) {
                 buildViewRibbonFromModel(
@@ -231,9 +244,17 @@
                 window.ribbonInitialised = true;
             }
             
-            deskStatusWidget = new DeskStatusWidget(document.getElementById("desk-status"));
-            console.info("Instantiated desk status widget")
             renderUiModel(model);
+            const container = document.getElementById("strip-container");
+            const order = window.allContexts.slice(
+                window.currentBank * window.channelsPerBank,
+                (window.currentBank + 1) * window.channelsPerBank
+            );
+            const strip = Array.from(container.children)
+                .find(element => element.dataset.contextId === model.contextId);
+            const next = Array.from(container.children)
+                .find(element => order.indexOf(element.dataset.contextId) > order.indexOf(model.contextId));
+            if (strip && next) container.insertBefore(strip, next);
         });
 
         ws.on("control-update", (payload) => {
@@ -260,13 +281,17 @@
 
         ws.on("REGISTRY_CHANGED", (payload) => {
             console.info("[Bootstrap] Registry changed:", payload);
+            pendingModels.clear();
+            setStripContexts([]);
+            window.ribbonInitialised = false;
+            ws.requestBank(window.currentDomain === "output" ? "bank.mixes" : "bank.inputs");
         });
 
         ws.on("server-event", handleServerEvent)
         
         function handleServerEvent(event) {
             if (event.category === "LIVENESS") {
-                if (deskStatusWidget) deskStatusWidget.update(event);
+                deskStatusWidget.update(event);
             }
         }
 
@@ -277,7 +302,7 @@
 
 <body>
     <div id="ui-root">
-        <div id="view-ribbon"></div>
+        <div id="view-ribbon"><div id="desk-status" role="status" aria-live="polite"></div></div>
         <div id="bank-selector"></div>
         <div id="strip-container"></div>
     </div>
