@@ -22,6 +22,12 @@ The script reuses a responding preview on port 18080 or starts the app headlessl
 with Gradle and prints the local `main.html` URL. Keep the terminal open while
 using the preview.
 
+The channel detail page includes input patch selection, attenuation, send on and
+pre/post controls, and mute-group assignments where supported. On the 01V96i,
+bus assignments are separate from aux sends. On the M7CL, fixed mixes use the
+send on control; level and pre/post controls are disabled while the mix is fixed.
+Output patch selection is not yet available on this page.
+
 For a Windows desktop launcher (recommended for file-browser launches), run:
 
 ```powershell

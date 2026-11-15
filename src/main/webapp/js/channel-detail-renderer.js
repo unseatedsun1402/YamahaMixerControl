@@ -22,8 +22,11 @@ const SECTION_TITLES = {
     "bus.fader":            "Fader",
     "bus.pan":              "Pan",
     "channel.mute":         "Mute",
+    "channel.mute-groups":  "Mute Groups",
     "channel.pair":         "Pair",
-    "channel.attenuation":  "Attenuation"
+    "channel.attenuation":  "Attenuation",
+    "input.patch":          "Input Patch",
+    "input.bus-routing":    "Bus Assignments"
 };
 
 /**
@@ -33,13 +36,16 @@ const SECTION_TITLES = {
 const SECTION_ORDER = [
     "input.control",
     "channel.mute",
+    "channel.mute-groups",
     "channel.pair",
     "input.pan",
     "bus.pan",
     "channel.attenuation",
+    "input.patch",
     "input.eq",
     "input.dynamics",
     "input.send",
+    "input.bus-routing",
     "input.fader",
     "bus.fader"
 ];
@@ -48,15 +54,18 @@ const COLUMN_GROUPS = {
     left: new Set([
         "input.control",
         "channel.mute",
+        "channel.mute-groups",
         "channel.pair",
         "input.pan",
         "bus.pan",
         "channel.attenuation",
+        "input.patch",
         "input.dynamics"
     ]),
     center: new Set(["input.eq"]),
     right: new Set([
         "input.send",
+        "input.bus-routing",
         "input.fader",
         "bus.fader"
     ])
@@ -146,8 +155,12 @@ export function renderChannelDetail(model) {
         sectionTitle.textContent = SECTION_TITLES[groupName] || groupName;
         section.appendChild(sectionTitle);
 
-        for (const control of controls) {
-            section.appendChild(renderControl(control));
+        if (groupName === "input.send") {
+            renderSends(section, controls);
+        } else {
+            for (const control of controls) {
+                section.appendChild(renderControl(control));
+            }
         }
 
         columns[columnName].appendChild(section);
@@ -161,6 +174,44 @@ export function renderChannelDetail(model) {
     attachChannelDetailVisualizations(panel);
 
     currentPanel = panel;
+}
+
+function renderSends(section, controls) {
+    const sends = new Map();
+    for (const control of controls) {
+        if (!sends.has(control.sendIndex)) {
+            const send = document.createElement("div");
+            send.className = "detail-send";
+            sends.set(control.sendIndex, send);
+            section.appendChild(send);
+        }
+        sends.get(control.sendIndex).appendChild(renderControl(control));
+    }
+
+    for (const send of sends.values()) {
+        const pre = send.querySelector('[data-role="INPUT_SEND_PRE"]');
+        if (pre) {
+            const button = pre.querySelector("button");
+            const updateLabel = () => {
+                button.textContent = button.classList.contains("active") ? "Pre" : "Post";
+            };
+            button.addEventListener("click", updateLabel);
+            pre.addEventListener("control-update", updateLabel);
+            updateLabel();
+        }
+
+        const type = send.querySelector('[data-role="INPUT_SEND_TYPE"]');
+        if (type) {
+            const updateType = () => {
+                const fixed = Number(type.dataset.value) === 2;
+                send.classList.toggle("detail-send-fixed", fixed);
+                const preButton = pre?.querySelector("button");
+                if (preButton) preButton.disabled = fixed || pre.controlMeta.readOnly;
+            };
+            type.addEventListener("control-update", updateType);
+            updateType();
+        }
+    }
 }
 
 export function getDetailPanel() {
