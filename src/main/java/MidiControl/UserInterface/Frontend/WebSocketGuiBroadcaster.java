@@ -1,27 +1,39 @@
 package MidiControl.UserInterface.Frontend;
 
-import java.util.logging.Logger;
-
 import MidiControl.Routing.WebSocketEndpoint;
 import MidiControl.Server.SubscriptionManager;
 import jakarta.websocket.Session;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Logger;
 
 public class WebSocketGuiBroadcaster implements GuiBroadcaster {
 
-    private SubscriptionManager subscriptions;
+  private SubscriptionManager subscriptions;
 
-    public WebSocketGuiBroadcaster(SubscriptionManager subscriptions) {
-        this.subscriptions = subscriptions;
+  public WebSocketGuiBroadcaster(SubscriptionManager subscriptions) {
+    this.subscriptions = subscriptions;
+  }
+
+  @Override
+  public void broadcast(String json, String contextId) {
+    broadcast(json, java.util.List.of(contextId));
+  }
+
+  @Override
+  public void broadcast(String json, Collection<String> contextIds) {
+    Set<Session> sessions = new HashSet<>();
+    for (String contextId : contextIds) {
+      sessions.addAll(subscriptions.getSubscribers(contextId));
     }
-
-    @Override
-    public void broadcast(String json, String contextId) {
-        for (Session s : subscriptions.getSubscribers(contextId)) {
-            try {
-                WebSocketEndpoint.send(s, json);
-            } catch (Exception e) {
-                Logger.getLogger("WebSocketGuiBroadcaster").severe("Exception thrown sending update to subscriber "+s.getId());
-            }
-        }
-}
+    for (Session s : sessions) {
+      try {
+        WebSocketEndpoint.send(s, json);
+      } catch (Exception e) {
+        Logger.getLogger("WebSocketGuiBroadcaster")
+            .severe("Exception thrown sending update to subscriber " + s.getId());
+      }
+    }
+  }
 }

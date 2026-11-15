@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import MidiControl.ContextModel.Context;
 import MidiControl.ContextModel.ContextFilter;
+import MidiControl.ContextModel.ChannelMapLoader;
 import MidiControl.ContextModel.ControlType;
 import MidiControl.ContextModel.ViewBuilder;
 import MidiControl.ContextModel.ViewControl;
@@ -31,11 +32,12 @@ import MidiControl.Controls.ControlInstance;
  *   <li>MUTE toggle</li>
  *   <li>PAIR toggle</li>
  *   <li>PAN horizontal slider</li>
- *   <li>ATTENUATION knob (head amp)</li>
+ *   <li>ATTENUATION knob and input patch selector</li>
  *   <li>EQ — 4 bands x G/F/Q</li>
  *   <li>GATE / DYNAMICS1 toggle</li>
  *   <li>COMPRESSOR / DYNAMICS2 — on toggle, ratio, threshold</li>
- *   <li>SEND_MIX{n} — all mix/aux send knobs, sorted by bus index</li>
+ *   <li>Mix/aux send levels, on and pre/post controls, and bus assignments</li>
+ *   <li>Mute-group assignments</li>
  *   <li>FADER</li>
  * </ul>
  *
@@ -45,6 +47,7 @@ import MidiControl.Controls.ControlInstance;
  *   <li>PAN</li>
  *   <li>COMPRESSOR — on toggle, ratio, threshold</li>
  *   <li>EQ — 4 bands x G/F/Q</li>
+ *   <li>Mute-group assignments</li>
  * </ul>
  *
  * <p>Registered under the key {@code "channel-detail-view"} in
@@ -58,6 +61,10 @@ public class ChannelDetailViewBuilder implements ViewBuilder {
 
     private static final Pattern SEND_PATTERN =
             Pattern.compile("^k(Mix|AUX)(\\d+)Level$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern MUTE_GROUP_PATTERN =
+            Pattern.compile("^k(?:MuteAssign|InGroupMute|BusGroupMute)(\\d+)$");
+    private static final Pattern BUS_ROUTING_PATTERN =
+            Pattern.compile("^kRoutingBus(\\d+)$");
 
     private static final String VIEW_TYPE = "channel-detail-view";
 
@@ -97,9 +104,10 @@ public class ChannelDetailViewBuilder implements ViewBuilder {
 
         String viewSuffix = suffix != null ? suffix : context.getId();
 
-        // Fetch all instances once and reuse for group-based lookups
-        List<ControlInstance> all =
-                registry.getAllInstancesForContext(context.getId());
+        List<ControlInstance> all = new ArrayList<>();
+        for (ContextFilter filter : context.getFilters()) {
+            all.addAll(registry.getInstancesForFilter(filter));
+        }
 
         // --- Channel On ---
         ControlInstance channelOn = registry.find(channelIndex, "kInputOn", "kChannelOn");
@@ -112,7 +120,7 @@ public class ChannelDetailViewBuilder implements ViewBuilder {
         }
 
         // --- Mute ---
-        ControlInstance mute = findFirstInGroup(all, "kInputMute");
+        ControlInstance mute = findInstance(all, "kInputMute", "kMute");
         if (mute != null) {
             result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
                     mute, "MUTE", "channel.mute", "Mute",
@@ -139,17 +147,26 @@ public class ChannelDetailViewBuilder implements ViewBuilder {
                     pan, VIEW_TYPE, viewSuffix, channelIndex));
         }
 
-        // --- Attenuation / Head Amp ---
-        ControlInstance ha = findFirstInGroup(all, "kInputHA");
-        if (ha == null) {
-            ha = findFirstInGroup(all, "kInputAttenuation");
-        }
+        // --- Attenuation ---
+        ControlInstance ha = findInstance(all, "kInputAttenuator", "kAtt");
         if (ha != null) {
             result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
                     ha, "ATTENUATION", "channel.attenuation", "Attenuation",
                     ControlType.KNOB, VIEW_TYPE, viewSuffix,
                     "INPUT_ATTENUATION", null));
         }
+
+        ControlInstance inputPatch = findFirst(all,
+                "kChannelInput", "kChannelIn",
+                "kPatchInInput", "kPatchIn");
+        if (inputPatch != null) {
+            ViewControl patch = createControl(inputPatch, "INPUT_PATCH", "input.patch",
+                    "Input source", ControlType.SELECT, viewSuffix, "INPUT_PATCH", null);
+            patch.options = ChannelMapLoader.loadSources(registry.getDeskType());
+            result.add(patch);
+        }
+
+        addMuteGroups(result, all, "kInputMute", "kInputGroup", viewSuffix);
 
         // --- EQ (4 bands x G/F/Q) ---
         addInputEqControls(result, registry, channelIndex, viewSuffix);
@@ -218,9 +235,41 @@ public class ChannelDetailViewBuilder implements ViewBuilder {
                         || "kInputAUX".equals(ci.getGroup()))
                 .filter(ci -> isSendLevel(ci.getSubcontrol()))
                 .sorted(Comparator.comparingInt(ci -> extractSendIndex(ci.getSubcontrol())))
-                .forEach(ci -> result.add(
-                        MidiControl.Controls.Widgets.SendMix.createSendMix(
-                                ci, VIEW_TYPE, viewSuffix, channelIndex)));
+                .forEach(ci -> {
+                    int send = extractSendIndex(ci.getSubcontrol());
+                    String familyName = "kInputAUX".equals(ci.getGroup()) ? "Aux" : "Mix";
+                    String subPrefix = "k" + ("Aux".equals(familyName) ? "AUX" : "Mix") + send;
+                    ViewControl level = MidiControl.Controls.Widgets.SendMix.createSendMix(
+                            ci, VIEW_TYPE, viewSuffix, channelIndex);
+                    level.label = familyName + " " + send;
+                    result.add(level);
+                    addSendToggle(result, all, ci.getGroup(), subPrefix + "On",
+                            "On", "INPUT_SEND_ON", send, viewSuffix);
+                    addSendToggle(result, all, ci.getGroup(),
+                            subPrefix + ("Aux".equals(familyName) ? "Pre" : "Pos"),
+                            "Pre/Post", "INPUT_SEND_PRE", send, viewSuffix);
+                    if ("Mix".equals(familyName)) {
+                        all.stream()
+                                .filter(type -> "kMixBusType".equals(type.getGroup())
+                                        && "kBusType".equals(type.getSubcontrol())
+                                        && type.getInstanceIndex() == send - 1)
+                                .findFirst()
+                                .ifPresent(type -> result.add(createControl(type,
+                                        "SEND_TYPE_" + send, "input.send", "Mix type",
+                                        ControlType.DATA, viewSuffix, "INPUT_SEND_TYPE", send)));
+                    }
+                });
+
+        all.stream()
+                .filter(ci -> "kInputRouting".equals(ci.getGroup()))
+                .filter(ci -> BUS_ROUTING_PATTERN.matcher(ci.getSubcontrol()).matches())
+                .sorted(Comparator.comparingInt(ci -> extractPatternIndex(
+                        BUS_ROUTING_PATTERN, ci.getSubcontrol())))
+                .forEach(ci -> {
+                    int bus = extractPatternIndex(BUS_ROUTING_PATTERN, ci.getSubcontrol());
+                    result.add(createControl(ci, "BUS_ROUTE_" + bus, "input.bus-routing",
+                            "Bus " + bus, ControlType.TOGGLE, viewSuffix, "INPUT_BUS_ROUTE", bus));
+                });
 
         // --- Fader ---
         all.stream()
@@ -311,7 +360,39 @@ public class ChannelDetailViewBuilder implements ViewBuilder {
         // --- EQ (4 bands x G/F/Q) ---
         addBusEqControls(result, all, prefix, viewSuffix);
 
+        addMuteGroups(result, all, prefix + "Group", prefix + "OutGroup", viewSuffix);
+
         return result;
+    }
+
+    private void addSendToggle(List<ViewControl> result, List<ControlInstance> all,
+            String group, String subcontrol, String label, String role, int send,
+            String viewSuffix) {
+        ControlInstance instance = findInstance(all, group, subcontrol);
+        if (instance != null) {
+            result.add(createControl(instance, role + "_" + send, "input.send", label,
+                    ControlType.TOGGLE, viewSuffix, role, send));
+        }
+    }
+
+    private void addMuteGroups(List<ViewControl> result, List<ControlInstance> all,
+            String firstGroup, String secondGroup, String viewSuffix) {
+        all.stream()
+                .filter(ci -> firstGroup.equals(ci.getGroup()) || secondGroup.equals(ci.getGroup()))
+                .filter(ci -> MUTE_GROUP_PATTERN.matcher(ci.getSubcontrol()).matches())
+                .sorted(Comparator.comparingInt(ci -> extractPatternIndex(
+                        MUTE_GROUP_PATTERN, ci.getSubcontrol())))
+                .forEach(ci -> {
+                    int group = extractPatternIndex(MUTE_GROUP_PATTERN, ci.getSubcontrol());
+                    result.add(createControl(ci, "MUTE_GROUP_" + group, "channel.mute-groups",
+                            "Mute " + group, ControlType.TOGGLE, viewSuffix,
+                            "MUTE_GROUP_ASSIGN", null));
+                });
+    }
+
+    private int extractPatternIndex(Pattern pattern, String value) {
+        Matcher matcher = pattern.matcher(value);
+        return matcher.matches() ? Integer.parseInt(matcher.group(1)) : Integer.MAX_VALUE;
     }
 
     // =================== EQ HELPERS ===================

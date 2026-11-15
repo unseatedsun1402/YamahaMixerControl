@@ -42,6 +42,11 @@ export function applyControlUpdate({ canonicalId, value }) {
             updateSelect(el,value);
             break;
 
+        case "DATA":
+            el.dataset.value = value;
+            el.dispatchEvent(new CustomEvent("control-update", { detail: { value } }));
+            break;
+
         default:
             console.warn("Unknown control type for partial update:", type);
     }

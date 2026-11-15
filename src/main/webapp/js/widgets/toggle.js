@@ -24,6 +24,7 @@ export function renderToggle(control) {
 
     button.className = "toggle-button";
     button.textContent = control.label;
+    button.disabled = control.readOnly;
 
     if (control.value > 0) {
         button.classList.add("active");
@@ -33,8 +34,8 @@ export function renderToggle(control) {
 
         const nextValue =
             button.classList.contains("active")
-                ? 0
-                : 127;
+                ? control.min
+                : control.max;
 
         button.classList.toggle("active");
 

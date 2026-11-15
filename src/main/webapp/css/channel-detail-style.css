@@ -152,6 +152,23 @@
     width: 100%;
 }
 
+.detail-send {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+.detail-send .control.control-knob {
+    flex-basis: 100%;
+}
+
+.detail-send-fixed .control.control-knob {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 .detail-section .control[data-role="DYNAMICS1_THRESHOLD"] {
     width: 100%;
 }

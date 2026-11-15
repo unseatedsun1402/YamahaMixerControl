@@ -9,11 +9,11 @@ export function renderSelect(control) {
     const select = document.createElement("select");
     select.disabled = control.readOnly;
 
-    // Build source list dynamically
+    const names = new Map((control.options ?? []).map(option => [option.source, option.name]));
     for (let i = control.min; i <= control.max; i++) {
         const o = document.createElement("option");
         o.value = i;
-        o.textContent = `Source ${i}`;
+        o.textContent = names.get(i) ?? `Source ${i}`;
         select.appendChild(o);
     }
 
@@ -21,7 +21,6 @@ export function renderSelect(control) {
 
     select.addEventListener("change", () => {
         const canonicalId = canonicalIdFor(control);
-        console.log("SELECT canonicalId:", canonicalId);
         window.wsClient?.sendControlChange(canonicalId, Number(select.value));
     });
 
