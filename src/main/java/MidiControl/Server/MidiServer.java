@@ -11,6 +11,7 @@ import MidiControl.ContextModel.ViewBuilders.ChannelDetailViewBuilder;
 import MidiControl.ContextModel.ViewBuilders.InputChannelSendsOnFaderViewBuilder;
 import MidiControl.ContextModel.ViewBuilders.InputChannelStripViewBuilder;
 import MidiControl.ContextModel.ViewBuilders.MixAuxBusViewBuilder;
+import MidiControl.ContextModel.ViewBuilders.SystemControlsViewBuilder;
 import MidiControl.ContextModel.ViewRegistry;
 import MidiControl.ControlServer.HardwareInputHandler;
 import MidiControl.Controls.CanonicalRegistry;
@@ -105,6 +106,7 @@ public class MidiServer implements Runnable, UiModelService {
     this.viewBuilders.addView(new MixAuxBusViewBuilder(), "basic-master-view");
     this.viewBuilders.addView(new PatchViewBuilder(), "basic-patch-view");
     this.viewBuilders.addView(new ChannelDetailViewBuilder(), "channel-detail-view");
+    this.viewBuilders.addView(new SystemControlsViewBuilder(), "system-controls-view");
 
     this.systemTelemetry = new SystemTelemetry();
 

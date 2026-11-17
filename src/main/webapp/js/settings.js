@@ -5,6 +5,7 @@ import { renderPatchMatrixOverlay } from "./widgets/patch-matrix.js";
 import { applyControlUpdate } from './partial-update.js';
 import { buildPatchRibbon } from "./view-ribbon.js";
 import { installAuthentication } from "./authentication.js";
+import { renderControl } from "./control-renderer.js";
 
 console.log(">>> settings.js LOADED <<<");
 
@@ -18,6 +19,16 @@ const serverLog = document.getElementById("server-log");
 const deskStatusWidget = new DeskStatusWidget(document.getElementById("desk-status"));
 
 const patchMatrix = document.getElementById("patch-matrix");
+const monitorControls = document.getElementById("monitor-controls");
+let pendingMonitorModel = null;
+
+function requestMonitorControls() {
+    pendingMonitorModel = null;
+    monitorControls.textContent = "Loading mixer controls...";
+    ws.requestBank("bank.monitor");
+}
+
+document.querySelector('[data-tab="monitor"]').addEventListener("click", requestMonitorControls);
 
 window.patchBanks = [
     { id: "bank.inputs", label: "INPUT" },
@@ -53,6 +64,7 @@ ws.on("connected", () => {
   ws.requestMidiDevices();
   loadServerInterfaceOptions();
   ws.setSessionType("settings");
+  if (!document.getElementById("tab-monitor").hidden) requestMonitorControls();
   console.info(`[Settings] Registering session type ${ws.sessionType}`);
 });
 
@@ -78,6 +90,17 @@ function selectPatchBank(bankId) {
 
 let expectedChannels = 0;
 ws.on("ui-bank", (bank) => {
+    if (bank.contextId === "bank.monitor") {
+        monitorControls.replaceChildren();
+        if (bank.contexts.length === 0) {
+            monitorControls.textContent = "No monitor controls available for this mixer.";
+        }
+        for (const ctxId of bank.contexts) {
+            ws.subscribe(ctxId);
+            pendingMonitorModel = ws.requestUiModel(ctxId, "system-controls-view");
+        }
+        return;
+    }
     const container = document.getElementById("patch-matrix");
 
     container.innerHTML = "";
@@ -94,6 +117,12 @@ ws.on("ui-bank", (bank) => {
 });
 
 ws.on("ui-model", async model => {
+    if (model.contextId === "monitor.0") {
+        if (model.__meta?.requestId !== pendingMonitorModel) return;
+        pendingMonitorModel = null;
+        monitorControls.replaceChildren(...model.controls.map(renderControl));
+        return;
+    }
     if (model.viewType !== "basic-patch-view") {
         console.warn(`${model.viewType} is an unknown type and not handled`);
         return;
@@ -492,6 +521,9 @@ function saveLogsToLocalStorage() {
 function handleRegistryChanged(payload) {
     console.info("[Settings] Registry changed:", payload);
     resetTelemetryDisplay();
+    pendingMonitorModel = null;
+    monitorControls.replaceChildren();
+    if (!document.getElementById("tab-monitor").hidden) requestMonitorControls();
 
     const telemetryLog = document.getElementById("telemetry-log");
     if (telemetryLog) telemetryLog.innerHTML = "";

@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 public class ChannelContextDiscoverer implements ContextDiscoverer {
-  private static final Logger log = Logger.getLogger(ChannelContextDiscoverer.class.getName());
+  private static final Logger logger = Logger.getLogger(ChannelContextDiscoverer.class.getName());
 
   private static final Set<String> REAL_CHANNEL_GROUPS =
       Set.of(
@@ -43,7 +43,9 @@ public class ChannelContextDiscoverer implements ContextDiscoverer {
           "kInputToMix",
           "kInputAUX",
           "kInputRouting",
-          "kInputGroup");
+          "kInputGroup",
+          "kSetupSoloChOn",
+          "kSetupCueInput");
 
   @Override
   public void discover(List<Context> out, CanonicalRegistry registry) {

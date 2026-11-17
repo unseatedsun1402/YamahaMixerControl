@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/page-navigation.css">
     <link rel="stylesheet" href="css/setting-style.css">
     <link rel="stylesheet" href="css/authentication.css">
+    <link rel="stylesheet" href="css/widgets/generic.css">
     <script type="module" src="js/settings.js"></script>
 </head>
 
@@ -21,6 +22,7 @@
         </div>
         <button data-tab="configuration" aria-selected="true">Configuration</button>
         <button data-tab="diagnostics" aria-selected="false">Diagnostics</button>
+        <button data-tab="monitor" aria-selected="false">Monitor</button>
         <button data-tab="patching" class="danger-zone" aria-selected="false">Patching</button>
 
         <a class="page-nav-link" href="/MidiControl/main.html" aria-label="View Mixer">Mixer</a>
@@ -30,6 +32,16 @@
 </header>
 
 <main class="settings-container">
+
+    <section class="settings-tab" id="tab-monitor" hidden>
+        <section class="settings-column">
+            <section class="settings-card">
+                <h2>Monitor and cue</h2>
+                <p>Available controls depend on the mixer model. Monitor source codes refer to the desk's parameter table.</p>
+                <div id="monitor-controls" class="monitor-controls" role="status">Waiting for mixer controls...</div>
+            </section>
+        </section>
+    </section>
 
     <section class="settings-tab" id="tab-configuration">
 

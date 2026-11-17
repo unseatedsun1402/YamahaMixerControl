@@ -36,6 +36,13 @@ pre/post controls, and mute-group assignments where supported. On the 01V96i,
 bus assignments are separate from aux sends. On the M7CL, fixed mixes use the
 send on control; level and pre/post controls are disabled while the mix is fixed.
 Output patch selection is not yet available on this page.
+The channel detail page also provides solo/cue on supported input channels.
+Mute-group masters are available in the mixer bank rail; the 01V96i has
+separate input and output groups and requires its mute-group master function
+to be enabled on the desk. The settings Monitor tab exposes the available
+monitor and cue controls for each model. M7CL monitor source choices are
+shown as desk codes because the source-name table is not included in the
+mapping. Use Sync Desk State to refresh control values after connecting.
 The detail view groups bus assignments with sends and uses compact dynamics
 response curves; these are not live gain-reduction meters. The layout is tested
 at several desktop sizes, including 1920 × 1080, and remains scrollable on

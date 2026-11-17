@@ -57,6 +57,7 @@ public class ChannelDetailViewBuilderTest {
     CanonicalRegistry registry = registry("YAMAHA_01V96I", "01v96i");
     List<ViewControl> controls = input(registry, 39);
     assertEquals(Set.of("kInputAttenuator.kAtt.39"), ids(controls, "INPUT_ATTENUATION"));
+    assertEquals(Set.of("kSetupSoloChOn.kSoloChOn.39"), ids(controls, "INPUT_SOLO"));
     assertEquals(Set.of("kChannelInput.kChannelIn.39"), ids(controls, "INPUT_PATCH"));
     ViewControl patch =
         controls.stream()
@@ -91,6 +92,7 @@ public class ChannelDetailViewBuilderTest {
     CanonicalRegistry registry = registry("YAMAHA_M7CL", "m7cl");
     List<ViewControl> controls = input(registry, 55);
     assertEquals(Set.of("kInputAttenuator.kAtt.55"), ids(controls, "INPUT_ATTENUATION"));
+    assertEquals(Set.of("kSetupCueInput.kCueOn.55"), ids(controls, "INPUT_SOLO"));
     assertEquals(Set.of("kPatchInInput.kPatchIn.55"), ids(controls, "INPUT_PATCH"));
     for (int n = 1; n <= 16; n++) {
       assertTrue(ids(controls, "INPUT_SEND_LEVEL").contains("kInputToMix.kMix" + n + "Level.55"));

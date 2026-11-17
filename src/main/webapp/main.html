@@ -25,6 +25,7 @@
         import { updateChannelStripName } from './js/utils/channel-name.js';
         import { DeskStatusWidget } from "./js/widgets/liveness.js";
         import { installAuthentication } from "./js/authentication.js";
+        import { renderControl } from "./js/control-renderer.js";
         
         window.ribbonInitialised = false;
         window.lastBankContexts= [];
@@ -46,10 +47,14 @@
         installAuthentication(ws);
         const deskStatusWidget = new DeskStatusWidget(document.getElementById("desk-status"));
         let pendingModels = new Map();
+        let pendingMuteModel = null;
+        const mutePanel = document.createElement("div");
+        mutePanel.className = "mute-master-panel";
 
         ws.on("connected", () => {
             console.info("[Bootstrap] Connected — requesting bank.inputs…");
             ws.requestBank("bank.inputs");
+            ws.requestBank("bank.mute");
             ws.sendMeterKeepAlive();
 
             if (!ws.keepAliveInterval) {
@@ -185,6 +190,7 @@
                 container.appendChild(btn);
             }
             updateModeButtonState();
+            container.appendChild(mutePanel);
         }
 
         function updateModeButtonState() {
@@ -196,6 +202,15 @@
         }
         
         ws.on("ui-bank", (bank) => {
+            if (bank.contextId === "bank.mute") {
+                mutePanel.replaceChildren();
+                pendingMuteModel = null;
+                for (const ctxId of bank.contexts) {
+                    ws.subscribe(ctxId);
+                    pendingMuteModel = ws.requestUiModel(ctxId, "system-controls-view");
+                }
+                return;
+            }
             const expectedBank = window.currentDomain === "output" ? "bank.mixes" : "bank.inputs";
             if (bank.contextId !== expectedBank) {
                 console.debug("[Bootstrap] Ignoring bank for inactive mode:", bank.contextId);
@@ -229,6 +244,20 @@
 
         ws.on("ui-model", (model) => {
 
+            if (model.contextId === "mute.0") {
+                if (model.__meta?.requestId !== pendingMuteModel) return;
+                pendingMuteModel = null;
+                mutePanel.replaceChildren();
+                const heading = document.createElement("div");
+                heading.className = "mute-master-heading";
+                heading.textContent = "MUTE GROUPS";
+                mutePanel.appendChild(heading);
+                for (const control of model.controls) {
+                    mutePanel.appendChild(renderControl(control));
+                }
+                return;
+            }
+            
             console.log("UI MODEL RECEIVED", model.contextId);
             if (pendingModels.get(model.contextId) !== model.__meta?.requestId) {
                 console.debug("[Bootstrap] Ignoring stale UI model:", model.contextId);
@@ -284,6 +313,9 @@
             pendingModels.clear();
             setStripContexts([]);
             window.ribbonInitialised = false;
+            mutePanel.replaceChildren();
+            pendingMuteModel = null;
+            ws.requestBank("bank.mute");
             ws.requestBank(window.currentDomain === "output" ? "bank.mixes" : "bank.inputs");
         });
 

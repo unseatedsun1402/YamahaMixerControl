@@ -123,6 +123,32 @@
     gap: 5px;
 }
 
+.mute-master-panel {
+    display: grid;
+    gap: 5px;
+    padding-top: 6px;
+    border-top: 2px solid var(--mix-color-strip-border);
+}
+
+.mute-master-panel:empty {
+    display: none;
+}
+
+.mute-master-heading {
+    color: var(--mix-color-text-muted);
+    font-size: 0.65rem;
+    text-align: center;
+}
+
+.mute-master-panel .control-label {
+    display: none;
+}
+
+.mute-master-panel .toggle-button {
+    padding: 8px 2px;
+    font-size: 0.65rem;
+}
+
 .bank-selector-divider {
     height: 2px;
     flex: 0 0 2px;

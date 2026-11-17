@@ -156,6 +156,16 @@ a:hover {
     box-shadow: var(--settings-card-shadow);
 }
 
+.monitor-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-lg);
+}
+
+.monitor-controls .control {
+    align-items: stretch;
+}
+
 .settings-card h2 {
     margin: calc(-1 * var(--space-lg)) calc(-1 * var(--space-lg)) var(--space-md);
     padding: var(--settings-card-heading-padding);

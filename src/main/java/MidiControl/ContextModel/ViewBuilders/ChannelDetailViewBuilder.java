@@ -128,6 +128,15 @@ public class ChannelDetailViewBuilder implements ViewBuilder {
                     "INPUT_MUTE", null));
         }
 
+        ControlInstance solo = findFirst(all,
+                "kSetupCueInput", "kCueOn",
+                "kSetupSoloChOn", "kSoloChOn");
+        if (solo != null) {
+            result.add(MidiControl.Controls.Widgets.Generic.createGenericControl(
+                    solo, "SOLO", "channel.solo", "Solo / Cue",
+                    ControlType.TOGGLE, VIEW_TYPE, viewSuffix, "INPUT_SOLO", null));
+        }
+
         // --- Pair ---
         ControlInstance pair = findFirstInGroup(all, "kInputPair");
         if (pair != null) {

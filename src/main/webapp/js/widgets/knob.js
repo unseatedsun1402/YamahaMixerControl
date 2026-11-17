@@ -54,15 +54,12 @@ export function renderKnob(control) {
 
     let uiValue = toUiValue(control.value);
 
-<<<<<<< HEAD
-=======
     updateKnobVisual(uiValue);
     wrapper.setRawValue = rawValue => {
         control.value = rawValue;
         uiValue = toUiValue(rawValue);
     };
 
->>>>>>> 2470060 (Reuse ui models and reduce loading of banks within console view plus nrpn fix for 01v eq lowG)
     function updateKnobVisual(val) {
         const angle = valueToAngle(val, uiMin, uiMax);
         valueArc.style.transform = `rotate(${angle}deg)`;
