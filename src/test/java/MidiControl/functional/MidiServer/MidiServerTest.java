@@ -1,7 +1,7 @@
 package MidiControl.functional.MidiServer;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.anyInt;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mockConstruction;
@@ -151,6 +151,10 @@ public class MidiServerTest {
       CanonicalRegistry discovered = server.getCanonicalRegistry();
       assertNotSame(initial, discovered);
       FakeSession session = new FakeSession("bank-state");
+
+      //asserts satisfy lint referenced but not used
+      assertFalse(liveness.constructed().isEmpty());
+      assertFalse(processing.constructed().isEmpty());
 
       requestModel(server, session, "channel.0");
       changeFader(server, session, 77);

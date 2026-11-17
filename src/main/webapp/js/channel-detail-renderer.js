@@ -156,7 +156,7 @@ export function renderChannelDetail(model) {
         const section = document.createElement("div");
         section.className = "section detail-section";
         section.dataset.group = groupName;
-        if (groupName !== "input.eq" && controls.some(c => c.type === "KNOB")) {
+        if (controls.some(c => c.type === "KNOB")) {
             section.classList.add("section-knob-grid");
         }
 
