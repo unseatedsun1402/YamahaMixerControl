@@ -1,6 +1,6 @@
 export function doubleTapReset(
     inputEl,
-    canonicalId,
+    getCanonicalId,
     defaultValue
 ) {
     if (defaultValue == null) {
@@ -8,6 +8,7 @@ export function doubleTapReset(
     }
 
     let lastTap = 0;
+    inputEl.resetDoubleTap = () => { lastTap = 0; };
 
     inputEl.addEventListener("pointerdown", () => {
 
@@ -15,6 +16,7 @@ export function doubleTapReset(
 
         if (now - lastTap < 300) {
 
+            const canonicalId = getCanonicalId();
             console.log(
                 "RESET",
                 canonicalId,

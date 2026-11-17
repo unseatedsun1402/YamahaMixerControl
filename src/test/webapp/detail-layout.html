@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Channel detail layout test</title></head>
+<body>
+<pre id="result">Running</pre>
+<script type="module">
+    function check(condition, message) {
+        if (!condition) throw new Error(message);
+    }
+
+    function createModel() {
+        const controls = [];
+        function add(type, group, label, role, extra = {}) {
+            const subcontrol = `${role}_${controls.length}`;
+            controls.push({
+                type, uiGroup: group, label, index: controls.length,
+                hwGroup: "input", hwSubcontrol: subcontrol, hwInstance: 0,
+                canonicalId: `input.${subcontrol}.0`,
+                controlRole: role, min: 0, max: 127, defaultValue: 64,
+                value: 64, readOnly: false, ...extra
+            });
+        }
+
+        add("TOGGLE", "input.control", "On", "INPUT_CHANNEL_ON");
+        add("TOGGLE", "channel.mute", "Mute", "INPUT_MUTE");
+        add("TOGGLE", "channel.pair", "Pair", "INPUT_PAIR");
+        add("SLIDER_HORIZONTAL", "input.pan", "Pan", "INPUT_PAN");
+        add("KNOB", "channel.attenuation", "Attenuation", "INPUT_ATTENUATION");
+        add("SELECT", "input.patch", "Input source", "INPUT_PATCH", { max: 10 });
+        for (let group = 1; group <= 8; group++) {
+            add("TOGGLE", "channel.mute-groups", `Mute ${group}`, "MUTE_GROUP");
+        }
+        for (let band = 1; band <= 4; band++) {
+            for (const parameter of ["GAIN", "FREQUENCY", "Q"]) {
+                add("SLIDER_HORIZONTAL", "input.eq", parameter, `INPUT_EQ${band}_${parameter}`);
+            }
+        }
+        add("TOGGLE", "input.dynamics", "Gate", "DYNAMICS1_ON");
+        add("SLIDER_HORIZONTAL", "input.dynamics", "Gate threshold", "DYNAMICS1_THRESHOLD");
+        add("TOGGLE", "input.dynamics", "Comp", "DYNAMICS2_ON");
+        add("SLIDER_HORIZONTAL", "input.dynamics", "Ratio", "DYNAMICS2_RATIO");
+        add("SLIDER_HORIZONTAL", "input.dynamics", "Threshold", "DYNAMICS2_THRESHOLD");
+        for (let send = 1; send <= 16; send++) {
+            add("KNOB", "input.send", `Mix ${send}`, "INPUT_SEND_LEVEL", { sendIndex: send });
+            add("TOGGLE", "input.send", "On", "INPUT_SEND_ON", { sendIndex: send });
+            add("TOGGLE", "input.send", "Pre/Post", "INPUT_SEND_PRE", { sendIndex: send });
+            add("DATA", "input.send", "Mix type", "INPUT_SEND_TYPE", { sendIndex: send, value: 0 });
+        }
+        for (let bus = 1; bus <= 8; bus++) {
+            add("TOGGLE", "input.bus-routing", `Bus ${bus}`, "INPUT_BUS_ROUTE", { sendIndex: bus });
+        }
+        add("FADER", "input.fader", "Fader", "INPUT_FADER");
+        return { contextId: "channel.0", viewType: "channel-detail-view", controls };
+    }
+
+    try {
+        const response = await fetch("../../main/webapp/channel-detail.html");
+        check(response.ok, "cannot load channel detail page");
+        const html = await response.text();
+        const base = new URL("../../main/webapp/", location.href).href;
+        const mock = `
+            <base href="${base}">
+            <script>
+                window.sentMessages = [];
+                window.WebSocket = class {
+                    static OPEN = 1;
+                    constructor() {
+                        this.readyState = 1;
+                        queueMicrotask(() => this.onopen());
+                    }
+                    send(data) { window.sentMessages.push(JSON.parse(data)); }
+                };
+            <\/script>`;
+        const frame = document.createElement("iframe");
+        Object.assign(frame.style, {
+            position: "absolute", left: "-10000px", top: "0", border: "0",
+            width: "1920px", height: "1080px"
+        });
+        const loaded = new Promise(resolve => frame.addEventListener("load", resolve, { once: true }));
+        frame.srcdoc = html.replace("<head>", `<head>${mock}`);
+        document.body.appendChild(frame);
+        await loaded;
+
+        const page = frame.contentWindow;
+        const doc = frame.contentDocument;
+        const client = page.wsClient;
+        const emit = (type, payload, requestId) =>
+            client._routeMessage({ type, payload, requestId });
+        emit("auth-status", { authenticated: true });
+        emit("ui-bank", { contextId: "bank.inputs", contexts: ["channel.0"] });
+        const request = page.sentMessages.find(message => message.type === "get-ui-model");
+        check(request, "channel model was not requested");
+        emit("ui-model", createModel(), request.requestId);
+
+        const panel = doc.getElementById("detail-panel");
+        const sends = doc.querySelector('[data-group="input.send"]');
+        const buses = doc.querySelector('[data-group="input.bus-routing"]');
+        const muteGroups = doc.querySelector('[data-group="channel.mute-groups"]');
+        check(sends.parentElement === buses.parentElement, "sends and bus assignments are in different columns");
+        check(sends.compareDocumentPosition(buses) & Node.DOCUMENT_POSITION_FOLLOWING,
+            "bus assignments must follow sends");
+        const sizes = Array.from(doc.querySelectorAll(".detail-column")).map(column =>
+            `${column.className}: ${Math.round(column.getBoundingClientRect().height)} [${Array.from(column.children)
+                .map(section => `${section.dataset.group}:${Math.round(section.getBoundingClientRect().height)}`).join(", ")}]`
+        ).join("; ");
+        check(panel.scrollHeight <= panel.clientHeight + 1,
+            `desktop scrolls vertically: ${panel.scrollHeight} > ${panel.clientHeight}; ${sizes}`);
+        check(panel.scrollWidth <= panel.clientWidth + 1,
+            `desktop scrolls horizontally: ${panel.scrollWidth} > ${panel.clientWidth}`);
+        check(doc.querySelector(".eq-response-graph").getBoundingClientRect().height <= 152,
+            "EQ graph is too tall");
+        for (const graph of doc.querySelectorAll(".gate-response-graph, .compressor-response-graph")) {
+            check(graph.getBoundingClientRect().height <= 66 && graph.querySelector("path"),
+                "dynamics response graph is missing or too tall");
+        }
+        const gate = doc.querySelector('[data-role="DYNAMICS1_ON"]');
+        emit("control-update", { canonicalId: gate.dataset.canonicalId, value: 0 });
+        check(doc.querySelector(".gate-response-graph .graph-bypass-line"),
+            "compact gate curve did not update");
+        check(buses.querySelectorAll(".control-toggle").length === 8 &&
+            muteGroups.querySelectorAll(".control-toggle").length === 8,
+            "routing or mute controls are missing");
+        const bus = buses.querySelector(".control-toggle");
+        bus.querySelector("button").click();
+        const change = page.sentMessages.filter(message => message.type === "set-control-value").at(-1);
+        check(change.payload.canonicalId === bus.dataset.canonicalId, "bus control changed the wrong canonical ID");
+        const firstSend = sends.querySelector(".detail-send");
+        const sendType = firstSend.querySelector('[data-role="INPUT_SEND_TYPE"]');
+        emit("control-update", { canonicalId: sendType.dataset.canonicalId, value: 2 });
+        check(firstSend.classList.contains("detail-send-fixed") &&
+            firstSend.querySelector('[data-role="INPUT_SEND_PRE"] button').disabled,
+            "fixed mix did not disable send controls");
+
+        for (const [width, height] of [[1440, 900], [1366, 768], [1024, 768]]) {
+            frame.style.width = `${width}px`;
+            frame.style.height = `${height}px`;
+            check(panel.scrollWidth <= panel.clientWidth + 1,
+                `${width}x${height} layout overflows horizontally`);
+            check(buses.getBoundingClientRect().top >= sends.getBoundingClientRect().bottom,
+                `${width}x${height} bus assignments are not below sends`);
+            check(buses.querySelectorAll("button").length === 8 &&
+                sends.querySelectorAll(".detail-send").length === 16,
+                `${width}x${height} routing controls are missing`);
+        }
+
+        frame.style.width = "390px";
+        frame.style.height = "844px";
+        check(panel.scrollHeight > panel.clientHeight, "phone layout should remain scrollable");
+        check(panel.scrollWidth <= panel.clientWidth + 1, "phone layout overflows horizontally");
+        check(buses.getBoundingClientRect().top >= sends.getBoundingClientRect().bottom,
+            "phone bus assignments are not below sends");
+        check(buses.querySelector("button").getBoundingClientRect().height >= 44 &&
+            muteGroups.querySelector("button").getBoundingClientRect().height >= 44,
+            "phone routing buttons are too small to touch");
+        frame.style.width = "844px";
+        frame.style.height = "390px";
+        check(panel.scrollHeight > panel.clientHeight && panel.scrollWidth <= panel.clientWidth + 1,
+            "landscape phone layout should scroll vertically without horizontal overflow");
+        check(buses.getBoundingClientRect().top >= sends.getBoundingClientRect().bottom,
+            "landscape phone bus assignments are not below sends");
+        check(buses.querySelector("button").getBoundingClientRect().height >= 44,
+            "landscape phone routing buttons are too small to touch");
+        if (new URLSearchParams(location.search).has("preview")) {
+            Object.assign(frame.style, { position: "fixed", left: "0", width: "100vw", height: "100vh" });
+        } else {
+            frame.remove();
+        }
+        document.getElementById("result").textContent = "PASS";
+    } catch (error) {
+        document.getElementById("result").textContent = `FAIL: ${error.stack}`;
+        console.error(error);
+    }
+</script>
+</body>
+</html>

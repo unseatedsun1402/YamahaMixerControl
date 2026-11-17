@@ -20,6 +20,7 @@ export class DeskStatusWidget {
 }
 
 function loadLivenessCss() {
+  if (document.querySelector('link[href="css/widgets/liveness.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
   link.href = "css/widgets/liveness.css";

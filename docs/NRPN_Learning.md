@@ -66,8 +66,11 @@ generate mappings. Conflicting probes, multiple MIDI channels, duplicate
 addresses, and ranges larger than the SysEx control's channel count are rejected
 or skipped. Review the output before using it as a production mapping.
 
-The 01V96i resource currently includes the six captured EQ and attenuator blocks
-as `NRPN_14BIT`, consistent with the client's 14-bit input scaling. Their
-intermediate addresses and outgoing value encoding still need hardware
-verification. In particular, the captured low-gain start `19E8` is outside the
-M7CL low-gain range and is the M7CL HPF ON address; its identity is provisional.
+The 01V96i resource includes six captured EQ and attenuator blocks as
+`NRPN_14BIT`, consistent with the client's 14-bit input scaling. A low-gain
+capture while channels 31 and 32 were paired observed `149C` and `149D`.
+The low-gain block starts at `147E`, assuming an address stride of one for
+channels 1-32. The other addresses and outgoing value encoding still need
+hardware verification. The former low-gain start `19E8` came from a capture
+whose control identity was uncertain; the M7CL label for that address does not
+establish its function on the 01V96i.

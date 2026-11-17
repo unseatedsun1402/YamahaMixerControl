@@ -33,7 +33,8 @@
         window.currentDomain = "input";
         window.channelMeters = new Map();
         window.selectedContextId = null;
-        let deskStatusWidget = null;
+        let deskStatusWidget;
+        let pendingModelRequest = null;
 
         const DETAIL_VIEW = "channel-detail-view";
 
@@ -62,7 +63,18 @@
 
         // ---- Mode switching ----
 
+        function clearDetailPanel() {
+            const panel = document.getElementById("detail-panel");
+            panel.querySelectorAll(".rotary-knob, .fader-container, .slider-container")
+                .forEach(widget => widget.cancelInteraction?.());
+            panel.replaceChildren();
+            pendingModelRequest = null;
+            window.selectedContextId = null;
+            window.channelMeters.clear();
+        }
+
         function selectInputMode() {
+            clearDetailPanel();
             window.currentDomain = "input";
             updateModeButtonState();
             window.currentBank = 0;
@@ -70,6 +82,7 @@
         }
 
         function selectOutputMode() {
+            clearDetailPanel();
             window.currentDomain = "output";
             updateModeButtonState();
             window.currentBank = 0;
@@ -102,8 +115,7 @@
             if (visibleContexts.length > 0) {
                 selectChannel(visibleContexts[0]);
             } else {
-                document.getElementById("detail-panel").innerHTML = "";
-                window.selectedContextId = null;
+                clearDetailPanel();
             }
 
             ws.requestChannelNames();
@@ -140,6 +152,7 @@
         }
 
         function selectChannel(contextId) {
+            clearDetailPanel();
             window.selectedContextId = contextId;
 
             document.querySelectorAll(".channel-select-btn").forEach(btn => {
@@ -148,7 +161,7 @@
                 btn.setAttribute("aria-pressed", String(isActive));
             });
 
-            ws.requestUiModel(contextId, DETAIL_VIEW);
+            pendingModelRequest = ws.requestUiModel(contextId, DETAIL_VIEW);
         }
 
         // ---- Bank selector rail (same pattern as main.html) ----
@@ -249,6 +262,11 @@
         // ---- WebSocket event handlers ----
 
         ws.on("ui-bank", (bank) => {
+            const expectedBank = window.currentDomain === "output" ? "bank.mixes" : "bank.inputs";
+            if (bank.contextId !== expectedBank) {
+                console.debug("[Detail] Ignoring bank for inactive mode:", bank.contextId);
+                return;
+            }
             window.allContexts = bank.contexts;
             for (const ctxId of bank.contexts) {
                 ws.subscribe(ctxId);
@@ -259,12 +277,9 @@
 
         ws.on("ui-model", (model) => {
             console.log("[Detail] UI model received:", model.contextId);
+            if (model.__meta?.requestId !== pendingModelRequest) return;
+            pendingModelRequest = null;
             renderChannelDetail(model);
-
-            if (!deskStatusWidget) {
-                const el = document.getElementById("desk-status");
-                if (el) deskStatusWidget = new DeskStatusWidget(el);
-            }
         });
 
         ws.on("control-update", (payload) => {
@@ -309,6 +324,8 @@
 
         ws.on("REGISTRY_CHANGED", (payload) => {
             console.info("[Detail] Registry changed:", payload);
+            clearDetailPanel();
+            ws.requestBank(window.currentDomain === "output" ? "bank.mixes" : "bank.inputs");
         });
 
         ws.on("server-event", (event) => {
@@ -320,6 +337,7 @@
         // ---- Boot ----
 
         buildRibbon();
+        deskStatusWidget = new DeskStatusWidget(document.getElementById("desk-status"));
         ws.connect();
         window.wsClient = ws;
     </script>
