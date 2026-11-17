@@ -77,6 +77,10 @@ export function renderHorizontalSlider(control) {
     updateSlider();
 
     let dragging = false;
+    wrapper.cancelInteraction = () => {
+        dragging = false;
+        wrapper.resetDoubleTap?.();
+    };
 
     wrapper.addEventListener("pointerdown", (e) => {
 
@@ -122,8 +126,7 @@ export function renderHorizontalSlider(control) {
 
     doubleTapReset(
         wrapper,
-        control.canonicalId ??
-            canonicalIdFor(control),
+        () => control.canonicalId ?? canonicalIdFor(control),
         control.defaultValue
     );
 

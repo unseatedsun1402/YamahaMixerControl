@@ -15,9 +15,11 @@ export function applyControlUpdate({ canonicalId, value }) {
         return;
     }
 
-    const type = el.dataset.type; // e.g. "FADER", "KNOB"
+    updateControlValue(el, value);
+}
 
-    switch (type) {
+export function updateControlValue(el, value) {
+    switch (el.dataset.type) {
         case "FADER":
             updateFader(el, value);
             break;
@@ -48,6 +50,6 @@ export function applyControlUpdate({ canonicalId, value }) {
             break;
 
         default:
-            console.warn("Unknown control type for partial update:", type);
+            console.warn("Unknown control type for partial update:", el.dataset.type);
     }
 }

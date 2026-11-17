@@ -22,11 +22,24 @@ The script reuses a responding preview on port 18080 or starts the app headlessl
 with Gradle and prints the local `main.html` URL. Keep the terminal open while
 using the preview.
 
+The console reuses a bank-sized pool of channel strips, refreshing their bindings
+and values from the desk. A changed control layout or profile rebuilds the
+affected strip. The desk status indicator retains its latest state while
+switching banks or input/output modes.
+
+Run the strip-pool and channel-detail browser tests with
+`node src\test\webapp\run-strip-pool.mjs`. They use Microsoft Edge by default;
+set `CHROME_BIN` to use another Chromium-based browser.
+
 The channel detail page includes input patch selection, attenuation, send on and
 pre/post controls, and mute-group assignments where supported. On the 01V96i,
 bus assignments are separate from aux sends. On the M7CL, fixed mixes use the
 send on control; level and pre/post controls are disabled while the mix is fixed.
 Output patch selection is not yet available on this page.
+The detail view groups bus assignments with sends and uses compact dynamics
+response curves; these are not live gain-reduction meters. The layout is tested
+at several desktop sizes, including 1920 × 1080, and remains scrollable on
+smaller screens.
 
 For a Windows desktop launcher (recommended for file-browser launches), run:
 

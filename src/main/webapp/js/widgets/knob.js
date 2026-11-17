@@ -54,6 +54,12 @@ export function renderKnob(control) {
 
     let uiValue = toUiValue(control.value);
 
+    updateKnobVisual(uiValue);
+    wrapper.setRawValue = rawValue => {
+        control.value = rawValue;
+        uiValue = toUiValue(rawValue);
+    };
+
     function updateKnobVisual(val) {
         const angle = valueToAngle(val, uiMin, uiMax);
         valueArc.style.transform = `rotate(${angle}deg)`;
@@ -108,9 +114,12 @@ export function renderKnob(control) {
     }
 
     function endDrag() {
+        startY = null;
+        startUiValue = null;
         document.removeEventListener("pointermove", onDrag);
         document.removeEventListener("pointerup", endDrag);
     }
+    wrapper.cancelInteraction = endDrag;
 
     knob.addEventListener("dblclick", () => {
         if (control.readOnly) return;
@@ -131,11 +140,26 @@ export function updateKnob(el, rawValue) {
     const knob = el.querySelector(".rotary-knob");
     if (!knob) return;
 
-    knob.updateValue(rawValue);
+    const valueArc = knob.querySelector(".knob-value");
+    if (!valueArc) return;
+
+    const min = Number(el.dataset.min);
+    const max = Number(el.dataset.max);
+    const uiMin = Number(el.dataset.uiMin);
+    const uiMax = Number(el.dataset.uiMax);
+    const needsNormalization = el.dataset.needsNormalization === "1";
+
+    const uiValue = needsNormalization
+        ? Math.round((rawValue - min) / (max - min) * uiMax)
+        : rawValue;
+
+    const angle = valueToAngle(uiValue, uiMin, uiMax);
+    valueArc.style.transform = `rotate(${angle}deg)`;
+    knob.setRawValue?.(rawValue);
     
     el.dispatchEvent(
         new CustomEvent("control-update", {
-            detail: { rawValue }
+            detail: { value: rawValue, rawValue }
         })
     );
 }

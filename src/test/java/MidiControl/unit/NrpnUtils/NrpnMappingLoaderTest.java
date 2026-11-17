@@ -77,7 +77,7 @@ public class NrpnMappingLoaderTest {
                 "MidiControl/nrpn/01v96i_nrpn_mappings.json"));
         String[] prefixes = {"kInputEQ.kEQOn", "kInputEQ.kEQLowQ", "kInputEQ.kEQLowF",
                 "kInputEQ.kEQLowG", "kInputEQ.kEQHiG", "kInputAttenuator.kAtt"};
-        int[] starts = {0x1304, 0x1382, 0x1400, 0x19E8, 0x18EC, 0x196A};
+        int[] starts = {0x1304, 0x1382, 0x1400, 0x147E, 0x18EC, 0x196A};
         HardwareInputHandler handler = new HardwareInputHandler(new NrpnParser(), new NrpnRegistry());
 
         for (int block = 0; block < prefixes.length; block++) {

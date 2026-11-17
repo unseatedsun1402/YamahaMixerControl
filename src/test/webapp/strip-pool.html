@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Strip pool test</title></head>
+<body>
+<div id="view-ribbon"><div id="desk-status"></div></div>
+<div id="strip-container"></div>
+<pre id="result">Running</pre>
+<script type="module">
+    import { renderUiModel, setStripContexts, getRenderedStrip } from "../../main/webapp/js/new-ui-renderer.js";
+    import { buildViewRibbonFromModel } from "../../main/webapp/js/view-ribbon.js";
+    import { DeskStatusWidget } from "../../main/webapp/js/widgets/liveness.js";
+    import { applyControlUpdate } from "../../main/webapp/js/partial-update.js";
+
+    const sent = [];
+    window.channelMeters = new Map();
+    window.wsClient = { sendControlChange: (id, value) => sent.push({ id, value }) };
+
+    function check(condition, message) {
+        if (!condition) throw new Error(message);
+    }
+
+    function model(channel, changes = {}) {
+        const make = (type, group, subcontrol, value, extra = {}) => ({
+            type, uiGroup: group, label: subcontrol, index: 0,
+            hwGroup: "input", hwSubcontrol: subcontrol, hwInstance: channel,
+            canonicalId: `input.${subcontrol}.${channel}`,
+            channelIndex: channel, min: 0, max: 127, defaultValue: 64,
+            readOnly: false, value, ...extra
+        });
+        return {
+            contextId: `channel.${channel}`,
+            viewType: "basic-input-view",
+            controls: [
+                make("TOGGLE", "channel", "on", channel ? 127 : 0, { controlRole: "INPUT_CHANNEL_ON" }),
+                make("KNOB", "send", "kMix1Level", channel ? 80 : 20),
+                make("SLIDER_HORIZONTAL", "pan", "pan", channel ? 90 : 30),
+                make("SELECT", "patch", "patch", channel ? 2 : 1, { max: 3 }),
+                make("DATA", "data", "mode", channel ? 2 : 0),
+                make("FADER", "fader", "fader", channel ? 100 : 40, changes),
+                make("SLIDER_HORIZONTAL", "eq", "gain", channel ? 90 : 40, { controlRole: "INPUT_EQ1_GAIN" }),
+                make("TOGGLE", "dynamics", "gate", 0, { controlRole: "DYNAMICS1_ON" }),
+                make("TOGGLE", "dynamics", "comp", 0, { controlRole: "DYNAMICS2_ON" }),
+                make("SLIDER_HORIZONTAL", "dynamics", "threshold", channel ? 90 : 40, { controlRole: "DYNAMICS2_THRESHOLD" })
+            ]
+        };
+    }
+
+    function pointer(slider, x) {
+        slider.setPointerCapture = () => {};
+        slider.querySelector(".slider-track").getBoundingClientRect =
+            () => ({ left: 0, width: 100 });
+        slider.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 1, clientX: x }));
+        slider.dispatchEvent(new PointerEvent("pointerup", { pointerId: 1, clientX: x }));
+    }
+
+    try {
+        const statusElement = document.getElementById("desk-status");
+        const status = new DeskStatusWidget(statusElement);
+        status.update({ message: "Connected", details: { isConnected: true } });
+        buildViewRibbonFromModel(model(0), () => {});
+        check(document.getElementById("desk-status") === statusElement, "ribbon replaced status widget");
+        check(statusElement.textContent === "Connected", "ribbon reset status");
+
+        setStripContexts(["channel.0"]);
+        renderUiModel(model(0));
+        const strip = getRenderedStrip("channel.0");
+        const controls = Array.from(strip.querySelectorAll(".control"));
+        const knob = strip.querySelector(".rotary-knob");
+        const slider = strip.querySelector(".group-pan .slider-container");
+        const eqSlider = strip.querySelector(".eq-widget .slider-container");
+        const dynamicsSlider = strip.querySelector(".dynamics-widget .slider-container");
+        const meter = window.channelMeters.get("channel.0");
+        check(controls.length === 10, "all control groups must render");
+
+        setStripContexts(["channel.8"]);
+        renderUiModel(model(8));
+        check(getRenderedStrip("channel.8") === strip, "strip was not reused");
+        check(strip.querySelector(".rotary-knob") === knob, "knob was rebuilt");
+        check(strip.querySelector(".group-pan .slider-container") === slider, "slider was rebuilt");
+        check(!window.channelMeters.has("channel.0") && window.channelMeters.get("channel.8") === meter,
+            "meter binding was not moved");
+        check(strip.querySelector(".group-fader input").value === "100", "fader value not refreshed");
+        check(strip.querySelector(".group-patch select").value === "2", "select value not refreshed");
+        check(strip.querySelector(".group-data").dataset.value === "2", "data value not refreshed");
+        check(strip.querySelector(".channelon").classList.contains("active"), "composite toggle not refreshed");
+        applyControlUpdate({ canonicalId: "input.kMix1Level.0", value: 10 });
+        applyControlUpdate({ canonicalId: "input.kMix1Level.8", value: 50 });
+
+        knob.querySelector(".knob-dial").dispatchEvent(new WheelEvent("wheel", { deltaY: -1 }));
+        check(sent.at(-1).id === "input.kMix1Level.8" && sent.at(-1).value === 51,
+            "knob did not use new channel and value");
+        const select = strip.querySelector(".group-patch select");
+        select.value = "3";
+        select.dispatchEvent(new Event("change"));
+        check(sent.at(-1).id === "input.patch.8" && sent.at(-1).value === 3,
+            "select did not use new channel");
+        pointer(slider, 25);
+        pointer(slider, 30);
+        check(sent.at(-1).id === "input.pan.8" && sent.at(-1).value === 64,
+            "slider reset did not use new channel");
+        pointer(eqSlider, 25);
+        check(sent.at(-1).id === "input.gain.8", "EQ slider retained old channel");
+        pointer(dynamicsSlider, 25);
+        check(sent.at(-1).id === "input.threshold.8", "dynamics slider retained old channel");
+        strip.querySelector(".channelon").click();
+        check(sent.at(-1).id === "input.on.8", "composite toggle retained old channel");
+
+        renderUiModel(model(8, { max: 100 }));
+        check(strip.querySelector(".rotary-knob") !== knob, "changed profile did not rebuild controls");
+        check(document.getElementById("desk-status") === statusElement &&
+            statusElement.textContent === "Connected", "status changed while rendering");
+        await testMainPage();
+        await testDetailPage();
+        document.getElementById("result").textContent = "PASS";
+    } catch (error) {
+        document.getElementById("result").textContent = `FAIL: ${error.stack}`;
+        console.error(error);
+    }
+
+    async function createMockPage(file) {
+        const response = await fetch(`../../main/webapp/${file}`);
+        check(response.ok, `cannot load ${file}`);
+        const html = await response.text();
+        const base = new URL("../../main/webapp/", location.href).href;
+        const mock = `
+            <base href="${base}">
+            <script>
+                window.sentMessages = [];
+                window.WebSocket = class {
+                    static OPEN = 1;
+                    constructor() {
+                        this.readyState = 1;
+                        queueMicrotask(() => this.onopen());
+                    }
+                    send(data) { window.sentMessages.push(JSON.parse(data)); }
+                };
+            <\/script>`;
+        const frame = document.createElement("iframe");
+        frame.hidden = true;
+        const loaded = new Promise(resolve => frame.addEventListener("load", resolve, { once: true }));
+        frame.srcdoc = html.replace("<head>", `<head>${mock}`);
+        document.body.appendChild(frame);
+        await loaded;
+        check(frame.contentWindow.wsClient, `${file} did not initialize`);
+        return frame;
+    }
+
+    async function testMainPage() {
+        const frame = await createMockPage("main.html");
+        const page = frame.contentWindow;
+        const doc = frame.contentDocument;
+        const client = page.wsClient;
+        check(client, "main page did not initialize");
+        const emit = (type, payload, requestId) =>
+            client._routeMessage({ type, payload, requestId });
+        const requests = () => page.sentMessages.filter(message => message.type === "get-ui-model");
+        const reply = (request, changes = {}) => {
+            const channel = Number(request.payload.contextId.split(".")[1]);
+            const payload = model(channel, changes);
+            payload.viewType = request.payload.uiType;
+            emit("ui-model", payload, request.requestId);
+        };
+
+        emit("auth-status", { authenticated: true });
+        emit("server-event", { category: "LIVENESS", message: "Connected", details: { isConnected: true } });
+        const pageStatus = doc.getElementById("desk-status");
+        const contexts = Array.from({ length: 10 }, (_, index) => `channel.${index}`);
+        emit("ui-bank", { contextId: "bank.inputs", contexts });
+        const firstRequests = requests().slice();
+        reply(firstRequests[0]);
+        const firstStrip = doc.querySelector(".channel-strip");
+        const firstKnob = firstStrip.querySelector(".rotary-knob");
+        const firstFader = firstStrip.querySelector(".fader-container");
+        firstFader.setPointerCapture = () => {};
+        firstFader.getBoundingClientRect = () => ({ top: 0, height: 100, left: 0, width: 100 });
+        firstFader.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 1, clientY: 25, clientX: 75 }));
+        firstFader.dispatchEvent(new PointerEvent("pointerup", { pointerId: 1, clientY: 25, clientX: 75 }));
+        const faderChange = page.sentMessages.filter(message => message.type === "set-control-value").at(-1);
+        check(faderChange.payload.canonicalId === "input.fader.0", "fader sent the wrong canonical ID");
+        const changedFaderValue = faderChange.payload.value;
+        check(changedFaderValue !== 40, "fader change was not sent");
+
+        firstKnob.querySelector(".knob-dial").dispatchEvent(
+            new PointerEvent("pointerdown", { clientY: 20 })
+        );
+        doc.querySelector('[data-bank-index="1"]').click();
+        const changesBeforeMove = page.sentMessages.filter(message => message.type === "set-control-value").length;
+        doc.dispatchEvent(new PointerEvent("pointermove", { clientY: 5 }));
+        check(page.sentMessages.filter(message => message.type === "set-control-value").length === changesBeforeMove,
+            "old-channel drag continued after switching banks");
+        const nextRequests = requests().slice(-2);
+        reply(firstRequests[1]);
+        check(!doc.querySelector(".channel-strip"), "late previous-bank model was rendered");
+        reply(nextRequests[1]);
+        reply(nextRequests[0]);
+        const visible = Array.from(doc.querySelectorAll(".channel-strip"));
+        check(visible.map(strip => strip.dataset.contextId).join(",") === "channel.8,channel.9",
+            "bank responses rendered in the wrong order");
+        check(visible[0] === firstStrip && visible[0].querySelector(".rotary-knob") === firstKnob,
+            "bank switch did not reuse the slot and its controls");
+        emit("control-update", { canonicalId: "input.fader.8", value: 75 });
+        check(visible[0].querySelector(".group-fader input").value === "75", "new canonical update not applied");
+        emit("control-update", { canonicalId: "input.fader.0", value: 10 });
+        check(visible[0].querySelector(".group-fader input").value === "75", "old canonical update affected new bank");
+        visible[0].querySelector(".knob-dial").dispatchEvent(new WheelEvent("wheel", { deltaY: -1 }));
+        const outgoing = page.sentMessages.filter(message => message.type === "set-control-value").at(-1);
+        check(outgoing.payload.canonicalId === "input.kMix1Level.8", "bank control sent the old canonical ID");
+
+        doc.querySelector('[data-bank-index="0"]').click();
+        const returningRequests = requests().slice(-8);
+        reply(returningRequests[0], { value: changedFaderValue });
+        check(doc.querySelector(".channel-strip") === firstStrip &&
+            doc.querySelector(".rotary-knob") === firstKnob, "returning to a bank rebuilt the slot");
+        check(Number(firstStrip.querySelector(".group-fader input").value) === changedFaderValue,
+            "returning bank did not show the updated model value");
+        emit("control-update", { canonicalId: "input.fader.0", value: 65 });
+        check(firstStrip.querySelector(".group-fader input").value === "65",
+            "returning bank did not restore its canonical binding");
+
+        emit("REGISTRY_CHANGED", { profile: "new-profile" });
+        check(!doc.querySelector(".channel-strip"), "old profile remained interactive");
+        reply(returningRequests[1]);
+        check(!doc.querySelector(".channel-strip"), "old profile model was accepted after registry change");
+        check(page.sentMessages.at(-1).type === "get-ui-bank" &&
+            page.sentMessages.at(-1).payload.bankId === "bank.inputs", "profile change did not request a new bank");
+        emit("ui-bank", { contextId: "bank.inputs", contexts });
+        const profileRequest = requests().at(-8);
+        reply(profileRequest, { max: 100, hwGroup: "newProfile", canonicalId: "newProfile.fader.0" });
+        const profileStrip = doc.querySelector(".channel-strip");
+        check(profileStrip === firstStrip, "profile change discarded the strip slot");
+        check(profileStrip.querySelector(".rotary-knob") !== firstKnob, "changed profile did not rebuild controls");
+        emit("control-update", { canonicalId: "newProfile.fader.0", value: 55 });
+        check(profileStrip.querySelector(".group-fader input").value === "55", "new profile update not applied");
+        const profileFader = profileStrip.querySelector(".fader-container");
+        profileFader.setPointerCapture = () => {};
+        profileFader.releasePointerCapture = () => {};
+        profileFader.getBoundingClientRect = () => ({ top: 0, left: 0, width: 100, height: 100 });
+        profileFader.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 2, clientX: 75, clientY: 25 }));
+        profileFader.dispatchEvent(new PointerEvent("pointerup", { pointerId: 2, clientX: 75, clientY: 25 }));
+        const profileChange = page.sentMessages.filter(message => message.type === "set-control-value").at(-1);
+        check(profileChange.payload.canonicalId === "newProfile.fader.0",
+            "profile control sent the previous canonical ID");
+        check(doc.getElementById("desk-status") === pageStatus && pageStatus.textContent === "Connected",
+            "bank or profile change reset liveness");
+        doc.querySelector('[data-domain="output"]').click();
+        emit("ui-bank", { contextId: "bank.inputs", contexts });
+        check(page.currentDomain === "output" && !doc.querySelector(".channel-strip"),
+            "inactive input bank was accepted in output mode");
+        emit("REGISTRY_CHANGED", { profile: "another-profile" });
+        check(page.sentMessages.at(-1).payload.bankId === "bank.mixes",
+            "profile change in output mode requested the input bank");
+        frame.remove();
+    }
+
+    async function testDetailPage() {
+        const frame = await createMockPage("channel-detail.html");
+        const page = frame.contentWindow;
+        const doc = frame.contentDocument;
+        const client = page.wsClient;
+        const emit = (type, payload, requestId) =>
+            client._routeMessage({ type, payload, requestId });
+        const requests = () => page.sentMessages.filter(message => message.type === "get-ui-model");
+        const reply = request => {
+            const channel = Number(request.payload.contextId.split(".")[1]);
+            const payload = model(channel);
+            payload.viewType = request.payload.uiType;
+            emit("ui-model", payload, request.requestId);
+        };
+
+        emit("auth-status", { authenticated: true });
+        emit("server-event", { category: "LIVENESS", message: "Connected", details: { isConnected: true } });
+        const status = doc.getElementById("desk-status");
+        emit("ui-bank", { contextId: "bank.inputs", contexts: ["channel.0", "channel.1"] });
+        const firstRequest = requests().at(-1);
+        doc.querySelector('[data-context-id="channel.1"]').click();
+        const secondRequest = requests().at(-1);
+        reply(firstRequest);
+        check(!doc.querySelector(".channel-detail"), "detail accepted a stale channel model");
+        reply(secondRequest);
+        check(doc.querySelector(".channel-detail").dataset.contextId === "channel.1",
+            "detail did not render the selected channel");
+        emit("control-update", { canonicalId: "input.fader.1", value: 65 });
+        check(doc.querySelector(".group-fader input").value === "65",
+            "detail control update did not use selected canonical ID");
+
+        emit("REGISTRY_CHANGED", { profile: "new-profile" });
+        check(!doc.querySelector(".channel-detail"), "detail left old profile controls interactive");
+        reply(secondRequest);
+        check(!doc.querySelector(".channel-detail"), "detail accepted a model from the old profile");
+        check(page.sentMessages.at(-1).payload.bankId === "bank.inputs",
+            "detail did not request the new profile's bank");
+        emit("ui-bank", { contextId: "bank.inputs", contexts: ["channel.0"] });
+        reply(requests().at(-1));
+        check(doc.querySelector(".channel-detail").dataset.contextId === "channel.0",
+            "detail did not render the new profile");
+        check(doc.getElementById("desk-status") === status && status.textContent === "Connected",
+            "detail reset liveness while changing channel or profile");
+        frame.remove();
+    }
+</script>
+</body>
+</html>
