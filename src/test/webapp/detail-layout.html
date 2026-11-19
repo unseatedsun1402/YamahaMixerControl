@@ -23,6 +23,7 @@
 
         add("TOGGLE", "input.control", "On", "INPUT_CHANNEL_ON");
         add("TOGGLE", "channel.mute", "Mute", "INPUT_MUTE");
+        add("TOGGLE", "channel.solo", "Solo / Cue", "INPUT_SOLO", { min: 0, max: 1, value: 0 });
         add("TOGGLE", "channel.pair", "Pair", "INPUT_PAIR");
         add("SLIDER_HORIZONTAL", "input.pan", "Pan", "INPUT_PAN");
         add("KNOB", "channel.attenuation", "Attenuation", "INPUT_ATTENUATION");
@@ -96,6 +97,13 @@
         const sends = doc.querySelector('[data-group="input.send"]');
         const buses = doc.querySelector('[data-group="input.bus-routing"]');
         const muteGroups = doc.querySelector('[data-group="channel.mute-groups"]');
+        const solo = doc.querySelector('[data-role="INPUT_SOLO"]');
+        check(solo && solo.closest(".detail-column-left"), "solo control is missing from channel controls");
+        solo.querySelector("button").click();
+        check(page.sentMessages.filter(message => message.type === "set-control-value").at(-1)
+            .payload.canonicalId === solo.dataset.canonicalId, "solo changed the wrong control");
+        emit("control-update", { canonicalId: solo.dataset.canonicalId, value: 0 });
+        check(!solo.querySelector("button").classList.contains("active"), "solo did not update from desk");
         check(sends.parentElement === buses.parentElement, "sends and bus assignments are in different columns");
         check(sends.compareDocumentPosition(buses) & Node.DOCUMENT_POSITION_FOLLOWING,
             "bus assignments must follow sends");

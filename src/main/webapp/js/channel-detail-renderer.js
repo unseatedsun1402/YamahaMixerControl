@@ -22,6 +22,7 @@ const SECTION_TITLES = {
     "bus.fader":            "Fader",
     "bus.pan":              "Pan",
     "channel.mute":         "Mute",
+    "channel.solo":         "Solo / Cue",
     "channel.mute-groups":  "Mute Groups",
     "channel.pair":         "Pair",
     "channel.attenuation":  "Attenuation",
@@ -36,6 +37,7 @@ const SECTION_TITLES = {
 const SECTION_ORDER = [
     "input.control",
     "channel.mute",
+    "channel.solo",
     "channel.mute-groups",
     "channel.pair",
     "input.pan",
@@ -54,14 +56,18 @@ const COLUMN_GROUPS = {
     left: new Set([
         "input.control",
         "channel.mute",
+        "channel.solo",
         "channel.mute-groups",
         "channel.pair",
         "input.pan",
         "bus.pan",
-        "channel.attenuation",
-        "input.patch"
+        "input.patch",
+        "input.dynamics"
     ]),
-    center: new Set(["input.eq", "input.dynamics", "input.bus-routing"]),
+    center: new Set([
+        "channel.attenuation",
+        "input.eq"
+    ]),
     right: new Set([
         "input.send",
         "input.fader",

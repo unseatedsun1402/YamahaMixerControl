@@ -111,6 +111,7 @@
             statusElement.textContent === "Connected", "status changed while rendering");
         await testMainPage();
         await testDetailPage();
+        await testMonitorPage();
         document.getElementById("result").textContent = "PASS";
     } catch (error) {
         document.getElementById("result").textContent = `FAIL: ${error.stack}`;
@@ -168,6 +169,22 @@
         emit("ui-bank", { contextId: "bank.inputs", contexts });
         const firstRequests = requests().slice();
         reply(firstRequests[0]);
+        emit("ui-bank", { contextId: "bank.mute", contexts: ["mute.0"] });
+        const muteRequest = requests().at(-1);
+        const muteControl = {
+            type: "TOGGLE", uiGroup: "mute", label: "Mute 1", index: 0,
+            canonicalId: "kSceneMuteMaster.kMuteMaster.0", min: 0, max: 1,
+            value: 0, defaultValue: 0, readOnly: false
+        };
+        emit("ui-model", { contextId: "mute.0", viewType: "system-controls-view",
+            controls: [muteControl] }, muteRequest.requestId);
+        const muteButton = doc.querySelector(".mute-master-panel button");
+        check(muteButton, "mute master did not render");
+        muteButton.click();
+        check(page.sentMessages.filter(message => message.type === "set-control-value").at(-1)
+            .payload.canonicalId === muteControl.canonicalId, "mute master sent the wrong control");
+        emit("control-update", { canonicalId: muteControl.canonicalId, value: 0 });
+        check(!muteButton.classList.contains("active"), "mute master did not update from desk");
         const firstStrip = doc.querySelector(".channel-strip");
         const firstKnob = firstStrip.querySelector(".rotary-knob");
         const firstFader = firstStrip.querySelector(".fader-container");
@@ -194,6 +211,8 @@
         reply(nextRequests[1]);
         reply(nextRequests[0]);
         const visible = Array.from(doc.querySelectorAll(".channel-strip"));
+        check(doc.querySelector(".mute-master-panel button") === muteButton,
+            "mute masters disappeared when switching banks");
         check(visible.map(strip => strip.dataset.contextId).join(",") === "channel.8,channel.9",
             "bank responses rendered in the wrong order");
         check(visible[0] === firstStrip && visible[0].querySelector(".rotary-knob") === firstKnob,
@@ -218,6 +237,9 @@
             "returning bank did not restore its canonical binding");
 
         emit("REGISTRY_CHANGED", { profile: "new-profile" });
+        check(!doc.querySelector(".mute-master-panel button"), "old mute controls remained interactive");
+        emit("ui-model", { contextId: "mute.0", controls: [muteControl] }, muteRequest.requestId);
+        check(!doc.querySelector(".mute-master-panel button"), "old mute model was accepted after reload");
         check(!doc.querySelector(".channel-strip"), "old profile remained interactive");
         reply(returningRequests[1]);
         check(!doc.querySelector(".channel-strip"), "old profile model was accepted after registry change");
@@ -295,6 +317,42 @@
             "detail did not render the new profile");
         check(doc.getElementById("desk-status") === status && status.textContent === "Connected",
             "detail reset liveness while changing channel or profile");
+        frame.remove();
+    }
+
+    async function testMonitorPage() {
+        const frame = await createMockPage("settings.html");
+        const page = frame.contentWindow;
+        const doc = frame.contentDocument;
+        const emit = (type, payload, requestId) =>
+            page.wsClient._routeMessage({ type, payload, requestId });
+        emit("auth-status", { authenticated: true });
+        doc.querySelector('[data-tab="monitor"]').click();
+        check(page.sentMessages.some(message => message.type === "get-ui-bank" &&
+            message.payload.bankId === "bank.monitor"), "monitor bank was not requested");
+        emit("ui-bank", { contextId: "bank.monitor", contexts: ["monitor.0"] });
+        const request = page.sentMessages.filter(message => message.type === "get-ui-model").at(-1);
+        const id = "kSetupCue.kCueLocInput.0";
+        const control = {
+            type: "SELECT", uiGroup: "monitor", label: "Input cue point", index: 0,
+            canonicalId: id, min: 0, max: 2, value: 0, defaultValue: 0, readOnly: false,
+            options: [{ source: 0, name: "PFL" }, { source: 1, name: "AFL" },
+                { source: 2, name: "Post Pan" }]
+        };
+        emit("ui-model", { contextId: "monitor.0", controls: [control] }, request.requestId);
+        const select = doc.querySelector("#monitor-controls select");
+        check(select && select.options[1].textContent === "AFL", "monitor choices missing");
+        select.value = "1";
+        select.dispatchEvent(new Event("change"));
+        const change = page.sentMessages.filter(message => message.type === "set-control-value").at(-1);
+        check(change.payload.canonicalId === id && change.payload.value === 1,
+            "monitor selector sent the wrong value");
+        emit("control-update", { canonicalId: id, value: 2 });
+        check(select.value === "2", "monitor selector did not update from desk");
+        emit("REGISTRY_CHANGED", { profile: "new-profile" });
+        check(!doc.querySelector("#monitor-controls select"), "old monitor controls remained interactive");
+        emit("ui-model", { contextId: "monitor.0", controls: [control] }, request.requestId);
+        check(!doc.querySelector("#monitor-controls select"), "old monitor model was accepted");
         frame.remove();
     }
 </script>
