@@ -6,10 +6,8 @@ import MidiControl.Controls.SubControl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 public class ChannelContextDiscoverer implements ContextDiscoverer {
-  private static final Logger logger = Logger.getLogger(ChannelContextDiscoverer.class.getName());
 
   private static final Set<String> REAL_CHANNEL_GROUPS =
       Set.of(
