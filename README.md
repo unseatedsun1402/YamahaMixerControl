@@ -112,13 +112,20 @@ Load the index at http://\<ip-address-of-server\>:8080/MidiControl/settings.html
 and use the selectors to assign the input and output interfaces of the server
 to the Yamaha desk.
 
+### Desk Setup
+Go to the MIDI configuration page and set the output routing for MIDI to MIDI (DIN) or USB; remote (YAMAHA IP MIDI) is not supported at
+this time.
+
+Also configure the MIDI options to select NRPN:OMNI rather than Channel (CH) Table
+
+For RX and TX settings enable TX and RX for Parameter Control row
+Enable RX Only for the CC row.
+
 When the output is set you should be able to move faders and if the desk is receiving correctly faders on the desk should respond.
 
 When the input is set and the server is correctly receiving and interpretting the data then the gui should respond on the mix (main.html) page.
 
 Try moving some faders and see if it works
-
-You can either edit the channels.json resource in the webapps/MidiControl area or use the change name to use the index of each channel (1-48) and rename them through this basic api tool.
 
 ### ===== Protected areas ======
 

@@ -23,6 +23,7 @@ public class ContextDiscoveryEngine {
     this.discoverers.add(new OutputContextDiscoverer());
     this.discoverers.add(new MuteContextDiscoverer());
     this.discoverers.add(new MonitorContextDiscoverer());
+    this.discoverers.add(new DcaContextDiscoverer());
   }
 
   public void addDiscoverer(ContextDiscoverer d) {
