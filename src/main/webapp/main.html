@@ -26,10 +26,10 @@
         import { DeskStatusWidget } from "./js/widgets/liveness.js";
         import { installAuthentication } from "./js/authentication.js";
         import { renderControl } from "./js/control-renderer.js";
-        
+
         window.ribbonInitialised = false;
         window.lastBankContexts= [];
-        
+
         window.allContexts = [];
         window.currentBank = 0;
         window.channelsPerBank = 8;
@@ -37,7 +37,7 @@
         window.currentDomain = "input";
         window.channelMeters = new Map();
 
-        
+
         console.log(">>> MidiControl UI bootstrap running <<<");
 
         const contextPath = window.location.pathname.split('/')[1];
@@ -62,35 +62,44 @@
                     ws.sendMeterKeepAlive();
                 }, 10000);
             }
-            
+
             ws.setSessionType("control");
             console.info(`[Mix] Registering session type ${ws.sessionType}`);
         });
 
-
         function selectOutputMode() {
-
             pendingModels.clear();
             setStripContexts([]);
             window.currentDomain = "output";
             updateModeButtonState();
             window.currentView = "basic-master-view";
-            
+
             window.currentBank = 0;
             window.ribbonInitialised = false;
 
             ws.requestBank("bank.mixes");
         }
 
+        function selectDCAMode(){
+            pendingModels.clear();
+            setStripContexts([]);
+            window.currentDomain = "dca";
+            updateModeButtonState();
+            window.currentView = "system-controls-view";
+
+            window.currentBank = 0;
+            window.ribbonInitialised = false;
+
+            ws.requestBank("bank.dca");
+        }
 
         function selectInputMode() {
-
             pendingModels.clear();
             setStripContexts([]);
             window.currentDomain ="input";
             updateModeButtonState();
             window.currentView ="basic-input-view";
-            
+
             window.currentBank = 0;
             window.ribbonInitialised = false;
 
@@ -98,7 +107,6 @@
         }
 
         function handleViewSelection(sendId) {
-
             const view = sendId
                 ? `basic-sends-on-fader-view:${sendId}`
                 : "basic-input-view";
@@ -108,8 +116,21 @@
             loadBank(window.currentBank);
         }
 
+        function getBankIdForDomain(domain) {
+            switch (domain) {
+                case "input":
+                    return "bank.inputs";
+                case "output":
+                    return "bank.mixes";
+                case "dca":
+                    return "bank.dca";
+                default:
+                    throw new Error(`Unknown domain ${domain}`);
+            }
+        }
+
         function loadBank(bankIndex) {
-            window.currentBank = bankIndex;    
+            window.currentBank = bankIndex;
             console.log("Loading bank", bankIndex);
 
             document.querySelectorAll("#bank-selector .bank-btn[data-bank-index]").forEach(button => {
@@ -124,7 +145,7 @@
             const visibleContexts =
                 window.allContexts.slice(start, end);
             console.log("Contexts", visibleContexts);
-            
+
             setStripContexts(visibleContexts);
             pendingModels = new Map();
 
@@ -144,7 +165,8 @@
             modeControls.className = "bank-mode-controls";
             for (const [domain, label, selectMode] of [
                 ["input", "INPUT", selectInputMode],
-                ["output", "OUTPUT", selectOutputMode]
+                ["output", "OUTPUT", selectOutputMode],
+                ["dca", "DCA", selectDCAMode]
             ]) {
                 const modeButton = document.createElement("button");
                 modeButton.type = "button";
@@ -200,7 +222,7 @@
                 button.setAttribute("aria-pressed", String(isActive));
             });
         }
-        
+
         ws.on("ui-bank", (bank) => {
             if (bank.contextId === "bank.mute") {
                 mutePanel.replaceChildren();
@@ -211,7 +233,7 @@
                 }
                 return;
             }
-            const expectedBank = window.currentDomain === "output" ? "bank.mixes" : "bank.inputs";
+            const expectedBank = getBankIdForDomain(window.currentDomain);
             if (bank.contextId !== expectedBank) {
                 console.debug("[Bootstrap] Ignoring bank for inactive mode:", bank.contextId);
                 return;
@@ -257,7 +279,7 @@
                 }
                 return;
             }
-            
+
             console.log("UI MODEL RECEIVED", model.contextId);
             if (pendingModels.get(model.contextId) !== model.__meta?.requestId) {
                 console.debug("[Bootstrap] Ignoring stale UI model:", model.contextId);
@@ -272,7 +294,7 @@
                 );
                 window.ribbonInitialised = true;
             }
-            
+
             renderUiModel(model);
             const container = document.getElementById("strip-container");
             const order = window.allContexts.slice(
@@ -316,11 +338,10 @@
             mutePanel.replaceChildren();
             pendingMuteModel = null;
             ws.requestBank("bank.mute");
-            ws.requestBank(window.currentDomain === "output" ? "bank.mixes" : "bank.inputs");
+            ws.requestBank(getBankIdForDomain(window.currentDomain));
         });
 
         ws.on("server-event", handleServerEvent)
-        
         function handleServerEvent(event) {
             if (event.category === "LIVENESS") {
                 deskStatusWidget.update(event);
@@ -330,7 +351,7 @@
         ws.connect();
         window.wsClient = ws;
     </script>
-</head>
+    </head>
 
 <body>
     <div id="ui-root">
@@ -338,7 +359,6 @@
         <div id="bank-selector"></div>
         <div id="strip-container"></div>
     </div>
-
 </body>
 
 </html>
