@@ -18,10 +18,16 @@ export function createStripElement(ctxId) {
     title.className = "context-title";
     title.textContent = ctxId;
 
+    const editBtn = document.createElement("a");
+    editBtn.className = "channel-edit-btn soft-key";
+    editBtn.textContent = "ADV";
+    editBtn.title = "Edit channel";
+
     const meter = createLedMeter();
     meter.classList.add("strip-meter");
 
     header.appendChild(title);
+    header.appendChild(editBtn);
     header.appendChild(meter);
 
     strip.appendChild(header);
@@ -76,6 +82,13 @@ export function updateStrip(stripEl, model) {
     const controlElements = new Map();
 
     const grouped = {};
+
+    const editBtn = stripEl.querySelector(".channel-edit-btn");
+
+    if (editBtn) {
+        editBtn.href =
+            `/MidiControl/channel-detail.html?contextId=${encodeURIComponent(model.contextId)}`;
+    }
 
     for (const c of model.controls) {
         if (!grouped[c.uiGroup]) {
