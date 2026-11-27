@@ -27,10 +27,13 @@
         import { DeskStatusWidget } from "./js/widgets/liveness.js";
         import { installAuthentication } from "./js/authentication.js";
 
+        const params = new URLSearchParams(window.location.search);
+        const requestedContext = params.get("contextId");
+
         window.allContexts = [];
         window.currentBank = 0;
         window.channelsPerBank = 8;
-        window.currentDomain = "input";
+        window.currentDomain = getDomainForContext(requestedContext);
         window.channelMeters = new Map();
         window.selectedContextId = null;
         let deskStatusWidget;
@@ -49,8 +52,19 @@
         // ---- Connection lifecycle ----
 
         ws.on("connected", () => {
-            console.info("[Detail] Connected — requesting bank.inputs…");
-            ws.requestBank("bank.inputs");
+            console.info("[Detail] Connected — requesting bank");
+            switch (window.currentDomain) {
+                case "output":
+                    ws.requestBank("bank.mixes");
+                    break;
+
+                case "dca":
+                    ws.requestBank("bank.dca");
+                    break;
+
+                default:
+                    ws.requestBank("bank.inputs");
+            }
             ws.sendMeterKeepAlive();
 
             if (!ws.keepAliveInterval) {
@@ -225,6 +239,21 @@
                 });
         }
 
+        function getDomainForContext(contextId) {
+            if (!contextId) return "input";
+
+            if (contextId.startsWith("channel.")) { return "input"; }
+            if (
+                contextId.startsWith("aux.") ||
+                contextId.startsWith("mix.") ||
+                contextId.startsWith("stereo.")
+            ) { return "output"; }
+
+            if (contextId.startsWith("dca.")) { return "dca"; }
+
+            return "input";
+        }
+
         // ---- Ribbon ----
 
         function buildRibbon() {
@@ -272,7 +301,19 @@
                 ws.subscribe(ctxId);
             }
             buildBankSelector();
-            loadBank(0);
+            
+            if (requestedContext &&
+                window.allContexts.includes(requestedContext)) {
+
+                const index = window.allContexts.indexOf(requestedContext);
+                const bank = Math.floor(index / window.channelsPerBank);
+
+                loadBank(bank);
+                selectChannel(requestedContext);
+            }
+            else {
+                loadBank(0);
+            }
         });
 
         ws.on("ui-model", (model) => {
