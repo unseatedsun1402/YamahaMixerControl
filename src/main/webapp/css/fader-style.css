@@ -98,7 +98,11 @@
 }
 
 .fader-role-master .fader-thumb {
-    background-image: url("assets/fader-thumb-green.svg");
+    background-image: url("assets/fader-thumb-red.svg");
+}
+
+.fader-role-dca .fader-thumb{
+    background-image: url("assets/fader-thumb-black.svg");
 }
 
 
