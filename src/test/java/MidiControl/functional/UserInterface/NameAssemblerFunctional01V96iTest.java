@@ -35,22 +35,69 @@ public class NameAssemblerFunctional01V96iTest {
         return assembler;
     }
 
-    private byte[] buildNameSysex(int subControlindex, int channel, int ascii) {
+    private byte[] buildNameSysex(
+        CanonicalRegistry registry,
+        String group,
+        String subControl,
+        int channel,
+        int value) {
 
-        return new byte[] {
-            (byte)0xF0,
-            (byte)0x43,
-            (byte)0x10,     // "1n" for MIDI device/channel
-            (byte)0x3E,
-            (byte)0x1A,
-            (byte)0x02,
-            (byte)0x04,
-            (byte)(subControlindex),  // offset selects long-name position
-            (byte)(channel),        // "cc" → CHANNEL INDEX
-            0, 0, 0,                // remaining dd dd dd
-            (byte)(ascii),          // ascii chr      
-            (byte)0xF7
-        };
+        ControlGroup cg = registry.getGroup(group);
+        assertNotNull(cg, "Missing group " + group);
+
+        SubControl sc = cg.getSubcontrol(subControl);
+        assertNotNull(sc, "Missing subcontrol " + subControl);
+
+        ControlInstance ci = sc.getInstances().get(channel);
+        assertNotNull(ci);
+
+        SysexMapping mapping = ci.getSysex();
+
+        byte[] msg = mapping.buildChangeMessage(value,channel);
+
+        return msg;
+    }
+
+    private byte[] buildInputNameSysex(
+        CanonicalRegistry registry,
+        int shortIndex,
+        int channel,
+        int value) {
+
+        return buildNameSysex(
+            registry,
+            "kInputChannelName",
+            "kChannelNameShort" + (shortIndex + 1),
+            channel,
+            value);
+    }
+
+    private byte[] buildAuxNameSysex(
+        CanonicalRegistry registry,
+        int shortIndex,
+        int auxIndex,
+        int value) {
+
+        return buildNameSysex(
+            registry,
+            "kAUXModuleName",
+            "kAUXModuleNameShort" + (shortIndex + 1),
+            auxIndex,
+            value);
+    }
+
+    private byte[] buildBusNameSysex(
+        CanonicalRegistry registry,
+        int shortIndex,
+        int auxIndex,
+        int value) {
+
+        return buildNameSysex(
+            registry,
+            "kBusModuleName",
+            "kBusModuleNameShort" + (shortIndex + 1),
+            auxIndex,
+            value);
     }
 
     @Test
@@ -83,21 +130,21 @@ public class NameAssemblerFunctional01V96iTest {
         SysexMessage sysex2 = new SysexMessage();
         SysexMessage sysex3 = new SysexMessage();
 
-        int messageLength = buildNameSysex(0, 0, 'K').length;
+        int messageLength = buildInputNameSysex(registry,0, 0, 'K').length;
         // long index 0 = K
-        sysex.setMessage(buildNameSysex(0, 0, 'K'),messageLength);
+        sysex.setMessage(buildInputNameSysex(registry,0, 0, 'K'),messageLength);
         server.addtoinputqueue(sysex);
 
         // long index 1 = i
-        sysex1.setMessage(buildNameSysex(1, 0, 'i'),messageLength);
+        sysex1.setMessage(buildInputNameSysex(registry,1, 0, 'i'),messageLength);
         server.addtoinputqueue(sysex1);
 
         // long index 2 = c
-        sysex2.setMessage(buildNameSysex(2, 0, 'c'),messageLength);
+        sysex2.setMessage(buildInputNameSysex(registry,2, 0, 'c'),messageLength);
         server.addtoinputqueue(sysex2);
 
         // long index 3 = k
-        sysex3.setMessage(buildNameSysex(3, 0, 'k'),messageLength);
+        sysex3.setMessage(buildInputNameSysex(registry,3, 0, 'k'),messageLength);
         server.addtoinputqueue(sysex3);
         server.processIncomingMidiForTest();
         // --------- 6. Verify assembled long name ---------
@@ -137,18 +184,18 @@ public class NameAssemblerFunctional01V96iTest {
             ));
         }
 
-        int len = buildNameSysex(0, 0, 'K').length;
+        int len = buildInputNameSysex(registry,0, 0, 'K').length;
 
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(0, 0, 'K'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(1, 0, 'i'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(2, 0, 'c'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(3, 0, 'k'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,0, 0, 'K'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,1, 0, 'i'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,2, 0, 'c'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,3, 0, 'k'), len));
 
         // Channel 1 → Snr
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(0, 1, 'S'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(1, 1, 'n'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(2, 1, 'r'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(3, 1, ' '), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,0, 1, 'S'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,1, 1, 'n'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,2, 1, 'r'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,3, 1, ' '), len));
 
         server.processIncomingMidiForTest();
         Thread.sleep(900);
@@ -184,13 +231,13 @@ public class NameAssemblerFunctional01V96iTest {
         AtomicReference<String> result = new AtomicReference<>();
         ChannelNameAssembler test = assemblersAdd(new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name)));
 
-        int len = buildNameSysex(0, 0, 'K').length;
+        int len = buildInputNameSysex(registry,0, 0, 'K').length;
 
         // Send updates OUT OF ORDER:
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(3, 0, 'k'), len)); // pos4
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(1, 0, 'i'), len)); // pos2
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(2, 0, 'c'), len)); // pos3
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(0, 0, 'K'), len)); // pos1
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,3, 0, 'k'), len)); // pos4
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,1, 0, 'i'), len)); // pos2
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,2, 0, 'c'), len)); // pos3
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,0, 0, 'K'), len)); // pos1
 
         server.processIncomingMidiForTest();
         Thread.sleep(900);
@@ -219,12 +266,12 @@ public class NameAssemblerFunctional01V96iTest {
         AtomicReference<String> result = new AtomicReference<>();
         ChannelNameAssembler test = assemblersAdd(new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name)));
 
-        int len = buildNameSysex(0, 0, 'K').length;
+        int len = buildInputNameSysex(registry,0, 0, 'K').length;
 
         // Missing “Short2” deliberately
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(0, 0, 'K'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(2, 0, 'c'), len)); // Short3
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(3, 0, 'k'), len)); // Short4
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,0, 0, 'K'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,2, 0, 'c'), len)); // Short3
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,3, 0, 'k'), len)); // Short4
 
         server.processIncomingMidiForTest();
         Thread.sleep(900);
@@ -255,17 +302,17 @@ public class NameAssemblerFunctional01V96iTest {
         AtomicReference<String> result = new AtomicReference<>();
         assemblersAdd(new ChannelNameAssembler(ctx0, registry, (id, name) -> result.set(name)));
 
-        int len = buildNameSysex(0, 0, 'K').length;
+        int len = buildInputNameSysex(registry,0, 0, 'K').length;
 
         // Initial name: "Kick"
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(0, 0, 'K'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(1, 0, 'i'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(2, 0, 'c'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(3, 0, 'k'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,0, 0, 'K'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,1, 0, 'i'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,2, 0, 'c'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,3, 0, 'k'), len));
 
         // User edits name → "Fook"
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(0, 0, 'F'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(1, 0, 'o'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,0, 0, 'F'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,1, 0, 'o'), len));
 
         server.processIncomingMidiForTest();
         Thread.sleep(900);
@@ -297,16 +344,16 @@ public class NameAssemblerFunctional01V96iTest {
                 (id,name)->results.put(id, name))));
         }
         
-        int len = buildNameSysex(0, 0, 'K').length;
+        int len = buildInputNameSysex(registry,0, 0, 'K').length;
         // Channel 0 and 1 interleaved
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(0, 0, 'K'), len)); // ch0
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(0, 1, 'S'), len)); // ch1
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(1, 0, 'i'), len)); // ch0
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(1, 1, 'n'), len)); // ch1
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(2, 0, 'c'), len)); // ch0
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(2, 1, 'r'), len)); // ch1
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(3, 0, 'k'), len)); // ch0
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(3, 1, ' '), len)); // ch1
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,0, 0, 'K'), len)); // ch0
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,0, 1, 'S'), len)); // ch1
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,1, 0, 'i'), len)); // ch0
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,1, 1, 'n'), len)); // ch1
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,2, 0, 'c'), len)); // ch0
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,2, 1, 'r'), len)); // ch1
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,3, 0, 'k'), len)); // ch0
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,3, 1, ' '), len)); // ch1
 
         server.processIncomingMidiForTest();
 
@@ -336,10 +383,10 @@ public class NameAssemblerFunctional01V96iTest {
         AtomicReference<String> result = new AtomicReference<>();
         assemblersAdd(new ChannelNameAssembler(ctx0, registry, (id,name)->result.set(name)));
 
-        int len = buildNameSysex(0, 0, 0xFF).length;
+        int len = buildInputNameSysex(registry,0, 0, 0xFF).length;
 
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(0, 0, 0xFF), len)); // invalid
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(1, 0, 'i'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,0, 0, 0xFF), len)); // invalid
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,1, 0, 'i'), len));
 
         server.processIncomingMidiForTest();
         Thread.sleep(900);
@@ -367,13 +414,13 @@ public class NameAssemblerFunctional01V96iTest {
         List<String> events = new ArrayList<>();
         assemblersAdd(new ChannelNameAssembler(ctx0, registry, (id,name)->events.add(name)));
 
-        int len = buildNameSysex(0, 0, 'K').length;
+        int len = buildInputNameSysex(registry,0, 0, 'K').length;
 
         // Burst of rapid updates (< debounce time)
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(0, 0, 'K'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(1, 0, 'i'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(2, 0, 'c'), len));
-        server.addtoinputqueue(new SysexMessage(buildNameSysex(3, 0, 'k'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,0, 0, 'K'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,1, 0, 'i'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,2, 0, 'c'), len));
+        server.addtoinputqueue(new SysexMessage(buildInputNameSysex(registry,3, 0, 'k'), len));
 
         server.processIncomingMidiForTest();
         Thread.sleep(100);  // No output yet (debounce still active)
@@ -386,6 +433,98 @@ public class NameAssemblerFunctional01V96iTest {
         assertEquals(1, events.size(),
             "Only one assembled name should be emitted");
         assertEquals("Kick", events.get(0));
+    }
+
+    @Test
+    public void testAuxNameEndToEnd() throws Exception {
+
+        List<SysexMapping> mappings =
+            SysexMappingLoader.loadMappingsFromResource(
+                "MidiControl/01v96i_sysex_mappings.json");
+
+        SysexParser parser = new SysexParser(mappings);
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
+        registry.setDeskType("YAMAHA_01V96I");
+
+        MockMidiServer server = new MockMidiServer(registry);
+
+        Context auxContext = new ContextDiscoveryEngine(registry)
+            .discoverContexts()
+            .stream()
+            .filter(c -> c.getId().equals("name.aux.0"))
+            .findFirst()
+            .orElseThrow();
+
+        AtomicReference<String> lastName = new AtomicReference<>();
+
+        assemblersAdd(new ChannelNameAssembler(
+            auxContext,
+            registry,
+            (id, name) -> lastName.set(name)));
+
+        int len = buildAuxNameSysex(registry,0, 0, 'A').length;
+
+        server.addtoinputqueue(
+            new SysexMessage(buildAuxNameSysex(registry,0, 0, 'A'), len));
+
+        server.addtoinputqueue(
+            new SysexMessage(buildAuxNameSysex(registry,1, 0, 'u'), len));
+
+        server.addtoinputqueue(
+            new SysexMessage(buildAuxNameSysex(registry,2, 0, 'x'), len));
+
+        server.processIncomingMidiForTest();
+
+        Thread.sleep(1100);
+
+        assertEquals("Aux", lastName.get());
+    }
+
+    @Test
+    public void testBusNameEndToEnd() throws Exception {
+
+        List<SysexMapping> mappings =
+            SysexMappingLoader.loadMappingsFromResource(
+                "MidiControl/01v96i_sysex_mappings.json");
+
+        ChannelNameAssembler.enableDebug();
+
+        SysexParser parser = new SysexParser(mappings);
+        CanonicalRegistry registry = new CanonicalRegistry(mappings, parser);
+        registry.setDeskType("YAMAHA_01V96I");
+
+        MockMidiServer server = new MockMidiServer(registry);
+
+        Context busContext = new ContextDiscoveryEngine(registry)
+            .discoverContexts()
+            .stream()
+            .filter(c -> c.getId().equals("name.bus.0"))
+            .findFirst()
+            .orElseThrow();
+
+        AtomicReference<String> lastName = new AtomicReference<>();
+
+        assemblersAdd(new ChannelNameAssembler(
+            busContext,
+            registry,
+            (id, name) -> lastName.set(name)));
+
+        int len = buildBusNameSysex(registry,0, 0, 'B').length;
+
+        server.addtoinputqueue(
+            new SysexMessage(buildBusNameSysex(registry,0, 0, 'B'), len));
+
+        server.addtoinputqueue(
+            new SysexMessage(buildBusNameSysex(registry,1, 0, 'u'), len));
+
+        server.addtoinputqueue(
+            new SysexMessage(buildBusNameSysex(registry,2, 0, 's'), len));
+
+        server.processIncomingMidiForTest();
+
+        Thread.sleep(1100);
+
+        assertEquals("Bus", lastName.get());
     }
 
 }

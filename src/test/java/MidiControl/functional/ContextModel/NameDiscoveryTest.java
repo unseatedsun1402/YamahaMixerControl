@@ -14,6 +14,17 @@ import java.util.stream.Collectors;
 
 public class NameDiscoveryTest {
 
+    private long countContextsForGroup(
+        List<Context> contexts,
+        String groupName)
+    {
+        return contexts.stream()
+            .filter(c -> c.getContextType() == ContextType.NAME)
+            .filter(c -> c.getFilters().stream()
+                .anyMatch(f -> groupName.equals(f.getControlGroup())))
+            .count();
+    }
+
     @Test
     public void test01V96INameDiscovery() {
 
@@ -30,43 +41,25 @@ public class NameDiscoveryTest {
 
         assertFalse(nameContexts.isEmpty(), "No name contexts discovered!");
 
-        boolean hasInputNames = nameContexts.stream()
-            .anyMatch(ctx -> ctx.getId().startsWith("name.") &&
-                             ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kInput")));
-
         boolean hasMixNames = nameContexts.stream()
             .anyMatch(ctx -> ctx.getId().startsWith("name.") &&
                              ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kMix")));
 
-        boolean hasAuxNames = nameContexts.stream()
-            .anyMatch(ctx -> ctx.getId().startsWith("name.") &&
-                             ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kAUX")));
-
-        boolean hasMatrixNames = nameContexts.stream()
-            .anyMatch(ctx -> ctx.getId().startsWith("name.") &&
-                             ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kMatrix")));
-
         boolean hasDcaNames = nameContexts.stream()
             .anyMatch(ctx -> ctx.getId().startsWith("name.") &&
                              ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kDCA")));
-
-        assertTrue(hasInputNames, "Input channel names not discovered!");
-
         
-        assertEquals(32, nameContexts.stream()
-            .filter(ctx -> ctx.getFilters().stream()
-                .anyMatch(f ->
-                    f.getControlGroup().equals("kInputChannelName") &&
-                    f.getSubControl().equals("kChannelNameShort1")
-                )
-            )
-            .count(),
-            "Expected 40 01V96i input channel name contexts");
+        assertFalse(hasMixNames,"01V96i should not expose Mix name contexts");
+        assertFalse(hasDcaNames,"01V96i should not expose DCA name contexts");
 
-        // assertFalse(hasMixNames, "Mix bus names not discovered!"); // auxes on 01v96i not mixes
-        // assertTrue(hasAuxNames, "Aux bus names not discovered!");
-        // assertTrue(hasMatrixNames, "Matrix names not discovered!");
-        // assertFalse(hasDcaNames, "DCA names not discovered!");  // no dcas on 01v96i
+        assertEquals(32,
+            countContextsForGroup(nameContexts, "kInputChannelName"));
+
+        assertEquals(8,
+            countContextsForGroup(nameContexts, "kAUXModuleName"));
+
+        assertEquals(8,
+            countContextsForGroup(nameContexts, "kBusModuleName"));
 
         boolean hasShortNames = nameContexts.stream()
             .flatMap(ctx -> ctx.getFilters().stream())
@@ -78,7 +71,7 @@ public class NameDiscoveryTest {
                            f.getControlGroup().contains("NameMixModule"));
 
         assertTrue(hasShortNames, "Short (4 char) names not detected!");
-        // assertTrue(hasLongNames, "Long (8–16 char) names not detected!");
+        assertTrue(hasLongNames, "Long (8–16 char) names not detected!");
     }
 
     @Test
@@ -97,27 +90,17 @@ public class NameDiscoveryTest {
 
         assertFalse(nameContexts.isEmpty(), "No name contexts discovered!");
 
-        boolean hasInputNames = nameContexts.stream()
-            .anyMatch(ctx -> ctx.getId().startsWith("name.") &&
-                             ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kNameInput")));
+        assertEquals(56,
+            countContextsForGroup(nameContexts, "kNameInputChannel"));
 
-        boolean hasMixNames = nameContexts.stream()
-            .anyMatch(ctx -> ctx.getId().startsWith("name.") &&
-                             ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kNameMix")));
+        assertEquals(8,
+            countContextsForGroup(nameContexts, "kDCAName"));
 
-        boolean hasAuxNames = nameContexts.stream()
-            .anyMatch(ctx -> ctx.getId().startsWith("name.") &&
-                             ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kNameAUX")));
+        assertEquals(16,
+            countContextsForGroup(nameContexts, "kNameMixModule"));
 
-        boolean hasMatrixNames = nameContexts.stream()
-            .anyMatch(ctx -> ctx.getId().startsWith("name.") &&
-                             ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kNameMatrix")));
-
-        boolean hasDcaNames = nameContexts.stream()
-            .anyMatch(ctx -> ctx.getId().startsWith("name.") &&
-                             ctx.getFilters().stream().anyMatch(f -> f.getControlGroup().contains("kDCA")));
-
-        assertTrue(hasInputNames, "Input channel names not discovered!");
+        assertEquals(8,
+            countContextsForGroup(nameContexts, "kNameMatrixModule"));
 
         assertEquals(56, nameContexts.stream()
             .filter(ctx -> ctx.getFilters().stream()

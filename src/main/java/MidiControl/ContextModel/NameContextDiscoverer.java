@@ -109,8 +109,7 @@ public class NameContextDiscoverer implements ContextDiscoverer {
     }
 
     private boolean isNameSubcontrol(String groupName, String subControlName) {
-        return groupName.contains("Name")
-            && (subControlName.contains("Short") || subControlName.contains("Long"));
+        return groupName.contains("Name");
     }
 
     private int namePartOrder(String subControlName) {
@@ -124,28 +123,60 @@ public class NameContextDiscoverer implements ContextDiscoverer {
     }
 
     private String normaliseNameGroup(String groupName) {
-        String key = groupName;
 
-        key = key.replaceFirst("^k", "");
-        key = key.replace("Name", "");
-        key = key.replace("Channel", "");
-        key = key.replace("Input", "input");
-        key = key.replace("Mix", "mix");
-        key = key.replace("AUX", "aux");
-        key = key.replace("Aux", "aux");
-        key = key.replace("Matrix", "matrix");
-        key = key.replace("DCA", "dca");
-
-        key = key.replaceAll("[^A-Za-z0-9]+", "").toLowerCase();
-
-        if (key.isBlank()) {
-            return groupName.toLowerCase();
+        if (groupName.contains("Input")) {
+            return "input";
         }
 
-        return key;
+        if (groupName.contains("DCA")) {
+            return "dca";
+        }
+
+        if (groupName.contains("Mix")) {
+            return "mix";
+        }
+
+        if (groupName.contains("Matrix")) {
+            return "matrix";
+        }
+
+        if (groupName.contains("AUX")
+            || groupName.contains("Aux")) {
+            return "aux";
+        }
+
+        if (groupName.contains("Bus")) {
+            return "bus";
+        }
+
+        return groupName
+            .replaceFirst("^k", "")
+            .replace("Name", "")
+            .replaceAll("[^A-Za-z0-9]+", "")
+            .toLowerCase();
     }
 
-    private String displayNameFor(String groupName, int channelIndex) {
-        return groupName + " Name " + (channelIndex + 1);
+    private String displayNameFor(String groupName, int index) {
+        if (groupName.contains("Input")) {
+            return "Input " + (index + 1) + " Name";
+        }
+
+        if (groupName.contains("DCA")) {
+            return "DCA " + (index + 1) + " Name";
+        }
+
+        if (groupName.contains("Mix") || groupName.contains("Bus")) {
+            return "Mix " + (index + 1) + " Name";
+        }
+
+        if (groupName.contains("Matrix")) {
+            return "Matrix " + (index + 1) + " Name";
+        }
+
+        if (groupName.contains("AUX") || groupName.contains("Aux")) {
+            return "Aux " + (index + 1) + " Name";
+        }
+
+        return groupName + " Name " + (index + 1);
     }
 }

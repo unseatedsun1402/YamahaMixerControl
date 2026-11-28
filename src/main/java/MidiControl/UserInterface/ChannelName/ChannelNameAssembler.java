@@ -89,11 +89,6 @@ public class ChannelNameAssembler implements ControlListener {
 
         for (ContextFilter filter : context.getFilters()) {
 
-            if (!"kInputChannelName".equals(filter.getControlGroup())
-                && !"kNameInputChannel".equals(filter.getControlGroup())) {
-                continue;
-            }
-
             ControlGroup cg = registry.getGroup(filter.getControlGroup());
             if (cg == null) continue;
 
